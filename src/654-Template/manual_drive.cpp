@@ -1,4 +1,5 @@
-#include "manual_drive.h"
+#include "654-Template/motor_chain.h"
+#include "654-Template/auton_drive.h"
 #include "util.h"
 #include "vex.h"
 

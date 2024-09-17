@@ -1,8 +1,9 @@
 #ifndef MANUAL_DRIVE_H
 #define MANUAL_DRIVE_H
 
+#include "654-Template/motor_chain.h"
+#include "654-Template/auton_drive.h"
 #include "vex.h"
-#include "motor_chain.h"
 
 class manual_drive {   
 public:

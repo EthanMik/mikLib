@@ -2,8 +2,6 @@
 #define MOTOR_CHAIN_H
 
 #include "vex.h"
-#include <algorithm>
-#include <cmath>
 
 // Enum for different velocity units
 enum class velocity_units {normalized, rpm, percent, volt};

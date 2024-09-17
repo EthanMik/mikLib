@@ -1,11 +1,19 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include "654-Template/motor_chain.h"
+#include "654-Template/manual_drive.h"
+#include "654-Template/auton_drive.h"
+#include "robot-config.h"
 #include "vex.h"
-#include <algorithm>
-#include <cmath>
 
-// Cnvert RPM to voltage
+// Clamp a value between a minimum and maximum
+float clamp(float input, float min, float max);
+
+// Returns zero for input less than absolute value width
+float deadband(float input, float width);
+
+// Convert RPM to voltage
 float rpm_to_volt(float rpm, float maxRPM = 600.0);
 
 // Convert percentage to voltage
@@ -22,11 +30,5 @@ float volt_to_percent(float volt);
 
 // Convert voltage to normalized value
 float volt_to_normalized(float volt);
-
-// Clamp a value between a minimum and maximum
-float clamp(float input, float min, float max);
-
-// Returns zero for input less than absolute value width
-float deadband(float input, float width);
 
 #endif
