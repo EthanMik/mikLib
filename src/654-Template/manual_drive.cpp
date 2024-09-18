@@ -3,6 +3,9 @@
 #include "util.h"
 #include "vex.h"
 
+manual_drive::manual_drive(motor_chain left, motor_chain right)
+  : leftDrive(left), rightDrive(right) {};
+
 void manual_drive::control_drivetrain()
 {
   while (1)
@@ -11,11 +14,11 @@ void manual_drive::control_drivetrain()
     float turn = deadband(controller(primary).Axis1.value(), 5);
 
     leftDrive.spin(fwd, percent_to_volt(throttle + turn), velocity_units::volt);
-    rightDrive.spin(fwd, percent_to_volt(throttle - turn), velocity_units::volt);
+    rightDrive.spin(fwd, percent_to_volt(throttle - turn), velocity_units::volt);    
   }
 }
 
 void manual_drive::control_drive_tasks()
 {
-  thread(control_drivetrain);
+  thread(control_drivetrain());
 }

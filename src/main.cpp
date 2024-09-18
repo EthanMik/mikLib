@@ -13,7 +13,6 @@ int main() {
   motor_chain rightDrive(PORT7, false, PORT7, false, PORT9, false, ratio18_1);
 
   manual_drive manual_drive(leftDrive, rightDrive);
-  auton_drive auton();
 
   manual_drive.control_drive_tasks();
   
