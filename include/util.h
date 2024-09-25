@@ -31,4 +31,8 @@ float volt_to_percent(float volt);
 // Convert voltage to normalized value
 float volt_to_normalized(float volt);
 
+float reduce_negative_180_to_180(float angle);
+
+float reduce_0_to_360(float angle);
+
 #endif

@@ -7,10 +7,10 @@ using namespace vex;
 
 motor_chain::motor_chain(int MotorF_port, bool reverseF, int MotorM_port, bool reverseM, int MotorB_port, bool reverseB, 
         vex::gearSetting ratio):
+    maxRPM(get_max_rpm(ratio)),
     motorF(MotorF_port, ratio, reverseF),
     motorM(MotorM_port, ratio, reverseM),
-    motorB(MotorB_port, ratio, reverseB),
-    maxRPM(get_max_rpm(ratio))
+    motorB(MotorB_port, ratio, reverseB)
 {
 }
 

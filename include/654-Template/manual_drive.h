@@ -11,8 +11,8 @@ public:
 
     void control_drive_tasks();
 
-    void control_drivetrain();
-
+    void control_split_arcade(float speedLimiter = 1);
+    
 public:
     motor_chain leftDrive;
     motor_chain rightDrive;
