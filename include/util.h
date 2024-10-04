@@ -37,6 +37,8 @@ float to_rad(float angle_deg);
 // Converts degrees into normalized vector
 std::vector<float> to_normalized_vector(float angle);
 
+float get_vector_distance(std::vector<float> v1, std::vector<float> v2);
+
 float reduce_negative_180_to_180(float angle);
 
 float reduce_0_to_360(float angle);

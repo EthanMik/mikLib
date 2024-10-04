@@ -60,6 +60,10 @@ std::vector<float> to_normalized_vector(float angle) {
   std::vector<float> coordinates {x, y};
   return(coordinates);
 }
+//√( (x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2 )
+float get_vector_distance(std::vector<float> v1, std::vector<float> v2) {
+  return sqrt(pow(v2[0] - v1[0], 2) + pow(v2[1] - v1[1], 2));
+}
 
 float reduce_negative_180_to_180(float angle) {
   while(!(angle >= -180 && angle < 180)) {

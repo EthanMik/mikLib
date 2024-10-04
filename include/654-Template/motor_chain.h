@@ -53,6 +53,8 @@ public:
     vex::motor motorF;  // Front motor
     vex::motor motorM;  // Middle motor
     vex::motor motorB;  // Back motor
+
+    //std::vector<vex::motor> motors;
 };
 
 #endif

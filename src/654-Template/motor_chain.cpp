@@ -12,6 +12,7 @@ motor_chain::motor_chain(int MotorF_port, bool reverseF, int MotorM_port, bool r
     motorM(MotorM_port, ratio, reverseM),
     motorB(MotorB_port, ratio, reverseB)
 {
+    //motors.insert(motors.end(), {motorF, motorM, motorB});
 }
 
 void motor_chain::spin(vex::directionType direction, float speed, velocity_units velocityUnits)
