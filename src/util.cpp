@@ -49,6 +49,18 @@ float volt_to_normalized(float volt) {
     return volt / 12.0;
 }
 
+float to_rad(float angle_deg){
+  return(angle_deg / (180.0 / M_PI));
+}
+
+std::vector<float> to_normalized_vector(float angle) {
+  float radians = to_rad(angle);
+  float x = cosf(radians);
+  float y = sinf(radians);
+  std::vector<float> coordinates {x, y};
+  return(coordinates);
+}
+
 float reduce_negative_180_to_180(float angle) {
   while(!(angle >= -180 && angle < 180)) {
     if(angle < -180) { 

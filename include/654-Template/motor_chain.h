@@ -7,7 +7,8 @@
 enum class velocity_units {normalized, rpm, percent, volt};
 
 // Class to manage a group of three motors, similar to VEX motor group but with extended functionality
-class motor_chain {
+class motor_chain 
+{
 public:
     // Constructor: initializes three motors with their ports, directions, and gear ratio
     motor_chain(int MotorF_port, bool reverseF, int MotorM_port, bool reverseM, int MotorB_port, bool reverseB, vex::gearSetting ratio);

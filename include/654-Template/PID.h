@@ -25,15 +25,20 @@ public:
     float output = 0;
     float time_spent_settled = 0;
     float time_spent_running = 0;
-    std::vector<std::vector<float>> matrix;
 
     PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout);
 
     PID(float error, float kp, float ki, float kd, float starti);
 
-    float compute(float error);
+    float compute(float error, bool is_tracking = false);
 
     bool is_settled();
 
+    void print_PID() const;
+
+private:
+    std::vector<std::vector<float>> pid_data;
+
     std::vector<std::vector<float>> track_PID(float data1, float data2, float data3, float data4);
+
 };

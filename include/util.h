@@ -31,6 +31,12 @@ float volt_to_percent(float volt);
 // Convert voltage to normalized value
 float volt_to_normalized(float volt);
 
+// Converts degrees to radians
+float to_rad(float angle_deg);
+
+// Converts degrees into normalized vector
+std::vector<float> to_normalized_vector(float angle);
+
 float reduce_negative_180_to_180(float angle);
 
 float reduce_0_to_360(float angle);
