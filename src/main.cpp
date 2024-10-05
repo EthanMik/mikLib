@@ -39,11 +39,9 @@ int main() {
   // manual_drive manual_drive(leftDrive, rightDrive);
   // thread odom(odom_test);
 
-  // while (true) {
-  //   manual_tasks.control_split_arcade();
-  // }
-
-  turnAlongCircleLeft(30, 270);
+  while (true) {
+    manual_tasks.control_split_arcade();
+  }
 
   // wait(5, seconds);
   // auton_drive.turn_on_PID(180, 12, 1, 300, 1000000, .4, .03, 3, 15);

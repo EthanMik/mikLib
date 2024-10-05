@@ -26,7 +26,6 @@ private:
     float desired_heading;
     bool track_pid = false;
 
-
 public:
     motor_chain leftDrive;
     motor_chain rightDrive; 

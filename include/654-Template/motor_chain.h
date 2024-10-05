@@ -2,16 +2,18 @@
 #define MOTOR_CHAIN_H
 
 #include "vex.h"
+#include <vector>
+#include <array>
 
 // Enum for different velocity units
-enum class velocity_units {normalized, rpm, percent, volt};
+enum class velocity_units {normalized, percent, volt};
 
 // Class to manage a group of three motors, similar to VEX motor group but with extended functionality
 class motor_chain 
 {
 public:
-    // Constructor: initializes three motors with their ports, directions, and gear ratio
-    motor_chain(int MotorF_port, bool reverseF, int MotorM_port, bool reverseM, int MotorB_port, bool reverseB, vex::gearSetting ratio);
+    // Constructor: initializes a variable amount of motor
+    motor_chain(std::vector<vex::motor> motors);
 
     // Spins the motors in the specified direction and speed
     void spin(vex::directionType direction, float speed, velocity_units velocityUnits);
@@ -19,7 +21,7 @@ public:
     // Spins the motors for a specified time
     void spin_for_time(vex::directionType direction, int speed, velocity_units velocityUnits, float time, vex::timeUnits timeUnits = vex::timeUnits::sec);
    
-   // Changes the robots velocity in the opposite direction
+    // Changes the robots velocity in the opposite direction
     void flip_direction();
 
     // Sets the position of the motor encoders
@@ -48,13 +50,10 @@ private:
     float from_volt(float volt, velocity_units velocityUnits);
 
 public:
-    float maxRPM;    // Stores the maximum RPM of the motors
     float setSpeed;  // Stores the last set speed
-    vex::motor motorF;  // Front motor
-    vex::motor motorM;  // Middle motor
-    vex::motor motorB;  // Back motor
 
-    //std::vector<vex::motor> motors;
+private:
+    std::vector<vex::motor> motors;
 };
 
 #endif
