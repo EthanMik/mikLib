@@ -3,7 +3,7 @@
 
 int get_sign(int num);
 
-void turnAlongCircleLeft(float radius, float arcLength);
+void turnAlongCircleLeft(float radius, float arcLength, float speed);
 
 
 #endif

@@ -34,6 +34,9 @@ float volt_to_normalized(float volt);
 // Converts degrees to radians
 float to_rad(float angle_deg);
 
+// Converts radians to degrees
+float to_deg(float anngle_rad);
+
 // Converts degrees into normalized vector
 std::vector<float> to_normalized_vector(float angle);
 
@@ -41,6 +44,16 @@ float get_vector_distance(std::vector<float> v1, std::vector<float> v2);
 
 float reduce_negative_180_to_180(float angle);
 
+float reduce_negative_90_to_90(float angle);
+
 float reduce_0_to_360(float angle);
+
+bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y);
+
+float left_voltage_scaling(float drive_output, float heading_output);
+
+float right_voltage_scaling(float drive_output, float heading_output);
+
+float clamp_min_voltage(float drive_output, float drive_min_voltage);
 
 #endif

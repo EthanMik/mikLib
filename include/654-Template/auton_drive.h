@@ -27,13 +27,6 @@ private:
     bool track_pid = false;
 
 public:
-    motor_chain leftDrive;
-    motor_chain rightDrive; 
-
-    rotation forwardTracker;
-    rotation sidewaysTracker;
-
-public:
     auton_drive(motor_chain leftDrive, motor_chain rightDrive, float Wheel_diamteter, float Wheel_ratio, int ForwardTracker_port, float ForwardTracker_diameter, 
         float ForwardTracker_center_distance, int SidewaysTracker_port, float SidewaysTracker_diameter, float SidewaysTracker_center_distance);
 
@@ -42,6 +35,7 @@ public:
 
     //Helper Methods drive
     void drive_with_voltage(float leftVoltage, float rightVoltage);
+    void stop_drive(vex::brakeType brake);
     float get_left_position_in();
     float get_right_position_in();
 
@@ -67,10 +61,60 @@ public:
     std::vector<float> get_position_vector();
 
     //Odom drive methods
-
+    void drive_to_pose(float X_position, float Y_position, float angle, float lead, float setback, 
+        float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, 
+        float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, 
+        float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
     //Vector field helper methods
 
     //Vector field drive methods
+
+public:
+    float turn_max_voltage;
+    float turn_kp;
+    float turn_ki;
+    float turn_kd;
+    float turn_starti;
+
+    float turn_settle_error;
+    float turn_settle_time;
+    float turn_timeout;
+
+    float drive_min_voltage;
+    float drive_max_voltage;
+    float drive_kp;
+    float drive_ki;
+    float drive_kd;
+    float drive_starti;
+
+    float drive_settle_error;
+    float drive_settle_time;
+    float drive_timeout;
+
+    float heading_max_voltage;
+    float heading_kp;
+    float heading_ki;
+    float heading_kd;
+    float heading_starti;
+
+    float swing_max_voltage;
+    float swing_kp;
+    float swing_ki;
+    float swing_kd;
+    float swing_starti;
+
+    float swing_settle_error;
+    float swing_settle_time;
+    float swing_timeout;
+
+    float boomerang_lead;
+    float boomerang_setback;
+
+    motor_chain leftDrive;
+    motor_chain rightDrive; 
+
+    rotation forwardTracker;
+    rotation sidewaysTracker;
 
 };
 

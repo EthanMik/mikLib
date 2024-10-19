@@ -51,8 +51,6 @@ private:
 
 public:
     float setSpeed;  // Stores the last set speed
-
-private:
     std::vector<vex::motor> motors;
 };
 

@@ -2,6 +2,7 @@
 #include "654-Template/manual_drive.h"
 #include "654-Template/auton_drive.h"
 #include "654-Template/auton_drive_methods.h"
+#include "654-Template/test.h"
 #include "robot-config.h"
 #include "vex.h"
 
@@ -19,8 +20,7 @@ void test_serial_output() {
   // }
 }
 
-
-void odom_test(){
+void print_coordinates() {
   chassis.set_coordinates(0, 0, 0);
   while(true){
     Brain.Screen.clearScreen();
@@ -33,15 +33,35 @@ void odom_test(){
   }
 }
 
+
+
 int main() {
   vexcodeInit();
+  //(maxVoltage, kP, kI, kD, startI).
+  //chassis.set_drive_constants(10, 1.5, 0, 10, 0);
+  //chassis.set_heading_constants(6, .4, 0, 1, 0);
+  // chassis.heading_max_voltage = 10;
+  // chassis.drive_max_voltage = 8;
+  // chassis.drive_settle_error = 3;
+  // chassis.boomerang_lead = .5;
+  // chassis.drive_min_voltage = 0;
 
-  // manual_drive manual_drive(leftDrive, rightDrive);
-  // thread odom(odom_test);
+  // Each exit condition set is in the form of (settle_error, settle_time, timeout).
+  //chassis.set_drive_exit_conditions(1.5, 300, 5000);
+  //chassis.set_turn_exit_conditions(1, 300, 3000);
+  thread odom(print_coordinates);
+  // chassis.drive_to_pose(30, -50, 180, 0.45, 1, 0, 8, 10, 1.5, 300, 5000, 1.5, 0, 10, 0, .4, 0, 1, 0);
+  //manual_drive manual_drive(leftDrive, rightDrive);
 
-  while (true) {
-    manual_tasks.control_split_arcade();
-  }
+  turnAlongCircleLeft(30, 130, 0.2);
+
+  // while (true) {
+  //   manual_tasks.control_split_arcade();
+  // }
+
+
+
+  //spin_motors({leftDrive, leftDrive});
 
   // wait(5, seconds);
   // auton_drive.turn_on_PID(180, 12, 1, 300, 1000000, .4, .03, 3, 15);
