@@ -1,10 +1,4 @@
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "654-Template/motor_chain.h"
-#include "util.h"
 #include "vex.h"
-
-using namespace vex;
 
 motor_chain::motor_chain(std::vector<vex::motor> motors) {
     this->motors = motors;

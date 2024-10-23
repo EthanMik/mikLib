@@ -1,5 +1,4 @@
-#ifndef ODOM_H
-#define ODOM_H
+#pragma once
 
 class Odom
 {
@@ -20,5 +19,3 @@ private:
   float ForwardTracker_position;
   float SideWaysTracker_position;
 };
-
-#endif

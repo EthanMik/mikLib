@@ -1,7 +1,3 @@
-#include "654-Template/motor_chain.h"
-#include "654-Template/auton_drive.h"
-#include "robot-config.h"
-#include "util.h"
 #include "vex.h"
 
 manual_drive::manual_drive(motor_chain left, motor_chain right)

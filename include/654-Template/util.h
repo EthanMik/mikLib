@@ -1,10 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "robot-config.h"
 #include "vex.h"
 
 // Clamp a value between a minimum and maximum
@@ -55,5 +50,3 @@ float left_voltage_scaling(float drive_output, float heading_output);
 float right_voltage_scaling(float drive_output, float heading_output);
 
 float clamp_min_voltage(float drive_output, float drive_min_voltage);
-
-#endif

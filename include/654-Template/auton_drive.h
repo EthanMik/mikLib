@@ -1,13 +1,6 @@
-#ifndef AUTON_DRIVE_H
-#define AUTON_DRIVE_H
+#pragma once
 
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/odom.h"
 #include "vex.h"
-#include "motor_chain.h"
-#include <vector>
-
 
 class auton_drive {
 private:
@@ -66,9 +59,11 @@ public:
         float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, 
         float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, 
         float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
+    
     //Vector field helper methods
 
     //Vector field drive methods
+    void turn_left_arc(float radius, float arcLength, float speed);
 
 public:
     float turn_max_voltage;
@@ -111,12 +106,11 @@ public:
     float boomerang_lead;
     float boomerang_setback;
 
+    vex::rotation forwardTracker;
+    vex::rotation sidewaysTracker;
+
     motor_chain leftDrive;
     motor_chain rightDrive; 
 
-    rotation forwardTracker;
-    rotation sidewaysTracker;
-
+    manual_drive tasks;
 };
-
-#endif

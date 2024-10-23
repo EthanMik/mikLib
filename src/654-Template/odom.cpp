@@ -1,9 +1,3 @@
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "654-Template/odom.h"
-#include "util.h"
-#include "robot-config.h"
 #include "vex.h"
 
 void Odom::set_physical_distances(float ForwardTracker_center_distance, float SidewaysTracker_center_distance){

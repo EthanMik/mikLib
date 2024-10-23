@@ -1,11 +1,6 @@
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "robot-config.h"
-#include "util.h"
-#include "vex.h"
+#pragma once
 
-#include <vector>
+#include "vex.h"
 
 class PID {
 public:

@@ -1,7 +1,4 @@
-#include "654-Template/auton_drive.h"
 #include "vex.h"
-
-using namespace vex;
 
 brain Brain;
 controller Controller;
@@ -18,10 +15,9 @@ motor motorRB(PORT18, ratio18_1, false);
 motor_chain rightDrive = motor_chain({motorRF, motorRM, motorRM});
 
 //Input Forward Tracker center distance (a positive distance corresponds to a tracker on the right side of the robot, negative is left.)
-//Sideways tracker center distance (positive distance is behind the center of the robot, negative is in front):
+//Sideways tracker center distance (positive distance is behindcl the center of the robot, negative is in front):
 //This distance is in inches:
 auton_drive chassis(leftDrive, rightDrive, 2.75, 36/48, PORT20, -2.75, 0, PORT8, 2.75, 5.4);
-manual_drive manual_tasks(leftDrive, rightDrive);
 
 void vexcodeInit( void ) {
   Brain.Screen.print("Device initialization...");

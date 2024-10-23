@@ -1,8 +1,3 @@
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "654-Template/PID.h"
-#include "robot-config.h"
 #include "vex.h"
 
 PID::PID(float error, float kp, float ki, float kd, float starti) :

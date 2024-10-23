@@ -1,12 +1,4 @@
-#include "654-Template/motor_chain.h"
-#include "654-Template/manual_drive.h"
-#include "654-Template/auton_drive.h"
-#include "robot-config.h"
 #include "vex.h"
-
-#include <vector>
-#include <type_traits>
-#include <cmath>
 
 float clamp(float input, float min, float max) {
     if (input > max) {

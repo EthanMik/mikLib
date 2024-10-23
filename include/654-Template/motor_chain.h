@@ -1,9 +1,6 @@
-#ifndef MOTOR_CHAIN_H
-#define MOTOR_CHAIN_H
+#pragma once
 
 #include "vex.h"
-#include <vector>
-#include <array>
 
 // Enum for different velocity units
 enum class velocity_units {normalized, percent, volt};
@@ -53,5 +50,3 @@ public:
     float setSpeed;  // Stores the last set speed
     std::vector<vex::motor> motors;
 };
-
-#endif

@@ -1,8 +1,5 @@
-#ifndef MANUAL_DRIVE_H
-#define MANUAL_DRIVE_H
+#pragma once
 
-#include "654-Template/motor_chain.h"
-#include "654-Template/auton_drive.h"
 #include "vex.h"
 
 class manual_drive {   
@@ -17,6 +14,3 @@ public:
     motor_chain leftDrive;
     motor_chain rightDrive;
 };
-
-
-#endif
