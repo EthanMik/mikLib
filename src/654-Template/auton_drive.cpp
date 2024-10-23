@@ -45,6 +45,10 @@ float auton_drive::get_absolute_heading(){
   return(reduce_0_to_360(Inertial.rotation())); 
 }
 
+float auton_drive::get_heading(){ 
+  return(360-reduce_0_to_360(Inertial.rotation())); 
+}
+
 float auton_drive::get_left_position_in(){
   return(leftDrive.get_position(deg) * Drive_in_to_deg_ratio);
 }
@@ -144,7 +148,7 @@ float auton_drive::get_Y_position() {
 }
 
 std::vector<float> auton_drive::get_position_vector() {
-  std::vector<float> coordinates {odom.Y_position, odom.X_position};  
+  std::vector<float> coordinates {odom.X_position, odom.Y_position};  
   return(coordinates);
 } 
 

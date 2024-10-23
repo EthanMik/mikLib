@@ -13,11 +13,11 @@
 using namespace vex;
 
 void test_serial_output() {
-  // while (true) {
-  //   printf("%f\n", Controller.Axis1.position());
-  //   fflush(stdout);
-  //   wait(100, msec);
-  // }
+  while (true) {
+    printf("%f\n", Controller.Axis1.position());
+    fflush(stdout);
+    wait(100, msec);
+  }
 }
 
 void print_coordinates() {
@@ -37,6 +37,7 @@ void print_coordinates() {
 
 int main() {
   vexcodeInit();
+  //test_serial_output();
   //(maxVoltage, kP, kI, kD, startI).
   //chassis.set_drive_constants(10, 1.5, 0, 10, 0);
   //chassis.set_heading_constants(6, .4, 0, 1, 0);
@@ -53,7 +54,7 @@ int main() {
   // chassis.drive_to_pose(30, -50, 180, 0.45, 1, 0, 8, 10, 1.5, 300, 5000, 1.5, 0, 10, 0, .4, 0, 1, 0);
   //manual_drive manual_drive(leftDrive, rightDrive);
 
-  turnAlongCircleLeft(30, 130, 0.2);
+  turnAlongCircleLeft(30, 180, 1);
 
   // while (true) {
   //   manual_tasks.control_split_arcade();

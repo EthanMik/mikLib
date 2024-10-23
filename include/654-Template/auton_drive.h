@@ -32,6 +32,7 @@ public:
 
     //Helper Methods general
     float get_absolute_heading();
+    float get_heading();
 
     //Helper Methods drive
     void drive_with_voltage(float leftVoltage, float rightVoltage);
