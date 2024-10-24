@@ -6,7 +6,7 @@ void test_serial_output() {
   while (true) {
     printf("%f\n", Controller.Axis1.position());
     fflush(stdout);
-    wait(100, msec);
+    wait(1, sec);
   }
 }
 
@@ -23,11 +23,9 @@ void print_coordinates() {
   }
 }
 
-
-
 int main() {
   vexcodeInit();
-  //test_serial_output();
+  // test_serial_output();
   //(maxVoltage, kP, kI, kD, startI).
   //chassis.set_drive_constants(10, 1.5, 0, 10, 0);
   //chassis.set_heading_constants(6, .4, 0, 1, 0);
@@ -40,16 +38,26 @@ int main() {
   // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   //chassis.set_drive_exit_conditions(1.5, 300, 5000);
   //chassis.set_turn_exit_conditions(1, 300, 3000);
-  thread odom(print_coordinates);
+  //thread odom(print_coordinates);
   // chassis.drive_to_pose(30, -50, 180, 0.45, 1, 0, 8, 10, 1.5, 300, 5000, 1.5, 0, 10, 0, .4, 0, 1, 0);
 
-  chassis.turn_left_arc(30, 180, 1);
+  //chassis.turn_left_arc(30, 180, 1);
 
-  // while (true) {
-  //   chassis.tasks.control_split_arcade();
-  // }
+  // motorRF.spinFor(1, sec);
+  // wait(1, sec);
+  // motorRF.spinFor(1, sec);
+  // wait(1, sec);
+  // motorRF.spinFor(1, sec);
+  // wait(1, sec);
 
-
+  // wait(1, sec);
+  
+  // motorLF.spinFor(1, sec);
+  // wait(1, sec);
+  // motorLF.spinFor(1, sec);
+  // wait(1, sec);
+  // motorLF.spinFor(1, sec);
+  // wait(1, sec);
 
   //spin_motors({leftDrive, leftDrive});
 
