@@ -8,17 +8,11 @@ float clamp(float input, float min, float max);
 // Returns zero for input less than absolute value width
 float deadband(float input, float width);
 
-// Convert RPM to voltage
-float rpm_to_volt(float rpm, float maxRPM = 600.0);
-
 // Convert percentage to voltage
 float percent_to_volt(float percent);
 
 // convert normalized percentage to voltage
 float normalize_to_volt(float normalized_percent);
-
-// Convert voltage to RPM
-float volt_to_rpm(float volt, double maxRPM = 600.0);
 
 // Convert voltage to percentage
 float volt_to_percent(float volt);
@@ -30,7 +24,9 @@ float volt_to_normalized(float volt);
 float to_rad(float angle_deg);
 
 // Converts radians to degrees
-float to_deg(float anngle_rad);
+float to_deg(float angle_rad);
+
+float to_pixels(float distance, distance_units units);
 
 // Converts degrees into normalized vector
 std::vector<float> to_normalized_vector(float angle);

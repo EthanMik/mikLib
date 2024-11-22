@@ -6,9 +6,7 @@ PID::PID(float error, float kp, float ki, float kd, float starti) :
   ki(ki),
   kd(kd),
   starti(starti)
-{
-  pid_data = std::vector<std::vector<float>>(1, std::vector<float>(4, 0));
-};
+{};
 
 PID::PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout) :
   error(error),
@@ -19,11 +17,9 @@ PID::PID(float error, float kp, float ki, float kd, float starti, float settle_e
   settle_error(settle_error),
   settle_time(settle_time),
   timeout(timeout)
-{
-  pid_data = std::vector<std::vector<float>>(1, std::vector<float>(4, 0));
-};
+{};
 
-float PID::compute(float error, bool is_tracking) {
+float PID::compute(float error) {
   if (fabs(error) < starti){
     accumulated_error += error;
   }
@@ -31,15 +27,7 @@ float PID::compute(float error, bool is_tracking) {
     accumulated_error = 0; 
   }
 
-  p = kp * error;
-  i = ki * accumulated_error;
-  d = kd * (error-previous_error);
-
-  output = p + i + d;
-
-  if (is_tracking) {
-    track_PID(p, i, d, output);
-  }
+  output = kp * error + ki * accumulated_error + kd * (error - previous_error);
 
   previous_error = error;
 
@@ -64,16 +52,3 @@ bool PID::is_settled(){
   return(false);
 }
 
-std::vector<std::vector<float>> PID::track_PID(float data1, float data2, float data3, float data4) {
-    pid_data.push_back({data1, data2, data3, data4});
-    
-    return pid_data;
-}
-
-void PID::print_PID() const {
-  for (const auto &row : pid_data) {
-          printf("%f,%f,%f, %f\n", row[0],  row[1], row[2], row[3]);
-          fflush(stdout);
-          wait(100, msec);
-      }
-  }

@@ -41,6 +41,17 @@ float to_deg(float angle_rad) {
   return(angle_rad * (180.0 / M_PI));
 }
 
+float to_pixels(float distance, distance_units units) {
+    switch(units) {
+      case distance_units::inches:
+          return(96 * distance);
+      case distance_units::centimeters: 
+          return(37.79527559 * distance);
+      case distance_units::pixels:
+          return(1 * distance);
+  }
+}
+
 std::vector<float> to_normalized_vector(float angle) {
   float radians = to_rad(angle);
   float x = cosf(radians);

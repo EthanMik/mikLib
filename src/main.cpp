@@ -2,70 +2,114 @@
 
 using namespace vex;
 
-void test_serial_output() {
-  while (true) {
-    printf("%f\n", Controller.Axis1.position());
-    fflush(stdout);
-    wait(1, sec);
+competition Competition;
+int current_auton_selection = 0;
+bool auto_started = false;
+
+void win_point_blue(void) {
+  chassis.drive_on_PID(-26);
+  chassis.turn_on_PID(30);
+  chassis.drive_on_PID(-9);
+  assembly.mogo_clamp_piston.set(true);
+  chassis.turn_on_PID(100);
+  assembly.intake_motor.spin(fwd, 12, volt);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_on_PID(35);
+
+}
+
+void win_point_red(void) {
+  chassis.drive_on_PID(-26);
+  chassis.turn_on_PID(330);
+  chassis.drive_on_PID(-9);
+  assembly.mogo_clamp_piston.set(true);
+  chassis.turn_on_PID(260);
+  assembly.intake_motor.spin(fwd, 12, volt);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_on_PID(35);
+
+}
+
+void goal_rush(void) {
+  chassis.drive_on_PID(-23);
+  chassis.turn_on_PID(340);
+  chassis.drive_on_PID(-24);
+  assembly.mogo_clamp_piston.set(true);
+}
+
+void pre_auton() {
+  init();
+  default_constants();
+
+  while(!auto_started) {
+    Brain.Screen.printAt(5, 20, "Absolute Heading:");
+    Brain.Screen.printAt(5, 40, "%f", chassis.get_absolute_heading());
+    Brain.Screen.printAt(5, 80, "Auton:");
+    switch(current_auton_selection){
+      case 0:
+        Brain.Screen.printAt(5, 100, "Win point Red");
+        break;
+      case 1:
+        Brain.Screen.printAt(5, 100, "Win point Blue");
+        break;
+      case 2:
+        Brain.Screen.printAt(5, 100, "Goal Rush      ");
+        break;
+      case 3:
+        Brain.Screen.printAt(5, 100, "No Auton       ");
+        break;
+    }
+    if(Brain.Screen.pressing()){
+      while(Brain.Screen.pressing()) {}
+      current_auton_selection++;
+    } else if (current_auton_selection == 4){
+      current_auton_selection = 0;
+    }
+    task::sleep(10);
   }
 }
 
-void print_coordinates() {
-  chassis.set_coordinates(0, 0, 0);
-  while(true){
-    Brain.Screen.clearScreen();
-    Brain.Screen.printAt(0, 50, "X: %f", chassis.get_X_position());
-    Brain.Screen.printAt(0, 70, "Y: %f", chassis.get_Y_position());
-    Brain.Screen.printAt(0, 90, "Heading: %f", chassis.get_absolute_heading());
-    Brain.Screen.printAt(0, 110, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
-    Brain.Screen.printAt(0, 130, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
-    task::sleep(20);
-  }
+void auton(void) {
+  auto_started = true;
+  switch (current_auton_selection) { 
+    case 0:
+      win_point_red();
+      break;
+    case 1:
+      win_point_blue();
+      break;
+    case 2:
+      goal_rush();
+      break;
+    case 3:
+      break;
+ }
 }
+
+void user_control(void) {
+  assembly.user_control_tasks();
+}
+
 
 int main() {
-  vexcodeInit();
-  // test_serial_output();
-  //(maxVoltage, kP, kI, kD, startI).
-  //chassis.set_drive_constants(10, 1.5, 0, 10, 0);
-  //chassis.set_heading_constants(6, .4, 0, 1, 0);
-  // chassis.heading_max_voltage = 10;
-  // chassis.drive_max_voltage = 8;
-  // chassis.drive_settle_error = 3;
-  // chassis.boomerang_lead = .5;
-  // chassis.drive_min_voltage = 0;
+  init();
+  thread odom(print_coordinates);
+  assembly.user_control_tasks();  
 
-  // Each exit condition set is in the form of (settle_error, settle_time, timeout).
-  //chassis.set_drive_exit_conditions(1.5, 300, 5000);
-  //chassis.set_turn_exit_conditions(1, 300, 3000);
-  //thread odom(print_coordinates);
-  // chassis.drive_to_pose(30, -50, 180, 0.45, 1, 0, 8, 10, 1.5, 300, 5000, 1.5, 0, 10, 0, .4, 0, 1, 0);
+  // thread test_UI(test_palette);
 
-  //chassis.turn_left_arc(30, 180, 1);
+  // Competition.autonomous(auton);
+  // Competition.drivercontrol(user_control);
 
-  // motorRF.spinFor(1, sec);
-  // wait(1, sec);
-  // motorRF.spinFor(1, sec);
-  // wait(1, sec);
-  // motorRF.spinFor(1, sec);
-  // wait(1, sec);
+  // pre_auton();
 
-  // wait(1, sec);
-  
-  // motorLF.spinFor(1, sec);
-  // wait(1, sec);
-  // motorLF.spinFor(1, sec);
-  // wait(1, sec);
-  // motorLF.spinFor(1, sec);
-  // wait(1, sec);
-
-  //spin_motors({leftDrive, leftDrive});
-
-  // wait(5, seconds);
-  // auton_drive.turn_on_PID(180, 12, 1, 300, 1000000, .4, .03, 3, 15);
-
-  return 0;
+  // while (true) {
+  //   wait(100, msec);
+  // }
 }
+
+
+
 
 
 

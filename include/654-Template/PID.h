@@ -25,15 +25,7 @@ public:
 
     PID(float error, float kp, float ki, float kd, float starti);
 
-    float compute(float error, bool is_tracking = false);
+    float compute(float error);
 
     bool is_settled();
-
-    void print_PID() const;
-
-private:
-    std::vector<std::vector<float>> pid_data;
-
-    std::vector<std::vector<float>> track_PID(float data1, float data2, float data3, float data4);
-
 };

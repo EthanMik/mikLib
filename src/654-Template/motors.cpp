@@ -1,10 +1,20 @@
 #include "vex.h"
 
-motor_chain::motor_chain(std::vector<vex::motor> motors) {
-    this->motors = motors;
-}
+using namespace hzn;
 
-void motor_chain::spin(vex::directionType direction, float speed, velocity_units velocityUnits) {
+hzn::motor::motor(int port, bool reversed, std::string name) :
+    port(port), reversed(reversed), name(name), mtr(port, reversed)
+{};
+
+hzn::motor_group::motor_group(const std::vector<hzn::motor>& motor_constructor) :
+    motor_constructor(motor_constructor)
+{
+    for (const auto& motor : motor_constructor) {
+        motors.push_back(motor.mtr);
+    }
+};
+
+void hzn::motor_group::spin(vex::directionType direction, float speed, velocity_units velocityUnits) {
     speed = to_volt(speed, velocityUnits);
     setSpeed = speed;
 
@@ -13,7 +23,7 @@ void motor_chain::spin(vex::directionType direction, float speed, velocity_units
     }
 }
 
-void motor_chain::spin_for_time(vex::directionType direction, int speed, velocity_units velocityUnits, float time, vex::timeUnits timeUnits) {
+void hzn::motor_group::spin_for_time(vex::directionType direction, int speed, velocity_units velocityUnits, float time, vex::timeUnits timeUnits) {
     speed = to_volt(speed, velocityUnits);
     setSpeed = speed;
 
@@ -25,23 +35,19 @@ void motor_chain::spin_for_time(vex::directionType direction, int speed, velocit
     stop(brake);
 }
 
-void motor_chain::flip_direction() {
+void hzn::motor_group::flip_direction() {
     for (vex::motor& motor : motors) {
         motor.spin(fwd, setSpeed * -1, vex::voltageUnits::volt);
     }
 }
 
-void motor_chain::set_position(float position, vex::rotationUnits rotationUnits) {
+void hzn::motor_group::set_position(float position, vex::rotationUnits rotationUnits) {
     for (vex::motor& motor : motors) {
         motor.setPosition(position, rotationUnits);
     }   
 }
 
-float motor_chain::get_position(vex::rotationUnits rotationUnits, vex::motor motor) {
-    return motor.position(rotationUnits);
-}
-
-float motor_chain::get_position(vex::rotationUnits rotationUnits) {
+float hzn::motor_group::get_position(vex::rotationUnits rotationUnits) {
     float position = 0;
 
     for (vex::motor& motor : motors) {
@@ -50,18 +56,18 @@ float motor_chain::get_position(vex::rotationUnits rotationUnits) {
     return position / motors.size();
 }
 
-void motor_chain::stop(vex::brakeType brake) {
+void hzn::motor_group::stop(vex::brakeType brake) {
     for (vex::motor& motor : motors) {
         motor.stop(brake);
     }   
 }
 
-float motor_chain::get_set_speed(velocity_units velocityUnits) {
+float hzn::motor_group::get_set_speed(velocity_units velocityUnits) {
     return from_volt(setSpeed, velocityUnits);
 }
 
-float motor_chain::to_volt(float speed, velocity_units velocityUnits) {
-    switch(velocityUnits){
+float hzn::motor_group::to_volt(float speed, velocity_units velocityUnits) {
+    switch (velocityUnits) {
         case velocity_units::normalized:
             return normalize_to_volt(speed);
         case velocity_units::percent:
@@ -71,7 +77,7 @@ float motor_chain::to_volt(float speed, velocity_units velocityUnits) {
     }
 }
 
-float motor_chain::from_volt(float volt, velocity_units velocityUnits) {
+float hzn::motor_group::from_volt(float volt, velocity_units velocityUnits) {
     volt = clamp(volt, 0, 12);
 
     switch(velocityUnits) {
