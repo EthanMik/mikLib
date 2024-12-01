@@ -14,6 +14,16 @@ hzn::motor_group::motor_group(const std::vector<hzn::motor>& motor_constructor) 
     }
 };
 
+vex::motor& hzn::motor_group::get_motor(std::string motor_name) {
+    for (auto& motor : motor_constructor) {
+        if (motor.name == motor_name) {
+            return motor.mtr;
+        }
+    }
+    Brain.Screen.printAt(30, 30, "MOTOR NOT FOUND");
+    exit(1);
+}
+
 void hzn::motor_group::spin(vex::directionType direction, float speed, velocity_units velocityUnits) {
     speed = to_volt(speed, velocityUnits);
     setSpeed = speed;

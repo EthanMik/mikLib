@@ -26,8 +26,6 @@ float to_rad(float angle_deg);
 // Converts radians to degrees
 float to_deg(float angle_rad);
 
-float to_pixels(float distance, distance_units units);
-
 // Converts degrees into normalized vector
 std::vector<float> to_normalized_vector(float angle);
 

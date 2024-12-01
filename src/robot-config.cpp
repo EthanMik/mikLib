@@ -8,39 +8,39 @@ controller Controller;
 auton_drive chassis(
     // Drivetrain motors
     hzn::motor_group({
-      hzn::motor(PORT12, true, "left front motor"), 
-      hzn::motor(PORT3, true, "left middle motor"), 
-      hzn::motor(PORT19, true, "left back motor")
+      hzn::motor(PORT12, true, "left_front_motor"), 
+      hzn::motor(PORT3, true, "left_middle_motor"), 
+      hzn::motor(PORT19, true, "left_back_motor")
     }),
     hzn::motor_group({
-      hzn::motor(PORT9, false, "right front motor"), 
-      hzn::motor(PORT14, false, "right middle motor"), 
-      hzn::motor(PORT20, false, "right back motor")
+      hzn::motor(PORT9, false, "right_front_motor"), 
+      hzn::motor(PORT14, false, "right_middle_motor"), 
+      hzn::motor(PORT20, false, "right_back_motor")
     }),
 
-    PORT10, // Inertia sensor port
-    2.75,   // Drivetrain wheel diameter
-    0.75,   // Drivetrain wheel ratio
+    PORT10,  // Inertia sensor port
+    2.75,    // Drivetrain wheel diameter
+    0.75,    // Drivetrain wheel ratio
 
-    PORT18, // Forward Tracker Port
-    -2,      // Forward Tracker wheel diameter
+    PORT18,  // Forward Tracker Port
+    -2,      // Forward Tracker wheel diameter in inches (negative flips direction)
     0.34375, // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
-    PORT4, // Sideways tracker port
-    2,      // Sideways tracker wheel diameter (inches)
+    PORT4,  // Sideways tracker port
+    2,      // Sideways tracker wheel diameter in inches (negative flips direction)
     3.125   // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 );
 
 manual_drive assembly(
   // Lady Brown motors
   hzn::motor_group({
-    hzn::motor(PORT11, false, "left LB motor"),
-    hzn::motor(PORT12, true, "right LB motor") 
+    hzn::motor(PORT11, false, "left_LB_motor"),
+    hzn::motor(PORT12, true, "right_LB_motor") 
   }), 
 
   PORT10, // Lady Brown rotation sensor port
 
-  hzn::motor(PORT13, true, "Intake motor"),
+  hzn::motor(PORT13, true, "intake_motor"),
   PORT14, // Ring color sensor port
   PORT15, // Ring distance sensor port
 
@@ -50,11 +50,8 @@ manual_drive assembly(
 
 void init(void) {
   Brain.Screen.drawImageFromFile("loading.png", 0, 0);
-  Brain.Screen.setCursor(2, 1);
 
-  wait(200, msec);
   chassis.inertial.calibrate();
-
   while (chassis.inertial.isCalibrating()) {
     wait(25, msec);
   }
@@ -63,6 +60,11 @@ void init(void) {
   Brain.Screen.setCursor(1,1);
   wait(50, msec);
   Brain.Screen.clearScreen();
+  
+  Brain.Screen.setFillColor(vex::color::black);
+  
+  Brain.Screen.setPenWidth(1);
+  Brain.Screen.setPenColor(vex::color::white);
 }
 
 void default_constants(void) {

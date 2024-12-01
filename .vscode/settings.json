@@ -41,6 +41,8 @@
 		"typeinfo": "cpp",
 		"iostream": "cpp",
 		"string": "cpp",
-		"*.bin": "cpp"
+		"*.bin": "cpp",
+		"list": "cpp",
+		"iomanip": "cpp"
 	}
 }

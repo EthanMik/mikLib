@@ -1,66 +1,86 @@
 #include "vex.h"
 
-toggle::toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units) :
-    toggle_file_name(toggle_file_name),
-    toggled_file_name(toggled_file_name),
-    x(x),
-    y(y),
-    w(x),
-    h(h),
-    units(units)
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic) :
+    toggle_graphic(toggle_graphic),
+    pressed_toggle_graphic(pressed_toggle_graphic)
 {
-    this->x = to_pixels(x, units);
-    this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
 };
 
-toggle::toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units, std::function<void()> callback) :
-    toggle_file_name(toggle_file_name),
-    toggled_file_name(toggled_file_name),
-    x(x),
-    y(y),
-    w(x),
-    h(h),
-    units(units),
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback) :
+    toggle_graphic(toggle_graphic),
+    pressed_toggle_graphic(pressed_toggle_graphic),
     callback(callback)
 {
-    this->x = to_pixels(x, units);
-    this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
 };
 
-toggle::toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units, std::function<void()> callback, int id) :
-    toggle_file_name(toggle_file_name),
-    toggled_file_name(toggled_file_name),
-    x(x),
-    y(y),
-    w(x),
-    h(h),
-    units(units),
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id) :
+    toggle_graphic(toggle_graphic),
+    pressed_toggle_graphic(pressed_toggle_graphic),
     callback(callback),
     id(id)
 {
-    this->x = to_pixels(x, units);
-    this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
 };
 
-int toggle::get_y_pos() { return(y); }
-int toggle::get_x_pos() { return(x); }
-int toggle::get_h_pos() { return(h); }
-int toggle::get_w_pos() { return(w); }
-void toggle::set_x_pos(int x) { this->x = x; }
-void toggle::set_y_pos(int y) { this->y = y; }
+int toggle::get_x_pos() { return(toggle_graphic->get_x_pos()); }
+int toggle::get_y_pos() { return(toggle_graphic->get_y_pos()); }
+int toggle::get_width() { return(toggle_graphic->get_width()); }
+int toggle::get_height() { return(toggle_graphic->get_height()); }
+
+void toggle::set_x_pos(int x) { 
+    toggle_graphic->set_x_pos(x); 
+    pressed = false; 
+}
+
+void toggle::set_y_pos(int y) { 
+    toggle_graphic->set_y_pos(y); 
+    pressed = false; 
+}
+
+void toggle::set_position(int x, int y) { 
+    set_x_pos(x);
+    set_y_pos(y);
+    pressed = false; 
+}
 
 void toggle::render() {
     if (is_toggled) {
-        Brain.Screen.drawImageFromFile(toggled_file_name.c_str(), x, y);
+        pressed_toggle_graphic->render();
+    } else {
+        toggle_graphic->render();
     }
-    else {
-        Brain.Screen.drawImageFromFile(toggle_file_name.c_str(), x, y);
+}
+
+void toggle::is_pressing() {
+    float touch_x = Brain.Screen.xPosition();
+    float touch_y = Brain.Screen.yPosition();
+    bool is_touch_within_toggle = touch_x >= x && touch_x <= x + w && touch_y >= y && touch_y <= y + h;
+
+    if (Brain.Screen.pressing()) {
+        if (!pressed && is_touch_within_toggle) {
+            pressed = true;
+            render();
+        } else if (pressed && !is_touch_within_toggle) {
+            pressed = false;
+            render();
+        }
+    } else if (pressed) {
+        pressed = false;
+        render();
+        if (is_touch_within_toggle) {
+            is_toggled = !is_toggled;
+        }
     }
 }
 

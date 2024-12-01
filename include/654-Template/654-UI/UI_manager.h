@@ -2,32 +2,25 @@
 
 #include "vex.h"
 
-class UI_manager {
-public:
-    ~UI_manager();
-    
-    void run();
+void UI_run();
 
-    static void display_screen(screen* scr);
+static void UI_display_screen(std::shared_ptr<screen> scr);
+static void UI_display_screens(const std::vector<std::shared_ptr<screen>>& render_queue);
 
-    void setup_queue_whitelist(const std::vector<std::vector<int>>& states);
-    void flush_whitelist();
+void UI_setup_queue_whitelist(std::vector<std::vector<int>> states);
+void UI_flush_whitelist();
 
-    static void add_function_to_queue(std::function<void()> func, int id);
+static void UI_add_function_to_queue(std::function<void()> func, int id);
 
-    void flush_queue(); 
+void UI_flush_queue(); 
 
-    static void click();
+static void UI_click(screen* scr);
 
-    static void run_toggles(screen* scr);
-    
-private:
-    std::vector<std::vector<int>> whitelist;
-    static std::unordered_map<int, std::function<void()>> queue;
+static void UI_run_toggles(screen* scr);
 
-    screen* start_screen;
-    // screen* print_values_screen_1;
-    // screen* macros_screen_1;
-    // screen* drive_mode_screen_1;
+int bruh();
 
-};
+// extern screen* selector_panel;
+// screen* macros_screen_1;
+// screen* drive_mode_screen_1;
+

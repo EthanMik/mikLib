@@ -1,34 +1,44 @@
 #include "vex.h"
 
-button::button(const std::string& button_file_name, const std::string& pressed_button_file_name, int x, int y, int w, int h, distance_units units, std::function<void()> on_click) :
-    button_file_name(button_file_name),
-    pressed_button_file_name(pressed_button_file_name),
-    x(x),
-    y(y),
-    w(w),
-    h(h),
-    units(units),
-    on_click(on_click)
-{
-    this->x = to_pixels(x, units);
-    this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+button::button(std::shared_ptr<drawable> button_graphic, std::shared_ptr<drawable> pressed_button_graphic, std::function<void()> on_click_func) :
+    button_graphic(button_graphic),
+    pressed_button_graphic(pressed_button_graphic),
+    on_click(std::move(on_click_func))
+{    
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
 };
 
-int button::get_x_pos() { return(x); }
-int button::get_y_pos() { return(y); }
-int button::get_w_pos() { return(w); }
-int button::get_h_pos() { return(h); }
-void button::set_x_pos(int x) { this->x = x; }
-void button::set_y_pos(int y) { this->y = y; }
+int button::get_x_pos() { return(button_graphic->get_x_pos()); }
+int button::get_y_pos() { return(button_graphic->get_y_pos()); }
+int button::get_width() { return(button_graphic->get_width()); }
+int button::get_height() { return(button_graphic->get_height()); }
+
+void button::set_x_pos(int x) { 
+    button_graphic->set_x_pos(x);
+    pressed_button_graphic->set_x_pos(x); 
+    pressed = false; 
+}
+
+void button::set_y_pos(int y) { 
+    button_graphic->set_y_pos(y); 
+    pressed_button_graphic->set_x_pos(y); 
+    pressed = false; 
+}
+
+void button::set_position(int x, int y) { 
+    set_x_pos(x);
+    set_y_pos(y);
+    pressed = false; 
+}
 
 void button::render() {
     if (pressed) {
-        Brain.Screen.drawImageFromFile(pressed_button_file_name.c_str(), x, y);
-    }
-    else {
-        Brain.Screen.drawImageFromFile(button_file_name.c_str(), x, y);
+        pressed_button_graphic->render();
+    } else {
+        button_graphic->render();
     }
 }
 

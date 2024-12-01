@@ -5,20 +5,21 @@
 class toggle : public UI_component
 {
 public:
-    toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units, std::function<void()> callback, int id);
-    toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units, std::function<void()> callback);
-    toggle(const std::string& toggle_file_name, const std::string& toggled_file_name, int x, int y, int w, int h, distance_units units);
+    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id);
+    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback);
+    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic);
 
     int get_x_pos() override;
     int get_y_pos() override;
-    int get_w_pos() override;
-    int get_h_pos() override;
+    int get_width() override;
+    int get_height() override;
 
     void set_x_pos(int x) override;
     void set_y_pos(int y) override;
+    void set_position(int x, int y) override;
 
     void render() override;
-
+    
     void is_pressing() override;
 
     void execute();
@@ -27,13 +28,9 @@ public:
     int get_toggle_id();
 
 private:
-    std::string toggle_file_name;
-    std::string toggled_file_name;
-    int x;
-    int y;
-    int w;
-    int h;
-    distance_units units;
+    std::shared_ptr<drawable> toggle_graphic;
+    std::shared_ptr<drawable> pressed_toggle_graphic;
+    int x, y, w, h;
     std::function<void()> callback;
     int id;
 

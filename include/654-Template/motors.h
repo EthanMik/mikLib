@@ -26,6 +26,8 @@ public:
     // Constructor: initializes a variable amount of motor
     motor_group(const std::vector<hzn::motor>& motor_constructor);
 
+    vex::motor& get_motor(std::string motor_name);
+
     // Spins the motors in the specified direction and speed
     void spin(vex::directionType direction, float speed, velocity_units velocityUnits);
 

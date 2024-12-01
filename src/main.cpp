@@ -93,9 +93,10 @@ void user_control(void) {
 
 int main() {
   init();
-  thread odom(print_coordinates);
-  assembly.user_control_tasks();  
+  default_constants();
 
+  thread test(test_palette);
+  // UI_display_screens({selector_panel});
   // thread test_UI(test_palette);
 
   // Competition.autonomous(auton);

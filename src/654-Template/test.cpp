@@ -3,8 +3,8 @@
 std::vector<std::vector<float>> graph_buffer;
 
 void test_palette() {
-  UI_manager ui;
-  ui.run();
+  // UI_manager ui;
+  UI_run();
 }
 
 void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains) {
