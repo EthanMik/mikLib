@@ -18,4 +18,7 @@ public:
     virtual void set_x_pos(int x) = 0;
     virtual void set_y_pos(int y) = 0;
     virtual void set_position(int x, int y) = 0;
+
+    virtual void set_width(int w) = 0;
+    virtual void set_height(int h) = 0;
 };

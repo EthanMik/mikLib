@@ -20,6 +20,9 @@ public:
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
 
+    void set_width(int w) override;
+    void set_height(int h) override;
+    
     void render() override;
 
     void add_graphic();

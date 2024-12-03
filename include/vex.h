@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <iomanip>
 #include <memory>
+#include <atomic>
 #include <sstream>
 #include <iostream>
 

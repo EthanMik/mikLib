@@ -6,6 +6,8 @@ extern std::vector<std::vector<float>> graph_buffer;
 
 void test_palette();
 
+void test();
+
 void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains);
 
 void test_print_motor_torque(std::vector<hzn::motor_group> motor_chains);

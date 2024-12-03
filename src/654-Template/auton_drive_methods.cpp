@@ -4,7 +4,7 @@
 
 void turn_left_arc(float radius, float arcLength, float speed, bool precisionStop){ //RADIUS IN INCHES
     if(radius == 0) return;
-    const int ADJUSTMENT_SHARPNESS = 3; //How much the code will change velocity when veering off course
+    const int ADJUSTMENT_SHARPNESS = 0.3; //How much the code will change velocity when veering off course
    
     float dotProduct;
     float lengthOfVector;
@@ -216,8 +216,8 @@ void go_smart_straight(float distance, float speed, bool precisionStop){ //RADIU
     float distToPath; //Distance from robot to the circular path (0 -> on path)
      
     while (yPos < distance && get_vector_distance(chassis.get_position_vector(), targetDestination) > 2) {
-        xPos = (chassis.get_X_position() - startX) * cos(chassis.get_heading() - offset) - (chassis.get_Y_position() - startY) * sin(chassis.get_heading() - offset);
-        yPos = (chassis.get_Y_position() - startY) * sin(chassis.get_heading() - offset) + (chassis.get_X_position() - startX) * cos(chassis.get_heading() - offset);
+        xPos = (chassis.get_X_position() - startX) * cos(to_rad(chassis.get_heading() - offset)) - (chassis.get_Y_position() - startY) * sin(to_rad(chassis.get_heading() - offset));
+        yPos = (chassis.get_Y_position() - startY) * sin(to_rad(chassis.get_heading() - offset)) + (chassis.get_X_position() - startX) * cos(to_rad(chassis.get_heading() - offset));
         distToPath = clamp(std::abs(get_vector_distance({0.0f, 0.0f}, {xPos, yPos}) - distance),0,100);
         currentDirection[0] = to_normalized_vector(chassis.get_heading()+90)[0];
         currentDirection[1] = to_normalized_vector(chassis.get_heading()+90)[1];

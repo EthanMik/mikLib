@@ -16,6 +16,8 @@ int image::get_height() { return(h); }
 void image::set_x_pos(int x) { this->x = x; }
 void image::set_y_pos(int y) { this->y = y; }
 void image::set_position(int x, int y) { this->x = x; this->y = y; }
+void image::set_width(int w) { this->w = w; }
+void image::set_height(int h) { this->h = h; }
 
 void image::render() {
     Brain.Screen.drawImageFromFile(file_name.c_str(), x, y);

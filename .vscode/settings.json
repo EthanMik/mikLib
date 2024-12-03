@@ -43,6 +43,11 @@
 		"string": "cpp",
 		"*.bin": "cpp",
 		"list": "cpp",
-		"iomanip": "cpp"
+		"iomanip": "cpp",
+		"atomic": "cpp",
+		"condition_variable": "cpp",
+		"mutex": "cpp",
+		"system_error": "cpp",
+		"thread": "cpp"
 	}
 }

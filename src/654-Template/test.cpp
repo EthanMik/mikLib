@@ -7,6 +7,11 @@ void test_palette() {
   UI_run();
 }
 
+void test() {
+  Brain.Screen.printAt(30, 30, "test");
+  exit(1);
+}
+
 void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains) {
     for (hzn::motor_group& motor_chain : motor_chains) {
       for (vex::motor& motor : motor_chain.motors) {
@@ -53,6 +58,7 @@ void print_coordinates(){
     Brain.Screen.printAt(0, 110, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
     Brain.Screen.printAt(0, 130, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
     task::sleep(20);
+    Brain.Screen.render();
   }
 }
 

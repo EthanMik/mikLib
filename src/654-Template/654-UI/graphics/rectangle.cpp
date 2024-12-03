@@ -51,11 +51,15 @@ int rectangle::get_height() { return(h); }
 void rectangle::set_x_pos(int x) { this->x = x; }
 void rectangle::set_y_pos(int y) { this->y = y; }
 void rectangle::set_position(int x, int y) { this->x = x; this->y = y; }
+void rectangle::set_width(int w) { this->w = w; }
+void rectangle::set_height(int h) {this->h = h; }
 
 void rectangle::render() {
+    Brain.Screen.setPenWidth(1);
     Brain.Screen.setFillColor(fill_color);
     Brain.Screen.setPenColor(outline_color);
     Brain.Screen.drawRectangle(x, y, w, h);
 
     Brain.Screen.setPenColor(vex::white);
+    Brain.Screen.setPenWidth(0);
 }

@@ -20,18 +20,19 @@ void button::set_x_pos(int x) {
     button_graphic->set_x_pos(x);
     pressed_button_graphic->set_x_pos(x); 
     pressed = false; 
+    this->x = x;
 }
 
 void button::set_y_pos(int y) { 
     button_graphic->set_y_pos(y); 
-    pressed_button_graphic->set_x_pos(y); 
+    pressed_button_graphic->set_y_pos(y); 
     pressed = false; 
+    this->y = y;
 }
 
 void button::set_position(int x, int y) { 
     set_x_pos(x);
     set_y_pos(y);
-    pressed = false; 
 }
 
 void button::render() {

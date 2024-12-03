@@ -20,6 +20,10 @@ void screen::check_bounds(int w, int h) {
     }
 }
 
+void screen::set_swap_pending() { swap_pending = true; }
+bool screen::is_swap_pending() { return swap_pending; }
+void screen::clear_swap_pending() { swap_pending = false; }
+
 int screen::get_width() { return(this->w); }
 int screen::get_height() { return(this->h); }
 int screen::get_x_pos() { return(this->x); }
@@ -68,7 +72,20 @@ void screen::update_scroll_bar() {
 
 void screen::render() {
     for (const auto& component : UI_components) {
+
+        if (scroll_dir == scroll_direction::VERTICAL &&
+            component->get_y_pos() + component->get_height() < this->y || 
+            component->get_y_pos() + component->get_height() > this->y + this->h) {
+            continue;
+        }
+        if (scroll_dir == scroll_direction::HORIZONTAL &&
+            component->get_x_pos() + component->get_width() < this->x || 
+            component->get_x_pos() > this->x + this->w) {
+            continue;
+        }
+
         component->render();
+        
         if(!pressed) {
             component->is_pressing();
         }
@@ -116,7 +133,7 @@ void screen::is_scrolling() {
              scr_speed_limit = std::max(scr_speed_limit, 0.1f);
         }
 
-        int local_position = (delta_touch * scroll_speed) * scr_speed_limit;
+        int local_position = (delta_touch * scroll_speed) * scr_speed_limit + 1;
         if (screen_pos + local_position <= 0 && screen_pos + local_position >= -dimension && std::abs(delta_touch) > 10) {
             scr_speed_limit = 1;
             for (const auto& component : UI_components) {
@@ -144,12 +161,6 @@ int screen::get_touch_pos() {
     }
 }
 
-void screen::execute_toggles() {
-    for (const auto& component : UI_components) {
-        component->execute();
-    }
-}
-
 void screen::add_UI_component(std::shared_ptr<UI_component> component) {
     component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
     UI_components.push_back(component);
@@ -160,6 +171,10 @@ void screen::add_UI_components(std::vector<std::shared_ptr<UI_component>> compon
         component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
         UI_components.push_back(component);
     }
+}
+
+std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {
+    return UI_components;
 }
 
 int screen::get_aligment_pos(alignment alignment, int scroll_bar_w, int scroll_bar_h) {

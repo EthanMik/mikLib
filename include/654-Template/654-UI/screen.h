@@ -21,19 +21,25 @@ public:
     void set_x_pos(int x);
     void set_y_pos(int y);
 
+    void set_swap_pending();
+    bool is_swap_pending();
+    void clear_swap_pending();
+
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar);
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align);
 
     void render();
-    void execute_toggles();
 
     void add_UI_component(std::shared_ptr<UI_component> component);
     void add_UI_components(std::vector<std::shared_ptr<UI_component>> components);
     void set_UI_components(std::vector<std::shared_ptr<UI_component>> components);
+    std::vector<std::shared_ptr<UI_component>> get_UI_components();
 
 private:
     enum class scroll_direction { HORIZONTAL, VERTICAL };
 
+    bool swap_pending = false;
+    
     void check_bounds(int w, int h);
 
     void is_scrolling();

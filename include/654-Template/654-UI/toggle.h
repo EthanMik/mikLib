@@ -17,22 +17,29 @@ public:
     void set_x_pos(int x) override;
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
+    void set_callback(std::function<void()> cb) override;
+
+    void lock_toggle();
+    void unlock_toggle();
 
     void render() override;
     
     void is_pressing() override;
+    void unpress();
+
+    int get_ID() override;
 
     void execute();
-
     bool get_toggle_state();
-    int get_toggle_id();
 
-private:
+private:    
     std::shared_ptr<drawable> toggle_graphic;
     std::shared_ptr<drawable> pressed_toggle_graphic;
     int x, y, w, h;
     std::function<void()> callback;
     int id;
+
+    bool locked = false;
 
     bool pressed = false;
     bool is_toggled = false;

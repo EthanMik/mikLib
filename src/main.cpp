@@ -95,9 +95,10 @@ int main() {
   init();
   default_constants();
 
-  thread test(test_palette);
-  // UI_display_screens({selector_panel});
-  // thread test_UI(test_palette);
+/* ------------------THREADS----------------------- */
+  // thread odom_coords(print_coordinates);
+  // thread UI(test_palette);
+/* ------------------------------------------------ */
 
   // Competition.autonomous(auton);
   // Competition.drivercontrol(user_control);

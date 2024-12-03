@@ -18,8 +18,12 @@ public:
     virtual void set_x_pos(int x) = 0;
     virtual void set_y_pos(int y) = 0;    
     virtual void set_position(int x, int y) = 0;
+    virtual void set_width(int w) {}
+    virtual void set_height(int h) {}
 
     virtual void is_pressing() {}
-    virtual void execute() {}
+    
+    virtual void set_callback(std::function<void()> cb) {}
+    virtual int get_ID() {}
 
 };

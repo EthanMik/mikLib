@@ -2,10 +2,14 @@
 
 #include "vex.h"
 
+extern std::vector<std::shared_ptr<screen>> UI_render_queue;
+
 void UI_run();
 
 static void UI_display_screen(std::shared_ptr<screen> scr);
-static void UI_display_screens(const std::vector<std::shared_ptr<screen>>& render_queue);
+static void UI_display_render_queue();
+
+void UI_execute_selector_toggles(std::shared_ptr<UI_component> tgl, std::shared_ptr<screen> scr, bool lock_toggles = false);
 
 void UI_setup_queue_whitelist(std::vector<std::vector<int>> states);
 void UI_flush_whitelist();
