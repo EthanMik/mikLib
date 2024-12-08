@@ -17,8 +17,10 @@ public:
     void set_position(int x, int y) override;
 
     void render() override;
+    bool needs_update() override;
 
 private:
+    bool needs_render_update;
     std::shared_ptr<drawable> graphic;
     int x, y, w, h;
     bool position_is_set = false;

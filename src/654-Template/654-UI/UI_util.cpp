@@ -1,5 +1,36 @@
 #include "vex.h"
 
+static int UI_id = 0;
+
+int UI_create_ID(int component_type, int toggle_group) {
+    // Assume component_type and toggle_group are in [0..99]
+    // We allocate two digits for component_type, two digits for toggle_group,
+    // and then UI_id is appended at the end.
+    // Format: CC TT U...
+    // Example: component_type=1, toggle_group=1, UI_id=13 -> 1 * 10000 + 1 * 100 + 13 = 10113
+    
+    if (component_type < 0 || component_type > 99 ||
+        toggle_group < 0 || toggle_group > 99) {
+            Brain.Screen.printAt(30, 30, "0-99 MAX");
+            exit(1);
+    }
+
+    int id = component_type * 10000 + toggle_group * 100 + ++UI_id;
+    return id;
+}
+
+int UI_decode_component_type(int id) {
+    return(id / 10000);
+}
+
+int UI_decode_toggle_group(int id) {
+    return((id % 10000) / 100);
+}
+
+int UI_decode_unique_id(int id) {
+    return ((id % 10000) % 100);
+}
+
 float to_pixels(float distance, UI_distance_units units) {
     switch(units) {
       case UI_distance_units::inches:
@@ -42,20 +73,20 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue,
 }
 
 
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id) {
-    return std::make_shared<toggle>(toggle_graphic, pressed_toggle_graphic, callback, id);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id) {
+    return std::make_shared<toggle>(toggle_graphic, callback, id);
 }
 
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback) {
-    return std::make_shared<toggle>(toggle_graphic, pressed_toggle_graphic, callback);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback) {
+    return std::make_shared<toggle>(toggle_graphic, callback);
 }
 
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic) {
-    return std::make_shared<toggle>(toggle_graphic, pressed_toggle_graphic);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic) {
+    return std::make_shared<toggle>(toggle_graphic);
 }
 
-std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphic, std::shared_ptr<drawable> pressed_button_graphic, std::function<void()> on_click) {
-    return std::make_shared<button>(button_graphic, pressed_button_graphic, on_click);
+std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphic, std::function<void()> on_click) {
+    return std::make_shared<button>(button_graphic, on_click);
 }
 
 

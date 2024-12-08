@@ -49,12 +49,14 @@ manual_drive assembly(
 );
 
 void init(void) {
-  Brain.Screen.drawImageFromFile("loading.png", 0, 0);
+  thread UI(test_palette);
 
   chassis.inertial.calibrate();
   while (chassis.inertial.isCalibrating()) {
     wait(25, msec);
   }
+
+  // Brain.Screen.render(true, true);
 
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1,1);

@@ -96,8 +96,18 @@ int main() {
   default_constants();
 
 /* ------------------THREADS----------------------- */
-  // thread odom_coords(print_coordinates);
-  // thread UI(test_palette);
+  // print_coordinates();
+
+  // How to use console screen
+  int sum = 0;
+  UI_console_scr_add(sum); // variable render updates occur every 100ms
+  UI_console_scr_add("text"); // can add text
+  UI_console_scr_add([](){ return chassis.get_X_position(); }); // can add functions but they must not be void!!!
+
+  while(true) {
+    sum++;
+    task::sleep(10); // make sure you dont flood cpu
+  }
 /* ------------------------------------------------ */
 
   // Competition.autonomous(auton);

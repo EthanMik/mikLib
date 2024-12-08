@@ -4,7 +4,7 @@
 
 void turn_left_arc(float radius, float arcLength, float speed, bool precisionStop){ //RADIUS IN INCHES
     if(radius == 0) return;
-    const int ADJUSTMENT_SHARPNESS = 0.3; //How much the code will change velocity when veering off course
+    const float ADJUSTMENT_SHARPNESS = 0.3; //How much the code will change velocity when veering off course
    
     float dotProduct;
     float lengthOfVector;

@@ -1,8 +1,12 @@
 #include "vex.h"
 
-graphic::graphic() {};
+graphic::graphic() {
+    unique_id = UI_create_ID(1);
+};
 
 graphic::graphic(std::shared_ptr<drawable> graphic) {
+    unique_id = UI_create_ID(1);
+    
     graphics.push_back(graphic);
 
     calculate_bounds();
@@ -11,6 +15,7 @@ graphic::graphic(std::shared_ptr<drawable> graphic) {
 graphic::graphic(std::vector<std::shared_ptr<drawable>> graphics) :
     graphics(graphics)
 {
+    unique_id = UI_create_ID(1);
     calculate_bounds();
 };
 
@@ -48,6 +53,7 @@ void graphic::set_x_pos(int x) {
     for (const auto& graphic : graphics) {
         graphic->set_x_pos(graphic->get_x_pos() + delta_x);
     }
+    needs_render_update = true;
     this->x = x;
 }
 
@@ -56,6 +62,7 @@ void graphic::set_y_pos(int y) {
     for (const auto& graphic : graphics) {
         graphic->set_y_pos(graphic->get_y_pos() + delta_y);
     }
+    needs_render_update = true;
     this->y = y;
 }
 
@@ -77,6 +84,14 @@ void graphic::set_height(int h) {
         graphic->set_height(graphic->get_height() + delta_h);
     }
     this->h = h;
+}
+
+bool graphic::needs_update() {    
+    if (needs_render_update) {
+        needs_render_update = false;
+        return true;
+    }
+    return false;
 }
 
 void graphic::render() {

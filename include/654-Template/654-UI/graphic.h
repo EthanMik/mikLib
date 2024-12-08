@@ -23,11 +23,14 @@ public:
     void set_width(int w) override;
     void set_height(int h) override;
     
+    bool needs_update() override;
     void render() override;
 
     void add_graphic();
 
 private:
+    bool needs_render_update;
+
     int x, y, w, h;
     UI_distance_units units;
     std::vector<std::shared_ptr<drawable>> graphics;

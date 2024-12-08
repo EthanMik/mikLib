@@ -5,6 +5,12 @@
 class screen;
 class label;
 
+int UI_create_ID(int component_type, int toggle_group = 0);
+
+int UI_decode_component_type(int id);
+int UI_decode_toggle_group(int id);
+int UI_decode_unique_id(int id);
+
 float to_pixels(float distance, UI_distance_units units);
 
 void UI_img_exists(std::string file_name);
@@ -16,11 +22,11 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color fill
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue, UI_distance_units units);
 
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id);
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback);
-std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback);
+std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic);
 
-std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphic, std::shared_ptr<drawable> pressed_button_graphic, std::function<void()> on_click);
+std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphic, std::function<void()> on_click);
 
 std::shared_ptr<UI_component> UI_crt_lbl(const std::string& label_text, int x, int y, UI_distance_units units);
 template <typename T>

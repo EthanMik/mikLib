@@ -3,28 +3,13 @@
 #include "vex.h"
 
 extern std::vector<std::shared_ptr<screen>> UI_render_queue;
+extern std::vector<std::shared_ptr<screen>> UI_render_buffer;
+extern bool is_screen_swapping;
 
-void UI_run();
+void UI_init();
+void UI_render();
 
-static void UI_display_screen(std::shared_ptr<screen> scr);
-static void UI_display_render_queue();
+static void UI_swap_screens(const std::vector<std::shared_ptr<screen>>& scr);
 
 void UI_execute_selector_toggles(std::shared_ptr<UI_component> tgl, std::shared_ptr<screen> scr, bool lock_toggles = false);
-
-void UI_setup_queue_whitelist(std::vector<std::vector<int>> states);
-void UI_flush_whitelist();
-
-static void UI_add_function_to_queue(std::function<void()> func, int id);
-
-void UI_flush_queue(); 
-
-static void UI_click(screen* scr);
-
-static void UI_run_toggles(screen* scr);
-
-int bruh();
-
-// extern screen* selector_panel;
-// screen* macros_screen_1;
-// screen* drive_mode_screen_1;
 

@@ -3,8 +3,8 @@
 std::vector<std::vector<float>> graph_buffer;
 
 void test_palette() {
-  // UI_manager ui;
-  UI_run();
+  UI_init();
+  UI_render();
 }
 
 void test() {
@@ -50,16 +50,12 @@ void test_serial_output() {
 
 void print_coordinates(){
   chassis.set_coordinates(0, 0, 0);
-  while(true){
-    Brain.Screen.clearScreen();
-    Brain.Screen.printAt(0, 50, "X: %f", chassis.get_X_position());
-    Brain.Screen.printAt(0, 70, "Y: %f", chassis.get_Y_position());
-    Brain.Screen.printAt(0, 90, "Heading: %f", chassis.get_absolute_heading());
-    Brain.Screen.printAt(0, 110, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
-    Brain.Screen.printAt(0, 130, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
-    task::sleep(20);
-    Brain.Screen.render();
-  }
+
+  UI_console_scr_add("X: ", [](){ return chassis.get_X_position(); });
+  UI_console_scr_add("Y: ", [](){ return chassis.get_Y_position(); });
+  UI_console_scr_add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+  UI_console_scr_add("ForwardTracker: ", [](){ return chassis.get_ForwardTracker_position(); });
+  UI_console_scr_add("SidewaysTracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
 }
 
 void add_to_graph_buffer(std::vector<float> data) {

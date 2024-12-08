@@ -3,35 +3,38 @@
 screen::screen(int x, int y, int w, int h) :
     x(x), y(y), w(w), h(h)
 {
-    check_bounds(w, h);
+    check_bounds();
 };
 
-void screen::check_bounds(int w, int h) {
+void screen::check_bounds() {
     if (w > SCREEN_WIDTH && h  > SCREEN_HEIGHT) {
         Brain.Screen.printAt(30, 30, "BOTH SCREEN SIZE BOUNDS LARGER THAN DISPLAY");
         exit(1);
     }
 
-    if (h > SCREEN_HEIGHT) {
+    if (h > SCREEN_HEIGHT - y) {
         scroll_dir = scroll_direction::VERTICAL;
     }
-    if (w > SCREEN_WIDTH) {
+    if (w > SCREEN_WIDTH - x) {
         scroll_dir = scroll_direction::HORIZONTAL;
     }
 }
 
-void screen::set_swap_pending() { swap_pending = true; }
-bool screen::is_swap_pending() { return swap_pending; }
-void screen::clear_swap_pending() { swap_pending = false; }
-
 int screen::get_width() { return(this->w); }
 int screen::get_height() { return(this->h); }
+int screen::get_component_delta_pos() { return(component_delta_position); }
 int screen::get_x_pos() { return(this->x); }
 int screen::get_y_pos() { return(this->y); }
-void screen::set_width(int w) { check_bounds(w, h); this->w = w; }
-void screen::set_height(int h) { check_bounds(w, h); this->h = h; } 
+void screen::set_width(int w) { 
+    this->w = w; 
+    check_bounds(); 
+}
+void screen::set_height(int h) { 
+    this->h = h;
+    check_bounds(); 
+} 
 
-void screen::set_x_pos(int x) { 
+void screen::set_x_pos(int x) {
     this->x = x;
     for (const auto& component : UI_components) {
         component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
@@ -61,37 +64,74 @@ void screen::add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scro
 void screen::update_scroll_bar() {
     switch (scroll_dir) {
     case scroll_direction::VERTICAL:
-        scroll_bar->set_y_pos((float)screen_pos * -(((float)SCREEN_HEIGHT - scroll_bar->get_height() - y) / h) + y);
+        scroll_bar->set_y_pos((float)screen_pos * -(((float)SCREEN_HEIGHT - scroll_bar->get_height() - y) / (h - SCREEN_HEIGHT + y)) + y);
         break;
     case scroll_direction::HORIZONTAL:
-        scroll_bar->set_x_pos((float)screen_pos * -(((float)SCREEN_WIDTH - scroll_bar->get_width() - x) / w) + x);
-        break;    
+        scroll_bar->set_x_pos((float)screen_pos * -(((float)SCREEN_WIDTH - scroll_bar->get_width() - x) / (w - SCREEN_WIDTH + w)) + x);
+        break; 
+    case scroll_direction::NONE:
+        break;   
     }
     scroll_bar->render();
 }
 
-void screen::render() {
-    for (const auto& component : UI_components) {
+bool screen::needs_update() {
+    if (removal_scheduled) {
+        execute_removal();
+        removal_scheduled = false;
+        needs_render_update = true;
+    }
 
-        if (scroll_dir == scroll_direction::VERTICAL &&
-            component->get_y_pos() + component->get_height() < this->y || 
-            component->get_y_pos() + component->get_height() > this->y + this->h) {
+    for (const auto& component : UI_components) {
+        if ((scroll_dir == scroll_direction::VERTICAL) &&
+            (component->get_y_pos() + component->get_height() < this->y || 
+            component->get_y_pos() + component->get_height() > this->y + this->h)) {
             continue;
         }
-        if (scroll_dir == scroll_direction::HORIZONTAL &&
-            component->get_x_pos() + component->get_width() < this->x || 
-            component->get_x_pos() > this->x + this->w) {
+        if ((scroll_dir == scroll_direction::HORIZONTAL) &&
+            (component->get_x_pos() + component->get_width() < this->x || 
+            component->get_x_pos() > this->x + this->w)) {
+            continue;
+        }
+
+        if(!pressed) {
+            component->is_pressing();
+        }
+
+        if (component->needs_update()) {
+            needs_render_update = true;
+        }
+
+    }
+    if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
+        is_scrolling();
+    }
+
+    if (needs_render_update) {
+        needs_render_update = false;
+        return true;
+    }
+    return false;
+}
+
+void screen::render() {
+    for (const auto& component : UI_components) {
+        if ((scroll_dir == scroll_direction::VERTICAL) &&
+            (component->get_y_pos() + component->get_height() < this->y || 
+            component->get_y_pos() + component->get_height() > this->y + this->h)) {
+            continue;
+        }
+        if ((scroll_dir == scroll_direction::HORIZONTAL) &&
+            (component->get_x_pos() + component->get_width() < this->x || 
+            component->get_x_pos() > this->x + this->w)) {
             continue;
         }
 
         component->render();
-        
-        if(!pressed) {
-            component->is_pressing();
+
+        if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
+            update_scroll_bar();
         }
-    }
-    if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
-        is_scrolling();
     }
 }
 
@@ -112,9 +152,9 @@ void screen::is_scrolling() {
         int dimension;
 
         if (scroll_dir == scroll_direction::VERTICAL) {
-            dimension = h;
+            dimension = h - SCREEN_HEIGHT + y;
         } else {
-            dimension = w;
+            dimension = w - SCREEN_WIDTH + x;
         }
 
         float distance_to_lower_bound = screen_pos;
@@ -143,9 +183,10 @@ void screen::is_scrolling() {
                     component->set_x_pos(component->get_x_pos() + local_position);
                 }
             }
+            component_delta_position += local_position;
+            
             screen_pos += local_position;
         }
-        update_scroll_bar();
     }
     if (!Brain.Screen.pressing()) {
         pressed = false;
@@ -158,18 +199,46 @@ int screen::get_touch_pos() {
         return Brain.Screen.xPosition();    
     case scroll_direction::VERTICAL:
         return Brain.Screen.yPosition();
+    case scroll_direction::NONE:
+        return 0;
     }
 }
 
 void screen::add_UI_component(std::shared_ptr<UI_component> component) {
     component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
     UI_components.push_back(component);
+    id_to_index[component->get_ID()] = UI_components.size() - 1;
 }
 
 void screen::add_UI_components(std::vector<std::shared_ptr<UI_component>> components) {
     for (const auto& component : components) {
         component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
         UI_components.push_back(component);
+        id_to_index[component->get_ID()] = UI_components.size() - 1;
+    }
+}
+
+void screen::remove_UI_component(std::vector<int> id) {
+    removal_id.swap(id);
+    removal_scheduled = true;
+}
+
+void screen::execute_removal() {
+    for (auto id : removal_id) {
+        auto it = id_to_index.find(id);
+        if (it != id_to_index.end()) {
+            size_t index_to_remove = it->second;
+            size_t last_index = UI_components.size() - 1;
+
+            if (index_to_remove != last_index) {
+                std::swap(UI_components[index_to_remove], UI_components[last_index]);
+                int moved_element_id = UI_components[index_to_remove]->get_ID();
+                id_to_index[moved_element_id] = index_to_remove;
+            }
+
+            UI_components.pop_back();
+            id_to_index.erase(it);
+        }
     }
 }
 

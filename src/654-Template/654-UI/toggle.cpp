@@ -1,32 +1,35 @@
 #include "vex.h"
 
-toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic) :
-    toggle_graphic(toggle_graphic),
-    pressed_toggle_graphic(pressed_toggle_graphic)
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic) :
+    toggle_graphic(toggle_graphic)
 {
+    unique_id = UI_create_ID(5);
+
     this->x = get_x_pos();
     this->y = get_y_pos();
     this->w = get_width();
     this->h = get_height();
 };
 
-toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback) :
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback) :
     toggle_graphic(toggle_graphic),
-    pressed_toggle_graphic(pressed_toggle_graphic),
     callback(std::move(callback))
 {
+    unique_id = UI_create_ID(5);
+    
     this->x = get_x_pos();
     this->y = get_y_pos();
     this->w = get_width();
     this->h = get_height();
 };
 
-toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id) :
+toggle::toggle(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id) :
     toggle_graphic(toggle_graphic),
-    pressed_toggle_graphic(pressed_toggle_graphic),
     callback(std::move(callback)),
     id(id)
 {
+    unique_id = UI_create_ID(5, id);
+
     if (id <= 0) { 
         Brain.Screen.printAt(30, 30, "CANNOT HAVE TOGGLE WITH ID 0 OR LESS"); 
         exit(1);
@@ -44,15 +47,31 @@ int toggle::get_width() { return(toggle_graphic->get_width()); }
 int toggle::get_height() { return(toggle_graphic->get_height()); }
 
 void toggle::set_x_pos(int x) { 
-    toggle_graphic->set_x_pos(x); 
-    pressed_toggle_graphic->set_x_pos(x);
+    toggle_graphic->set_x_pos(x);
+
+    if (toggled_graphic) {
+        toggled_graphic->set_x_pos(x);
+    }
+    if (pressing_toggle_graphic) {
+        pressing_toggle_graphic->set_x_pos(x);
+    }
+
+    needs_render_update = true;
     pressed = false; 
     this->x = x;
 }
 
 void toggle::set_y_pos(int y) { 
     toggle_graphic->set_y_pos(y); 
-    pressed_toggle_graphic->set_y_pos(y);
+
+    if (toggled_graphic) {
+        toggled_graphic->set_y_pos(y);
+    }
+    if (pressing_toggle_graphic) {
+        pressing_toggle_graphic->set_y_pos(y);
+    }
+
+    needs_render_update = true;
     pressed = false; 
     this->y = y;
 }
@@ -65,15 +84,47 @@ void toggle::set_position(int x, int y) {
 void toggle::set_callback(std::function<void()> cb) {
     callback = cb;
 }
+void toggle::set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered) {
+    pressing_toggle_graphic = pressing_state; 
+    toggled_graphic = triggered; 
+}
 
 void toggle::lock_toggle() { locked = true; }
 void toggle::unlock_toggle() { locked = false; }
 
+bool toggle::needs_update() {
+    if (state != prev_state) {
+        needs_render_update = true;
+    }
+    prev_state = state;
+
+    if (needs_render_update) {
+        needs_render_update = false;
+        return true;
+    }
+    return false;
+}
+
 void toggle::render() {
-    if (is_toggled) {
-        pressed_toggle_graphic->render();
-    } else {
+    switch (state)
+    {
+    case toggle_state::INACTIVE:
         toggle_graphic->render();
+        break;    
+    case toggle_state::PRESSING:
+        if (pressing_toggle_graphic) {
+            pressing_toggle_graphic->render();
+        } else {
+            toggle_graphic->render();
+        }
+        break;    
+    case toggle_state::TOGGLED:
+        if (toggled_graphic) {
+            toggled_graphic->render();
+        } else {
+            toggle_graphic->render();
+        }
+        break;    
     }
 }
 
@@ -87,17 +138,25 @@ void toggle::is_pressing() {
     if (Brain.Screen.pressing()) {
         if (!pressed && is_touch_within_toggle) {
             pressed = true;
+            state = toggle_state::PRESSING;
             render();
         } else if (pressed && !is_touch_within_toggle) {
             pressed = false;
+            state = toggle_state::INACTIVE;
             render();
         }
     } else if (pressed) {
         pressed = false;
+        state = toggle_state::TOGGLED;
         render();
         if (is_touch_within_toggle) {
             is_toggled = !is_toggled;
             execute();
+        }
+    }
+    else {
+        if (!pressed) {
+            state = toggle_state::INACTIVE;
         }
     }
 }
@@ -106,6 +165,7 @@ void toggle::unpress() {
     locked = false;
     is_toggled = false;
     pressed = false;
+    state = toggle_state::INACTIVE;
 }
 
 void toggle::execute() {
@@ -116,8 +176,4 @@ void toggle::execute() {
 
 bool toggle::get_toggle_state() {
     return(is_toggled);
-}
-
-int toggle::get_ID() {
-    return(id);
 }

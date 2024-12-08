@@ -5,9 +5,9 @@
 class toggle : public UI_component
 {
 public:
-    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback, int id);
-    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic, std::function<void()> callback);
-    toggle(std::shared_ptr<drawable> toggle_graphic, std::shared_ptr<drawable> pressed_toggle_graphic);
+    toggle(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id);
+    toggle(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback);
+    toggle(std::shared_ptr<drawable> toggle_graphic);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -18,23 +18,31 @@ public:
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
     void set_callback(std::function<void()> cb) override;
-
+    void set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered) override;
+    
     void lock_toggle();
     void unlock_toggle();
 
+    bool needs_update() override;
     void render() override;
-    
+
     void is_pressing() override;
     void unpress();
-
-    int get_ID() override;
 
     void execute();
     bool get_toggle_state();
 
-private:    
-    std::shared_ptr<drawable> toggle_graphic;
-    std::shared_ptr<drawable> pressed_toggle_graphic;
+private:
+    enum class toggle_state { INACTIVE, PRESSING, TOGGLED };
+
+    toggle_state state = toggle_state::INACTIVE;
+    toggle_state prev_state;
+    bool needs_render_update;
+
+    std::shared_ptr<drawable> toggle_graphic = nullptr;
+    std::shared_ptr<drawable> pressing_toggle_graphic = nullptr;
+    std::shared_ptr<drawable> toggled_graphic = nullptr;
+
     int x, y, w, h;
     std::function<void()> callback;
     int id;

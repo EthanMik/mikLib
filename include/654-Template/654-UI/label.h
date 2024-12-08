@@ -22,16 +22,21 @@ public:
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
 
+    bool needs_update() override;
     void render() override;
 
 private:
     std::string label_text;
-    std::function<std::string()> data_func;
-    int x;
-    int y;
-    int w;
-    int h;
+    int x, y, w, h;
     UI_distance_units units;
+    std::function<std::string()> data_func;
+    
+    std::string prev_data;
+    bool needs_render_update;
+
+    uint32_t last_update_time = 0;
+    const uint32_t update_interval_ms = 100;
+
 };
 
 template<typename T>
@@ -47,6 +52,8 @@ label::label(const std::string& label, T& data, int x, int y, UI_distance_units 
     }),
     x(x), y(y), units(units)
 {
+    unique_id = UI_create_ID(3);
+
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
 };
@@ -66,6 +73,8 @@ label::label(const std::string& label, F&& data_func, int x, int y, UI_distance_
     }),
     x(x), y(y), units(units) 
 {
+    unique_id = UI_create_ID(3);
+
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
 };
