@@ -28,7 +28,7 @@ void label::set_y_pos(int y) {
 void label::set_position(int x, int y) { this->x = x; this->y = y; }
 
 bool label::needs_update() {
-    uint32_t current_time = Brain.Timer.time(vex::timeUnits::msec);
+    int current_time = Brain.Timer.time(vex::timeUnits::msec);
 
     if (current_time - last_update_time >= update_interval_ms) {
         const std::string data = data_func();

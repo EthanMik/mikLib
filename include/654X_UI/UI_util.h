@@ -5,6 +5,14 @@
 class screen;
 class label;
 
+int UI_get_cursor_x_position();
+int UI_get_cursor_y_position();
+
+int UI_get_cursor_x_bound();
+int UI_get_cursor_y_bound();
+
+void UI_update_cursor_position(std::shared_ptr<screen> scr);
+
 int UI_create_ID(int component_type, int toggle_group = 0);
 
 int UI_decode_component_type(int id);
@@ -13,7 +21,7 @@ int UI_decode_unique_id(int id);
 
 float to_pixels(float distance, UI_distance_units units);
 
-void UI_img_exists(std::string file_name);
+void UI_img_exists(const std::string& file_name);
 
 std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units);
 
@@ -45,7 +53,6 @@ template <typename F>
 std::shared_ptr<UI_component> UI_crt_lbl(const std::string& label_text, F&& data_func, int x, int y, UI_distance_units units) {
     return std::make_shared<label>(label_text, std::forward<F>(data_func), x, y, units);
 }
-
 
 std::shared_ptr<UI_component> UI_crt_gfx(std::shared_ptr<drawable> graphic_);
 std::shared_ptr<UI_component> UI_crt_gfx(std::vector<std::shared_ptr<drawable>> graphics);

@@ -34,8 +34,8 @@ private:
     std::string prev_data;
     bool needs_render_update;
 
-    uint32_t last_update_time = 0;
-    const uint32_t update_interval_ms = 100;
+    int last_update_time = 0;
+    const int update_interval_ms = 100;
 
 };
 

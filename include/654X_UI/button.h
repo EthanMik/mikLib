@@ -21,7 +21,9 @@ public:
     void render() override;
     bool needs_update() override;
 
-    void is_pressing() override;
+    void is_pressing(input_type input_type) override;
+    void is_pressing_touch();
+    void is_pressing_controller();
 
 private:
     enum class button_state { INACTIVE, PRESSING, TRIGGERED };
@@ -36,4 +38,8 @@ private:
     int x, y, w, h;
     std::function<void()> on_click;
     bool pressed = false;
+
+    int initial_msec = 0;
+    const int cooldown_msec = 200;
+    bool cooldown = false;
 };

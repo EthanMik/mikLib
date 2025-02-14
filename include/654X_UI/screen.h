@@ -32,15 +32,17 @@ public:
     void add_UI_components(std::vector<std::shared_ptr<UI_component>> components);
     void remove_UI_component(std::vector<int> id);
     void set_UI_components(std::vector<std::shared_ptr<UI_component>> components);
-    std::vector<std::shared_ptr<UI_component>> get_UI_components();
+    const std::vector<std::shared_ptr<UI_component>> get_UI_components();
 
 private:
     enum class scroll_direction { NONE, HORIZONTAL, VERTICAL };
     
     void check_bounds();
-    bool is_render_exceptions(const std::shared_ptr<UI_component>& component);
+    bool is_render_exception(const std::shared_ptr<UI_component>& component);
 
     void is_scrolling();
+    void is_scrolling_controller();
+    
     void update_scroll_bar();
 
     int get_touch_pos();
@@ -65,4 +67,5 @@ private:
     std::vector<int> removal_id;
 
     bool needs_render_update;
+    input_type input_type = input_type::TOUCHSCREEN;
 };

@@ -18,19 +18,19 @@ void UI_auton_screen::UI_crt_auton_scr() {
     auto off_skills_tgl_lbl = UI_crt_gfx(UI_crt_img("off_skills_toggle_label.png", 13, 193, 204, 41, UI_distance_units::pixels));
 
     auto red_blue_tgl = UI_crt_tgl(UI_crt_img("blue_toggle.png", 94, 60, 43, 24, UI_distance_units::pixels));
-        red_blue_tgl->set_states(nullptr, UI_crt_img("red_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
+        red_blue_tgl->set_states(UI_crt_img("default_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels), UI_crt_img("red_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
         red_blue_tgl->set_callback([this](){ UI_select_auton(UI_RED_BLUE_BIT); });
 
     auto rings_goal_tgl = UI_crt_tgl(UI_crt_img("rings_toggle.png", 94, 108, 43, 24, UI_distance_units::pixels));
-        rings_goal_tgl->set_states(nullptr, UI_crt_img("goal_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
+        rings_goal_tgl->set_states(UI_crt_img("default_toggle.png", 94, 108, 43, 24, UI_distance_units::pixels), UI_crt_img("goal_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
         rings_goal_tgl->set_callback([this](){ UI_select_auton(UI_RINGS_GOAL_BIT); });
 
     auto quals_elims_tgl = UI_crt_tgl(UI_crt_img("quals_toggle.png", 94, 156, 43, 24, UI_distance_units::pixels));
-        quals_elims_tgl->set_states(nullptr, UI_crt_img("elims_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
+        quals_elims_tgl->set_states(UI_crt_img("default_toggle.png", 94, 156, 43, 24, UI_distance_units::pixels), UI_crt_img("elims_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
         quals_elims_tgl->set_callback([this](){ UI_select_auton(UI_QUALS_ELIMS_BIT); });
         
     auto off_skills_tgl = UI_crt_tgl(UI_crt_img("off_toggle.png", 94, 204, 43, 24, UI_distance_units::pixels));
-        off_skills_tgl->set_states(nullptr, UI_crt_img("skills_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
+        off_skills_tgl->set_states(UI_crt_img("default_toggle.png", 94, 204, 43, 24, UI_distance_units::pixels), UI_crt_img("skills_toggle.png", 94, 57, 43, 24, UI_distance_units::pixels));
         off_skills_tgl->set_callback([this](){ UI_select_auton(UI_OFF_SKILLS_BIT); });
 
     auto divider = UI_crt_gfx(UI_crt_img("divider.png", 233, 53, 11, 177, UI_distance_units::pixels));
@@ -43,8 +43,6 @@ void UI_auton_screen::UI_crt_auton_scr() {
         UI_crt_txt("Description...", 225, 94, UI_distance_units::pixels)
     });
     
-
-
     UI_auton_scr->add_UI_components({bg, red_blue_tgl_lbl, rings_goal_tgl_lbl, quals_elims_tgl_lbl, 
         off_skills_tgl_lbl, red_blue_tgl, rings_goal_tgl, quals_elims_tgl, 
         off_skills_tgl, divider, show_alignment_btn, description_box});

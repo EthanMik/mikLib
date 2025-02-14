@@ -2,18 +2,6 @@
 
 #include "vex.h"
 
-extern std::vector<std::shared_ptr<screen>> UI_render_queue;
-extern std::vector<std::shared_ptr<screen>> UI_render_buffer;
-
-extern std::shared_ptr<UI_console_screen> console_scr;
-// extern std::shared_ptr<screen> UI_console_scr; 
-
-extern std::shared_ptr<UI_auton_screen> auton_scr;
-// extern std::shared_ptr<screen> UI_auton_scr; 
-
-
-extern bool is_screen_swapping;
-
 void UI_init();
 void UI_render();
 

@@ -49,7 +49,7 @@ void test_serial_output() {
 }
 
 void print_coordinates(){
-  chassis.set_coordinates(0, 0, 0);
+  // chassis.set_coordinates(0, 0, 0);
   while(true){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(0, 50, "X: %f", chassis.get_X_position());

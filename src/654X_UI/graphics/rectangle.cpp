@@ -13,8 +13,8 @@ rectangle::rectangle(int x, int y, int w, int h, uint32_t fill_color, uint32_t o
 
 rectangle::rectangle(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units) :
     x(x), y(y), w(w), h(h),
-    fill_color(fill_color.hue()),
-    outline_color(outline_color.hue())
+    fill_color(fill_color),
+    outline_color(outline_color)
 {
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
@@ -35,8 +35,8 @@ rectangle::rectangle(int x, int y, int w, int h, uint32_t hue, UI_distance_units
 
 rectangle::rectangle(int x, int y, int w, int h, vex::color hue, UI_distance_units units) : 
     x(x), y(y), w(w), h(h),
-    fill_color(hue.hue()),
-    outline_color(hue.hue())
+    fill_color(hue),
+    outline_color(hue)
 {
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
@@ -60,6 +60,6 @@ void rectangle::render() {
     Brain.Screen.setPenColor(outline_color);
     Brain.Screen.drawRectangle(x, y, w, h);
 
-    Brain.Screen.setPenColor(vex::white);
+    Brain.Screen.setPenColor(vex::color::white);
     Brain.Screen.setPenWidth(0);
 }

@@ -3,12 +3,14 @@
 #include "vex.h"
 
 enum class UI_distance_units {inches, centimeters, pixels};
+enum class input_type { CONTROLLER, TOUCHSCREEN };
 
 #define UI_Graphic_ID    1
 #define UI_Background_ID 2
 #define UI_Label_ID      3
 #define UI_Button_ID     4
 #define UI_Toggle_ID     5
+#define UI_Textbox_ID    6
 
 class UI_component {
 protected:
@@ -31,7 +33,7 @@ public:
     virtual void set_width(int w) {}
     virtual void set_height(int h) {}
 
-    virtual void is_pressing() {}
+    virtual void is_pressing(input_type input_type) {}
     
     virtual void set_callback(std::function<void()> cb) {}
     virtual void set_states(std::shared_ptr<drawable> pressing, std::shared_ptr<drawable> triggered) {}

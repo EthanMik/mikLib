@@ -75,7 +75,7 @@ void screen::update_scroll_bar() {
     scroll_bar->render();
 }
 
-bool screen::is_render_exceptions(const std::shared_ptr<UI_component>& component) {
+bool screen::is_render_exception(const std::shared_ptr<UI_component>& component) {
     bool is_exception = false;
 
     if ((scroll_dir == scroll_direction::VERTICAL) &&
@@ -103,14 +103,19 @@ bool screen::needs_update() {
         needs_render_update = true;
     }
 
+    if (Controller.ButtonLeft.pressing() || Controller.ButtonRight.pressing() || Controller.ButtonUp.pressing() || Controller.ButtonDown.pressing()) {
+        input_type = input_type::CONTROLLER;
+    } else if (Brain.Screen.pressing()) {
+        input_type = input_type::TOUCHSCREEN;
+    }
 
     for (const auto& component : UI_components) {
-        if (is_render_exceptions(component)) {
+        if (is_render_exception(component)) {
             continue;
         }
 
         if(!pressed) {
-            component->is_pressing();
+            component->is_pressing(input_type);
         }
 
         if (component->needs_update()) {
@@ -119,7 +124,7 @@ bool screen::needs_update() {
 
     }
     if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
-        is_scrolling();
+        is_scrolling_controller();
     }
 
     if (needs_render_update) {
@@ -131,7 +136,7 @@ bool screen::needs_update() {
 
 void screen::render() {
     for (const auto& component : UI_components) {
-        if (is_render_exceptions(component)) {
+        if (is_render_exception(component)) {
             continue;
         }
 
@@ -140,6 +145,23 @@ void screen::render() {
         if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
             update_scroll_bar();
         }
+    }
+}
+
+void screen::is_scrolling_controller() {
+    int cursor_x = UI_get_cursor_x_position();
+    int cursor_y = UI_get_cursor_y_position();
+    int cursor_x_bound = UI_get_cursor_x_bound();
+    int cursor_y_bound = UI_get_cursor_y_bound();
+
+    bool is_cursor_within_screen = cursor_x >= x && cursor_x <= x + w && cursor_y >= y && cursor_y <= y + h;
+    
+    printf("\n%d", cursor_x);
+    if (cursor_x > SCREEN_WIDTH + screen_pos) {
+        for (const auto& component : UI_components) {
+            component->set_x_pos(component->get_x_pos() - cursor_x_bound * 2);
+        }
+        screen_pos += cursor_x_bound * 2;
     }
 }
 
@@ -183,7 +205,7 @@ void screen::is_scrolling() {
 
         int local_position = (delta_touch * scroll_speed) * scr_speed_limit + 1;
         local_position = local_position < 0 ? local_position - 1 : local_position + 1; 
-        if (screen_pos + local_position <= 0 && screen_pos + local_position >= -dimension && std::abs(delta_touch) > 10) {
+        if (screen_pos + local_position <= this->x && screen_pos + local_position >= -dimension && std::abs(delta_touch) > 10) {
             scr_speed_limit = 1;
             for (const auto& component : UI_components) {
                 if (scroll_dir == scroll_direction::VERTICAL) {
@@ -251,7 +273,7 @@ void screen::execute_removal() {
     }
 }
 
-std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {
+const std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {
     return UI_components;
 }
 

@@ -20,7 +20,7 @@ vex::motor& hzn::motor_group::get_motor(std::string motor_name) {
             return motor.mtr;
         }
     }
-    Brain.Screen.printAt(30, 30, "MOTOR NOT FOUND");
+    Brain.Screen.printAt(30, 30, (motor_name + " NOT FOUND").c_str());
     exit(1);
 }
 

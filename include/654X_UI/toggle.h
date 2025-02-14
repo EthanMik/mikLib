@@ -20,13 +20,17 @@ public:
     void set_callback(std::function<void()> cb) override;
     void set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered) override;
     
+    bool is_locked();
     void lock_toggle();
     void unlock_toggle();
 
     bool needs_update() override;
     void render() override;
 
-    void is_pressing() override;
+    void is_pressing(input_type input_type) override;
+    void is_pressing_touch();
+    void is_pressing_controller();
+
     void unpress();
 
     void execute();
@@ -51,4 +55,8 @@ private:
 
     bool pressed = false;
     bool is_toggled = false;
+
+    int initial_msec = 0;
+    const int cooldown_msec = 300;
+    bool cooldown = false;
 };

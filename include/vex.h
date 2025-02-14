@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <cstdint>
+#include <climits>
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
@@ -19,6 +20,7 @@
 #include "v5_vcs.h"
 
 #include "654X_Drive/util.h"
+#include "654X_Drive/autons.h"
 #include "654X_Drive/motors.h"
 #include "654X_Drive/odom.h"
 #include "654X_Drive/PID.h"
@@ -40,6 +42,7 @@
 #include "654X_UI/label.h"
 #include "654X_UI/graphic.h"
 #include "654X_UI/background.h"
+#include "654X_UI/textbox.h"
 #include "654X_UI/screen.h"
 #include "654X_UI/screens/console_screen.h"
 #include "654X_UI/screens/auton_screen.h"

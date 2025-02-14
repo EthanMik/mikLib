@@ -56,7 +56,7 @@ void button::set_states(std::shared_ptr<drawable> pressing_state, std::shared_pt
     if (pressing_state) {
         pressed_button_graphic = pressing_state;
     }
-    if (triggered_button_graphic) {
+    if (triggered_state) {
         triggered_button_graphic = triggered_state;
     }
 }
@@ -101,31 +101,71 @@ void button::render() {
     }
 }
 
-void button::is_pressing() {
+void button::is_pressing_touch() {
+    if (cooldown && (int)Brain.Timer.time(vex::timeUnits::msec) - initial_msec <= cooldown_msec) {
+        return;
+    }
+    cooldown = false;
+
     float touch_x = Brain.Screen.xPosition();
     float touch_y = Brain.Screen.yPosition();
     bool is_touch_within_button = touch_x >= x && touch_x <= x + w && touch_y >= y && touch_y <= y + h;
-
+    
     if (Brain.Screen.pressing()) {
         if (!pressed && is_touch_within_button) {
             pressed = true;
             state = button_state::PRESSING;
-            render();
         } else if (pressed && !is_touch_within_button) {
             pressed = false;
             state = button_state::INACTIVE;
-            render();
         }
     } else if (pressed) {
         pressed = false;
         state = button_state::TRIGGERED;
-        render();
         if (is_touch_within_button && on_click) {
             on_click();
         }
-    }
-    if (!pressed) {
+        cooldown = true;
+        initial_msec = Brain.Timer.time(vex::timeUnits::msec);
+    } else if (!pressed) {
         state = button_state::INACTIVE;
-        render();
+    }
+}
+
+void button::is_pressing_controller() {
+    if (cooldown && (int)Brain.Timer.time(vex::timeUnits::msec) - initial_msec <= cooldown_msec) {
+        return;
+    }
+    cooldown = false;
+
+
+    float cursor_x = UI_get_cursor_x_position();
+    float cursor_y = UI_get_cursor_y_position();
+    bool is_cursor_within_button = cursor_x >= x && cursor_x <= x + w && cursor_y >= y && cursor_y <= y + h;
+    
+    if (Controller.ButtonB.pressing() && is_cursor_within_button) {
+        state = button_state::TRIGGERED;
+        if (is_cursor_within_button && on_click) {
+            on_click();
+        }
+        cooldown = true;
+        initial_msec = Brain.Timer.time(vex::timeUnits::msec);
+    } else if (is_cursor_within_button) {
+        state = button_state::PRESSING;
+    } else if (!is_cursor_within_button) {
+        state = button_state::INACTIVE;
+    }
+}
+
+void button::is_pressing(input_type input_type) {
+    switch (input_type)
+    {
+    case input_type::CONTROLLER:
+        is_pressing_controller();
+        break;    
+    case input_type::TOUCHSCREEN:
+        is_pressing_touch();
+        break;
+    
     }
 }

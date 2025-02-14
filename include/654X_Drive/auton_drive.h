@@ -7,6 +7,7 @@ private:
     float wheel_diameter;
     float wheel_ratio;
     float drive_inch_to_deg_ratio;
+    float inertial_scale;
 
     float forward_tracker_diameter;
     float forward_tracker_center_distance;
@@ -22,7 +23,7 @@ private:
     float idealY;
 
 public:
-    auton_drive(hzn::motor_group left_drive, hzn::motor_group right_drive, int inertial_port, float wheel_diameter, float wheel_ratio, int forward_tracker_port, float forward_tracker_diameter, 
+    auton_drive(hzn::motor_group left_drive, hzn::motor_group right_drive, int inertial_port, float wheel_diameter, float wheel_ratio, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
         float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance);
 
     //Helper Methods general
@@ -31,6 +32,7 @@ public:
 
     //Helper Methods drive
     void drive_with_voltage(float leftVoltage, float rightVoltage);
+    void override_brake_type(vex::brakeType brake);
     void stop_drive(vex::brakeType brake);
     float get_left_position_in();
     float get_right_position_in();
@@ -85,7 +87,8 @@ public:
 
     //Odom drive methods
     void turn_to_point(float X_position, float Y_position);
-    void turn_to_point(float X_position, float Y_position, float extra_angle_deg, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+    void turn_to_point(float X_position, float Y_position, bool reversed);
+    void turn_to_point(float X_position, float Y_position, bool reversed, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
 
     void drive_to_point(float X_position, float Y_position);
     void drive_to_point(float X_position, float Y_position, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
@@ -150,5 +153,6 @@ public:
     hzn::motor_group left_drive;
     hzn::motor_group right_drive; 
 
-    bool is_reversed;
+    vex::brakeType brake_type;
+    bool brake_is_overrided;
 };

@@ -89,6 +89,7 @@ void toggle::set_states(std::shared_ptr<drawable> pressing_state, std::shared_pt
     toggled_graphic = triggered; 
 }
 
+bool toggle::is_locked() { return locked; }
 void toggle::lock_toggle() { locked = true; }
 void toggle::unlock_toggle() { locked = false; }
 
@@ -128,7 +129,19 @@ void toggle::render() {
     }
 }
 
-void toggle::is_pressing() {
+void toggle::is_pressing(input_type input_type) {
+    switch (input_type)
+    {
+    case input_type::CONTROLLER:
+        is_pressing_controller();
+        break;
+    case input_type::TOUCHSCREEN:
+        is_pressing_touch();
+        break;
+    }
+}
+
+void toggle::is_pressing_touch() {
     if (locked) { return; }
     
     float touch_x = Brain.Screen.xPosition();
@@ -143,12 +156,11 @@ void toggle::is_pressing() {
                 state = toggle_state::PRESSING;
             }
 
-            render();
         } else if (pressed && !is_touch_within_toggle) {
             pressed = false;
             state = toggle_state::INACTIVE;
-            render();
         }
+        
     } else if (pressed && is_touch_within_toggle) {
             pressed = false;
 
@@ -158,11 +170,50 @@ void toggle::is_pressing() {
                 state = toggle_state::INACTIVE;
             } 
 
-            render();
-
             is_toggled = !is_toggled;
             execute();
+    } else if (!is_touch_within_toggle) {
+        if (is_toggled) {
+            state = toggle_state::TOGGLED;
+        } else {
+            state = toggle_state::INACTIVE;
+        } 
     }
+}
+
+void toggle::is_pressing_controller() {
+    if (locked) { return; }
+    if (cooldown && (int)Brain.Timer.time(vex::timeUnits::msec) - initial_msec <= cooldown_msec) {
+        return;
+    }
+    cooldown = false;
+
+    float cursor_x = UI_get_cursor_x_position();
+    float cursor_y = UI_get_cursor_y_position();
+    bool is_cursor_within_toggle = cursor_x >= x && cursor_x <= x + w && cursor_y >= y && cursor_y <= y + h;
+    
+    if (Controller.ButtonB.pressing() && is_cursor_within_toggle) {
+        if (!is_toggled) {
+            state = toggle_state::TOGGLED;
+        } else {
+            state = toggle_state::INACTIVE;
+        } 
+
+        is_toggled = !is_toggled;
+        execute();
+
+        cooldown = true;
+        initial_msec = Brain.Timer.time(vex::timeUnits::msec);
+    } else if (is_cursor_within_toggle) {
+        state = toggle_state::PRESSING;
+    } else if (!is_cursor_within_toggle) {
+        if (is_toggled) {
+            state = toggle_state::TOGGLED;
+        } else {
+            state = toggle_state::INACTIVE;
+        } 
+    }
+
 }
 
 void toggle::unpress() {
