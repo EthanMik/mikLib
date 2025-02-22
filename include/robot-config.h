@@ -12,4 +12,5 @@ extern auton_drive chassis;
 extern manual_drive assembly;
 
 void init(void);
+void mogo_constants(void);
 void default_constants(void);

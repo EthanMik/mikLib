@@ -75,11 +75,15 @@ void init(void) {
   assembly.ring_color_sensor.setLightPower(80, pct);
 }
 
+void mogo_constants(void) {
+  chassis.set_turn_constants(12, .437, 0.02, 3.7, 15, .1, 300, 3000);
+}
+
 void default_constants(void) {
   chassis.set_turn_constants(12, .437, .0295, 3.486, 15, .1, 300, 3000);
   chassis.set_drive_constants(10, 1.5, 0, 10, 0, 1.5, 300, 5000);
   chassis.set_heading_constants(6, .4, 0, 1, 0);
-  chassis.set_swing_constants(12, .3, .001, 2, 15, 1, 300, 3000);
+  chassis.set_swing_constants(12, .437, .0295, 3.486, 15, .5, 300, 3000);
   assembly.set_LB_constants(12, .2, .1, .02, 0, 2, 200, 3000);
 
   chassis.heading_max_voltage = 10;

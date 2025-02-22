@@ -48,6 +48,22 @@ void test_serial_output() {
     }
 }
 
+int print_vector_to_serial(const std::string& name, const std::vector<float>& vector) {
+    printf("%s\n", name.c_str());
+    fflush(stdout);
+    vex::task::sleep(100);
+
+    for(size_t i = 0; i < vector.size(); ++i) {
+      printf("%f\n", vector[i]);
+      fflush(stdout);
+      vex::task::sleep(50);
+    }
+    printf("%f\n\n");
+    fflush(stdout);
+    vex::task::sleep(50);
+    return 0;
+}
+
 void print_coordinates(){
   // chassis.set_coordinates(0, 0, 0);
   while(true){

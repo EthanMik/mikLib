@@ -41,7 +41,7 @@ float to_deg(float angle_rad) {
   return(angle_rad * (180.0 / M_PI));
 }
 
-void to_normalized_vector(std::vector<float> vector){
+void to_normalized_vector(std::vector<float>& vector){
   float length = sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
   vector[0] /= length;
   vector[1] /= length;

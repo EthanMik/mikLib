@@ -27,7 +27,7 @@ float to_rad(float angle_deg);
 float to_deg(float angle_rad);
 
 // Converts vector into normalized vector
-void to_normalized_vector(std::vector<float> vector);
+void to_normalized_vector(std::vector<float>& vector);
 
 // Converts degrees into normalized vector
 std::vector<float> to_normalized_vector(float angle);

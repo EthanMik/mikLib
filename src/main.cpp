@@ -99,23 +99,25 @@ void UI_temp(void) {
 int main() {
   init();
   default_constants();
+  standardized_vector_movement(0.4, curveNumeroUno);
+  
+
   // test_spin_all_motors({chassis.left_drive, chassis.right_drive});
 
   // four_ring_red();
-  chassis.set_coordinates(-60.589, -0.858, 90);
+  // vex::thread odom(print_coordinates);
+  // task::sleep(2000);
+  // win_point();
 
-  vex::thread odom(print_coordinates);
-  task::sleep(2000);
-  skills();
-
-  vex::task hook_pos([](){
-    while(1) {
-      // Brain.Screen.printAt(30, 30, "%d", assembly.unjam_intake);
-    }
-    return 0;
-  });
+  // vex::task hook_pos([](){
+  //   while(1) {
+  //     // Brain.Screen.printAt(30, 30, "%d", assembly.unjam_intake);
+  //   }
+  //   return 0;
+  // });
 
   // user_control();
+
   // // initialize_auton();
   // task::sleep(2000);
   // four_ring_red();

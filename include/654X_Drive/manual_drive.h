@@ -4,7 +4,7 @@
 
 enum class color_sort { RED, BLUE, NONE };
 enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
-enum LB_state : int { ACTIVE = 194, INACTIVE = 220, HOLDING = 170, SCORING = 60 };
+enum LB_state : int { ACTIVE = 198, INACTIVE = 220, HOLDING = 170, SCORING = 60 };
 
 class manual_drive {   
 public:
@@ -119,5 +119,4 @@ public:
     float LB_ki; 
     float LB_kd;
     float LB_starti;
-
 };

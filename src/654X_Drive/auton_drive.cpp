@@ -59,15 +59,15 @@ void auton_drive::set_heading_constants(float heading_max_voltage, float heading
   this->heading_starti = heading_starti;
 }
 
-void auton_drive::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float turn_settle_error, float turn_settle_time, float turn_timeout){
+void auton_drive::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_settle_error, float swing_settle_time, float swing_timeout){
   this->swing_max_voltage = swing_max_voltage;
   this->swing_kp = swing_kp;
   this->swing_ki = swing_ki;
   this->swing_kd = swing_kd;
   this->swing_starti = swing_starti;
-  this->turn_settle_error = turn_settle_error;
-  this->turn_settle_time = turn_settle_time;
-  this->turn_timeout = turn_timeout;
+  this->swing_settle_error = swing_settle_error;
+  this->swing_settle_time = swing_settle_time;
+  this->swing_timeout = swing_timeout;
 } 
 
 void auton_drive::drive_with_voltage(float leftVoltage, float rightVoltage){
@@ -172,6 +172,9 @@ void auton_drive::left_swing_to_angle(float angle, float swing_max_voltage, floa
     float error = reduce_negative_180_to_180(angle - get_absolute_heading());
     float output = swingPID.compute(error);
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
+
+    add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
+    
     left_drive.spin(vex::fwd, output, velocity_units::volt);
     right_drive.stop(vex::hold);
     vex::task::sleep(10);
@@ -188,6 +191,9 @@ void auton_drive::right_swing_to_angle(float angle, float swing_max_voltage, flo
     float error = reduce_negative_180_to_180(angle - get_absolute_heading());
     float output = swingPID.compute(error);
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
+
+    add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
+
     right_drive.spin(vex::reverse, output, velocity_units::volt);
     left_drive.stop(vex::hold);
     vex::task::sleep(10);

@@ -282,7 +282,7 @@ void manual_drive::lady_brown() {
       
       if (prev_state == SCORING) {
         if (std::abs(LB_encoder.angle(deg) - ACTIVE) < 8) {
-            intake_motor.spinFor(23, vex::rotationUnits::deg, true);
+            intake_motor.spinFor(30, vex::rotationUnits::deg, true);
             prev_state = ACTIVE;
           }
         } else {

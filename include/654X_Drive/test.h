@@ -14,6 +14,8 @@ void test_print_motor_torque(std::vector<hzn::motor_group> motor_chains);
 
 void test_serial_output();
 
+int print_vector_to_serial(const std::string& name, const std::vector<float>& vector);
+
 void click();
 
 void print_coordinates();

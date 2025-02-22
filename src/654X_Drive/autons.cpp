@@ -226,43 +226,54 @@ chassis.drive_to_point(-0.106, -63.51);
 }
 
 void path_test(void) {
-  
-  vex::task intake_ring_halfway_task([](){
-    assembly.intake_override = true;
-    int timeout_start = Brain.Timer.time(vex::timeUnits::sec);
-    while (1) {
-      assembly.intake_motor.spin(fwd, 12, volt);
-      if (assembly.ring_distance_sensor.objectDistance(mm) < 50) {
-        assembly.intake_motor.stop(brake);
-        vex::this_thread::sleep_for(100);
-        assembly.intake_override = false;
-        assembly.is_intaking_ring_halfway = true;
-        break;
-      }
-      if (Brain.Timer.time(vex::timeUnits::sec) - timeout_start > 5) {
-        assembly.intake_override = false;
-        assembly.is_intaking_ring_halfway = true;
-        break;
+  chassis.set_coordinates(-55.3, -131.9, 0);
+}
+
+void win_point(void) {
+chassis.set_coordinates(-59.947, 12.311, 230);
+assembly.move_LB_to_angle(SCORING);
+assembly.unjam_intake = false;
+
+vex::task down = vex::task([](){
+  assembly.move_LB_to_angle(INACTIVE);
+  return 0;
+});
+
+vex::task unjam_intake_task([](){
+  while(1) {
+    while (assembly.unjam_intake) {
+      double start = assembly.intake_encoder.position(deg);
+      vex::task::sleep(100);
+      double end = assembly.intake_encoder.position(deg);
+
+      if (end - start < 1) {
+        assembly.is_reversing = true;
+        assembly.intake_motor.spinFor(directionType::rev, 100, rotationUnits::deg, 600, velocityUnits::rpm, true);
+        assembly.is_reversing = false;
       }
       vex::this_thread::sleep_for(50);
-      
     }
-    return 0;
-  });
-  assembly.rush_piston.set(true);
-  
-  chassis.drive_to_point(-5.648, 42.999);
-  chassis.drive_max_voltage = 8;
-  chassis.drive_to_point(-21.07, 36.974);
-  
-  chassis.turn_to_point(-38.661, 36.251, true);
-  chassis.drive_to_point(-38.661, 36.251);
-  assembly.rush_piston.set(false);
+    vex::this_thread::sleep_for(100);
+  }
+  return 0;
+});
 
-chassis.drive_max_voltage = 5;
 
-chassis.turn_to_point(-19.625, 18.661, true);
-chassis.drive_to_point(-19.625, 18.661);
+chassis.turn_to_point(-21.186, 24.402, true);
+chassis.drive_max_voltage = 6;
+chassis.drive_to_point(-21.186, 24.402);
+
 assembly.mogo_clamp_piston.set(true);
+mogo_constants();
+task::sleep(200);
+
+chassis.turn_to_point(-8.891, 37.832);
+assembly.intake_motor.spin(fwd, 12, volt);
+chassis.drive_to_point(-8.891, 37.832);
+
+assembly.unjam_intake = true;
+chassis.right_swing_to_angle(0);
+
+chassis.drive_to_point(-8.05, 60.8);
 
 }
