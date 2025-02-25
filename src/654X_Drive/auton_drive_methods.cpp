@@ -20,95 +20,71 @@ std::vector<std::pair<float, float>> curveNumeroUno = {
 };
 
 // Movement scheme developed by Thomas Grisamore
-float turningStength = 1000; // Used to control speed to prevent slippage
+float turningStength = 1000; // Used to control speed to prevent slippage. Functions as a coefficient
 
 
-void standardized_vector_movement(float speed, const std::vector<std::pair<float, float>> &curvePattern){
-    
+void standardized_vector_movement(float speed, const std::vector<std::pair<float, float>> &curvePattern){  //Moves a robot along a bezier curve with specific features to minimize slippage and maximize customizability
     float dotProduct;
-    float lengthOfVector;
-    float offset = chassis.get_heading();
     chassis.set_coordinates(curvePattern[0].first, curvePattern[0].second, chassis.get_absolute_heading());
-    std::vector<float> origin = {0,0};
+    //Line above MUST be removed and replaced with a better system - Ex. Position declared at the start of main
+    //Creates a normal vector pointing straight forward
    
-    //Creates a normal vector pointing straight up
+    std::vector<float> currentDirection = to_normalized_vector(chassis.get_heading()+90);// Normal Vector representing current orientation
+    std::vector<float> newDirection = currentDirection;//Normal Vector representing intended direction. Determined later with functions
    
-    std::vector<float> currentDirection;
-    currentDirection = to_normalized_vector(chassis.get_heading()+90);
-
-
-
-    std::vector<float> newDirection; // Normal Vector representing current orientation NEEDS REAL CODE
-    newDirection = currentDirection;
-   
-
-
-   
+    chassis.ideal_x = curvePattern[curvePattern.size()-1].first; //Sets end x-coordinate for robot
+    chassis.ideal_y = curvePattern[curvePattern.size()-1].second; //Sets end y-coordinate for robot
+      
     //Declaration of variables used below \/
-   
-    float xPos;
-    float yPos;
-    float leftSpeed;
-    float rightSpeed;
+    float leftSpeed; //Left drive chain speed
+    float rightSpeed; //Right drive chain speed
     float COMSpeed; //Center of mass speed
-    float curveSpeed;
+    float curveSpeed; //Max speed of robot when on some specified curve
 
     
-    while(true){ // get_vector_distance(chassis.get_position_vector(), {chassis.ideal_x, chassis.ideal_y}) < 1
+    while(get_vector_distance(chassis.get_position_vector(), {chassis.ideal_x, chassis.ideal_y}) < 3){ //While robot sufficiently far away from the end, keep running the function
+        currentDirection = to_normalized_vector(chassis.get_heading()+90); //Obtains degree heading of robot
+        
+        bezier(newDirection, curvePattern); //Returns vector pointing robot in the direction it will turn
+        
+        dotProduct = newDirection[0] * currentDirection[0] + newDirection[1] * currentDirection[1]; //Gives relative closeness of currentDirection to newDirection (1:same, -1:complete opposites)
        
-        //xPos = (chassis.get_X_position() - origin[0]) * cos(to_rad(chassis.get_heading() - offset)) - (chassis.get_Y_position() - origin[1]) * sin(to_rad(chassis.get_heading() - offset));
-        //yPos = (chassis.get_Y_position() - origin[1]) * sin(to_rad(chassis.get_heading() - offset)) + (chassis.get_X_position() - origin[0]) * cos(to_rad(chassis.get_heading() - offset));
-        currentDirection = to_normalized_vector(chassis.get_heading()+90);
-
-
-
-
-        bezier(newDirection, curvePattern);
-        lengthOfVector = get_vector_distance({0.0f, 0.0f}, newDirection);
-        newDirection[0] /= lengthOfVector;
-        newDirection[1] /= lengthOfVector;
-        dotProduct = newDirection[0] * currentDirection[0] + newDirection[1] * currentDirection[1]; //Gives relative closeness to direction (1:same, -1:complete opposites)
-       
-        // These two lines of code determine which movement scheme to input to the robot
-        //if(currentDirection[0] == 0) currentDirection[0] = 0.001;
-        float crossProduct = currentDirection[0] * newDirection[1] - currentDirection[1] *  newDirection[0];
+        float crossProduct = currentDirection[0] * newDirection[1] - currentDirection[1] *  newDirection[0]; //Cross product used to determine turning direction | (-) = Clockwise, (+) = Counterclockwise
+        
         if (crossProduct < 0) {  // Adjust to Right
             leftSpeed = speed;
-            rightSpeed = speed  * dotProduct;
+            rightSpeed = speed  * dotProduct; //Slows inner wheel down to cause turning
         } else {  // Adjust to Left
-            leftSpeed = speed * dotProduct;
+            leftSpeed = speed * dotProduct; //Slows inner wheel down to cause turning
             rightSpeed = speed;
         }
-        COMSpeed = (leftSpeed + rightSpeed) / 2;
-        curveSpeed = sqrt(turningStength * (1/(1.001-dotProduct)));
-        if(curveSpeed < COMSpeed){
+        COMSpeed = (leftSpeed + rightSpeed) / 2 + 0.01; //Obtains the speed of the center of mass. Used to determine the velocity when calculating the max curve speed without slipping
+        curveSpeed = sqrt(turningStength * (1/(1.01-dotProduct))); //Determines max speed without slippage for a given turn. Equation derived from Kinetic Energy with turningStrength proportional to friction coefficient 
+        if(curveSpeed < COMSpeed){ //If robot too fast for curve, slow down robot
             leftSpeed *=  curveSpeed / COMSpeed;
             rightSpeed *= curveSpeed / COMSpeed;
         }
         
-        // this needs to be a function
+        // Sets robot's speed
         chassis.right_drive.spin(vex::fwd, rightSpeed, velocity_units::normalized);
         chassis.left_drive.spin(vex::fwd, leftSpeed, velocity_units::normalized);
-        
+
    
     }
+    Controller.Screen.setCursor(1,1);
+    Controller.Screen.print("Code finished, hopefully it worked");
+    return;
 }
 
-
-
-
-//3{(1−t)2(P1−P0)+2t(1−t)(P2−P1)+t2(P3−P2)}
-
-
 void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float, float>> &points){
-    const float current_scalar = 1, lead_scalar = 1;
-    const float header_dist = 10;
-    const float header_stepper_size = 0.01;
+    const float current_scalar = 1, lead_scalar = 1; //Values used to determine which components of the final vector are most heavily weighed
+    const float header_dist = 10; //How many inches ahead the lead vector is taken from
+    const float header_stepper_size = 0.01; //Increment for t when used in finding the lead vector
     int num_of_curves = sizeof(points)/4;
-    static float time = 0;
-    float t = time;
-    int index = 0;
-    float increment = 0.1;
+    static float time = 0 //Where along the curve the robot is currently. Stored between runs of function. NOT ACTUALLY RELATED TO REAL-LIFE TIME, more like a third variable like "z" or "i" 
+    float t = time; //Form of "time" used in calculation. Often shortened to a float between 0-1 to get position along a bezier curve
+    int index = 0; //Marker of which bezier curve is being used 
+    float increment = 0.1; 
     float pastDist = 10000; //Big number
     float dist = 0;
     float carrot_dist;
@@ -164,7 +140,6 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
         py = py2;
         
     }
-    
     dx_dt = 3*(pow(1-t,2)*(points[index*4 + 1].first - points[index*4].first)) + 2*t*(1-t)*(points[index*4+2].first-points[index*4 + 1].first) + t*t*(points[index*4+2].first-points[index*4 + 1].first);
     dy_dt = 3*(pow(1-t,2)*(points[index*4 + 1].second - points[index*4].second)) + 2*t*(1-t)*(points[index*4+2].second-points[index*4 + 1].second) + t*t*(points[index*4+2].second-points[index*4 + 1].second);
     lead.push_back(dx_dt);
@@ -195,6 +170,7 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     Controller.Screen.setCursor(2,1);
     Controller.Screen.print("(" + output[0] + ", " + output[1]) + ")";
     Controller.Screen.setCursor(3,1);
+    Controller.Screen.print(turningStrength);
     newDirection = output;
 
     return;
