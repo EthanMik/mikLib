@@ -102,12 +102,12 @@ void standardized_vector_movement(float speed, const std::vector<std::pair<float
 
 void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float, float>> &points){
     const float current_scalar = 1, lead_scalar = 1;
-    const float header_dist = 5;
-    const float header_stepper_size = 0.001;
+    const float header_dist = 10;
+    const float header_stepper_size = 0.01;
     int num_of_curves = sizeof(points)/4;
     static float time = 0;
     float t = time;
-    int index = t;
+    int index = 0;
     float increment = 0.1;
     float pastDist = 10000; //Big number
     float dist = 0;
@@ -122,7 +122,8 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     std::vector<float> current;
 
     for(int i = 0; i < 20 && increment >= 0.01; i++){
-        index = t;
+        t += index; //Fixes problem
+        index = min(t, numOfCurves); //Gives integer of which curve to follow
         t -= index;
         px = pow(1-t,3)*points[index*4].first + 3*pow(1-t,2)*t*points[index*4+1].first + 3*(1-t)*t*t*points[index*4+2].first + t*t*t*points[index*4+3].first;
         py = pow(1-t,3)*points[index*4].second + 3*pow(1-t,2)*t*points[index*4+1].second + 3*(1-t)*t*t*points[index*4+2].second + t*t*t*points[index*4+3].second;
@@ -139,10 +140,6 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     t+=increment*9;
     time = t + index;
 
-
-    
-
-
     //This part gets the vector pointing directly to the path
     vx =  px - chassis.get_X_position();
     vy =  py - chassis.get_Y_position();
@@ -156,9 +153,10 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     //This part gets the vector tangent to the path of where the robot will later be (distance determined by header_dist)
     carrot_dist = sqrt(pow(vx,2)+pow(vy,2));
     for(int i = 0; i < 1/header_stepper_size; i++){ //   1/998001 ---> 1 is the total interval it will search through before quitting
-        t += header_stepper_size;//How finely it steps through the function
+        t += index + header_stepper_size; //How finely it steps through the function
+        index = t; //Gives integer of which curve to follow
+        t -= index;
         if(carrot_dist > header_dist || t > num_of_curves) break;  
-        index = t;
         px2 = pow(1-t,3)*points[index*4].first + 3*pow(1-t,2)*t*points[index*4+1].first + 3*(1-t)*t*t*points[index*4+2].first + t*t*t*points[index*4+3].first;
         py2 = pow(1-t,3)*points[index*4].second + 3*pow(1-t,2)*t*points[index*4+1].second + 3*(1-t)*t*t*points[index*4+2].second + t*t*t*points[index*4+3].second;
         carrot_dist += sqrt(pow(px - px2, 2)+pow(py-py2, 2));
@@ -166,8 +164,7 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
         py = py2;
         
     }
-    Controller.Screen.setCursor(1,1);
-    Controller.Screen.print(index);
+    
     dx_dt = 3*(pow(1-t,2)*(points[index*4 + 1].first - points[index*4].first)) + 2*t*(1-t)*(points[index*4+2].first-points[index*4 + 1].first) + t*t*(points[index*4+2].first-points[index*4 + 1].first);
     dy_dt = 3*(pow(1-t,2)*(points[index*4 + 1].second - points[index*4].second)) + 2*t*(1-t)*(points[index*4+2].second-points[index*4 + 1].second) + t*t*(points[index*4+2].second-points[index*4 + 1].second);
     lead.push_back(dx_dt);
@@ -193,11 +190,16 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
         turningStength += 0.0002;
     }
 
-    
+    Controller.Screen.setCursor(1,1);
+    Controller.Screen.print(time);
+    Controller.Screen.setCursor(2,1);
+    Controller.Screen.print("(" + output[0] + ", " + output[1]) + ")";
+    Controller.Screen.setCursor(3,1);
     newDirection = output;
 
+    return;
 
-    //Alright i need to draw a line from thje robot to the point it thinks it should be at then use that in conjunction with the tangent vector, using some scalar to determine the weight of each. After that, I need to make a tracer that goes ahead and also averages with the other vector
+    //Alright I need to draw a line from the robot to the point it thinks it should be at then use that in conjunction with the tangent vector, using some scalar to determine the weight of each. After that, I need to make a tracer that goes ahead and also averages with the other vector
 
 
 }
