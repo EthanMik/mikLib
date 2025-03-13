@@ -4,7 +4,7 @@
 
 enum class color_sort { RED, BLUE, NONE };
 enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
-enum LB_state : int { ACTIVE = 198, INACTIVE = 220, HOLDING = 170, SCORING = 60 };
+enum LB_state : int { ACTIVE = 195, INACTIVE = 220, HOLDING = 170, SCORING = 60 };
 
 class manual_drive {   
 public:
@@ -23,6 +23,7 @@ public:
     void initialize_user_control();
 
     void intake();
+    void unjam_intake_task();
     void select_ring_sort_mode();
     void select_ring_sort_mode(color_sort opposing_color);
     bool ring_sort();
@@ -50,6 +51,8 @@ public:
     vex::digital_out lift_piston;
     
     // Intake
+    vex::task _unjam_intake_task;
+    bool auto_unjam = false;
     bool unjam_intake = true;
     bool measuring = false; 
     float intake_jam_start_time;
@@ -63,6 +66,8 @@ public:
     int color_sort_mode = 0;
     int color_swap_cooldown = 0;
     bool ring_detected = false;
+    bool ring_distance_close = false;
+    int distance_start = 0;
     color_sort opposing_color = color_sort::NONE;
     float target_position;
     float current_position;
@@ -70,8 +75,8 @@ public:
     float color_max = 0;
     const std::vector<int> blue_color_min_max = { 190, 240 };
     const std::vector<int> red_color_min_max = { 0, 35 };
-    const float full_rotation = 1319.77;
-    const std::vector<int> hook_positions = { 169, 605, 1035 };
+    const float full_rotation = 1320.91;
+    const std::vector<int> hook_positions = { 169, 605, 1020 };
 
     // Doinker
     bool is_extended_doinker = false;
@@ -87,12 +92,15 @@ public:
 
     // Timer
     int start_time;
+    int time_remaining = 0;
+
 
     // Align Robot
     bool prev_align_state = false;
     vex::task async_aligner;
     
     // Lady Brown
+    int LB_goto_state_task = 0;
     int LB_goto_state;
     
     int prev_state;

@@ -44,20 +44,22 @@ public:
         float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
     
     void drive_on_PID(float distance);
-
+    void drive_on_PID(float distance, float heading);
     void drive_on_PID(float distance, float heading, float drive_max_voltage, float heading_max_voltage, 
         float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, 
         float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
 
     void left_swing_to_angle(float angle);
+    void left_swing_to_angle(float angle, bool reverse);
 
     void left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, 
-        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti);
+        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
 
     void right_swing_to_angle(float angle);
+    void right_swing_to_angle(float angle, bool reverse);
 
     void right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, 
-        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti);
+        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
 
 
     //PID Helper methods

@@ -10,23 +10,23 @@ auton_drive::auton_drive(hzn::motor_group left_drive, hzn::motor_group right_dri
     drive_inch_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
     inertial_scale(inertial_scale),
 
-    forward_tracker_diameter(forward_tracker_diameter),
-    forward_tracker_center_distance(forward_tracker_center_distance),
-    forward_tracker_inch_to_deg_ratio(M_PI * forward_tracker_diameter / 360.0),
+    forward_tracker_diameter(2.125),
+    forward_tracker_center_distance(0),
+    forward_tracker_inch_to_deg_ratio(M_PI * 2 / 360.0),
 
-    sideways_tracker_diameter(sideways_tracker_diameter),
-    sideways_tracker_center_distance(sideways_tracker_center_distance),
-    sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0),
+    sideways_tracker_diameter(-2.125),
+    sideways_tracker_center_distance(0.519),
+    sideways_tracker_inch_to_deg_ratio(M_PI * -2 / 360.0),
 
-    forward_tracker(forward_tracker_port),
-    sideways_tracker(sideways_tracker_port),
+    forward_tracker(PORT20),
+    sideways_tracker(PORT16),
     inertial(inertial_port),
 
     left_drive(left_drive),
     right_drive(right_drive)
 {
   brake_type = vex::brakeType::hold;
-  odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
+  odom.set_physical_distances(0, .519);
 }
 
 void auton_drive::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_settle_error, float turn_settle_time, float turn_timeout) {
@@ -91,7 +91,7 @@ void auton_drive::override_brake_type(vex::brakeType brake) {
 }
 
 float auton_drive::get_absolute_heading(){ 
-  return(reduce_0_to_360(inertial.rotation()*360.0 / inertial_scale )); 
+  return(reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale)); 
 }
 
 float auton_drive::get_heading(){ 
@@ -135,6 +135,10 @@ void auton_drive::drive_on_PID(float distance) {
   drive_on_PID(distance, get_absolute_heading(), drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
 }
 
+void auton_drive::drive_on_PID(float distance, float heading) {
+  drive_on_PID(distance, heading, drive_max_voltage, heading_max_voltage, drive_settle_error, drive_settle_time, drive_timeout, drive_kp, drive_ki, drive_kd, drive_starti, heading_kp, heading_ki, heading_kd, heading_starti);
+}
+
 void auton_drive::drive_on_PID(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti){
   desired_heading = heading;
   PID drivePID(distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
@@ -163,36 +167,52 @@ void auton_drive::drive_on_PID(float distance, float heading, float drive_max_vo
 }
 
 void auton_drive::left_swing_to_angle(float angle) {
-  left_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti);
+  left_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti, false);
 }
 
-void auton_drive::left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti){
-  PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
-  while(swingPID.is_settled() == false){
-    float error = reduce_negative_180_to_180(angle - get_absolute_heading());
-    float output = swingPID.compute(error);
-    output = clamp(output, -turn_max_voltage, turn_max_voltage);
+void auton_drive::left_swing_to_angle(float angle, bool reverse) {
+  left_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti, reverse);
+}
 
-    add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
-    
-    left_drive.spin(vex::fwd, output, velocity_units::volt);
-    right_drive.stop(vex::hold);
-    vex::task::sleep(10);
+void auton_drive::left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse) {
+PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
+
+while(!swingPID.is_settled()) {
+  float error  = reduce_negative_180_to_180(angle - get_absolute_heading());
+  float output = swingPID.compute(error);
+
+  output = clamp(output, -swing_max_voltage, swing_max_voltage);
+
+  if(reverse && output > 0) {
+    output = 0;
   }
+
+  left_drive.spin(fwd, output, velocity_units::volt);
+  right_drive.stop(hold);
+
+  vex::task::sleep(10);
+}
 }
 
 void auton_drive::right_swing_to_angle(float angle) {
-  right_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti);
+  right_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti, false);
 }
 
-void auton_drive::right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti) {
+void auton_drive::right_swing_to_angle(float angle, bool reverse) {
+  right_swing_to_angle(angle, swing_max_voltage, swing_settle_error, swing_settle_time, swing_timeout, swing_kp, swing_ki, swing_kd, swing_starti, reverse);
+}
+
+void auton_drive::right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse) {
   PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
   while(swingPID.is_settled() == false){
     float error = reduce_negative_180_to_180(angle - get_absolute_heading());
     float output = swingPID.compute(error);
-    output = clamp(output, -turn_max_voltage, turn_max_voltage);
-
-    add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
+    output = clamp(output, -swing_max_voltage, swing_max_voltage);
+    
+    if(reverse && output > 0) {
+      output = 0;
+    }
+    // add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
 
     right_drive.spin(vex::reverse, output, velocity_units::volt);
     left_drive.stop(vex::hold);
@@ -209,7 +229,7 @@ float auton_drive::get_SidewaysTracker_position() {
 }
 
 void auton_drive::position_track() {
-  while(true) {
+  while(1) {
     odom.update_position(get_ForwardTracker_position(), get_SidewaysTracker_position(), get_absolute_heading());
     vex::task::sleep(5);
   }
@@ -225,6 +245,8 @@ void auton_drive::set_heading(float orientation_deg){
 }
 
 void auton_drive::set_coordinates(float X_position, float Y_position, float orientation_deg) {
+  forward_tracker.resetPosition();
+  sideways_tracker.resetPosition();
   odom.set_position(X_position, Y_position, orientation_deg, get_ForwardTracker_position(), get_SidewaysTracker_position());
   set_heading(orientation_deg);
   odom_task = vex::task(position_track_task);

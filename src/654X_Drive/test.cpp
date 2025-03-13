@@ -66,6 +66,7 @@ int print_vector_to_serial(const std::string& name, const std::vector<float>& ve
 
 void print_coordinates(){
   // chassis.set_coordinates(0, 0, 0);
+  // vex::distance dis = vex::distance(vex::PORT21);
   while(true){
     Brain.Screen.clearScreen();
     Brain.Screen.printAt(0, 50, "X: %f", chassis.get_X_position());
@@ -73,6 +74,12 @@ void print_coordinates(){
     Brain.Screen.printAt(0, 90, "Heading: %f", chassis.get_absolute_heading());
     Brain.Screen.printAt(0, 110, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
     Brain.Screen.printAt(0, 130, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
+    // float hypotnuse = dis.objectDistance(vex::inches);
+    // Brain.Screen.printAt(0, 150, "Distance sensor: %f", hypotnuse);
+    // float theta = to_rad(chassis.get_absolute_heading());
+
+    // Brain.Screen.printAt(0, 170, "X adjusted: %f", -hypotnuse * sin(theta));
+    // Brain.Screen.printAt(0, 190, "Y adjusted: %f", 62 + (hypotnuse * cos(theta) - 7.7));
     vex::task::sleep(20);
   }
 }

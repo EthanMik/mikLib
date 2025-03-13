@@ -3,7 +3,10 @@
 #include "vex.h"
 
 extern std::vector<std::pair<float, float>> curveNumeroUno; 
-
+extern std::vector<std::pair<float, float>> curveNumeroDos; 
+extern float curve_time;
+extern float current_scalar;
+extern float lead_scalar;
 // Movement scheme developed my Thomas Grisamore
 void turn_left_arc(float radius, float arcLength, float speed, bool precisionStop);
 void turn_right_arc(float radius, float arcLength, float speed, bool precisionStop);

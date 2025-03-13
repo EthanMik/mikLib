@@ -2,107 +2,600 @@
 
 using namespace vex;
 
-// static vex::task _intake_fallback_task;
-// static vex::task _color_sort_task;
-// static vex::task _intake_ring_halway_task;
+void solo_win_point_red(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(-55, 23.5, 270);
+    return;
+  }
 
-// void initialize_auton() {
-//   _intake_fallback_task = vex::task(intake_fallback_task);
-//   _color_sort_task = vex::task(color_sort_task);
-//   _intake_ring_halway_task = vex::task(intake_ring_halfway_task);
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
 
-//   _intake_fallback_task.suspend();
-//   _color_sort_task.suspend();
-//   _intake_ring_halway_task.suspend();
-// }
-
-// int color_sort_task() {
-//   while(1) {
-//     if (assembly.ring_sort()) {
-//       assembly.intake_motor.spin(fwd, 12, volt);
-//     }
-//     vex::this_thread::sleep_for(50);
-//   }
-//   return 0;
-// }
-
-// int intake_fallback_task() {
-//     while (is_intake_fallback) {
-//       double start = assembly.intake_encoder.position(deg);
-//       vex::task::sleep(250);
-//       double end = assembly.intake_encoder.position(deg);
-
-//       if (end - start < 1) {
-//           assembly.intake_motor.spinFor(directionType::rev, 150, rotationUnits::deg, 600, velocityUnits::rpm, true);
-//           assembly.intake_motor.spin(directionType::fwd, 12, voltageUnits::volt);
-//       }
-//       vex::this_thread::sleep_for(50);
-//     }
-//     return 0;
-// }
-
-// int intake_ring_halfway_task() {
-//   int timeout_start = Brain.Timer.time(vex::timeUnits::sec);
-//    while (1) {
-//       assembly.intake_motor.spin(fwd, 11, volt);
-//       if (assembly.ring_distance_sensor.objectDistance(vex::distanceUnits::mm) < 120) {
-//         _intake_fallback_task.suspend();
-
-//         assembly.intake_motor.stop();
-//         vex::this_thread::sleep_for(100);
-//         _intake_ring_halway_task.suspend();
-//       }
-//       if (Brain.Timer.time(vex::timeUnits::sec) - timeout_start > 5) {
-//         _intake_ring_halway_task.suspend();
-//         _intake_fallback_task.suspend();
-//         timeout_start = Brain.Timer.time(vex::timeUnits::sec);
-//       }
-//       vex::this_thread::sleep_for(50);
-
-//   }
-//   return 0;
-// }
-
-void four_ring_red(void) {
-  static bool is_intake_fallback = false;
-
-  assembly.select_ring_sort_mode(color_sort::BLUE);
+  float time = Brain.Timer.time(msec);
+  assembly.LB_motors.stop(hold);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(600);
+  LB_task(INACTIVE);
   
-  vex::task _color_sort_task([](){
-    while(1) {
-      if (assembly.ring_sort()) {
-        assembly.intake_motor.spin(fwd, 12, volt);
-      }
-      vex::this_thread::sleep_for(50);
-    }
-    return 0;
-  });
+  chassis.turn_to_point(-23.087, 23.815, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-23.087, 23.815);
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  start_intake();
+  chassis.turn_to_point(-23.588, 47.386);
+  chassis.drive_to_point(-23.588, 47.386);
+  chassis.turn_to_point(-46.156, 1.749);
+  stop_intake();
+  assembly.intake_motor.spin(fwd, 12, volt);
+  intake_ring_halfway();
+  assembly.lift_piston.set(true);
+  chassis.drive_to_point(-46.156, 1.749);
+  assembly.lift_piston.set(false);
+  chassis.drive_on_PID(-8);
+  assembly.mogo_clamp_piston.set(false);
+  chassis.drive_on_PID(20);
 
-  vex::task _intake_fallback_task([](){
-    while (is_intake_fallback) {
-      double start = assembly.intake_encoder.position(deg);
-      vex::task::sleep(250);
-      double end = assembly.intake_encoder.position(deg);
+  chassis.turn_to_point(-23.839, -23.327, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-23.839, -23.327);
+  default_constants();
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  chassis.turn_to_point(-23.588, -47.399);
+  start_intake();
+  chassis.drive_to_point(-23.588, -47.399);
+  chassis.turn_to_point(-13.507, -15.608);
+  LB_task(SCORING);
+  chassis.drive_to_point(-13.507, -15.608);
+  stop_intake();
+  chassis.stop_drive(hold);
 
-      if (end - start < 1) {
-          assembly.intake_motor.spinFor(directionType::rev, 150, rotationUnits::deg, 600, velocityUnits::rpm, true);
-          assembly.intake_motor.spin(directionType::fwd, 12, voltageUnits::volt);
-      }
-      vex::this_thread::sleep_for(50);
-    }
-    return 0;
-  });
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+}
 
-  // Deploy piston and grab rings, and pull back
+void goalside_red(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(-55, -23.5, 270);
+    return;
+  }
+
+  float time = Brain.Timer.time(msec);
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  chassis.turn_settle_error = 1.5;
+  chassis.drive_max_voltage = 6;
+  chassis.drive_on_PID(-31);
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  
+  
+  chassis.turn_to_point(-44.5, -2);
+  start_intake();
+  assembly.lift_piston.set(true);
+  chassis.drive_to_point(-44.5, -2);
+  assembly.lift_piston.set(false);
+  task::sleep(100);
+  chassis.drive_on_PID(-15);
+  chassis.turn_to_point(-22.812, -49.026);
+  chassis.drive_to_point(-22.812, -49.026);
+  chassis.turn_to_point(-58.23, -60.832);
+  chassis.drive_to_point(-58.23, -60.832);
+  chassis.turn_to_point(-67.635, -68.436);
+
+  drive_until_settled(7, 7);
+  chassis.drive_on_PID(-5.8);
+  assembly.lift_piston.set(true);
+  
+  drive_until_settled(7, 7);
+  assembly.lift_piston.set(false);
+  chassis.drive_on_PID(-8);
   assembly.rush_piston.set(true);
+  chassis.turn_max_voltage = 4;
+  task::sleep(400);
+  chassis.turn_on_PID(0);
+  assembly.rush_piston.set(false);
+  chassis.turn_on_PID(45);
+  assembly.mogo_clamp_piston.set(false);
+  stop_intake();
+  chassis.drive_max_voltage = 12;
+  chassis.drive_min_voltage = 2;
+  chassis.drive_to_point(-16, -47);
+  chassis.turn_max_voltage = 10;
+  chassis.turn_on_PID(270);
+  
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+}
 
-  vex::task _intake_ring_halway_task([](){
+void goalside_blue(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(-55, -23.5, 90);
+    return;
+  }
+
+  float time = Brain.Timer.time(msec);
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  chassis.turn_settle_error = 1.5;
+  chassis.drive_max_voltage = 6;
+  chassis.drive_on_PID(-31);
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  
+  
+  chassis.turn_to_point(44.5, -2);
+  start_intake();
+  assembly.lift_piston.set(true);
+  chassis.drive_to_point(44.5, -2);
+  assembly.lift_piston.set(false);
+  task::sleep(100);
+  chassis.drive_on_PID(-15);
+  chassis.turn_to_point(22.812, -49.026);
+  chassis.drive_to_point(22.812, -49.026);
+  chassis.turn_to_point(58.23, -60.832);
+  chassis.drive_to_point(58.23, -60.832);
+  chassis.turn_to_point(67.635, -68.436);
+
+  drive_until_settled(7, 7);
+  chassis.drive_on_PID(-5.8);
+  assembly.lift_piston.set(true);
+  
+  drive_until_settled(7, 7);
+  assembly.lift_piston.set(false);
+  chassis.drive_on_PID(-8);
+  assembly.rush_piston.set(true);
+  chassis.turn_max_voltage = 4;
+  task::sleep(400);
+  chassis.turn_on_PID(0);
+  assembly.rush_piston.set(false);
+  chassis.turn_on_PID(315);
+  assembly.mogo_clamp_piston.set(false);
+  stop_intake();
+  chassis.drive_max_voltage = 12;
+  chassis.drive_min_voltage = 2;
+  chassis.drive_to_point(16, -47);
+  chassis.turn_max_voltage = 10;
+  chassis.turn_on_PID(90);
+  
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+}
+
+void ring_side_red(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(-55, 23.5, 270);
+    return;
+  }
+
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  
+  thread odom(print_coordinates);
+  float time = Brain.Timer.time(msec);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(600);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(-21.268, 24.397, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-21.268, 24.397);
+
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  chassis.turn_to_point(-6.5, 39);
+  start_intake();
+  chassis.drive_to_point(-6.5, 39);
+  
+  chassis.right_swing_to_angle(0);
+  
+  chassis.drive_to_point(-6.6, 54);
+  chassis.drive_to_point(-6.6, 39);
+
+  chassis.turn_to_point(-23.312, 47.024);
+  chassis.drive_to_point(-23.312, 47.024);
+
+  chassis.turn_to_point(-62.035, 60.348);
+  chassis.drive_to_point(-62.035, 60.348);
+
+  chassis.turn_to_point(-18.902, 12.154, true);
+  // chassis.drive_on_PID(5);
+  drive_until_settled(8, 8);
+  chassis.drive_on_PID(-10);
+  
+  chassis.turn_to_point(-47.083, 0.146);
+  assembly.lift_piston.set(true);
+  chassis.drive_to_point(-47.083, 0.146);
+  assembly.lift_piston.set(false);
+  chassis.drive_on_PID(-9);
+
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+
+}
+
+void ring_side_blue(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(55, 23.5, 90);
+    return;
+  }
+
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  
+  thread odom(print_coordinates);
+  float time = Brain.Timer.time(msec);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(600);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(21.268, 24.397, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(21.268, 24.397);
+
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  chassis.turn_to_point(6.5, 39);
+  start_intake();
+  chassis.drive_to_point(6.5, 39);
+  
+  chassis.left_swing_to_angle(0);
+  
+  chassis.drive_to_point(6.6, 54);
+  chassis.drive_to_point(6.6, 39);
+
+  chassis.turn_to_point(23.312, 47.024);
+  chassis.drive_to_point(23.312, 47.024);
+
+  chassis.turn_to_point(62.035, 60.348);
+  chassis.drive_to_point(62.035, 60.348);
+
+  chassis.turn_to_point(18.902, 12.154, true);
+  // chassis.drive_on_PID(5);
+  drive_until_settled(8, 8);
+  chassis.drive_on_PID(-10);
+  
+  chassis.turn_to_point(47.083, 0.146);
+  assembly.lift_piston.set(true);
+  chassis.drive_to_point(47.083, 0.146);
+  assembly.lift_piston.set(false);
+  chassis.drive_on_PID(-9);
+
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+
+}
+
+void win_point_red(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(-55, 23.5, 270);
+    return;
+  }
+
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  
+  float time = Brain.Timer.time(msec);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(600);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(-21.268, 24.397, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-21.268, 24.397);
+
+
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  chassis.turn_to_point(-6.5, 39);
+  start_intake();
+  chassis.drive_to_point(-6.5, 39);
+  
+  chassis.right_swing_to_angle(0);
+  
+  chassis.drive_to_point(-6.6, 54);
+  chassis.drive_to_point(-6.6, 39);
+
+  chassis.turn_to_point(-23.312, 47.024);
+  chassis.drive_to_point(-23.312, 47.024);
+  chassis.drive_on_PID(-5);
+
+  chassis.turn_to_point(-62.035, 60.348);
+  chassis.drive_to_point(-62.035, 60.348);
+
+  chassis.turn_to_point(-18.902, 12.154, true);
+  
+  drive_until_settled(8, 8);
+  chassis.drive_on_PID(-10);
+  
+  chassis.turn_to_point(-15.27, 14.749);
+  LB_task(SCORING);
+  chassis.drive_to_point(-15.27, 14.749);
+  chassis.stop_drive(hold);
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+}
+
+void win_point_blue(bool set_pos) {
+  if (set_pos) {
+    chassis.set_coordinates(55, 23.5, 90);
+    return;
+  }
+
+  assembly.unjam_intake_task();
+  stop_intake();
+  color_sort_auton(color_sort::BLUE);
+  
+  float time = Brain.Timer.time(msec);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(600);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(21.268, 24.397, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(21.268, 24.397);
+
+
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  default_constants();
+  chassis.turn_to_point(6.5, 39);
+  start_intake();
+  chassis.drive_to_point(6.5, 39);
+  
+  chassis.left_swing_to_angle(0);
+  
+  chassis.drive_to_point(6.6, 54);
+  chassis.drive_to_point(6.6, 39);
+
+  chassis.turn_to_point(23.312, 47.024);
+  chassis.drive_to_point(23.312, 47.024);
+  chassis.drive_on_PID(-5);
+
+  chassis.turn_to_point(62.035, 60.348);
+  chassis.drive_to_point(62.035, 60.348);
+
+  chassis.turn_to_point(18.902, 12.154, true);
+  
+  drive_until_settled(8, 8);
+  chassis.drive_on_PID(-10);
+  
+  chassis.turn_to_point(15.27, 14.749);
+  LB_task(SCORING);
+  chassis.drive_to_point(15.27, 14.749);
+  chassis.stop_drive(hold);
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+}
+
+void skills(void) {
+  float time = Brain.Timer.time(msec);
+  assembly.unjam_intake_task();
+  
+  chassis.set_coordinates(-61, 0, 90);
+  
+  assembly.intake_motor.spin(fwd, 12, volt);
+  task::sleep(400);
+  stop_intake();
+  
+  chassis.drive_to_point(-46.854, -0.135);
+  
+  chassis.turn_to_point(-47.577, -23.75, true);
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-47.577, -23.75);
+  default_constants();
+
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  
+  chassis.turn_to_point(-26, -24);
+  start_intake();
+  chassis.drive_to_point(-26, -24);
+  
+  chassis.turn_to_point(22, -48);
+  LB_task(ACTIVE);
+  start_intake(false);
+  chassis.drive_to_point(22, -48);
+  
+  chassis.turn_to_point(-0.284, -43, true);
+  chassis.drive_to_point(-0.284, -43);
+  
+  stop_intake();
+  LB_task(HOLDING - 30);
+  chassis.turn_to_point(-0.284, -62.694);
+  start_intake(false);
+  chassis.drive_to_point(-0.284, -62.694);
+  
+  drive_until_settled(2.5, 2.5);
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(400);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(-0.474, -48.488, true);
+  chassis.drive_to_point(-0.474, -48.488);
+  
+  chassis.turn_to_point(-60.516, -46.973);
+  start_intake();
+  chassis.drive_max_voltage = 6;
+  chassis.drive_to_point(-60.516, -46.973);
+  chassis.turn_to_point(-47.818, -57.727);
+  chassis.drive_to_point(-47.818, -57.727);
+  default_constants();
+  
+  chassis.turn_to_point(-58, -61, true);
+  drive_until_settled(-6, -6);
+  assembly.intake_motor.spin(fwd, -5, volt);
+  assembly.mogo_clamp_piston.set(false);
+  task::sleep(100);
+  
+  chassis.drive_on_PID(10);
+  stop_intake();
+
+  // chassis.set_coordinates(-47.5, 0, 0);
+
+  chassis.turn_to_point(-47.336, 27.239, true);
+  chassis.drive_max_voltage = 8;
+  chassis.drive_to_point(-47.336, 14.564);
+  chassis.drive_max_voltage = 4;
+  chassis.drive_to_point(-47.336, 27.239);
+  default_constants();
+  assembly.mogo_clamp_piston.set(true);
+  task::sleep(200);
+  chassis.turn_settle_error = .25;
+  chassis.turn_to_point(-23.721, 23.48);
+  start_intake(false);
+  chassis.drive_to_point(-23.721, 23.48);
+
+  chassis.turn_to_point(0, 43);
+  chassis.drive_to_point(0, 43);
+  LB_task(ACTIVE);
+
+  chassis.turn_to_point(23.75, 46.854);
+  chassis.drive_to_point(23.75, 46.854);
+  
+  chassis.turn_to_point(0, 43, true);
+  stop_intake();
+  chassis.drive_to_point(0, 43);
+  LB_task(HOLDING - 30);
+
+  chassis.turn_to_point(0, 62);
+  start_intake();
+  chassis.drive_to_point(0, 62);
+
+  drive_until_settled(2.5, 2.5);
+  distance_reset();
+  chassis.turn_settle_error = 1;
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  task::sleep(400);
+  LB_task(INACTIVE);
+
+  chassis.turn_to_point(0, 48, true);
+  chassis.drive_to_point(0, 48);
+  chassis.drive_max_voltage = 6;
+  chassis.turn_to_point(-60.348, 46.854);
+  chassis.drive_to_point(-60.348, 46.854);
+  default_constants();
+
+  chassis.turn_to_point(-45.649, 60.589);
+  chassis.drive_to_point(-45.649, 60.589);
+
+  chassis.turn_to_point(-61.312, 62.276, true);
+  drive_until_settled(-6, -6);
+  assembly.mogo_clamp_piston.set(false);
+  assembly.intake_motor.spin(fwd, -5, volt);
+  task::sleep(200);
+  chassis.drive_on_PID(10);
+  stop_intake();
+
+  chassis.turn_to_point(47.194, 46.912);
+  // chassis.set_coordinates(23.5, 47, 90);
+  start_intake(false);
+  intake_ring_halfway();
+
+
+  chassis.drive_to_point(47.194, 46.912);
+
+  chassis.turn_to_point(47.762, -9, true);
+  chassis.drive_to_point(47.762, -9);
+
+  chassis.turn_to_point(47.573, -0.378);
+  chassis.drive_to_point(47.573, -0.378);
+
+  chassis.turn_to_point(62.03, 0, true);
+  chassis.drive_to_point(62.03, 0);
+  drive_until_settled(-1, -1);
+  drive_until_settled(-10, -10);
+  chassis.drive_on_PID(2.5);
+  assembly.intake_motor.spin(fwd, 12, volt);
+  task::sleep(500);
+  stop_intake();
+  assembly.intake_motor.stop(coast);
+  assembly._unjam_intake_task.suspend();
+  
+  chassis.turn_to_point(54.572, 0);
+  chassis.drive_to_point(54.572, 0);
+  
+  chassis.turn_to_point(61.382, 56.748);
+  drive_until_settled(10, 10);
+  chassis.drive_on_PID(-8);
+  drive_until_settled(10, 10);
+  chassis.drive_on_PID(-25);
+  
+  chassis.turn_to_point(61.382, -61.748);
+  drive_until_settled(10, 10);
+  chassis.drive_on_PID(-8);
+  drive_until_settled(10, 10);
+  chassis.drive_on_PID(-15);
+
+  chassis.turn_to_point(13.153, -14.196, true);
+  LB_task(SCORING);
+  chassis.drive_to_point(13.153, -14.196);
+  Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+
+  
+}
+
+
+void start_intake(bool unjam_intake) {
+  if (unjam_intake) {
+    assembly._unjam_intake_task.resume();
+  } else {
+    assembly._unjam_intake_task.suspend();
+  }
+  assembly.intake_motor.spin(fwd, 12, volt);
+}
+
+void stop_intake() {
+  assembly._unjam_intake_task.suspend();
+  assembly.intake_motor.stop();
+}
+
+void LB_task(int angle) {
+  assembly.LB_goto_state_task = angle;
+  vex::task task = vex::task([](){
+    if (assembly.LB_goto_state_task < ACTIVE) {
+      assembly.intake_motor.spinFor(-30, vex::rotationUnits::deg, true);
+    }
+
+    assembly.move_LB_to_angle(assembly.LB_goto_state_task);
+    return 0;
+  });
+}
+
+void distance_reset() {
+  vex::distance dis = vex::distance(vex::PORT21);
+  float hypotnuse = dis.objectDistance(vex::inches);
+  float theta = to_rad(chassis.get_absolute_heading());
+  chassis.set_coordinates(-hypotnuse * sin(theta), 62 + (hypotnuse * cos(theta) - 7.7), chassis.get_absolute_heading());  
+}
+
+void drive_until_settled(float left_voltage, float right_voltage) {
+  chassis.drive_with_voltage(left_voltage, right_voltage);
+
+  while (1) {
+    double start = chassis.forward_tracker.position(deg);
+    vex::task::sleep(100);
+    double end = chassis.forward_tracker.position(deg);
+
+    if (std::abs(end - start) < 1) {
+      chassis.stop_drive(coast);
+      break;
+    }
+  }
+}
+
+void intake_ring_halfway() {
+  vex::task intake_ring_halfway_task([](){
     int timeout_start = Brain.Timer.time(vex::timeUnits::sec);
     while (1) {
-        assembly.intake_motor.spin(fwd, 9.5, volt);
-        if (assembly.ring_color_sensor.isNearObject()) {
-          assembly.intake_motor.stop();
-          vex::this_thread::sleep_for(100);
+        if (assembly.ring_distance_sensor.objectDistance(mm) < 50) {
+          assembly.intake_motor.stop(brake);
           break;
         }
         if (Brain.Timer.time(vex::timeUnits::sec) - timeout_start > 5) {
@@ -113,167 +606,24 @@ void four_ring_red(void) {
     }
     return 0;
   });
+}
 
-  chassis.drive_on_PID(43);
-  chassis.drive_on_PID(-18);  
+void score_LB() {
+  assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+  int start_pos = assembly.LB_encoder.position(deg);
+  while (!(std::abs(assembly.LB_encoder.position(deg) - start_pos) < (SCORING + 30))) {
+    assembly.LB_motors.stop(hold);
+  }
+}
 
-  // Pull back through rings and clamp goal
-  chassis.turn_max_voltage = 8;
-  chassis.turn_on_PID(30);
-  chassis.drive_max_voltage = 8;
-  chassis.drive_on_PID(-13);
-  task::sleep(250);
-  assembly.rush_piston.set(false);
-  chassis.turn_on_PID(237);
-  chassis.drive_max_voltage = 6;
-  chassis.drive_on_PID(-22);
-  assembly.mogo_clamp_piston.set(true);
-  task::sleep(100);
+void color_sort_auton(color_sort color) {
+  assembly.select_ring_sort_mode(color);
   
-  // Turn to stack of 3 rings
-  chassis.turn_on_PID(280);
-  
-  is_intake_fallback = true;
-  assembly.intake_motor.spin(fwd, 12, volt);
-
-  // Intake rings and turn to preload
-  chassis.drive_max_voltage = 6;
-  chassis.drive_on_PID(24);
-  task::sleep(1000);
-  chassis.turn_settle_time = 500;
-  chassis.turn_on_PID(143);
-
-  chassis.drive_max_voltage = 8;
-
-  // Intake preload and intake double stack
-  chassis.drive_on_PID(34);
-  _intake_fallback_task.stop();
-  _intake_ring_halway_task.stop();
-  chassis.turn_on_PID(112);
-  chassis.drive_max_voltage = 4;
-  chassis.drive_on_PID(35);
-  assembly.doinker_piston.set(true);
-}
-
-void four_ring_blue(void) {
-  chassis.drive_max_voltage = 5;
-  chassis.drive_on_PID(-31);
-  assembly.mogo_clamp_piston.set(true);
-  task::sleep(1000);
-  assembly.intake_motor.spin(fwd, 12, volt);
-  task::sleep(5000);
-  
-  assembly.intake_motor.stop();
-
-}
-void one_ring_red(void) {
-  assembly.select_ring_sort_mode(color_sort::BLUE);
-
-  chassis.drive_max_voltage = 5;
-  chassis.drive_on_PID(-31);
-  assembly.mogo_clamp_piston.set(true);
-  task::sleep(1000);
-  assembly.intake_motor.spin(fwd, 12, volt);
-  task::sleep(5000);
-  
-  assembly.intake_motor.stop();
-
-}
-void one_ring_blue(void) {
-  assembly.select_ring_sort_mode(color_sort::RED);
-
-  chassis.drive_max_voltage = 5;
-  chassis.drive_on_PID(-31);
-  assembly.mogo_clamp_piston.set(true);
-  task::sleep(1000);
-  assembly.intake_motor.spin(fwd, 12, volt);
-  task::sleep(5000);
-  
-  assembly.intake_motor.stop();
-}
-
-void skills(void) {
-assembly.intake_motor.spin(fwd, 12, volt);
-task::sleep(400);
-assembly.intake_motor.stop();
-
-chassis.turn_to_point(-47.577, -0.858);
-chassis.drive_to_point(-47.577, -0.858);
-
-chassis.turn_to_point(-47.577, -24.232, true);
-chassis.drive_max_voltage = 5;
-chassis.drive_to_point(-47.577, -24.232);
-assembly.mogo_clamp_piston.set(true);
-task::sleep(400);
-chassis.drive_max_voltage = 8;
-
-chassis.turn_to_point(-23.48, -23.991);
-assembly.intake_motor.spin(fwd, 12, volt);
-chassis.drive_to_point(-23.48, -23.991);
-
-chassis.turn_to_point(0.135, -47.124);
-chassis.drive_to_point(0.135, -47.124);
-
-chassis.turn_to_point(23.75, -47.365);
-chassis.drive_to_point(23.75, -47.365);
-
-chassis.turn_to_point(0.135, -47.365);
-chassis.drive_to_point(0.135, -47.365);
-
-chassis.turn_to_point(-0.106, -63.51);
-chassis.drive_to_point(-0.106, -63.51);
-
-}
-
-void path_test(void) {
-  chassis.set_coordinates(-55.3, -131.9, 0);
-}
-
-void win_point(void) {
-chassis.set_coordinates(-59.947, 12.311, 230);
-assembly.move_LB_to_angle(SCORING);
-assembly.unjam_intake = false;
-
-vex::task down = vex::task([](){
-  assembly.move_LB_to_angle(INACTIVE);
-  return 0;
-});
-
-vex::task unjam_intake_task([](){
-  while(1) {
-    while (assembly.unjam_intake) {
-      double start = assembly.intake_encoder.position(deg);
-      vex::task::sleep(100);
-      double end = assembly.intake_encoder.position(deg);
-
-      if (end - start < 1) {
-        assembly.is_reversing = true;
-        assembly.intake_motor.spinFor(directionType::rev, 100, rotationUnits::deg, 600, velocityUnits::rpm, true);
-        assembly.is_reversing = false;
-      }
+  vex::task _color_sort_task([](){
+    while(1) {
+      assembly.ring_sort();
       vex::this_thread::sleep_for(50);
     }
-    vex::this_thread::sleep_for(100);
-  }
-  return 0;
-});
-
-
-chassis.turn_to_point(-21.186, 24.402, true);
-chassis.drive_max_voltage = 6;
-chassis.drive_to_point(-21.186, 24.402);
-
-assembly.mogo_clamp_piston.set(true);
-mogo_constants();
-task::sleep(200);
-
-chassis.turn_to_point(-8.891, 37.832);
-assembly.intake_motor.spin(fwd, 12, volt);
-chassis.drive_to_point(-8.891, 37.832);
-
-assembly.unjam_intake = true;
-chassis.right_swing_to_angle(0);
-
-chassis.drive_to_point(-8.05, 60.8);
-
+    return 0;
+  });
 }

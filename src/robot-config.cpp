@@ -21,14 +21,14 @@ auton_drive chassis(
     PORT8,  // Inertia sensor port
     2.75,        // Drivetrain wheel diameter
     0.75,        // Drivetrain wheel ratio
-    359.1,  // Inertial scale, value that reads after full 360
+    360,  // Inertial scale, value that reads after full 360
 
     PORT20, // Forward Tracker Port
     2.125,           // Forward Tracker wheel diameter in inches (negative flips direction)
     0,           // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
     PORT16,  // Sideways tracker port
-    2.125,           // Sideways tracker wheel diameter in inches (negative flips direction)
+    -2.125,           // Sideways tracker wheel diameter in inches (negative flips direction)
     0.519             // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 );
 
@@ -44,12 +44,12 @@ manual_drive assembly(
   hzn::motor(vex::PORT7, false, "intake_motor"),
   vex::PORT13, // Intake rotation sensor port
   vex::PORT18, // Ring color sensor port
-  vex::PORT15, // Ring distance sensor port
+  vex::PORT19, // Ring distance sensor port
 
-  PORT_D,  // Mogo clamp piston
-  PORT_C,  // Doinker piston
-  PORT_B,  // Rush piston  
-  PORT_G   // Lift piston
+  PORT_A,  // Mogo clamp piston
+  PORT_B,  // Doinker piston
+  PORT_E,  // Rush piston  
+  PORT_D   // Lift piston
 );
 
 void init(void) {
@@ -57,7 +57,7 @@ void init(void) {
   while (chassis.inertial.isCalibrating()) {
     vex::task::sleep(25);
   }
-  vex::task::sleep(100);
+  vex::task::sleep(200);
 
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1,1);
@@ -69,8 +69,8 @@ void init(void) {
   Brain.Screen.setPenWidth(1);
   Brain.Screen.setPenColor(vex::color::white);
 
-  assembly.doinker_piston.set(true);
-  assembly.lift_piston.set(true);
+  // assembly.doinker_piston.set(true);
+  // assembly.lift_piston.set(true);
   assembly.intake_encoder.resetPosition();
   assembly.ring_color_sensor.setLightPower(80, pct);
 }
@@ -80,13 +80,14 @@ void mogo_constants(void) {
 }
 
 void default_constants(void) {
-  chassis.set_turn_constants(12, .437, .0295, 3.486, 15, .1, 300, 3000);
-  chassis.set_drive_constants(10, 1.5, 0, 10, 0, 1.5, 300, 5000);
+  chassis.set_turn_constants(12, .437, .0215, 3.686, 15, 1.25, 100, 2000);
+  chassis.set_drive_constants(10, 1.5, 0, 10, 0, 2.5, 100, 3000);
   chassis.set_heading_constants(6, .4, 0, 1, 0);
-  chassis.set_swing_constants(12, .437, .0295, 3.486, 15, .5, 300, 3000);
-  assembly.set_LB_constants(12, .2, .1, .02, 0, 2, 200, 3000);
+  chassis.set_swing_constants(12, .437, .0295, 3.486, 15, 1, 125, 3000);
+  assembly.set_LB_constants(12, .2, .1, .02, 0, .5, 200, 3000);
 
   chassis.heading_max_voltage = 10;
+  chassis.turn_max_voltage = 12;
   chassis.drive_max_voltage = 8;
   chassis.drive_settle_error = 3;
   chassis.boomerang_lead = .5;

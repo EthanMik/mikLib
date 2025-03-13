@@ -20,13 +20,13 @@
 #include "v5_vcs.h"
 
 #include "654X_Drive/util.h"
-#include "654X_Drive/autons.h"
 #include "654X_Drive/motors.h"
 #include "654X_Drive/odom.h"
 #include "654X_Drive/PID.h"
 #include "654X_Drive/manual_drive.h"
 #include "654X_Drive/auton_drive.h"
 #include "654X_Drive/auton_drive_methods.h"
+#include "654X_Drive/autons.h"
 #include "robot-config.h"
 
 #include "654X_UI/graphics/drawable.h"

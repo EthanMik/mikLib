@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace vex;
+
 std::vector<std::pair<float, float>> curveNumeroUno = {
     {-21.79f, -51.93f}, // (-55.3,  -131.9)
     {-30.71f, -42.13f}, // (-78,    -107)
@@ -16,8 +18,24 @@ std::vector<std::pair<float, float>> curveNumeroUno = {
     { 21.81f, -41.34f}, // (55.4,   -105)
     { 14.57f, -63.00f}, // (37,     -160)
     {-22.52f, -65.67f}, // (-57.2,  -166.8)
-    {-21.79f, -51.93f}  // (-55.3,  -131.9)
+    {-21.79f, -51.93f},  // (-55.3,  -131.9)
+    {-21.79f, -51.93f}, // (-55.3,  -131.9)
+    {-30.71f, -42.13f}, // (-78,    -107)
+    {-38.98f, -33.86f}, // (-99,    -86)
+    {-49.76f, -21.83f} // (-126.35, -55.428)
 };
+
+std::vector<std::pair<float, float>> curveNumeroDos = {
+   {-23.5,-23.5},
+   {-14,-36},
+   {-5,-44},
+   {24,-47}
+   
+};
+
+float current_scalar = 3;
+float lead_scalar = 3;
+float curve_time = 0;
 
 // Movement scheme developed by Thomas Grisamore
 float turningStength = 1000; // Used to control speed to prevent slippage. Functions as a coefficient
@@ -42,15 +60,16 @@ void standardized_vector_movement(float speed, const std::vector<std::pair<float
     float curveSpeed; //Max speed of robot when on some specified curve
 
     
-    while(get_vector_distance(chassis.get_position_vector(), {chassis.ideal_x, chassis.ideal_y}) < 3){ //While robot sufficiently far away from the end, keep running the function
+    while(curve_time < curvePattern.size()/4){ //While robot sufficiently far away from the end, keep running the function
         currentDirection = to_normalized_vector(chassis.get_heading()+90); //Obtains degree heading of robot
         
         bezier(newDirection, curvePattern); //Returns vector pointing robot in the direction it will turn
         
         dotProduct = newDirection[0] * currentDirection[0] + newDirection[1] * currentDirection[1]; //Gives relative closeness of currentDirection to newDirection (1:same, -1:complete opposites)
-       
+        //dotProduct *= std::abs(dotProduct);
         float crossProduct = currentDirection[0] * newDirection[1] - currentDirection[1] *  newDirection[0]; //Cross product used to determine turning direction | (-) = Clockwise, (+) = Counterclockwise
-        
+        Controller.Screen.setCursor(3,1);
+        Controller.Screen.print(dotProduct);
         if (crossProduct < 0) {  // Adjust to Right
             leftSpeed = speed;
             rightSpeed = speed  * dotProduct; //Slows inner wheel down to cause turning
@@ -72,34 +91,35 @@ void standardized_vector_movement(float speed, const std::vector<std::pair<float
    
     }
     Controller.Screen.setCursor(1,1);
-    Controller.Screen.print("Code finished, hopefully it worked");
+    //Controller.Screen.print("Code finished, hopefully it worked");
+    chassis.stop_drive(vex::brake);
     return;
 }
 
 void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float, float>> &points){
-    const float current_scalar = 1, lead_scalar = 1; //Values used to determine which components of the final vector are most heavily weighed
-    const float header_dist = 10; //How many inches ahead the lead vector is taken from
+     //Values used to determine which components of the final vector are most heavily weighed
+    const float header_dist = 15; //How many inches ahead the lead vector is taken from
     const float header_stepper_size = 0.01; //Increment for t when used in finding the lead vector
-    int num_of_curves = sizeof(points)/4;
-    static float time = 0 //Where along the curve the robot is currently. Stored between runs of function. NOT ACTUALLY RELATED TO REAL-LIFE TIME, more like a third variable like "z" or "i" 
-    float t = time; //Form of "time" used in calculation. Often shortened to a float between 0-1 to get position along a bezier curve
+    float num_of_curves = sizeof(points)/4; //Where along the curve the robot is currently. Stored between runs of function. NOT ACTUALLY RELATED TO REAL-LIFE TIME, more like a third variable like "z" or "i" 
+    float t = std::max(0.0, curve_time - 0.3); //Form of "time" used in calculation. Often shortened to a float between 0-1 to get position along a bezier curve
     int index = 0; //Marker of which bezier curve is being used 
     float increment = 0.1; 
-    float pastDist = 10000; //Big number
-    float dist = 0;
+    double pastDist = 10000; //Big number
+    double dist = 0;
     float carrot_dist;
     float dx_dt;
     float dy_dt;
     float px, py, px2, py2;
     float vx, vy;
+    float storeVariable;
     std::vector<float> correction;
     std::vector<float> output;
     std::vector<float> lead;
     std::vector<float> current;
 
-    for(int i = 0; i < 20 && increment >= 0.01; i++){
+    for(int i = 0; i < 200 && increment >= 0.0001; i++){
         t += index; //Fixes problem
-        index = min(t, numOfCurves); //Gives integer of which curve to follow
+        index = std::min(t, (num_of_curves + 1)); //Gives integer of which curve to follow
         t -= index;
         px = pow(1-t,3)*points[index*4].first + 3*pow(1-t,2)*t*points[index*4+1].first + 3*(1-t)*t*t*points[index*4+2].first + t*t*t*points[index*4+3].first;
         py = pow(1-t,3)*points[index*4].second + 3*pow(1-t,2)*t*points[index*4+1].second + 3*(1-t)*t*t*points[index*4+2].second + t*t*t*points[index*4+3].second;
@@ -109,12 +129,14 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
         if(pastDist<=dist){
             t-=increment;
             increment/=10;
+            pastDist = 1000;
         }
         t+=increment;
         pastDist = dist;
     }
     t+=increment*9;
-    time = t + index;
+    curve_time = t + index;
+    storeVariable = index;
 
     //This part gets the vector pointing directly to the path
     vx =  px - chassis.get_X_position();
@@ -164,13 +186,14 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     }else if(sqrt(pow(correction[0],2)+pow(correction[1],2)) < 1){ //When slips too little, make faster (more slippage) | Increase increment to make it more sensitive  
         turningStength += 0.0002;
     }
-
+    
     Controller.Screen.setCursor(1,1);
-    Controller.Screen.print(time);
+    Controller.Screen.print(curve_time);
     Controller.Screen.setCursor(2,1);
-    Controller.Screen.print("(" + output[0] + ", " + output[1]) + ")";
-    Controller.Screen.setCursor(3,1);
-    Controller.Screen.print(turningStrength);
+    Controller.Screen.print(current[0]);
+    Controller.Screen.print(", ");
+    Controller.Screen.print(current[1]);
+    
     newDirection = output;
 
     return;
