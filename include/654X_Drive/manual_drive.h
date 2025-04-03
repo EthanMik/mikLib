@@ -96,6 +96,7 @@ public:
 
 
     // Align Robot
+    bool is_aligning = false;
     bool prev_align_state = false;
     vex::task async_aligner;
     

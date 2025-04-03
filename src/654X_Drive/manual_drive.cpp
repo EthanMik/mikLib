@@ -162,7 +162,7 @@ void manual_drive::select_ring_sort_mode() {
 
     switch (color_sort_mode)
     {
-    case 0:
+      case 0:
       select_ring_sort_mode(color_sort::NONE);
       break;
     case 1:
@@ -277,10 +277,6 @@ void manual_drive::lady_brown() {
       is_holding = !is_holding;
     }
     prev_holding_state = holding_state;
-    
-    // Brain.Screen.printAt(30, 30, "holding: %d", is_holding);
-    // Brain.Screen.printAt(30, 50, "active: %d", is_active);
-    // Brain.Screen.printAt(30, 70, "scoring: %d", is_scoring);
 
     if (active_state && scoring_state && (Brain.Timer.time(vex::timeUnits::msec) - LB_override_cooldown > 500)) {
       Controller.rumble(".");
@@ -438,10 +434,12 @@ void manual_drive::align_robot() {
 
   if (align_state && !prev_align_state) {
     vex::task async_aligner([](){
+      assembly.is_aligning = true;
       chassis.brake_is_overrided = false;
       chassis.drive_on_PID(2.5);
       chassis.override_brake_type(vex::brakeType::undefined);
       vex::task::sleep(20);
+      assembly.is_aligning = false;
       return 0;
     });
   }
@@ -449,6 +447,7 @@ void manual_drive::align_robot() {
   prev_align_state = align_state;
 
   if (std::abs(deadband(Controller.Axis1.position(), 5) || std::abs(deadband(Controller.Axis3.position(), 5)) > 0)) {
+    assembly.is_aligning = false;
     async_aligner.stop();
   }
 

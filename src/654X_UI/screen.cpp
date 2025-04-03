@@ -124,7 +124,7 @@ bool screen::needs_update() {
 
     }
     if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
-        is_scrolling_controller();
+        is_scrolling();
     }
 
     if (needs_render_update) {

@@ -226,6 +226,12 @@ std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y,
 std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, UI_distance_units units) {
     return std::make_shared<text>(text_label, x, y, units);
 }
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units) {
+    return std::make_shared<text>(text_label, x, y, hue, units);
+}
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, vex::color hue, UI_distance_units units) {
+    return std::make_shared<text>(text_label, x, y, hue, units);
+}
 
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, fill_color, outline_color, units);
@@ -243,6 +249,9 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue,
     return std::make_shared<rectangle>(x, y, w, h, hue, units);
 }
 
+std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<drawable> box) {
+    return std::make_shared<textbox>(text, box);
+}
 
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id) {
     return std::make_shared<toggle>(toggle_graphic, callback, id);

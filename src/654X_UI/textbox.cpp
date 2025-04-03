@@ -4,11 +4,12 @@ textbox::textbox(std::string text, std::shared_ptr<drawable> box) :
     text(text), box(box)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
-
+    
     this->x = get_x_pos();
     this->y = get_y_pos();
     this->w = get_width();
     this->h = get_height();
+
 };
 
 int textbox::get_x_pos() { return(box->get_x_pos()); }
@@ -48,9 +49,22 @@ bool textbox::needs_update() {
     return false;
 }
 
+void textbox::wrap_text() {
+    int txt_width = Brain.Screen.getStringWidth(text.c_str());
+    
+    if (box->get_width() < txt_width) {
+        return;
+    }
+
+    std::string cropped_text = text;
+
+    while (Brain.Screen.getStringWidth(cropped_text.c_str()) > w) {
+        
+    }
+}
+
 void textbox::render() {
-    // box->render();
-    // Brain.Screen.setFont(vex::fontType::mono20);    Brain.Screen.setFillColor(vex::red);
+    box->render();
     // printf("%f\n", Brain.Screen.getStringHeight(text.c_str()));
     // Brain.SDcard.
     // Brain.Screen.printAt(x, y + 16, text.c_str());

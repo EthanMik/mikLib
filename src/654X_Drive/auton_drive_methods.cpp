@@ -66,7 +66,6 @@ void standardized_vector_movement(float speed, const std::vector<std::pair<float
         bezier(newDirection, curvePattern); //Returns vector pointing robot in the direction it will turn
         
         dotProduct = newDirection[0] * currentDirection[0] + newDirection[1] * currentDirection[1]; //Gives relative closeness of currentDirection to newDirection (1:same, -1:complete opposites)
-        //dotProduct *= std::abs(dotProduct);
         float crossProduct = currentDirection[0] * newDirection[1] - currentDirection[1] *  newDirection[0]; //Cross product used to determine turning direction | (-) = Clockwise, (+) = Counterclockwise
         Controller.Screen.setCursor(3,1);
         Controller.Screen.print(dotProduct);
@@ -97,7 +96,7 @@ void standardized_vector_movement(float speed, const std::vector<std::pair<float
 }
 
 void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float, float>> &points){
-     //Values used to determine which components of the final vector are most heavily weighed
+    const float lead_scalar = 3; //Values used to determine which components of the final vector are most heavily weighed
     const float header_dist = 15; //How many inches ahead the lead vector is taken from
     const float header_stepper_size = 0.01; //Increment for t when used in finding the lead vector
     float num_of_curves = sizeof(points)/4; //Where along the curve the robot is currently. Stored between runs of function. NOT ACTUALLY RELATED TO REAL-LIFE TIME, more like a third variable like "z" or "i" 
@@ -112,10 +111,14 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     float px, py, px2, py2;
     float vx, vy;
     float storeVariable;
+    float radius;
+    float innerSpeed;
+    float angleShift;
     std::vector<float> correction;
     std::vector<float> output;
     std::vector<float> lead;
     std::vector<float> current;
+    std::vector<float> onPath;
 
     for(int i = 0; i < 200 && increment >= 0.0001; i++){
         t += index; //Fixes problem
@@ -170,14 +173,20 @@ void bezier(std::vector<float>& newDirection, const std::vector<std::pair<float,
     
     //print_vector_to_serial("correction", correction);
     //print_vector_to_serial("current", current);
-    //print_vector_to_serial("lead", lead);
+    //print_vector_to_serial("lead", lead)
 
     to_normalized_vector(current);
     to_normalized_vector(lead);
 
+    radius = header_dist/(0.01+acos(current[0]*lead[0] + current[1]*lead[1]));
+    innerSpeed = (radius - 12.5/2) / (radius + 12.5/2);
+    angleShift = acos(innerSpeed);
+    if(current[0]*lead[1]-lead[0]*current[1] < 0) angleShift *= -1;
+    onPath.push_back(current[0]*cos(angleShift)-current[1]*sin(angleShift));
+    onPath.push_back(current[0]*sin(angleShift)+current[1]*cos(angleShift));
 
-    output.push_back(correction[0] + current[0]*current_scalar + lead[0]*lead_scalar);
-    output.push_back(correction[1] + current[1]*current_scalar + lead[1]*lead_scalar);
+    output.push_back(correction[0] + onPath[0]*lead_scalar);
+    output.push_back(correction[1] + onPath[1]*lead_scalar);
     to_normalized_vector(output);
 
 

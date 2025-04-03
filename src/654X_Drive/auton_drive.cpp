@@ -407,6 +407,8 @@ void auton_drive::split_arcade() {
   float throttle = deadband(vex::controller(vex::primary).Axis3.value(), 5);
   float turn = deadband(vex::controller(vex::primary).Axis1.value(), 5);
 
-  left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), velocity_units::volt);
-  right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), velocity_units::volt);      
+  if (!assembly.is_aligning) {
+    left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), velocity_units::volt);
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), velocity_units::volt);      
+  }
 }

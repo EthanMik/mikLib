@@ -26,7 +26,9 @@ void UI_img_exists(const std::string& file_name);
 std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units);
 
 std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, UI_distance_units units);
-
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units);
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, vex::color hue, UI_distance_units units);
+    
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
@@ -35,6 +37,8 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue,
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id);
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback);
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic);
+
+std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<drawable> box);
 
 std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphic, std::function<void()> on_click);
 

@@ -22,11 +22,14 @@ public:
     bool needs_update() override;
     void render() override;
 
+    void wrap_text();
+
 private:
     bool needs_render_update;
 
     int x, y, w, h;
     UI_distance_units units;
     std::string text;
+    std::vector<std::string> wrapped_text;
     std::shared_ptr<drawable> box;
-};  
+};
