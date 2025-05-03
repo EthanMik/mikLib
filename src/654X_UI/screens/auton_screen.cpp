@@ -51,14 +51,18 @@ void UI_auton_screen::UI_crt_auton_scr() {
     auto x_lbl = UI_crt_lbl("", [](){ return chassis.get_X_position(); }, 350, 95, UI_distance_units::pixels);
     auto y_lbl = UI_crt_lbl("", [](){ return chassis.get_Y_position(); }, 350, 115, UI_distance_units::pixels);
 
-    auto description_box = UI_crt_txtbox(
-        "", UI_crt_img("description_text_box.png", 278, 138, 173, 90, UI_distance_units::pixels)
-    );
-    description_textbox = static_cast<textbox*>(description_box.get());
+    auto description_box_btn = UI_crt_btn(UI_crt_img("description_text_box.png", 278, 138, 173, 51, UI_distance_units::pixels), [this](){ show_auton(); });
+        description_box_btn->set_states(UI_crt_img("description_text_box_pressed.png", 278, 138, 173, 51, UI_distance_units::pixels), UI_crt_img("description_text_box_pressed.png", 278, 138, 173, 90, UI_distance_units::pixels));
+
+    auto description_box = UI_crt_txtbox("", UI_crt_img("", 278, 138, 173, 90, UI_distance_units::pixels));
+        description_textbox = static_cast<textbox*>(description_box.get());
+
+    auto _auton_img = UI_crt_gfx(UI_crt_img("", 15, 40, 188, 173, UI_distance_units::pixels));
+        auton_img = static_cast<graphic*>(_auton_img.get());
 
     UI_auton_scr->add_UI_components({bg, red_blue_tgl_lbl, rings_goal_tgl_lbl, quals_elims_tgl_lbl, 
         off_sawp_tgl_lbl, red_blue_btn, red_blue_tgl, rings_goal_btn, rings_goal_tgl, quals_elims_btn, quals_elims_tgl, 
-        off_sawp_btn, off_sawp_tgl, divider, show_alignment_btn, description_box, heading_btn, x_lbl, y_lbl, heading_lbl});
+        off_sawp_btn, off_sawp_tgl, divider, show_alignment_btn, description_box_btn, description_box, _auton_img, heading_btn, heading_lbl, x_lbl, y_lbl});
     
     set_description();
 }
@@ -111,7 +115,7 @@ void UI_auton_screen::set_description() {
 }
 
 void UI_auton_screen::queue_autons(bool calibrating) {    
-    if (!red_blue && !rings_goal && !quals_elims && !off_sawp) { blue_ringside_winpoint(calibrating); return; }
+    if (!red_blue && !rings_goal && !quals_elims && !off_sawp) { skills(calibrating); return; }
     if (!red_blue && !rings_goal && !quals_elims &&  off_sawp) { blue_ringside_sawp(calibrating); return; }
     if (!red_blue && !rings_goal &&  quals_elims && !off_sawp) { blue_ringside_elim(calibrating); return; }
 
@@ -128,3 +132,30 @@ void UI_auton_screen::queue_autons(bool calibrating) {
     if ( red_blue &&  rings_goal &&  quals_elims && !off_sawp) { red_goalside_elim(calibrating); return; }
 }
 
+void UI_auton_screen::show_auton() {    
+    is_showing_auton = !is_showing_auton;
+    if (!is_showing_auton) {
+        auton_img->blacklist_ID();
+    }
+    if (is_showing_auton) {
+        auton_img->whitelist_ID();
+    }
+    
+    UI_auton_scr->refresh();
+
+    if (!red_blue && !rings_goal && !quals_elims && !off_sawp) { return; }
+    if (!red_blue && !rings_goal && !quals_elims &&  off_sawp) { return; }
+    if (!red_blue && !rings_goal &&  quals_elims && !off_sawp) { return; }
+    
+    if (!red_blue &&  rings_goal && !quals_elims && !off_sawp) { return; }
+    if (!red_blue &&  rings_goal && !quals_elims &&  off_sawp) { return; }
+    if (!red_blue &&  rings_goal &&  quals_elims && !off_sawp) { return; }
+    
+    if ( red_blue && !rings_goal && !quals_elims && !off_sawp) { return; }
+    if ( red_blue && !rings_goal && !quals_elims &&  off_sawp) { return; }
+    if ( red_blue && !rings_goal &&  quals_elims && !off_sawp) { return; }
+    
+    if ( red_blue &&  rings_goal && !quals_elims && !off_sawp) { return; }
+    if ( red_blue &&  rings_goal && !quals_elims &&  off_sawp) { return; }
+    if ( red_blue &&  rings_goal &&  quals_elims && !off_sawp) { auton_img->modify_graphic(UI_crt_img("red_goalside_elim_auto.png", 15, 40, 188, 173, UI_distance_units::pixels)); return; }    
+}

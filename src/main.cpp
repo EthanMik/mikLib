@@ -3,35 +3,21 @@
 using namespace vex;
 
 vex::competition Competition;
-
-void UI_temp(void) {
-  // auto btn = UI_crt_btn(UI_crt_rec(30, 30, 100, 100, vex::color::red, UI_distance_units::pixels), nullptr);
-  //   btn->set_states(UI_crt_rec(30, 30, 100, 100, vex::color::blue, UI_distance_units::pixels), UI_crt_rec(30, 30, 100, 100, vex::color::green, UI_distance_units::pixels));
-  
-  // auto tgl = UI_crt_tgl(UI_crt_rec(130, 130, 100, 100, vex::color::red, UI_distance_units::pixels), nullptr);
-  //   tgl->set_states(UI_crt_rec(130, 130, 100, 100, vex::color::blue, UI_distance_units::pixels), UI_crt_rec(130, 130, 100, 100, vex::color::green, UI_distance_units::pixels));
-  
-  // auto scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  // scr->add_UI_components({btn, tgl});
-
-  // UI_render_queue = {scr};
-  // UI_render();
-
-
-  vex::task UI([](){
-    test_palette();
-    return 0;
-  });
-}
+vex::task UI;
 
 void pre_auton() {
   init();
   default_constants();
-  UI_temp();
+
+  UI = vex::task([](){
+    UI_init();
+    UI_render();
+    return 0;
+  });
 }
 
-void auton(void) {
-  // auton_scr->start_auton();
+void auton(void) {  
+  auton_scr->start_auton();
 }
 
 void user_control(void) {
@@ -64,38 +50,34 @@ void run_competition() {
 }
 
 int main() {
-  // Competition.autonomous(auton);
-  // Competition.drivercontrol(user_control);
 
-  // while (true) {
-  //   vex::wait(100, vex::msec);
+  // pre_auton();
+  // skills(false);
+
+  // chassis.set_coordinates(0, 54.5, 0);
+
+  // while(1) {
+  //   distance_reset();
+  //   Brain.Screen.printAt(30, 70, " X_r: %f", chassis.get_X_position());
+  //   Brain.Screen.printAt(30, 90, " Y:_r %f", chassis.get_Y_position());
+
   // }
 
-
-  // UI_temp();
-  // skills();
-
+  // pre_auton();
   // vex::task e([](){
   //   while(1) {
-  //     Brain.Screen.printAt(30, 30, "Active: %d", assembly.is_active);
-  //     Brain.Screen.printAt(30, 50, "Scoring: %d", assembly.is_scoring);
-  //     Brain.Screen.printAt(30, 70, "Holding: %d", assembly.is_holding);
-  //     Brain.Screen.printAt(30, 90, "Hanging: %d", assembly.is_hanging);
-  //     Brain.Screen.printAt(30, 110, "Descore_top: %d", assembly.is_descoring_top);
-  //     Brain.Screen.printAt(30, 130, "Descore_bot: %d", assembly.is_descoring_bot);
-  //     Brain.Screen.printAt(30, 150, "prev: %d", assembly.LB_prev_state);
-  //     Brain.Screen.printAt(30, 170, "prev_state: %d", assembly.prev_state);
+  //     Brain.Screen.printAt(30, 30, "%f", chassis.left_drive.get_wattage());
+  //     Brain.Screen.printAt(30, 50, "%f", chassis.right_drive.get_wattage());
   //   }
   //   return 0;
   // });
-
+  // user_control();
   run_competition();
-  
-  // skills();
-  // thread odom(print_coordinates);
-  // print(chassis.get_ForwardTracker_position());
-  // assembly.mogo_clamp_piston.set(true);
-  // PID_tuner();
-  
-  // test_spin_all_motors({chassis.left_drive, chassis.right_drive});
+  // LB_task(ACTIVE);
+  // ring_side_red(true);
+  // ring_side_red(false);
+
+
+  // // user_control();
+  // // test_turn();  
 }

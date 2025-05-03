@@ -36,6 +36,8 @@
 #include "654X_UI/graphics/image.h"
 #include "654X_UI/graphics/rectangle.h"
 #include "654X_UI/graphics/text.h"
+#include "654X_UI/graphics/pixel.h"
+#include "654X_UI/graphics/line.h"
 
 #include "654X_UI/button.h"
 #include "654X_UI/toggle.h"
@@ -46,6 +48,7 @@
 #include "654X_UI/screen.h"
 #include "654X_UI/screens/console_screen.h"
 #include "654X_UI/screens/auton_screen.h"
+#include "654X_UI/screens/graph_screen.h"
 
 // #include "654-Template/654-UI/shapes/circle.h"
 // #include "654-Template/654-UI/shapes/line.h"

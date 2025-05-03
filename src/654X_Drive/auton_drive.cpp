@@ -16,7 +16,7 @@ auton_drive::auton_drive(hzn::motor_group left_drive, hzn::motor_group right_dri
 
     sideways_tracker_diameter(sideways_tracker_diameter),
     sideways_tracker_center_distance(sideways_tracker_center_distance),
-    sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_center_distance / 360.0),
+    sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0),
 
     forward_tracker(forward_tracker_port),
     sideways_tracker(sideways_tracker_port),
@@ -122,7 +122,7 @@ void auton_drive::turn_on_PID(float angle, float turn_max_voltage, float turn_se
     output = clamp(output, -turn_max_voltage, turn_max_voltage);
 
     //test
-    add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
+    // add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
 
     drive_with_voltage(output, -output);
     vex::task::sleep(10); 
@@ -140,17 +140,20 @@ void auton_drive::drive_on_PID(float distance, float heading) {
 }
 
 void auton_drive::drive_on_PID(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti){
+  finished = false;
   desired_heading = heading;
+  desired_distance = distance;
   PID drivePID(distance, drive_kp, drive_ki, drive_kd, drive_starti, drive_settle_error, drive_settle_time, drive_timeout);
   PID headingPID(reduce_negative_180_to_180(heading - get_absolute_heading()), heading_kp, heading_ki, heading_kd, heading_starti);
   
-  float start_average_position = get_ForwardTracker_position();
-  float average_position = start_average_position;
+  float start_position = get_ForwardTracker_position();
+  float current_position = start_position;
 
   while(drivePID.is_settled() == false) {
-    average_position = get_ForwardTracker_position();
+    current_position = get_ForwardTracker_position();
 
-    float drive_error = distance + start_average_position - average_position;
+    float drive_error = distance + start_position - current_position;
+    this->drive_error = drive_error;
 
     float heading_error = reduce_negative_180_to_180(heading - get_absolute_heading());
     float drive_output = drivePID.compute(drive_error);
@@ -162,6 +165,7 @@ void auton_drive::drive_on_PID(float distance, float heading, float drive_max_vo
     drive_with_voltage(drive_output + heading_output, drive_output - heading_output);
     vex::task::sleep(10);
   }
+  finished = true;
 
   stop_drive(vex::hold);
 }
@@ -179,13 +183,13 @@ PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_k
 
 while(!swingPID.is_settled()) {
   float error  = reduce_negative_180_to_180(angle - get_absolute_heading());
-  float output = swingPID.compute(error);
 
-  output = clamp(output, -swing_max_voltage, swing_max_voltage);
-
-  if(reverse && output > 0) {
-    output = 0;
+  if(reverse && error > 0 && std::abs(error) > 25) {
+    error = -error;
   }
+
+  float output = swingPID.compute(error);
+  output = clamp(output, -swing_max_voltage, swing_max_voltage);
 
   left_drive.spin(fwd, output, velocity_units::volt);
   right_drive.stop(hold);
@@ -206,13 +210,15 @@ void auton_drive::right_swing_to_angle(float angle, float swing_max_voltage, flo
   PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
   while(swingPID.is_settled() == false){
     float error = reduce_negative_180_to_180(angle - get_absolute_heading());
+
+    if(reverse && error > 0 && std::abs(error) > 25) {
+      error = -error;
+    }
+
     float output = swingPID.compute(error);
     output = clamp(output, -swing_max_voltage, swing_max_voltage);
     
-    if(reverse && output > 0) {
-      output = 0;
-    }
-    // add_to_graph_buffer({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
+    // ({angle, (output / turn_max_voltage) * 100, get_absolute_heading()});
 
     right_drive.spin(vex::reverse, output, velocity_units::volt);
     left_drive.stop(vex::hold);
@@ -250,6 +256,7 @@ void auton_drive::set_coordinates(float X_position, float Y_position, float orie
   odom.set_position(X_position, Y_position, orientation_deg, get_ForwardTracker_position(), get_SidewaysTracker_position());
   set_heading(orientation_deg);
   odom_task = vex::task(position_track_task);
+  odom_task.setPriority(0);
 }
 
 float auton_drive::get_X_position() {

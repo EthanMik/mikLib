@@ -17,6 +17,7 @@ manual_drive::manual_drive(hzn::motor_group LB_motors, int LB_encoder_port, hzn:
 
 void manual_drive::initialize_user_control() {
   start_time = Brain.Timer.time(vex::timeUnits::sec);
+  assembly.lift_piston.set(false);
   chassis.override_brake_type(vex::brakeType::undefined);
   assembly.LB_goto_state = INACTIVE;
   
@@ -110,7 +111,7 @@ void manual_drive::intake() {
   }
   else if (Controller.ButtonL2.pressing()) {
     unjam_intake = false;
-    intake_motor.spin(vex::fwd, -12, vex::volt);
+    intake_motor.spin(vex::fwd, -6, vex::volt);
   }
   else if (!intake_override) {
     unjam_intake = false;
@@ -426,7 +427,7 @@ void manual_drive::move_LB_to_angle(float angle, float LB_max_voltage, float LB_
     output = clamp(output, -LB_max_voltage, LB_max_voltage);
 
     if (buffer_data) {
-      add_to_graph_buffer({angle, (output / LB_max_voltage) * 100, reduce_0_to_360(LB_encoder.angle())});
+      // add_to_graph_buffer({angle, (output / LB_max_voltage) * 100, reduce_0_to_360(LB_encoder.angle())});
     }
     if (assembly.LB_goto_state != state) {
       break;
@@ -451,9 +452,9 @@ void manual_drive::mogo_clamp() {
 }
 
 void manual_drive::doinker() {
-  bool doinker_state = Controller.ButtonX.pressing();
+  bool doinker_state = false;
   bool rush_state = Controller.ButtonY.pressing();
-  bool lift_state = Controller.ButtonUp.pressing();
+  bool lift_state = false;
 
   if (doinker_state && !prev_doinker_state) {
     is_extended_doinker = !is_extended_doinker;
@@ -504,7 +505,7 @@ void manual_drive::align_robot() {
     vex::task async_aligner([](){
       assembly.is_aligning = true;
       chassis.brake_is_overrided = false;
-      chassis.drive_on_PID(-7);
+      chassis.drive_on_PID(-6.3);
       chassis.override_brake_type(vex::brakeType::undefined);
       vex::task::sleep(20);
       assembly.is_aligning = false;

@@ -43,6 +43,8 @@ public:
     // Gets the combined position of all three motors
     float get_position(vex::rotationUnits rotationUnits);
 
+    float get_wattage();
+
     // Stops the motors with the specified brake type
     void stop(vex::brakeType brake = vex::brakeType::brake);
 

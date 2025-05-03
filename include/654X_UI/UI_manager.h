@@ -6,6 +6,10 @@ void UI_init();
 void UI_render();
 
 extern std::shared_ptr<UI_auton_screen> auton_scr;
+extern std::shared_ptr<UI_console_screen> console_scr;
+extern std::shared_ptr<UI_graph_screen> graph_scr;
+
+extern std::vector<std::shared_ptr<screen>> UI_render_queue;
 
 static void UI_swap_screens(const std::vector<std::shared_ptr<screen>>& scr);
 

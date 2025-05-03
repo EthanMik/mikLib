@@ -2,16 +2,95 @@
 
 using namespace vex;
 
-std::vector<std::vector<float>> graph_buffer;
+pid_data data;
+std::function<void()> test_func;
 
-void test_palette() {
-  UI_init();
-  UI_render();
+void test_drive() {
+  data.variables = { {"drive_kp : ", chassis.drive_kp}, {"drive_ki: ", chassis.drive_ki}, {"drive_kd: ", chassis.drive_kd},
+    {"heading_kp: ", chassis.heading_kp }, {"heading_ki: ", chassis.heading_ki}, {"heading_kd: ", chassis.heading_kd}
+  };
+  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot({
+    [](double x){ return chassis.get_ForwardTracker_position(); }, 
+    [](double x){ return chassis.desired_distance; }
+  },
+    {{"D_Actual", 0x002E8B59}, 
+    {"D_SetPoint", 0x00FA8072}}
+  );
+
+  test_func = [](){
+    graph_scr->reset_graph();
+    graph_scr->graph();
+
+    chassis.drive_on_PID(6);
+    chassis.drive_on_PID(12);
+    chassis.drive_on_PID(18);
+    chassis.drive_on_PID(-36);
+  };
+
+  PID_tuner();
 }
 
-void test() {
-  Brain.Screen.printAt(30, 30, "test");
-  exit(1);
+void test_turn() {
+  data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd} };
+  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot({
+    [](double x){ return chassis.get_absolute_heading(); }, 
+    [](double x){ return chassis.desired_heading; }},
+    {{"ActualValue", 0x002E8B59}, 
+    {"SetPoint", 0x00FA8072}}
+  );
+
+  test_func = [](){
+    graph_scr->reset_graph();
+    graph_scr->graph();
+
+    chassis.turn_on_PID(5);
+    chassis.turn_on_PID(30);
+    chassis.turn_on_PID(90);
+    chassis.turn_on_PID(225);
+    chassis.turn_on_PID(0);
+  };
+
+  PID_tuner();
+}
+
+void test_swing() {
+  data.variables = { {"swing_kp: ", chassis.swing_kp }, {"swing_ki: ", chassis.swing_ki }, {"swing_kd: ", chassis.swing_kd } };
+  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot({
+    [](double x){ return chassis.get_absolute_heading(); }, 
+    [](double x){ return chassis.desired_heading; }},
+    {{"ActualValue", 0x002E8B59}, 
+    {"SetPoint", 0x00FA8072}}
+  );
+
+  test_func = [](){
+    graph_scr->reset_graph();
+    graph_scr->graph();
+    
+    chassis.left_swing_to_angle(90);
+    chassis.right_swing_to_angle(0);
+  };
+
+  PID_tuner();
+}
+
+void test_full() {
+  chassis.drive_on_PID(24);
+  chassis.turn_on_PID(-45);
+  chassis.drive_on_PID(-36);
+  chassis.right_swing_to_angle(-90);
+  chassis.drive_on_PID(24);
+  chassis.turn_on_PID(0);
+}
+
+void test_odom() {
+  chassis.set_coordinates(0, 0, 0);
+  chassis.turn_to_point(24, 24);
+  chassis.drive_to_point(24,24);
+  chassis.drive_to_point(0,0);
+  chassis.turn_on_PID(0);
 }
 
 void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains) {
@@ -23,24 +102,10 @@ void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains) {
           motor.spinFor(1, vex::sec);
           vex::task::sleep(2000);
       }
-      vex::task::sleep(2000);
+      vex::task::sleep(1000);
     }
 }
 
-void test_print_motor_torque(std::vector<hzn::motor_group> motor_chains) {
-  while (true) {
-    int y_pos = 50;
-    for (hzn::motor_group& motor_chain : motor_chains) {
-      for (vex::motor& motor : motor_chain.motors) {
-        Brain.Screen.printAt(0, y_pos, "PORT %d TORQUE: %d", motor.index() + 1, motor.torque());
-        y_pos += 20;
-      }
-    }
-    vex::task::sleep(2000);
-  }
-}
-
-pid_data data;
 
 int get_flicker_index(const std::string &valueStr, int place) {
   int dotPos = valueStr.find('.');
@@ -61,17 +126,28 @@ int get_flicker_index(const std::string &valueStr, int place) {
 }
 
 void PID_tuner() {
-  // Constants to Tune
-  vex::task turn_test;
-  chassis.set_turn_constants(12, .437, .0295, 3.486, 15, 1, 300, 3000);
+  vex::task test;
+
+  vex::task user_contol([](){
+    while(1) {
+      assembly.mogo_clamp();
+      chassis.split_arcade();
+      vex::this_thread::sleep_for(5);
+    }
+    return 0;
+  });
 
   vex::task update_screen([](){
-  static int flicker = 0;
+    static int flicker = 0;
+    while(1) {
+    data.max = std::max(3, data.index+1);
+    data.min = data.max - 3;
 
-  while(1) {
-    for(int i = 0; i < data.variables.size(); ++i) {
-      Controller.Screen.setCursor(i+1, 1);
-      std::string var = to_string_float(data.variables[i]);
+    int j = 0;
+    for(int i = data.min; i < data.max; ++i) {
+      Controller.Screen.setCursor(j+1, 1);
+      j++;
+      std::string var = to_string_float(data.variables[i].second);
       if(data.index == i) {
         flicker++;
         if(flicker % 2 == 0) {
@@ -90,14 +166,14 @@ void PID_tuner() {
         }
         else{}
       }
-      Controller.Screen.print(var.c_str());
+      Controller.Screen.print((data.variables[i].first + var).c_str());
       
       if (data.index == i) { 
         if (data.needs_update) {
-          data.variables[i] += data.modifier;
+          data.variables[i].second += data.modifier;
           data.needs_update = false;
         }
-        Controller.Screen.print("<"); 
+        Controller.Screen.print("<   "); 
       } else { 
         Controller.Screen.print("     "); 
       }
@@ -114,7 +190,7 @@ void PID_tuner() {
       task::sleep(200);
     }
     if (Controller.ButtonDown.pressing()) {
-      if (data.index < 2) { data.index++; }
+      if (data.index < data.variables.size() - 1) { data.index++; }
       task::sleep(200);
     }
     if (Controller.ButtonRight.pressing()) {
@@ -141,28 +217,17 @@ void PID_tuner() {
       }
       task::sleep(200);
     }
-    // Testing the constants
     if (Controller.ButtonX.pressing()) {
-      turn_test = vex::task([](){
-        chassis.set_coordinates(-26, -24, 90);
-        chassis.turn_to_point(22, -48);
-      
-        standardized_vector_movement(0.25, curveNumeroDos);
-        // chassis.turn_on_PID(5);
-        // task::sleep(200);
-        // chassis.turn_on_PID(30);
-        // task::sleep(200);
-        // chassis.turn_on_PID(90);
-        // task::sleep(200);
-        // chassis.turn_on_PID(225);
-        // task::sleep(200);
-        // chassis.turn_on_PID(0);
+      user_contol.suspend();
+      test = vex::task([](){
+        test_func();
         return 0;
       });
     }
     if (Controller.ButtonB.pressing()) {
+      user_contol.resume();
+      test.stop();
       chassis.stop_drive(vex::coast);
-      turn_test.stop();
       task::sleep(200);
     }
     task::sleep(20);
@@ -198,6 +263,14 @@ void print(int num) {
 }
 void print(bool boolean) {
     printf("%d\n", boolean);
+    fflush(stdout);
+}
+void print(uint32_t num) {
+    printf("%u\n", num);
+    fflush(stdout);
+}
+void print(double num) {
+    printf("%f\n", num);
     fflush(stdout);
 }
 
@@ -237,28 +310,6 @@ void print_coordinates(){
   }
 }
 
-void add_to_graph_buffer(std::vector<float> data) {
-  graph_buffer.push_back(data);
-}
-
-void clear_graph_buffer() {
-  graph_buffer.clear();
-}
-
-void graph() {
-  for (const auto &row : graph_buffer) {
-    for (size_t i = 0; i < row.size(); ++i) {
-      printf("%f", row[i]);
-      if (i != row.size() - 1) {
-        printf(",");
-      } 
-    }
-    printf("\n");
-    fflush(stdout);
-    vex::task::sleep(100);
-  }
-  clear_graph_buffer();
-}
 
 void skills_driver_run() {
   Controller.Screen.setCursor(1, 1);

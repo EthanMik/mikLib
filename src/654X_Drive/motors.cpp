@@ -66,6 +66,15 @@ float hzn::motor_group::get_position(vex::rotationUnits rotationUnits) {
     return position / motors.size();
 }
 
+float hzn::motor_group::get_wattage() {
+    float position = 0;
+
+    for (vex::motor& motor : motors) {
+        position += motor.power();
+    }   
+    return position / motors.size();
+}
+
 void hzn::motor_group::stop(vex::brakeType brake) {
     for (vex::motor& motor : motors) {
         motor.stop(brake);

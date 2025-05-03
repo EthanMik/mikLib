@@ -26,7 +26,8 @@ public:
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align);
 
     bool needs_update();
-    void render();
+    void render(bool full_refresh);
+    void refresh();
 
     void add_UI_component(std::shared_ptr<UI_component> component);
     void add_UI_components(std::vector<std::shared_ptr<UI_component>> components);
@@ -40,7 +41,7 @@ private:
     void check_bounds();
     bool is_render_exception(const std::shared_ptr<UI_component>& component);
 
-    void is_scrolling();
+    bool is_scrolling();
     void is_scrolling_controller();
     
     void update_scroll_bar();
@@ -66,6 +67,8 @@ private:
     bool removal_scheduled = false;
     std::vector<int> removal_id;
 
+    bool screen_needs_refresh;
     bool needs_render_update;
+    int render_index;
     input_type input_type = input_type::TOUCHSCREEN;
 };

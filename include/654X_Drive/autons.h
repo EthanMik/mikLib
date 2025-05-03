@@ -26,13 +26,12 @@ void ring_side_blue(bool set_pos = false);
 void win_point_blue(bool set_pos = false);
 void solo_win_point_blue(bool set_pos = false);
 
-void skills(void);
+void skills(bool calibrate);
 
-void drive_until_settled(float left_voltage, float right_voltage);
+void drive_until_settled(float left_voltage, float right_voltage, float max_timeout = 2500, float min_timeout = 500);
 void distance_reset();
-void LB_task(int angle);
+void LB_task(int angle, bool override = false);
 void start_intake(bool unjam_intake = true);
 void stop_intake();
 void intake_ring_halfway();
-void score_LB();
 void color_sort_auton(color_sort color);

@@ -48,4 +48,5 @@ float right_voltage_scaling(float drive_output, float heading_output);
 
 float clamp_min_voltage(float drive_output, float drive_min_voltage);
 
-std::string to_string_float(float num);
+std::string to_string_float(float num, int precision = 5);
+std::string to_string_int(int num);

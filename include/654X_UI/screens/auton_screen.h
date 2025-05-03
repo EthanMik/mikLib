@@ -16,15 +16,18 @@ private:
     void UI_select_auton(autons auton);
     void queue_autons(bool calibrating);
     void set_description();
+    void show_auton();
 
     bool red_blue = false;
     bool rings_goal = false;
     bool quals_elims = false;
     bool off_sawp = false;
     
+    bool is_showing_auton;
     int off_sawp_ID = 0;
 
     textbox* description_textbox; 
+    graphic* auton_img; 
     std::function<void()> auton;
     std::shared_ptr<screen> UI_auton_scr = nullptr;
 };

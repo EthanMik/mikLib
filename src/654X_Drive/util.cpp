@@ -121,8 +121,24 @@ float clamp_min_voltage(float drive_output, float drive_min_voltage) {
   return drive_output;
 }
 
-std::string to_string_float(float num) {
+std::string to_string_float(float num, int precision) {
+  std::ostringstream oss;
+  oss << std::fixed << std::setprecision(precision) << num;
+  std::string str = oss.str();
+
+  if (precision != 5) {
+    str.erase(str.find_last_not_of('0') + 1);
+    if (!str.empty() && str.back() == '.')
+        str.pop_back();
+    if (str == "-0")
+        str = "0";
+  }
+
+  return str;
+}
+
+std::string to_string_int(int num) {
   std::ostringstream stream;
-  stream << std::fixed << std::setprecision(5) << num;
+  stream << std::fixed << num;
   return stream.str();
 }

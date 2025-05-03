@@ -8,11 +8,6 @@ class label;
 int UI_get_cursor_x_position();
 int UI_get_cursor_y_position();
 
-int UI_get_cursor_x_bound();
-int UI_get_cursor_y_bound();
-
-void UI_update_cursor_position(std::shared_ptr<screen> scr);
-
 int UI_create_ID(int component_type, int toggle_group = 0);
 
 int UI_decode_component_type(int id);
@@ -26,6 +21,12 @@ float to_pixels(float distance, UI_distance_units units);
 void UI_img_exists(const std::string& file_name);
 
 std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units);
+
+std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_units units);
+
+std::shared_ptr<drawable> UI_crt_ln(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
+
+std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_units units);
 
 std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units);

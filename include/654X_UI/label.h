@@ -35,7 +35,7 @@ private:
     bool needs_render_update;
 
     int last_update_time = 0;
-    const int update_interval_ms = 100;
+    const int update_interval_ms = 250;
 
 };
 

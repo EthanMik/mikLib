@@ -109,22 +109,24 @@ bool screen::needs_update() {
         input_type = input_type::TOUCHSCREEN;
     }
 
-    for (const auto& component : UI_components) {
+    for (std::size_t i = 0; i < UI_components.size(); ++i) {
+        auto& component = UI_components[i];
         if (is_render_exception(component)) {
             continue;
         }
-
-        if(!pressed) {
+        if (!pressed) {
             component->is_pressing(input_type);
         }
-
         if (component->needs_update()) {
+            render_index = i;
             needs_render_update = true;
         }
-
     }
+
     if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
-        is_scrolling();
+        if (is_scrolling()) {
+            render_index = 0;
+        }
     }
 
     if (needs_render_update) {
@@ -134,8 +136,19 @@ bool screen::needs_update() {
     return false;
 }
 
-void screen::render() {
-    for (const auto& component : UI_components) {
+void screen::refresh() {
+    screen_needs_refresh = true;
+}
+
+void screen::render(bool full_refresh) {
+    if (full_refresh || screen_needs_refresh) {
+        render_index = 0;
+        screen_needs_refresh = false;
+    }
+
+    for (std::size_t i = render_index; i < UI_components.size(); ++i) {
+        auto& component = UI_components[i];
+
         if (is_render_exception(component)) {
             continue;
         }
@@ -146,26 +159,11 @@ void screen::render() {
             update_scroll_bar();
         }
     }
+    render_index = 0;
 }
 
-void screen::is_scrolling_controller() {
-    int cursor_x = UI_get_cursor_x_position();
-    int cursor_y = UI_get_cursor_y_position();
-    int cursor_x_bound = UI_get_cursor_x_bound();
-    int cursor_y_bound = UI_get_cursor_y_bound();
-
-    bool is_cursor_within_screen = cursor_x >= x && cursor_x <= x + w && cursor_y >= y && cursor_y <= y + h;
-    
-    printf("\n%d", cursor_x);
-    if (cursor_x > SCREEN_WIDTH + screen_pos) {
-        for (const auto& component : UI_components) {
-            component->set_x_pos(component->get_x_pos() - cursor_x_bound * 2);
-        }
-        screen_pos += cursor_x_bound * 2;
-    }
-}
-
-void screen::is_scrolling() {
+bool screen::is_scrolling() {
+    bool scrolled = false;
     float touch_x = Brain.Screen.xPosition();
     float touch_y = Brain.Screen.yPosition();
     bool is_touch_within_screen = touch_x >= x && touch_x <= x + w && touch_y >= y && touch_y <= y + h;
@@ -213,6 +211,9 @@ void screen::is_scrolling() {
                 } else {
                     component->set_x_pos(component->get_x_pos() + local_position);
                 }
+                if (local_position != 0) {
+                    scrolled = true;
+                }
             }
             component_delta_position += local_position;
             
@@ -222,6 +223,7 @@ void screen::is_scrolling() {
     if (!Brain.Screen.pressing()) {
         pressed = false;
     }
+    return scrolled;
 }
 
 int screen::get_touch_pos() {

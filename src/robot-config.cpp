@@ -8,48 +8,48 @@ vex::controller Controller;
 auton_drive chassis(
     // Drivetrain motors
     hzn::motor_group({
-      hzn::motor(vex::PORT4, true, "left_front_motor"), 
-      hzn::motor(vex::PORT5, true, "left_middle_motor"), 
-      hzn::motor(vex::PORT6, false, "left_back_motor")
+      hzn::motor(vex::PORT4, false, "left_front_motor"), 
+      hzn::motor(vex::PORT8, true, "left_middle_motor"), 
+      hzn::motor(vex::PORT6, true, "left_back_motor")
     }),
     hzn::motor_group({
-      hzn::motor(vex::PORT2, false, "right_front_motor"), 
-      hzn::motor(vex::PORT1, true, "right_middle_motor"), 
-      hzn::motor(vex::PORT3, false, "right_back_motor")
+      hzn::motor(vex::PORT5, false, "right_front_motor"), 
+      hzn::motor(vex::PORT9, true, "right_middle_motor"), 
+      hzn::motor(vex::PORT10, false, "right_back_motor")
     }),
 
-    PORT13,  // Inertia sensor port
+    PORT18,  // Inertia sensor port
     2.75,        // Drivetrain wheel diameter
     0.75,        // Drivetrain wheel ratio
     360,  // Inertial scale, value that reads after full 360
 
-    PORT11, // Forward Tracker Port
+    PORT19, // Forward Tracker Port
     -2,           // Forward Tracker wheel diameter in inches (negative flips direction)
     0,           // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
-    PORT12,  // Sideways tracker port
-    -2,           // Sideways tracker wheel diameter in inches (negative flips direction)
-    0.519             // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
+    PORT15,  // Sideways tracker port
+    2,           // Sideways tracker wheel diameter in inches (negative flips direction)
+    0.3             // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 );
 
 manual_drive assembly(
   // Lady Brown motors
   hzn::motor_group({
-    hzn::motor(vex::PORT17, true, "left_LB_motor"),
-    hzn::motor(vex::PORT18, false, "right_LB_motor") 
+    hzn::motor(vex::PORT13, true, "left_LB_motor"),
+    hzn::motor(vex::PORT20, false, "right_LB_motor") 
   }), 
 
-  vex::PORT19, // Lady Brown rotation sensor port
+  vex::PORT11, // Lady Brown rotation sensor port
 
   hzn::motor(vex::PORT16, true, "intake_motor"),
   vex::PORT8, // Intake rotation sensor port
-  vex::PORT21, // Ring color sensor port
-  vex::PORT20, // Ring distance sensor port
+  vex::PORT14, // Ring color sensor port
+  vex::PORT12, // Ring distance sensor port
 
   PORT_A,  // Mogo clamp piston
-  PORT_B,  // Doinker piston
-  PORT_E,  // Rush piston  
-  PORT_D   // Lift piston
+  PORT_D,  // Doinker piston
+  PORT_C,  // Rush piston  
+  PORT_B   // Lift piston
 );
 
 void calibrate_inertial(void) {
@@ -62,7 +62,6 @@ void calibrate_inertial(void) {
 
 void init(void) {
   Brain.Screen.drawImageFromFile("loading_screen.png", 0, 0);
-  task::sleep(30);
   vex::task loading_bar([](){
     std::string calibrate = "Calibrating";
     int count = 0;

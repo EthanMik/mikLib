@@ -47,6 +47,7 @@ int graphic::get_x_pos() { return(x); }
 int graphic::get_y_pos() { return(y); }
 int graphic::get_width() { return(w); }
 int graphic::get_height() { return(h); }
+int graphic::get_size() { return(graphics.size()); }
 
 void graphic::set_x_pos(int x) {
     int delta_x = x - this->x;
@@ -84,6 +85,23 @@ void graphic::set_height(int h) {
         graphic->set_height(graphic->get_height() + delta_h);
     }
     this->h = h;
+}
+
+void graphic::add_graphic(std::shared_ptr<drawable> graphic) {
+    graphics.push_back(graphic);
+    needs_render_update = true;
+}
+
+
+void graphic::modify_graphic(std::shared_ptr<drawable> graphic) {
+    graphics.clear();
+    graphics.push_back(graphic);
+    needs_render_update = true;
+}
+
+void graphic::remove_first_graphic() {
+    graphics.erase(graphics.begin());
+    needs_render_update = true;
 }
 
 bool graphic::needs_update() {    

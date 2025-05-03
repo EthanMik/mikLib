@@ -9,7 +9,7 @@ label::label(const std::string& label, int x, int y, UI_distance_units units):
     this->y = to_pixels(y, units);
     this->w = Brain.Screen.getStringWidth(label_text.c_str());
     this->h = Brain.Screen.getStringHeight(label_text.c_str());
-
+    
     last_update_time = Brain.Timer.time(vex::timeUnits::msec);
 };
 
