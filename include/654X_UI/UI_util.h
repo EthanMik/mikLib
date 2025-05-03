@@ -19,6 +19,8 @@ int UI_decode_component_type(int id);
 int UI_decode_toggle_group(int id);
 int UI_decode_unique_id(int id);
 
+std::shared_ptr<UI_component> UI_to_component(std::shared_ptr<UI_component> component);
+
 float to_pixels(float distance, UI_distance_units units);
 
 void UI_img_exists(const std::string& file_name);

@@ -2,6 +2,20 @@
 
 using namespace vex;
 
+void blue_ringside_winpoint(bool calibrate) { chassis.set_coordinates(100, 200, 180); }
+void blue_ringside_sawp(bool calibrate) { print("blue_ringside_sawp"); }
+void blue_ringside_elim(bool calibrate) { print("blue_ringside_elim"); }
+void blue_goalside_winpoint(bool calibrate) { print("blue_goalside_winpoint"); }
+void blue_goalside_sawp(bool calibrate) { print("blue_goalside_sawp"); }
+void blue_goalside_elim(bool calibrate) { print("blue_goalside_elim"); }
+void red_ringside_winpoint(bool calibrate) { print("red_ringside_winpoint"); }
+void red_ringside_sawp(bool calibrate) { print("red_ringside_sawp"); }
+void red_ringside_elim(bool calibrate) { print("red_ringside_elim"); }
+void red_goalside_winpoint(bool calibrate) { print("red_goalside_winpoint"); }
+void red_goalside_sawp(bool calibrate) { print("red_goalside_sawp"); }
+void red_goalside_elim(bool calibrate) { print("red_goalside_elim"); }
+
+
 void solo_win_point_red(bool set_pos) {
   if (set_pos) {
     chassis.set_coordinates(-55, 23.5, 270);
@@ -675,6 +689,7 @@ void distance_reset() {
 
 void drive_until_settled(float left_voltage, float right_voltage) {
   chassis.drive_with_voltage(left_voltage, right_voltage);
+
 
   while (1) {
     double start = chassis.forward_tracker.position(deg);

@@ -18,33 +18,33 @@ auton_drive chassis(
       hzn::motor(vex::PORT3, false, "right_back_motor")
     }),
 
-    PORT8,  // Inertia sensor port
+    PORT13,  // Inertia sensor port
     2.75,        // Drivetrain wheel diameter
     0.75,        // Drivetrain wheel ratio
     360,  // Inertial scale, value that reads after full 360
 
-    PORT20, // Forward Tracker Port
-    2.125,           // Forward Tracker wheel diameter in inches (negative flips direction)
+    PORT11, // Forward Tracker Port
+    -2,           // Forward Tracker wheel diameter in inches (negative flips direction)
     0,           // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
-    PORT16,  // Sideways tracker port
-    -2.125,           // Sideways tracker wheel diameter in inches (negative flips direction)
+    PORT12,  // Sideways tracker port
+    -2,           // Sideways tracker wheel diameter in inches (negative flips direction)
     0.519             // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 );
 
 manual_drive assembly(
   // Lady Brown motors
   hzn::motor_group({
-    hzn::motor(vex::PORT11, false, "left_LB_motor"),
-    hzn::motor(vex::PORT12, true, "right_LB_motor") 
+    hzn::motor(vex::PORT17, true, "left_LB_motor"),
+    hzn::motor(vex::PORT18, false, "right_LB_motor") 
   }), 
 
-  vex::PORT17, // Lady Brown rotation sensor port
+  vex::PORT19, // Lady Brown rotation sensor port
 
-  hzn::motor(vex::PORT7, false, "intake_motor"),
-  vex::PORT13, // Intake rotation sensor port
-  vex::PORT18, // Ring color sensor port
-  vex::PORT19, // Ring distance sensor port
+  hzn::motor(vex::PORT16, true, "intake_motor"),
+  vex::PORT8, // Intake rotation sensor port
+  vex::PORT21, // Ring color sensor port
+  vex::PORT20, // Ring distance sensor port
 
   PORT_A,  // Mogo clamp piston
   PORT_B,  // Doinker piston
@@ -52,18 +52,43 @@ manual_drive assembly(
   PORT_D   // Lift piston
 );
 
-void init(void) {
+void calibrate_inertial(void) {
   chassis.inertial.calibrate();
   while (chassis.inertial.isCalibrating()) {
     vex::task::sleep(25);
   }
   vex::task::sleep(200);
+}
+
+void init(void) {
+  Brain.Screen.drawImageFromFile("loading_screen.png", 0, 0);
+  task::sleep(30);
+  vex::task loading_bar([](){
+    std::string calibrate = "Calibrating";
+    int count = 0;
+    while(1) {
+      Brain.Screen.printAt(164, 220, calibrate.c_str());
+      task::sleep(200);
+      calibrate.append(".");
+      count++;
+      if (count > 4) {
+        count = 0;
+        calibrate = "Calibrating";
+        Brain.Screen.printAt(164, 220, (calibrate + "     ").c_str());
+      }
+
+    }
+    return 0;
+  });
+
+  calibrate_inertial();
+  loading_bar.stop();
 
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1,1);
   vex::task::sleep(50);
   Brain.Screen.clearScreen();
-  
+
   Brain.Screen.setFillColor(vex::color::black);
   
   Brain.Screen.setPenWidth(1);

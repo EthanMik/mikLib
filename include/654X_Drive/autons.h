@@ -2,6 +2,19 @@
 
 #include "vex.h"
 
+void blue_ringside_winpoint(bool calibrate);
+void blue_ringside_sawp(bool calibrate);
+void blue_ringside_elim(bool calibrate);
+void blue_goalside_winpoint(bool calibrate);
+void blue_goalside_sawp(bool calibrate);
+void blue_goalside_elim(bool calibrate);
+void red_ringside_winpoint(bool calibrate);
+void red_ringside_sawp(bool calibrate);
+void red_ringside_elim(bool calibrate);
+void red_goalside_winpoint(bool calibrate);
+void red_goalside_sawp(bool calibrate);
+void red_goalside_elim(bool calibrate);
+
 
 void goalside_red(bool set_pos = false);
 void ring_side_red(bool set_pos = false);

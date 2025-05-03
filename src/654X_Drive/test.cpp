@@ -184,6 +184,22 @@ void print(float num) {
     printf("%f\n", num);
     fflush(stdout);
 }
+void print(std::string str) {
+    printf("%s\n", str.c_str());
+    fflush(stdout);
+}
+void print(const char* str) {
+    printf("%s\n", str);
+    fflush(stdout);
+}
+void print(int num) {
+    printf("%d\n", num);
+    fflush(stdout);
+}
+void print(bool boolean) {
+    printf("%d\n", boolean);
+    fflush(stdout);
+}
 
 int print_vector_to_serial(const std::string& name, const std::vector<float>& vector) {
     printf("%s\n", name.c_str());
@@ -202,7 +218,7 @@ int print_vector_to_serial(const std::string& name, const std::vector<float>& ve
 }
 
 void print_coordinates(){
-  // chassis.set_coordinates(0, 0, 0);
+  chassis.set_coordinates(0, 0, 0);
   // vex::distance dis = vex::distance(vex::PORT21);
   while(true){
     Brain.Screen.clearScreen();
@@ -242,4 +258,37 @@ void graph() {
     vex::task::sleep(100);
   }
   clear_graph_buffer();
+}
+
+void skills_driver_run() {
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("SKILLS DRIVER RUN               ");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             3                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             2                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             1                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("            GO                 ");
+  Controller.rumble("-");
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("                               ");
+
+  vex::task time_left([](){
+    while(1) {
+      Controller.Screen.setCursor(1, 1);
+      Controller.Screen.print("           ");
+      Controller.Screen.print(assembly.time_remaining);
+      Controller.Screen.print("  ");
+    }
+    return 0;
+  });
 }

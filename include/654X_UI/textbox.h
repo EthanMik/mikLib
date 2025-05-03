@@ -18,13 +18,16 @@ public:
 
     void set_width(int w) override;
     void set_height(int h) override;
-    
+
     bool needs_update() override;
     void render() override;
 
+    void set_text(std::string text);
     void wrap_text();
 
 private:
+    void draw_text();
+    
     bool needs_render_update;
 
     int x, y, w, h;

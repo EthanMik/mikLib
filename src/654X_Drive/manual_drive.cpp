@@ -18,8 +18,8 @@ manual_drive::manual_drive(hzn::motor_group LB_motors, int LB_encoder_port, hzn:
 void manual_drive::initialize_user_control() {
   start_time = Brain.Timer.time(vex::timeUnits::sec);
   chassis.override_brake_type(vex::brakeType::undefined);
-  assembly.LB_goto_state = SCORING;
-
+  assembly.LB_goto_state = INACTIVE;
+  
   vex::task async_LB([](){
     while (1) {
       if (!assembly.LB_override) {
@@ -43,9 +43,9 @@ void manual_drive::unjam_intake_task() {
   _unjam_intake_task = vex::task([](){
     while(1) {
       while (assembly.unjam_intake) {
-        double start = assembly.intake_encoder.position(deg);
+        double start = assembly.intake_motor.position(deg);
         vex::task::sleep(100);
-        double end = assembly.intake_encoder.position(deg);
+        double end = assembly.intake_motor.position(deg);
   
         if (end - start < 1) {
           assembly.is_reversing = true;
@@ -62,7 +62,7 @@ void manual_drive::unjam_intake_task() {
 }
 
 void manual_drive::intake() {
-  if (Controller.ButtonDown.pressing()) {
+  if (Controller.ButtonL2.pressing() && Controller.ButtonR2.pressing()) {
     assembly.unjam_intake = true;
     assembly.is_intaking_ring_halfway = true;
 
@@ -70,14 +70,8 @@ void manual_drive::intake() {
       assembly.intake_override = true;
       int timeout_start = Brain.Timer.time(vex::timeUnits::sec);
       while (1) {
-          assembly.intake_motor.spin(fwd, 10, volt);
+          assembly.intake_motor.spin(fwd, 12, volt);
           if (assembly.ring_distance_sensor.objectDistance(mm) < 50) {
-            int voltage = 12;
-            while(voltage > 0) {
-              assembly.intake_motor.spin(fwd, voltage, volt);
-              voltage/=2;
-              task::sleep(20);
-            }
             assembly.intake_motor.stop(brake);
             assembly.intake_override = false;
             assembly.is_intaking_ring_halfway = true;
@@ -88,13 +82,14 @@ void manual_drive::intake() {
             assembly.is_intaking_ring_halfway = true;
             break;
           }
-          if (Controller.ButtonL2.pressing() || Controller.ButtonR2.pressing()) {
+          
+          if (Brain.Timer.time(vex::timeUnits::sec) - timeout_start > 1 && (Controller.ButtonL2.pressing() || Controller.ButtonR2.pressing())) {
             assembly.intake_override = false;
             assembly.is_intaking_ring_halfway = true;
             break;
           }
           vex::this_thread::sleep_for(50);
-  
+          
       }
       return 0;
     });
@@ -181,17 +176,17 @@ bool manual_drive::ring_sort() {
 
   if (ring_distance_sensor.objectDistance(mm) < 50) {
     ring_distance_close = true;
-    distance_start = intake_encoder.position(vex::rotationUnits::deg);
+    distance_start = intake_motor.position(vex::rotationUnits::deg);
   }
 
-  if (ring_distance_close && std::abs(intake_encoder.position(vex::rotationUnits::deg) - distance_start) > 500) {
+  if (ring_distance_close && std::abs(intake_motor.position(vex::rotationUnits::deg) - distance_start) > 500) {
     ring_distance_close = false;
   }
 
   if (ring_distance_close && ring_color_sensor.hue() < color_max && ring_color_sensor.hue() > color_min && !ring_detected) {
     ring_detected = true;
 
-    current_position = std::fmod(intake_encoder.position(vex::rotationUnits::deg), full_rotation);
+    current_position = std::fmod(intake_motor.position(vex::rotationUnits::deg), full_rotation);
     if (current_position < 0) {
         current_position += full_rotation;
     }
@@ -213,7 +208,7 @@ bool manual_drive::ring_sort() {
   
   if (ring_detected) {
     unjam_intake = false;
-    float angle = std::fmod(intake_encoder.position(deg), full_rotation);
+    float angle = std::fmod(intake_motor.position(deg), full_rotation);
 
     if(angle < 0) {
       angle += full_rotation;
@@ -222,7 +217,7 @@ bool manual_drive::ring_sort() {
     float error = target_position - angle;
 
     if (std::abs(error) < 10 || error < 0) {
-      float start = intake_encoder.position(deg);
+      float start = intake_motor.position(deg);
       assembly.intake_motor.spinFor(directionType::rev, 40, rotationUnits::deg, 600, velocityUnits::rpm, true);
 
       ring_detected = false;
@@ -247,36 +242,62 @@ void manual_drive::lady_brown_manual() {
     }
 }
 
+void manual_drive::LB_state_manager(int state) {
+  switch (state)
+  {
+  case ACTIVE:
+    LB_goto_state = ACTIVE;
+    break;
+  case INACTIVE:
+    LB_goto_state = INACTIVE;
+    break;
+  case HOLDING:
+    LB_goto_state = HOLDING;
+    break;
+  case SCORING:
+    if (prev_state != SCORING) {
+      vex::task([](){
+        assembly.intake_override = true;
+        assembly.intake_motor.spinFor(-30, vex::rotationUnits::deg, true);
+        assembly.intake_override = false;
+        return 0;
+      });
+    }
+    LB_goto_state = SCORING;
+    break;
+  case HANG:
+    LB_goto_state = HANG;
+    break;
+  case DESCORE_TOP:
+    LB_goto_state = DESCORE_TOP;
+    break;
+  case DECSCORE_BOTTOM:
+    LB_goto_state = DECSCORE_BOTTOM;
+    break;
+  default:
+    break;
+  }
+
+  prev_state = state;
+  LB_reset_states();
+} 
+
+void manual_drive::LB_reset_states() {
+  bool prev = LB_states[LB_prev_state].get();
+  for (int i = 0; i < LB_states.size(); ++i) {
+    LB_states[i].get() = false;
+  }
+
+  LB_states[LB_prev_state].get() = prev;
+}
+
 void manual_drive::lady_brown() {
     bool active_state = Controller.ButtonR1.pressing();
     bool scoring_state = Controller.ButtonL1.pressing();
     bool holding_state = Controller.ButtonB.pressing();
-
-    if (active_state && !prev_active_state) {
-      is_active = !is_active;
-
-      if (is_holding) {
-        is_holding = false;
-      }
-    }
-    prev_active_state = active_state;
-    
-    if (scoring_state && !prev_scoring_state) {
-      is_scoring = !is_scoring;
-
-      if (is_holding) {
-        is_holding = false;
-      }
-      if (prev_state == SCORING) {
-        is_active = true;
-      }
-    }
-    prev_scoring_state = scoring_state;
-
-    if (holding_state && !prev_holding_state && is_active) {
-      is_holding = !is_holding;
-    }
-    prev_holding_state = holding_state;
+    bool hanging_state = Controller.ButtonDown.pressing();
+    bool descoring_top_state = Controller.ButtonUp.pressing();
+    bool descoring_bot_state = Controller.ButtonX.pressing();
 
     if (active_state && scoring_state && (Brain.Timer.time(vex::timeUnits::msec) - LB_override_cooldown > 500)) {
       Controller.rumble(".");
@@ -284,50 +305,81 @@ void manual_drive::lady_brown() {
       LB_override = !LB_override;
     }
 
-    if (is_scoring && prev_state != SCORING) {
-      is_active = true; 
-      vex::task([](){
-        assembly.intake_override = true;
-        assembly.intake_motor.spinFor(-30, vex::rotationUnits::deg, true);
-        assembly.intake_override = false;
-        return 0;
-      });
-
-      LB_goto_state = SCORING;
-      prev_state = SCORING;
-    }
-    else if (is_active && !is_scoring && !is_holding) {
-      is_scoring = false;
-      LB_goto_state = ACTIVE;
-      
-      if (prev_state == SCORING) {
-        if (std::abs(LB_encoder.angle(deg) - ACTIVE) < 8) {
-          vex::task([](){
-            assembly.intake_override = true;
-            assembly.intake_motor.spinFor(35, vex::rotationUnits::deg, true);
-            assembly.intake_override = false;
-            return 0;
-          });
-          prev_state = ACTIVE;
-        }
-        } else {
-          prev_state = ACTIVE;
-        }
+    if (active_state && !prev_active_state) {
+      is_active = !is_active;
+      LB_prev_state = 1;
+      if (is_active && prev_state != ACTIVE) {
+        LB_queued_state = ACTIVE;
       }
-    else if (!is_active && !is_scoring && !is_holding) {
-      is_scoring = false;
-      LB_goto_state = INACTIVE;
-      prev_state = INACTIVE;
-    } else if (!is_active && is_scoring && !is_holding) {
-      is_scoring = false;
-      LB_goto_state = INACTIVE;
-      prev_state = INACTIVE;
-    } else if (is_holding && is_active && !is_scoring) {
-      is_scoring = false;
-      is_active = false;
-      LB_goto_state = HOLDING;
-      prev_state = HOLDING;
+      if (!is_active || prev_state == ACTIVE) {
+        LB_queued_state = INACTIVE;
+        is_active = false;
+      }
     }
+    prev_active_state = active_state;
+    
+    if (scoring_state && !prev_scoring_state) {
+      LB_prev_state = 0;
+      is_scoring = !is_scoring;
+      if (is_scoring) {
+        LB_queued_state = SCORING;
+      }
+      if (!is_scoring) {
+        LB_queued_state = ACTIVE;
+      }
+    }
+    prev_scoring_state = scoring_state;
+
+    if (holding_state && !prev_holding_state) {
+      LB_prev_state = 2;
+      is_holding = !is_holding;
+      if (is_holding) {
+        LB_queued_state = HOLDING;
+      }
+      if (!is_holding) {
+        LB_queued_state = ACTIVE;
+      }
+    }
+    prev_holding_state = holding_state;
+
+    if (hanging_state && !prev_hanging_state) {
+      LB_prev_state = 3;
+      is_hanging = !is_hanging;
+      if (is_hanging) {
+        LB_queued_state = HANG;
+      }
+      if (!is_hanging) {
+        LB_queued_state = ACTIVE;
+      }
+    }
+    prev_hanging_state = hanging_state;
+
+    if (descoring_top_state && !prev_descoring_top_state) {
+      LB_prev_state = 4;
+      is_descoring_top = !is_descoring_top;
+      if (is_descoring_top) {
+        LB_queued_state = DESCORE_TOP;
+      }
+      if (!is_descoring_top) {
+        LB_queued_state = ACTIVE;
+      }
+    }
+    prev_descoring_top_state = descoring_top_state;
+
+    if (descoring_bot_state && !prev_descoring_bot_state) {
+      LB_prev_state = 5;
+      is_descoring_bot = !is_descoring_bot;
+
+      if (is_descoring_bot) {
+        LB_queued_state = DECSCORE_BOTTOM;
+      }
+      if (!is_descoring_bot) {
+        LB_queued_state = ACTIVE;
+      }
+    }
+    prev_descoring_bot_state = descoring_bot_state;
+
+    LB_state_manager(LB_queued_state);
 }
 
 void manual_drive::set_LB_constants(float LB_max_voltage, float LB_kp, float LB_ki, float LB_kd, float LB_starti, float LB_settle_error, float LB_settle_time, float LB_timeout) {
@@ -347,14 +399,30 @@ void manual_drive::move_LB_to_angle(float angle, bool buffer_data) {
 
 void manual_drive::move_LB_to_angle(float angle, float LB_max_voltage, float LB_settle_error, float LB_settle_time, float LB_timeout, float LB_kp, float LB_ki, float LB_kd, float LB_starti, bool buffer_data) {
   desired_angle = angle;
+  float start_angle = reduce_0_to_360(LB_encoder.angle());
   PID turnPID(reduce_negative_180_to_180(angle - reduce_0_to_360(LB_encoder.angle())), LB_kp, LB_ki, LB_kd, LB_starti, LB_settle_error, LB_settle_time, LB_timeout);
 
   int state = assembly.LB_goto_state;
 
   while(turnPID.is_settled() == false) {
     float error = reduce_negative_180_to_180(angle - reduce_0_to_360(LB_encoder.angle()));
+    if (start_angle > angle || angle > 300) {
+      if (error > 0) {
+        if (error < -25 || error > 25) {
+          error = -error;
+        }
+      }
+    }
+    if (start_angle < angle && angle < 300 || start_angle > 300) {
+      if (error < 0) {
+        if (error < -25 || error > 25) {
+          error = std::abs(error);
+        }
+      }
+    }
+    
     float output = turnPID.compute(error);
-
+    
     output = clamp(output, -LB_max_voltage, LB_max_voltage);
 
     if (buffer_data) {
@@ -436,7 +504,7 @@ void manual_drive::align_robot() {
     vex::task async_aligner([](){
       assembly.is_aligning = true;
       chassis.brake_is_overrided = false;
-      chassis.drive_on_PID(2.5);
+      chassis.drive_on_PID(-7);
       chassis.override_brake_type(vex::brakeType::undefined);
       vex::task::sleep(20);
       assembly.is_aligning = false;

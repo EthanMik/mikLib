@@ -31,6 +31,10 @@ int get_flicker_index(const std::string &valueStr, int place);
 void PID_tuner();
 
 void print(float num);
+void print(std::string str);
+void print(const char* str);
+void print(int num);
+void print(bool boolean);
 
 void test_serial_output();
 
@@ -45,3 +49,5 @@ void display_screen(screen* scr);
 void add_to_graph_buffer(std::vector<float> data);
 void clear_graph_buffer();
 void graph();
+
+void skills_driver_run();

@@ -10,6 +10,7 @@ textbox::textbox(std::string text, std::shared_ptr<drawable> box) :
     this->w = get_width();
     this->h = get_height();
 
+    wrap_text();
 };
 
 int textbox::get_x_pos() { return(box->get_x_pos()); }
@@ -49,23 +50,40 @@ bool textbox::needs_update() {
     return false;
 }
 
+void textbox::set_text(std::string text) {
+    wrapped_text.clear();
+    this->text = text;
+    wrap_text();
+    needs_render_update = false;
+}
+
 void textbox::wrap_text() {
-    int txt_width = Brain.Screen.getStringWidth(text.c_str());
+    std::vector<std::string> words;
+    std::istringstream iss(text);
+    std::string word;
+    while (iss >> word)
+        words.push_back(word);
     
-    if (box->get_width() < txt_width) {
-        return;
+    std::string line;
+    for (int i = 0; i < words.size(); ++i) {
+        if (Brain.Screen.getStringWidth((line + words[i] + " ").c_str()) > w-10) {
+            wrapped_text.push_back(line);
+            line = "";
+        }
+        line += words[i] + " ";
     }
+    wrapped_text.push_back(line);
+}
 
-    std::string cropped_text = text;
-
-    while (Brain.Screen.getStringWidth(cropped_text.c_str()) > w) {
-        
+void textbox::draw_text() {
+    int newline = 20;
+    for (int i = 0; i < wrapped_text.size(); ++i) {
+        Brain.Screen.printAt(x+10, y + newline, wrapped_text[i].c_str());
+        newline+=20;
     }
 }
 
 void textbox::render() {
     box->render();
-    // printf("%f\n", Brain.Screen.getStringHeight(text.c_str()));
-    // Brain.SDcard.
-    // Brain.Screen.printAt(x, y + 16, text.c_str());
+    draw_text();
 }

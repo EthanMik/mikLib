@@ -10,23 +10,23 @@ auton_drive::auton_drive(hzn::motor_group left_drive, hzn::motor_group right_dri
     drive_inch_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
     inertial_scale(inertial_scale),
 
-    forward_tracker_diameter(2.125),
-    forward_tracker_center_distance(0),
-    forward_tracker_inch_to_deg_ratio(M_PI * 2 / 360.0),
+    forward_tracker_diameter(forward_tracker_diameter),
+    forward_tracker_center_distance(forward_tracker_center_distance),
+    forward_tracker_inch_to_deg_ratio(M_PI * forward_tracker_diameter / 360.0),
 
-    sideways_tracker_diameter(-2.125),
-    sideways_tracker_center_distance(0.519),
-    sideways_tracker_inch_to_deg_ratio(M_PI * -2 / 360.0),
+    sideways_tracker_diameter(sideways_tracker_diameter),
+    sideways_tracker_center_distance(sideways_tracker_center_distance),
+    sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_center_distance / 360.0),
 
-    forward_tracker(PORT20),
-    sideways_tracker(PORT16),
+    forward_tracker(forward_tracker_port),
+    sideways_tracker(sideways_tracker_port),
     inertial(inertial_port),
 
     left_drive(left_drive),
     right_drive(right_drive)
 {
   brake_type = vex::brakeType::hold;
-  odom.set_physical_distances(0, .519);
+  odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
 }
 
 void auton_drive::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_settle_error, float turn_settle_time, float turn_timeout) {

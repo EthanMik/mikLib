@@ -4,7 +4,7 @@
 
 enum class color_sort { RED, BLUE, NONE };
 enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
-enum LB_state : int { ACTIVE = 195, INACTIVE = 220, HOLDING = 170, SCORING = 60 };
+enum LB_state : int { ACTIVE = 212, INACTIVE = 229, HOLDING = 170, SCORING = 43, HANG = 345, DESCORE_TOP = 79, DECSCORE_BOTTOM = 65 };
 
 class manual_drive {   
 public:
@@ -29,6 +29,9 @@ public:
     bool ring_sort();
 
     void lady_brown();
+    void LB_state_manager(int state);
+    void log_prev_state();
+    void LB_reset_states();
     void lady_brown_manual();
     void set_LB_constants(float LB_max_voltage, float LB_kp, float LB_ki, float LB_kd, float LB_starti, float LB_settle_error, float LB_settle_time, float LB_timeout);
     void move_LB_to_angle(float angle, bool buffer_data = false);
@@ -75,8 +78,8 @@ public:
     float color_max = 0;
     const std::vector<int> blue_color_min_max = { 190, 240 };
     const std::vector<int> red_color_min_max = { 0, 35 };
-    const float full_rotation = 1320.91;
-    const std::vector<int> hook_positions = { 169, 605, 1020 };
+    const float full_rotation = 670.4;
+    const std::vector<int> hook_positions = { 97, 301, 534 };
 
     // Doinker
     bool is_extended_doinker = false;
@@ -102,6 +105,7 @@ public:
     
     // Lady Brown
     int LB_goto_state_task = 0;
+    int LB_queued_state;
     int LB_goto_state;
     
     int prev_state;
@@ -114,7 +118,19 @@ public:
 
     bool is_holding = false;
     bool prev_holding_state = false;
+
+    bool is_hanging = false;
+    bool prev_hanging_state = false;
+
+    bool is_descoring_top = false;
+    bool prev_descoring_top_state = false;
+
+    bool is_descoring_bot = false;
+    bool prev_descoring_bot_state = false;
     
+    int LB_prev_state = 0;
+    std::vector<std::reference_wrapper<bool>> LB_states = {is_scoring, is_active, is_holding, is_hanging, is_descoring_top, is_descoring_bot};
+
     int LB_override_cooldown;
     bool LB_override = false;
     bool intake_override = false;

@@ -194,6 +194,27 @@ int UI_decode_unique_id(int id) {
     return ((id % 10000) % 100);
 }
 
+std::shared_ptr<UI_component> UI_to_component(std::shared_ptr<UI_component> component) {
+    int id = UI_decode_component_type(component->get_ID());
+    switch (id)
+    {
+    case 1:
+        return std::static_pointer_cast<graphic>(component);
+    case 2:
+        return std::static_pointer_cast<background>(component);
+    case 3:
+        return std::static_pointer_cast<label>(component);
+    case 4:
+        return std::static_pointer_cast<button>(component);
+    case 5:
+        return std::static_pointer_cast<toggle>(component);
+    case 6:
+        return std::static_pointer_cast<textbox>(component);
+    default:
+        return nullptr;
+    }
+}
+
 float to_pixels(float distance, UI_distance_units units) {
     switch(units) {
       case UI_distance_units::inches:
