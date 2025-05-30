@@ -5,7 +5,7 @@
 class line : public drawable 
 {
 public:
-    line(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
+    line(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;

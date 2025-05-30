@@ -4,12 +4,16 @@ UI_console_screen::UI_console_screen() {
     UI_crt_console_scr();
 }
 
+void UI_console_screen::add(const std::string& label_text) {
+    add_impl(label_text, [](){ return ""; });
+}
+
 std::shared_ptr<screen> UI_console_screen::get_console_screen() {
     return(this->UI_console_scr);
 }
 
 void UI_console_screen::UI_crt_console_scr() {
-    auto bg = UI_crt_bg(UI_crt_rec(0, 0 , SCREEN_WIDTH, SCREEN_HEIGHT - 45, 0x00000000, UI_distance_units::pixels));
+    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45, 0x00000000, UI_distance_units::pixels));
 
     this->UI_console_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
     UI_console_scr->add_scroll_bar(UI_crt_rec(0, 0, 3, 40, 0x00434343, UI_distance_units::pixels), screen::alignment::RIGHT);

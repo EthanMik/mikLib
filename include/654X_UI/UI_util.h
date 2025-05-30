@@ -20,11 +20,11 @@ float to_pixels(float distance, UI_distance_units units);
 
 void UI_img_exists(const std::string& file_name);
 
-std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units);
+std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units);
 
 std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_units units);
 
-std::shared_ptr<drawable> UI_crt_ln(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
+std::shared_ptr<drawable> UI_crt_ln(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units);
 
 std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_units units);
 
@@ -36,6 +36,9 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t fill_c
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue, UI_distance_units units);
+
+std::shared_ptr<drawable> UI_crt_grp(std::shared_ptr<drawable> graphic_);
+std::shared_ptr<drawable> UI_crt_grp(std::vector<std::shared_ptr<drawable>> graphics);
 
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id);
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback);

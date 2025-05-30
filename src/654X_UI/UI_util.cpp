@@ -60,11 +60,11 @@ std::shared_ptr<UI_component> UI_to_component(std::shared_ptr<UI_component> comp
 float to_pixels(float distance, UI_distance_units units) {
     switch(units) {
       case UI_distance_units::inches:
-          return(96 * distance);
+          return (96 * distance);
       case UI_distance_units::centimeters: 
-          return(37.79527559 * distance);
+          return (37.79527559 * distance);
       case UI_distance_units::pixels:
-          return(1 * distance);
+          return (1 * distance);
   }
 }
 
@@ -82,7 +82,7 @@ void UI_img_exists(const std::string& file_name) {
     exit(1);
 }
 
-std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units) {
     return std::make_shared<image>(file_name, x, y, w, h, units);
 }
 
@@ -90,8 +90,8 @@ std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_unit
     return std::make_shared<pixel>(x, y, hue, units);
 }
 
-std::shared_ptr<drawable> UI_crt_ln(int x, int y, int w, int h, uint32_t hue, UI_distance_units units) {
-    return std::make_shared<line>(x, y, w, h, hue, units);
+std::shared_ptr<drawable> UI_crt_ln(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units) {
+    return std::make_shared<line>(x1, y1, x2, y2, hue, units);
 }
 
 std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, UI_distance_units units) {
@@ -119,6 +119,15 @@ std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t hue, U
 std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, hue, units);
 }
+
+std::shared_ptr<drawable> UI_crt_grp(std::shared_ptr<drawable> graphic_) {
+    return std::make_shared<group>(graphic_);
+}
+
+std::shared_ptr<drawable> UI_crt_grp(std::vector<std::shared_ptr<drawable>> graphics) {
+    return std::make_shared<group>(graphics);
+}
+
 
 std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<drawable> box) {
     return std::make_shared<textbox>(text, box);

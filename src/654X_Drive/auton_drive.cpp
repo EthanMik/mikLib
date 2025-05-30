@@ -179,23 +179,24 @@ void auton_drive::left_swing_to_angle(float angle, bool reverse) {
 }
 
 void auton_drive::left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse) {
-PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
+  desired_heading = angle;
+  PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
 
-while(!swingPID.is_settled()) {
-  float error  = reduce_negative_180_to_180(angle - get_absolute_heading());
+  while(!swingPID.is_settled()) {
+    float error  = reduce_negative_180_to_180(angle - get_absolute_heading());
 
-  if(reverse && error > 0 && std::abs(error) > 25) {
-    error = -error;
+    if(reverse && error > 0 && std::abs(error) > 25) {
+      error = -error;
+    }
+
+    float output = swingPID.compute(error);
+    output = clamp(output, -swing_max_voltage, swing_max_voltage);
+
+    left_drive.spin(fwd, output, velocity_units::volt);
+    right_drive.stop(hold);
+
+    vex::task::sleep(10);
   }
-
-  float output = swingPID.compute(error);
-  output = clamp(output, -swing_max_voltage, swing_max_voltage);
-
-  left_drive.spin(fwd, output, velocity_units::volt);
-  right_drive.stop(hold);
-
-  vex::task::sleep(10);
-}
 }
 
 void auton_drive::right_swing_to_angle(float angle) {
@@ -207,6 +208,7 @@ void auton_drive::right_swing_to_angle(float angle, bool reverse) {
 }
 
 void auton_drive::right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse) {
+  desired_heading = angle;
   PID swingPID(reduce_negative_180_to_180(angle - get_absolute_heading()), swing_kp, swing_ki, swing_kd, swing_starti, swing_settle_error, swing_settle_time, swing_timeout);
   while(swingPID.is_settled() == false){
     float error = reduce_negative_180_to_180(angle - get_absolute_heading());
@@ -251,6 +253,7 @@ void auton_drive::set_heading(float orientation_deg){
 }
 
 void auton_drive::set_coordinates(float X_position, float Y_position, float orientation_deg) {
+  position_tracking = true;
   forward_tracker.resetPosition();
   sideways_tracker.resetPosition();
   odom.set_position(X_position, Y_position, orientation_deg, get_ForwardTracker_position(), get_SidewaysTracker_position());

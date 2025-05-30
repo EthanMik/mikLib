@@ -32,10 +32,12 @@ private:
     std::function<std::string()> data_func;
     
     std::string prev_data;
+    std::string formatted_data;
+
     bool needs_render_update;
 
     int last_update_time = 0;
-    const int update_interval_ms = 250;
+    const int update_interval_ms = 15;
 
 };
 
@@ -56,6 +58,8 @@ label::label(const std::string& label, T& data, int x, int y, UI_distance_units 
 
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
+
+    formatted_data = "";
 };
 
 
@@ -77,4 +81,6 @@ label::label(const std::string& label, F&& data_func, int x, int y, UI_distance_
 
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
+
+    formatted_data = "";
 };

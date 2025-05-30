@@ -45,6 +45,8 @@ public:
 
     float get_wattage();
 
+    float get_temp();
+
     // Stops the motors with the specified brake type
     void stop(vex::brakeType brake = vex::brakeType::brake);
 

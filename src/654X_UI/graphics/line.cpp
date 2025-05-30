@@ -1,7 +1,7 @@
 #include "vex.h"
 
-line::line(int x, int y, int w, int h, uint32_t hue, UI_distance_units units) :
-    x(x), y(y), w(w), h(h), hue(hue)
+line::line(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units) :
+    x(x1), y(y1), w(x2), h(y2), hue(hue)
 {
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);

@@ -2,31 +2,22 @@
 
 #include "vex.h"
 
-void blue_ringside_winpoint(bool calibrate);
-void blue_ringside_sawp(bool calibrate);
-void blue_ringside_elim(bool calibrate);
-void blue_goalside_winpoint(bool calibrate);
-void blue_goalside_sawp(bool calibrate);
-void blue_goalside_elim(bool calibrate);
-void red_ringside_winpoint(bool calibrate);
-void red_ringside_sawp(bool calibrate);
-void red_ringside_elim(bool calibrate);
-void red_goalside_winpoint(bool calibrate);
-void red_goalside_sawp(bool calibrate);
-void red_goalside_elim(bool calibrate);
+enum class auto_variation { ONE, TWO, THREE, FOUR, FIVE };
+extern vex::task LB_move_task;
 
-
-void goalside_red(bool set_pos = false);
-void ring_side_red(bool set_pos = false);
-void win_point_red(bool set_pos = false);
-void solo_win_point_red(bool set_pos = false);
-
-void goalside_blue(bool set_pos = false);
-void ring_side_blue(bool set_pos = false);
-void win_point_blue(bool set_pos = false);
-void solo_win_point_blue(bool set_pos = false);
-
-void skills(bool calibrate);
+std::string blue_ringside_winpoint(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string blue_ringside_sawp(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string blue_ringside_elim(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string blue_goalside_winpoint(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string blue_goalside_sawp(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string blue_goalside_elim(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_ringside_winpoint(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_ringside_sawp(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_ringside_elim(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_goalside_winpoint(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_goalside_sawp(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string red_goalside_elim(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
+std::string skills(bool calibrate, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
 
 void drive_until_settled(float left_voltage, float right_voltage, float max_timeout = 2500, float min_timeout = 500);
 void distance_reset();

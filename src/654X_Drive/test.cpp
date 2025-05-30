@@ -9,7 +9,7 @@ void test_drive() {
   data.variables = { {"drive_kp : ", chassis.drive_kp}, {"drive_ki: ", chassis.drive_ki}, {"drive_kd: ", chassis.drive_kd},
     {"heading_kp: ", chassis.heading_kp }, {"heading_ki: ", chassis.heading_ki}, {"heading_kd: ", chassis.heading_kd}
   };
-  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot_bounds(360, 0, 0, 5000, 1, 1);
   graph_scr->set_plot({
     [](double x){ return chassis.get_ForwardTracker_position(); }, 
     [](double x){ return chassis.desired_distance; }
@@ -32,8 +32,9 @@ void test_drive() {
 }
 
 void test_turn() {
+  mogo_constants();
   data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd} };
-  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot_bounds(360, 0, 0, 5000, 1, 1);
   graph_scr->set_plot({
     [](double x){ return chassis.get_absolute_heading(); }, 
     [](double x){ return chassis.desired_heading; }},
@@ -56,8 +57,9 @@ void test_turn() {
 }
 
 void test_swing() {
+  mogo_constants();
   data.variables = { {"swing_kp: ", chassis.swing_kp }, {"swing_ki: ", chassis.swing_ki }, {"swing_kd: ", chassis.swing_kd } };
-  graph_scr->set_plot_bounds(360, 0, 0, 30, 0.2, 1);
+  graph_scr->set_plot_bounds(360, 0, 0, 3000, 1, 1);
   graph_scr->set_plot({
     [](double x){ return chassis.get_absolute_heading(); }, 
     [](double x){ return chassis.desired_heading; }},
@@ -69,7 +71,7 @@ void test_swing() {
     graph_scr->reset_graph();
     graph_scr->graph();
     
-    chassis.left_swing_to_angle(90);
+    chassis.left_swing_to_angle(110);
     chassis.right_swing_to_angle(0);
   };
 
@@ -92,20 +94,6 @@ void test_odom() {
   chassis.drive_to_point(0,0);
   chassis.turn_on_PID(0);
 }
-
-void test_spin_all_motors(std::vector<hzn::motor_group> motor_chains) {
-    for (hzn::motor_group& motor_chain : motor_chains) {
-      for (vex::motor& motor : motor_chain.motors) {
-          Brain.Screen.clearLine();
-          Brain.Screen.print("Spinning motor at PORT %d", (motor.index() + 1));
-          Brain.Screen.newLine();
-          motor.spinFor(1, vex::sec);
-          vex::task::sleep(2000);
-      }
-      vex::task::sleep(1000);
-    }
-}
-
 
 int get_flicker_index(const std::string &valueStr, int place) {
   int dotPos = valueStr.find('.');
@@ -234,15 +222,143 @@ void PID_tuner() {
   }
 }
 
-
-void test_serial_output() {
-    double count = 0;
-    while (true) {
-        printf("%f\n", count);
-        fflush(stdout);
-        vex::task::sleep(100);
-        count++;
+void config_spin_all_motors() {
+  UI_select_scr(console_scr->get_console_screen()); 
+  disable_user_control = true;
+  vex::task spin_mtrs([](){
+    for (hzn::motor& motor : chassis.left_drive.motor_constructor) { 
+      std::string data = (motor.name + ": PORT" + to_string_int((motor.mtr.index() + 1)) + ", Dir: fwd");
+      console_scr->add(std::string(data), [](){ return ""; });
+      motor.mtr.spin(fwd, 2, volt);
+      vex::task::sleep(1000);
+      motor.mtr.stop();
+      vex::task::sleep(1000);
     }
+    for (hzn::motor& motor : chassis.right_drive.motor_constructor) {      
+      std::string data = (motor.name + ": PORT" + to_string_int((motor.mtr.index() + 1)) + ", Dir: fwd");
+      console_scr->add(std::string(data), [](){ return ""; });
+      motor.mtr.spin(fwd, 2, volt);
+      vex::task::sleep(1000);
+      motor.mtr.stop();
+      vex::task::sleep(1000);
+    }
+    disable_user_control = false;
+    return 0;
+  });
+}
+
+void config_motor_wattage() {
+  console_scr->add("right_drive: ", []() { return chassis.right_drive.get_wattage(); });
+  console_scr->add("left_drive: ", []() { return chassis.left_drive.get_wattage(); });
+
+  for (size_t i = 0; i < chassis.left_drive.motors.size(); ++i) {
+    size_t index = i;
+    console_scr->add(chassis.left_drive.motor_constructor[index].name + ": ", [index]() { return chassis.left_drive.motors[index].power(); });
+  }
+  for (size_t i = 0; i < chassis.right_drive.motors.size(); ++i) {
+    size_t index = i;
+    console_scr->add(chassis.right_drive.motor_constructor[index].name + ": ", [index]() { return chassis.right_drive.motors[index].power(); });
+  }
+
+  UI_select_scr(console_scr->get_console_screen()); 
+}
+
+void config_motor_temp() {
+  console_scr->add("right_drive: ", []() { return chassis.right_drive.get_temp(); });
+  console_scr->add("left_drive: ", []() { return chassis.left_drive.get_temp(); });
+
+  for (size_t i = 0; i < chassis.left_drive.motors.size(); ++i) {
+    size_t index = i;
+    console_scr->add(chassis.left_drive.motor_constructor[index].name + ": ", [index]() { return chassis.left_drive.motors[index].temperature(vex::temperatureUnits::fahrenheit); });
+  }
+  for (size_t i = 0; i < chassis.right_drive.motors.size(); ++i) {
+    size_t index = i;
+    console_scr->add(chassis.right_drive.motor_constructor[index].name + ": ", [index]() { return chassis.right_drive.motors[index].temperature(vex::temperatureUnits::fahrenheit); });
+  }
+
+  UI_select_scr(console_scr->get_console_screen()); 
+}
+
+void config_odom_data() {
+  if (!chassis.position_tracking) {
+    chassis.set_coordinates(0, 0, 0);
+  }
+
+  console_scr->add("X: ", [](){ return chassis.get_X_position(); });
+  console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
+  console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+  console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
+  console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
+
+  UI_select_scr(console_scr->get_console_screen()); 
+}
+
+
+void config_skills_driver_run() {
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("SKILLS DRIVER RUN               ");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             3                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             2                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("             1                 ");
+  Controller.rumble(".");
+  task::sleep(1000);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("            GO                 ");
+  Controller.rumble("-");
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print("                               ");
+
+  vex::task timer([](){
+    float start_time = Brain.Timer.time(vex::timeUnits::sec);
+    float current_time = start_time;
+    float max_time = 60;
+    float elapsed_time = 0;
+    int time_remaining = 0;
+    while(1) {
+      current_time = Brain.Timer.time(vex::timeUnits::sec);
+      elapsed_time = current_time - start_time;
+      time_remaining = max_time - elapsed_time;
+
+      switch (time_remaining)
+      {
+      case 30:
+        Controller.rumble((".-"));
+      case 15:
+        Controller.rumble(("."));
+        break;
+      case 5:
+        Controller.rumble((".-"));
+        break;
+      case 0:
+        Controller.rumble(("."));
+        chassis.stop_drive(vex::brake);
+        disable_user_control = true;
+        std::abort();
+        break;
+      default:
+        break;
+      }
+      
+      Controller.Screen.setCursor(1, 1);
+      Controller.Screen.print("           ");
+      Controller.Screen.print(time_remaining);
+      Controller.Screen.print("  ");
+    }
+    return 0;
+  });
+}
+
+void config_test_three_wire_port(port port) {
+  vex::digital_out dig_out = Brain.ThreeWirePort.Port[port];
+  dig_out.set(!dig_out.value());
 }
 
 void print(float num) {
@@ -273,73 +389,23 @@ void print(double num) {
     printf("%f\n", num);
     fflush(stdout);
 }
-
-int print_vector_to_serial(const std::string& name, const std::vector<float>& vector) {
-    printf("%s\n", name.c_str());
+void print(long num) {
+    printf("%ld\n", num);
     fflush(stdout);
-    vex::task::sleep(100);
-
-    for(size_t i = 0; i < vector.size(); ++i) {
-      printf("%f\n", vector[i]);
-      fflush(stdout);
-      vex::task::sleep(50);
-    }
-    printf("%f\n\n");
+}
+void print(long long num) {
+    printf("%lld\n", num);
     fflush(stdout);
-    vex::task::sleep(50);
-    return 0;
 }
-
-void print_coordinates(){
-  chassis.set_coordinates(0, 0, 0);
-  // vex::distance dis = vex::distance(vex::PORT21);
-  while(true){
-    Brain.Screen.clearScreen();
-    Brain.Screen.printAt(0, 50, "X: %f", chassis.get_X_position());
-    Brain.Screen.printAt(0, 70, "Y: %f", chassis.get_Y_position());
-    Brain.Screen.printAt(0, 90, "Heading: %f", chassis.get_absolute_heading());
-    Brain.Screen.printAt(0, 110, "ForwardTracker: %f", chassis.get_ForwardTracker_position());
-    Brain.Screen.printAt(0, 130, "SidewaysTracker: %f", chassis.get_SidewaysTracker_position());
-    // float hypotnuse = dis.objectDistance(vex::inches);
-    // Brain.Screen.printAt(0, 150, "Distance sensor: %f", hypotnuse);
-    // float theta = to_rad(chassis.get_absolute_heading());
-
-    // Brain.Screen.printAt(0, 170, "X adjusted: %f", -hypotnuse * sin(theta));
-    // Brain.Screen.printAt(0, 190, "Y adjusted: %f", 62 + (hypotnuse * cos(theta) - 7.7));
-    vex::task::sleep(20);
-  }
+void print(unsigned long long num) {
+    printf("%llu\n", num);
+    fflush(stdout);
 }
-
-
-void skills_driver_run() {
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("SKILLS DRIVER RUN               ");
-  task::sleep(1000);
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("             3                 ");
-  Controller.rumble(".");
-  task::sleep(1000);
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("             2                 ");
-  Controller.rumble(".");
-  task::sleep(1000);
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("             1                 ");
-  Controller.rumble(".");
-  task::sleep(1000);
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("            GO                 ");
-  Controller.rumble("-");
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print("                               ");
-
-  vex::task time_left([](){
-    while(1) {
-      Controller.Screen.setCursor(1, 1);
-      Controller.Screen.print("           ");
-      Controller.Screen.print(assembly.time_remaining);
-      Controller.Screen.print("  ");
-    }
-    return 0;
-  });
+void print(unsigned int num) {
+    printf("%u\n", num);
+    fflush(stdout);
+}
+void print(char c) {
+    printf("%c\n", c);
+    fflush(stdout);
 }

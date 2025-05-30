@@ -49,11 +49,13 @@ int toggle::get_height() { return(toggle_graphic->get_height()); }
 void toggle::set_x_pos(int x) { 
     toggle_graphic->set_x_pos(x);
 
+    int delta_x = x - this->x;
+
     if (toggled_graphic) {
-        toggled_graphic->set_x_pos(x);
+        toggled_graphic->set_x_pos(toggled_graphic->get_x_pos() + delta_x);
     }
     if (pressing_toggle_graphic) {
-        pressing_toggle_graphic->set_x_pos(x);
+        pressing_toggle_graphic->set_x_pos(pressing_toggle_graphic->get_x_pos() + delta_x);
     }
 
     needs_render_update = true;
@@ -64,11 +66,13 @@ void toggle::set_x_pos(int x) {
 void toggle::set_y_pos(int y) { 
     toggle_graphic->set_y_pos(y); 
 
+    int delta_y = y - this->y;
+
     if (toggled_graphic) {
-        toggled_graphic->set_y_pos(y);
+        toggled_graphic->set_y_pos(toggled_graphic->get_y_pos() + delta_y);
     }
     if (pressing_toggle_graphic) {
-        pressing_toggle_graphic->set_y_pos(y);
+        pressing_toggle_graphic->set_y_pos(pressing_toggle_graphic->get_y_pos() + delta_y);
     }
 
     needs_render_update = true;
@@ -221,6 +225,13 @@ void toggle::unpress() {
     is_toggled = false;
     pressed = false;
     state = toggle_state::INACTIVE;
+}
+
+void toggle::press() {
+    locked = false;
+    is_toggled = true;
+    pressed = false;
+    state = toggle_state::TOGGLED;
 }
 
 void toggle::execute() {

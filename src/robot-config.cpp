@@ -4,6 +4,8 @@ using namespace vex;
 
 vex::brain Brain;
 vex::controller Controller;
+vex::competition Competition;
+bool disable_user_control;
 
 auton_drive chassis(
     // Drivetrain motors
@@ -97,17 +99,19 @@ void init(void) {
   // assembly.lift_piston.set(true);
   assembly.intake_encoder.resetPosition();
   assembly.ring_color_sensor.setLightPower(80, pct);
+  assembly.init_LB();
 }
 
 void mogo_constants(void) {
-  chassis.set_turn_constants(12, .437, 0.02, 3.7, 15, .1, 300, 3000);
+  chassis.set_turn_constants(12, .47, .0235, 5.086, 15, 1.5, 75, 2000);
+  chassis.set_swing_constants(12, 1.31, .0325, 8.676, 15, 1.5, 75, 2000);
 }
 
 void default_constants(void) {
-  chassis.set_turn_constants(12, .437, .0215, 3.686, 15, 1.25, 100, 2000);
-  chassis.set_drive_constants(10, 1.5, 0, 10, 0, 2.5, 100, 3000);
+  chassis.set_turn_constants(12, .437, .0215, 3.686, 15, 1.5, 75, 2000);
+  chassis.set_drive_constants(10, 1.5, 0, 10, 0, 2.75, 75, 3000);
   chassis.set_heading_constants(6, .4, 0, 1, 0);
-  chassis.set_swing_constants(12, .437, .0295, 3.486, 15, 1, 125, 3000);
+  chassis.set_swing_constants(12, .437, .0295, 3.486, 15, 1.25, 75, 3000);
   assembly.set_LB_constants(12, .2, .1, .02, 0, .5, 200, 3000);
 
   chassis.heading_max_voltage = 10;

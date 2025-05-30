@@ -31,6 +31,7 @@ public:
     void is_pressing_touch();
     void is_pressing_controller();
 
+    void press();
     void unpress();
 
     void execute();

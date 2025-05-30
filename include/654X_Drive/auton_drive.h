@@ -16,14 +16,9 @@ private:
     float sideways_tracker_diameter;
     float sideways_tracker_center_distance;
     float sideways_tracker_inch_to_deg_ratio;
-
-    
-    float idealX;
-    float idealY;
     
 public:
-    auton_drive(hzn::motor_group left_drive, hzn::motor_group right_drive, int inertial_port, float wheel_diameter, float wheel_ratio, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-        float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance);
+    auton_drive(hzn::motor_group left_drive, hzn::motor_group right_drive, int inertial_port, float wheel_diameter, float wheel_ratio, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance);
     
     //Helper Methods general
     float get_absolute_heading();
@@ -38,28 +33,19 @@ public:
     
     //PID drive methods
     void turn_on_PID(float angle);
-    
-    void turn_on_PID(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, 
-        float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
+    void turn_on_PID(float angle, float turn_max_voltage, float turn_settle_error, float turn_settle_time, float turn_timeout, float turn_kp, float turn_ki, float turn_kd, float turn_starti);
 
     void drive_on_PID(float distance);
     void drive_on_PID(float distance, float heading);
-    void drive_on_PID(float distance, float heading, float drive_max_voltage, float heading_max_voltage, 
-        float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, 
-        float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
+    void drive_on_PID(float distance, float heading, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
 
     void left_swing_to_angle(float angle);
     void left_swing_to_angle(float angle, bool reverse);
-
-    void left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, 
-        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
+    void left_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
 
     void right_swing_to_angle(float angle);
     void right_swing_to_angle(float angle, bool reverse);
-
-    void right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, 
-        float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
-
+    void right_swing_to_angle(float angle, float swing_max_voltage, float swing_settle_error, float swing_settle_time, float swing_timeout, float swing_kp, float swing_ki, float swing_kd, float swing_starti, bool reverse);
 
     //PID Helper methods
     void set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_settle_error, float drive_settle_time, float drive_timeout);
@@ -78,12 +64,9 @@ public:
     vex::task odom_task;
     float get_X_position();
     float get_Y_position();
-    
-    float ideal_x_position(float x); 
-    float ideal_y_position(float y);
-    float ideal_x = 0.0;
-    float ideal_y = 0.0;
-    
+        
+    float ideal_x;
+    float ideal_y;
     std::vector<float> get_position_vector();
     
     //Odom drive methods
@@ -95,14 +78,7 @@ public:
     void drive_to_point(float X_position, float Y_position, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
     
     void drive_to_pose(float X_position, float Y_position, float angle);
-    void drive_to_pose(float X_position, float Y_position, float angle, float lead, float setback, 
-    float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, 
-    float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, 
-    float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
-    
-    //Vector field helper methods
-    
-    //Vector field drive methods
+    void drive_to_pose(float X_position, float Y_position, float angle, float lead, float setback, float drive_min_voltage, float drive_max_voltage, float heading_max_voltage, float drive_settle_error, float drive_settle_time, float drive_timeout, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float heading_kp, float heading_ki, float heading_kd, float heading_starti);
     
     void split_arcade();
         
@@ -158,6 +134,7 @@ public:
     float desired_distance;
     float drive_error;
     bool finished = false;
+    bool position_tracking = false;
 
     vex::brakeType brake_type;
     bool brake_is_overrided;

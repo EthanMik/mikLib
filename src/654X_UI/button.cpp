@@ -20,11 +20,13 @@ int button::get_height() { return(button_graphic->get_height()); }
 void button::set_x_pos(int x) { 
     button_graphic->set_x_pos(x);
 
+    int delta_x = x - this->x;
+
     if (pressed_button_graphic) {
-        pressed_button_graphic->set_x_pos(x); 
+        pressed_button_graphic->set_x_pos(pressed_button_graphic->get_x_pos() + delta_x); 
     }
     if (triggered_button_graphic) {
-        triggered_button_graphic->set_x_pos(x);
+        triggered_button_graphic->set_x_pos(triggered_button_graphic->get_x_pos() + delta_x);
     }
 
     needs_render_update = true;
@@ -34,12 +36,14 @@ void button::set_x_pos(int x) {
 
 void button::set_y_pos(int y) { 
     button_graphic->set_y_pos(y);
+    
+    int delta_y = y - this->y;
 
     if (pressed_button_graphic) {
-        pressed_button_graphic->set_y_pos(y); 
+        pressed_button_graphic->set_y_pos(pressed_button_graphic->get_y_pos() + delta_y); 
     }
     if (triggered_button_graphic) {
-        triggered_button_graphic->set_y_pos(y);
+        triggered_button_graphic->set_y_pos(triggered_button_graphic->get_y_pos() + delta_y);
     }
 
     needs_render_update = true;

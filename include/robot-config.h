@@ -7,6 +7,8 @@ class manual_drive;
 
 extern vex::brain Brain;
 extern vex::controller Controller;
+extern vex::competition Competition;
+extern bool disable_user_control;
 
 extern auton_drive chassis;
 extern manual_drive assembly;

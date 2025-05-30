@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <climits>
 #include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <algorithm>
 #include <functional>
@@ -38,6 +39,7 @@
 #include "654X_UI/graphics/text.h"
 #include "654X_UI/graphics/pixel.h"
 #include "654X_UI/graphics/line.h"
+#include "654X_UI/graphics/group.h"
 
 #include "654X_UI/button.h"
 #include "654X_UI/toggle.h"
@@ -48,10 +50,8 @@
 #include "654X_UI/screen.h"
 #include "654X_UI/screens/console_screen.h"
 #include "654X_UI/screens/auton_screen.h"
+#include "654X_UI/screens/config_screen.h"
 #include "654X_UI/screens/graph_screen.h"
-
-// #include "654-Template/654-UI/shapes/circle.h"
-// #include "654-Template/654-UI/shapes/line.h"
 
 #include "654X_UI/UI_manager.h"
 #include "654X_Drive/test.h"

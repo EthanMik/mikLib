@@ -6,8 +6,10 @@ class UI_console_screen
 {
 public:
     UI_console_screen();
-
+ 
     std::shared_ptr<screen> get_console_screen();
+
+    void add(const std::string& label_text);
 
     template <typename F>
     void add(const std::string& label_text, F&& data);

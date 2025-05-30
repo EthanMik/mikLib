@@ -6,7 +6,7 @@ enum class color_sort { RED, BLUE, NONE };
 enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
 enum LB_state : int { ACTIVE = 206, INACTIVE = 229, HOLDING = 170, SCORING = 43, HANG = 345, DESCORE_TOP = 79, DECSCORE_BOTTOM = 65 };
 
-class manual_drive {   
+class manual_drive {
 public:
     manual_drive(
         hzn::motor_group LB_motors, 
@@ -20,6 +20,7 @@ public:
         int rush_piston_port,
         int list_piston_port
     );
+    void init_LB();
     void initialize_user_control();
 
     void intake();
@@ -78,8 +79,8 @@ public:
     float color_max = 0;
     const std::vector<int> blue_color_min_max = { 190, 240 };
     const std::vector<int> red_color_min_max = { 0, 35 };
-    const float full_rotation = 670.4;
-    const std::vector<int> hook_positions = { 97, 301, 534 };
+    const float full_rotation = 473.6;
+    const std::vector<int> hook_positions = { 85, 306 };
 
     // Doinker
     bool is_extended_doinker = false;
@@ -104,6 +105,7 @@ public:
     vex::task async_aligner;
     
     // Lady Brown
+    vex::task async_LB;
     int LB_goto_state_task = 0;
     int LB_queued_state;
     int LB_goto_state;

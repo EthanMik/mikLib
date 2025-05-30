@@ -15,13 +15,10 @@ manual_drive::manual_drive(hzn::motor_group LB_motors, int LB_encoder_port, hzn:
   lift_piston(Brain.ThreeWirePort.Port[lift_piston_port])
 {};
 
-void manual_drive::initialize_user_control() {
-  start_time = Brain.Timer.time(vex::timeUnits::sec);
-  assembly.lift_piston.set(false);
-  chassis.override_brake_type(vex::brakeType::undefined);
+void manual_drive::init_LB() {
   assembly.LB_goto_state = INACTIVE;
-  
-  vex::task async_LB([](){
+
+  async_LB = vex::task([](){
     while (1) {
       if (!assembly.LB_override) {
         assembly.move_LB_to_angle(assembly.LB_goto_state);
@@ -36,6 +33,15 @@ void manual_drive::initialize_user_control() {
 
     return 0;
   });
+}
+
+void manual_drive::initialize_user_control() {
+  start_time = Brain.Timer.time(vex::timeUnits::sec);
+  assembly.lift_piston.set(false);
+  assembly.doinker_piston.set(false);
+  LB_move_task.stop();
+  chassis.override_brake_type(vex::brakeType::undefined);  
+
   _unjam_intake_task.stop();
   unjam_intake_task();
 }
@@ -174,7 +180,6 @@ void manual_drive::select_ring_sort_mode() {
 }
 
 bool manual_drive::ring_sort() {
-
   if (ring_distance_sensor.objectDistance(mm) < 50) {
     ring_distance_close = true;
     distance_start = intake_motor.position(vex::rotationUnits::deg);
@@ -184,26 +189,21 @@ bool manual_drive::ring_sort() {
     ring_distance_close = false;
   }
 
-  if (ring_distance_close && ring_color_sensor.hue() < color_max && ring_color_sensor.hue() > color_min && !ring_detected) {
+  if (ring_color_sensor.hue() < color_max && ring_color_sensor.hue() > color_min && !ring_detected) {
     ring_detected = true;
 
     current_position = std::fmod(intake_motor.position(vex::rotationUnits::deg), full_rotation);
     if (current_position < 0) {
         current_position += full_rotation;
     }
-
-    auto forward_distance = [&](double target, double current) {
-        double diff = std::fmod((target - current + full_rotation), full_rotation);
-        return diff;
-    };
-
-    double min_distance = full_rotation;
-    for (const auto& target : hook_positions) {
-        double distance = forward_distance(target, current_position);
-        if (distance > 0 && distance < min_distance) {
-            min_distance = distance;
-            target_position = target;
-        }
+    
+    int min = current_position - hook_positions[0];
+    target_position = hook_positions[0];
+    for (size_t i = 0; i < hook_positions.size(); ++i) {
+      int pos = current_position - hook_positions[i];
+      if (pos < min && pos > 0) {
+        target_position = hook_positions[i];
+      }
     }
   }
   
@@ -217,7 +217,7 @@ bool manual_drive::ring_sort() {
 
     float error = target_position - angle;
 
-    if (std::abs(error) < 10 || error < 0) {
+    if (std::abs(error) < 5 || error < 0) {
       float start = intake_motor.position(deg);
       assembly.intake_motor.spinFor(directionType::rev, 40, rotationUnits::deg, 600, velocityUnits::rpm, true);
 
@@ -452,7 +452,7 @@ void manual_drive::mogo_clamp() {
 }
 
 void manual_drive::doinker() {
-  bool doinker_state = false;
+  bool doinker_state = Controller.ButtonUp.pressing();
   bool rush_state = Controller.ButtonY.pressing();
   bool lift_state = false;
 

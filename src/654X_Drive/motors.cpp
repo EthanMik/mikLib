@@ -75,6 +75,15 @@ float hzn::motor_group::get_wattage() {
     return position / motors.size();
 }
 
+float hzn::motor_group::get_temp() {
+    float position = 0;
+
+    for (vex::motor& motor : motors) {
+        position += motor.temperature(vex::temperatureUnits::fahrenheit);
+    }   
+    return position / motors.size();
+}
+
 void hzn::motor_group::stop(vex::brakeType brake) {
     for (vex::motor& motor : motors) {
         motor.stop(brake);

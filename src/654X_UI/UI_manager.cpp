@@ -6,6 +6,12 @@ static std::vector<std::shared_ptr<screen>> UI_render_buffer;
 std::shared_ptr<UI_console_screen> console_scr = std::make_shared<UI_console_screen>();
 std::shared_ptr<UI_auton_screen> auton_scr = std::make_shared<UI_auton_screen>();
 std::shared_ptr<UI_graph_screen> graph_scr = std::make_shared<UI_graph_screen>();
+std::shared_ptr<UI_config_screen> config_scr = std::make_shared<UI_config_screen>();
+static std::shared_ptr<UI_component> console_tgl;
+static std::shared_ptr<UI_component> auton_tgl;
+static std::shared_ptr<UI_component> graph_tgl;
+static std::shared_ptr<UI_component> config_tgl;
+
 
 static bool is_screen_swapping = false;
 
@@ -13,64 +19,151 @@ static bool local_needs_render_update = false;
 static bool full_refresh = false;
 static std::vector<std::shared_ptr<screen>> temp;
 
+static std::shared_ptr<screen> selector_panel_scr;
+
 void UI_init() {
   auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, UI_distance_units::pixels));
   auto main_bg_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   main_bg_scr->add_UI_component(main_bg);
 
-  auto selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160, 45);
+  // Initialize selector panel
+  selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160, 45);
   selector_panel_scr->add_scroll_bar(UI_crt_rec(0, 0, 40, 3, 0x00434343, UI_distance_units::pixels), screen::alignment::BOTTOM);
 
-  auto console_tgl = UI_crt_tgl(
-    UI_crt_img("console_button.png", 0, 0, 160, 45, UI_distance_units::pixels),
+  // Init config selector toggle
+  config_tgl = UI_crt_tgl(UI_crt_grp({
+    UI_crt_rec(0, 0, 160, 45, vex::color::black, UI_distance_units::pixels),
+    UI_crt_rec(0, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(159, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(0, 35, 160, 5, 0x00434343, UI_distance_units::pixels),
+    UI_crt_txt("Config", 48, 23, UI_distance_units::pixels)}),
     nullptr, 1
   );
-  console_tgl->set_states(UI_crt_img("console_button_pressing.png", 0, 0, 160, 45, UI_distance_units::pixels), UI_crt_img("console_button_pressed.png", 0, 0, 160, 45, UI_distance_units::pixels));
-  console_tgl->set_callback([=](){ 
-      UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
-      UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr}); 
+  config_tgl->set_states(UI_crt_grp({
+    UI_crt_rec(0, 0, 160, 45, 0x00666666, UI_distance_units::pixels),
+    UI_crt_rec(0, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(0, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Config", 48, 23, 0x00666666, UI_distance_units::pixels)}),
+     
+    UI_crt_grp({
+    UI_crt_rec(0, 0, 160, 45, 0x00434343, UI_distance_units::pixels),
+    UI_crt_rec(0, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(0, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Config", 48, 23, 0x00434343, UI_distance_units::pixels)}));
+  config_tgl->set_callback([=](){ 
+      UI_execute_selector_toggles(config_tgl, selector_panel_scr, true);
+      UI_swap_screens({config_scr->get_config_screen(), selector_panel_scr}); 
     } 
   );
 
-  auto auton_tgl = UI_crt_tgl(
-    UI_crt_img("auton_button.png", 160, 0, 160, 45, UI_distance_units::pixels),
+  // Init auton selector toggle
+  auton_tgl = UI_crt_tgl(UI_crt_grp({
+    UI_crt_rec(160, 0, 160, 45, vex::color::black, UI_distance_units::pixels),
+    UI_crt_rec(160, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(159+160, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(160, 35, 160, 5, 0x00434343, UI_distance_units::pixels),
+    UI_crt_txt("Autons", 48+160, 23, UI_distance_units::pixels)}),
     nullptr, 1
   );
-  auton_tgl->set_states(UI_crt_img("auton_button_pressing.png", 0, 0, 160, 45, UI_distance_units::pixels), UI_crt_img("auton_button_pressed.png", 160, 0, 160, 45, UI_distance_units::pixels));
+  auton_tgl->set_states(UI_crt_grp({
+    UI_crt_rec(160, 0, 160, 45, 0x00666666, UI_distance_units::pixels),
+    UI_crt_rec(160, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(160, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Autons", 48+160, 23, 0x00666666, UI_distance_units::pixels)}),
+     
+    UI_crt_grp({
+    UI_crt_rec(160, 0, 160, 45, 0x00434343, UI_distance_units::pixels),
+    UI_crt_rec(160, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(160, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Autons", 48+160, 23, 0x00434343, UI_distance_units::pixels)}));
   auton_tgl->set_callback([=](){ 
       UI_execute_selector_toggles(auton_tgl, selector_panel_scr, true);
       UI_swap_screens({auton_scr->get_auton_screen(), selector_panel_scr}); 
     } 
   );
-  auto graph_tgl = UI_crt_tgl(
-    UI_crt_img("graph_button.png", 320, 0, 160, 45, UI_distance_units::pixels),
+
+  // Init graph selector toggle
+  graph_tgl = UI_crt_tgl(UI_crt_grp({
+    UI_crt_rec(320, 0, 160, 45, vex::color::black, UI_distance_units::pixels),
+    UI_crt_rec(320, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(159+160+160, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(320, 35, 160, 5, 0x00434343, UI_distance_units::pixels),
+    UI_crt_txt("Graph", 56+160+160, 23, UI_distance_units::pixels)}),
     nullptr, 1
   );
-  graph_tgl->set_states(UI_crt_img("graph_button_pressing.png", 320, 0, 160, 45, UI_distance_units::pixels), UI_crt_img("graph_button_pressed.png", 320, 0, 160, 45, UI_distance_units::pixels));
+  graph_tgl->set_states(UI_crt_grp({
+    UI_crt_rec(320, 0, 160, 45, 0x00666666, UI_distance_units::pixels),
+    UI_crt_rec(320, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(320, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Graph", 56+160+160, 23, 0x00666666, UI_distance_units::pixels)}),
+     
+    UI_crt_grp({
+    UI_crt_rec(320, 0, 160, 45, 0x00434343, UI_distance_units::pixels),
+    UI_crt_rec(320, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(320, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Graph", 56+160+160, 23, 0x00434343, UI_distance_units::pixels)}));
   graph_tgl->set_callback([=](){ 
       UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
       UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
     } 
   );
 
-  auto config_tgl = UI_crt_tgl(
-    UI_crt_img("config_button.png", 480, 0, 160, 45, UI_distance_units::pixels),
+  // Init console selector toggle
+  console_tgl = UI_crt_tgl(UI_crt_grp({
+    UI_crt_rec(480, 0, 160, 45, vex::color::black, UI_distance_units::pixels),
+    UI_crt_rec(480, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(159+160+160+160, 0, 1, 35, 0x00434343, UI_distance_units::pixels), 
+    UI_crt_rec(480, 35, 160, 5, 0x00434343, UI_distance_units::pixels),
+    UI_crt_txt("Console", 48+160+160+160, 23, UI_distance_units::pixels)}),
     nullptr, 1
   );
-  config_tgl->set_states(UI_crt_img("config_button_pressing.png", 480, 0, 160, 45, UI_distance_units::pixels), UI_crt_img("config_button_pressed.png", 320, 0, 160, 45, UI_distance_units::pixels));
-
-  auto temp_tgl2 = UI_crt_tgl(
-    UI_crt_img("console_button.png", 640, 0, 160, 45, UI_distance_units::pixels),
-    nullptr, 1
+  console_tgl->set_states(UI_crt_grp({
+    UI_crt_rec(480, 0, 160, 45, 0x00666666, UI_distance_units::pixels),
+    UI_crt_rec(480, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(480, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Console", 48+160+160+160, 23, 0x00666666, UI_distance_units::pixels)}),
+     
+    UI_crt_grp({
+    UI_crt_rec(480, 0, 160, 45, 0x00434343, UI_distance_units::pixels),
+    UI_crt_rec(480, 40, 160, 5, vex::black, UI_distance_units::pixels),
+    UI_crt_rec(480, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
+    UI_crt_txt("Console", 48+160+160+160, 23, 0x00434343, UI_distance_units::pixels)}));
+  console_tgl->set_callback([=](){ 
+      UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
+      UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr}); 
+    } 
   );
-  temp_tgl2->set_states(UI_crt_rec(160, 0, 160, 45, vex::color::red, UI_distance_units::pixels), UI_crt_img("console_button_pressed.png", 320, 0, 160, 45, UI_distance_units::pixels));
 
+  selector_panel_scr->add_UI_components({console_tgl, auton_tgl, graph_tgl, config_tgl});
 
-  selector_panel_scr->add_UI_components({console_tgl, auton_tgl, graph_tgl, config_tgl, temp_tgl2});
-
+  // init rendering
   UI_render_queue = {main_bg_scr, selector_panel_scr};
   for (const auto& scr : UI_render_queue) {
     scr->refresh();
+  }
+}
+
+void UI_select_scr(std::shared_ptr<screen> scr) {
+  if (scr == console_scr->get_console_screen()) {
+    UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
+    UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr});
+    auto* tgl = static_cast<toggle*>(console_tgl.get());
+    tgl->press();
+  } else if (scr == config_scr->get_config_screen()) {
+    UI_execute_selector_toggles(config_tgl, selector_panel_scr, true);
+    UI_swap_screens({config_scr->get_config_screen(), selector_panel_scr});
+    auto* tgl = static_cast<toggle*>(config_tgl.get());
+    tgl->press(); 
+  } else if (scr == auton_scr->get_auton_screen()) {
+    UI_execute_selector_toggles(auton_tgl, selector_panel_scr, true);
+    UI_swap_screens({auton_scr->get_auton_screen(), selector_panel_scr}); 
+    auto* tgl = static_cast<toggle*>(auton_tgl.get());
+    tgl->press();
+  } else if (scr == graph_scr->get_graph_screen()) {
+    UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
+    UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
+    auto* tgl = static_cast<toggle*>(graph_tgl.get());
+    tgl->press();
   }
 }
 
@@ -95,6 +188,9 @@ void UI_render() {
         if (screen->needs_update()) {
           temp.push_back(screen);
           local_needs_render_update = true;
+        }
+        if (screen->needs_full_refresh()) {
+          temp = UI_render_queue;
           break;
         }
       }

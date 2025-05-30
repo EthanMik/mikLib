@@ -1,18 +1,12 @@
 #include "vex.h"
 
-image::image(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units) :
-    file_name(file_name), x(x), y(y), w(w), h(h), units(units)
+image::image(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units) :
+    file_name(file_name), units(units)
 {
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
     this->w = to_pixels(w, units);
     this->h = to_pixels(h, units);
-
-    // if (!Brain.SDcard.exists(file_name.c_str())) {
-    //     Brain.Screen.printAt(30, 30, (file_name + " DOESNT EXIT").c_str());
-    //     Brain.Screen.render();
-    //     exit(1);
-    // }
 };
 
 int image::get_x_pos() { return(x); }

@@ -5,7 +5,7 @@
 class image : public drawable 
 {
 public:
-    image(const std::string& file_name, int x, int y, int w, int h, UI_distance_units units);
+    image(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;

@@ -17,14 +17,17 @@ int textbox::get_x_pos() { return(box->get_x_pos()); }
 int textbox::get_y_pos() { return(box->get_y_pos()); }
 int textbox::get_width() { return(box->get_width()); }
 int textbox::get_height() { return(box->get_height()); }
+std::string textbox::get_text() { return(text); }
 
 void textbox::set_x_pos(int x) {
     box->set_x_pos(x);
+    this->x = x;
     needs_render_update = true;
 }
 
 void textbox::set_y_pos(int y) { 
     box->set_y_pos(y);
+    this->y = y;
     needs_render_update = true;
 }
 
@@ -35,10 +38,12 @@ void textbox::set_position(int x, int y) {
 
 void textbox::set_width(int w) { 
     box->set_width(w);
+    this->w = w;
     needs_render_update = true;
 }
 void textbox::set_height(int h) { 
     box->set_height(h);
+    this->h = h;
     needs_render_update = true;
 }
 
@@ -54,7 +59,7 @@ void textbox::set_text(std::string text) {
     wrapped_text.clear();
     this->text = text;
     wrap_text();
-    needs_render_update = false;
+    needs_render_update = true;
 }
 
 void textbox::wrap_text() {
