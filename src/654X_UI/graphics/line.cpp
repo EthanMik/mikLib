@@ -1,12 +1,12 @@
 #include "vex.h"
 
-line::line(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units) :
-    x(x1), y(y1), w(x2), h(y2), hue(hue)
+line::line(float x1, float y1, float x2, float y2, uint32_t hue, UI_distance_units units) :
+    hue(hue)
 {
-    this->x = to_pixels(x, units);
-    this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->x = to_pixels(x1, units);
+    this->y = to_pixels(y1, units);
+    this->w = to_pixels(x2, units);
+    this->h = to_pixels(y2, units);
 }
 
 int line::get_x_pos() { return(x); }

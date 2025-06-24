@@ -1,44 +1,35 @@
 #include "vex.h"
 
-text::text(const std::string& text_label, int x, int y, UI_distance_units units) :
-    text_label(text_label), x(x), y(y), hue(vex::color::black), units(units)
+text::text(const std::string& text_label, float x, float y, UI_distance_units units) :
+    text_label(text_label), hue(vex::color::black), units(units)
 {
-    this->w = Brain.Screen.getStringHeight(text_label.c_str());
-    this->w = Brain.Screen.getStringWidth(text_label.c_str());
-    
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->w = Brain.Screen.getStringWidth(text_label.c_str());
+    this->h = Brain.Screen.getStringHeight(text_label.c_str());
 };
 
-text::text(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units) :
-    text_label(text_label), x(x), y(y), hue(hue), units(units)
+text::text(const std::string& text_label, float x, float y, uint32_t hue, UI_distance_units units) :
+    text_label(text_label), hue(hue), units(units)
 {
-    this->w = Brain.Screen.getStringHeight(text_label.c_str());
-    this->w = Brain.Screen.getStringWidth(text_label.c_str());
-    
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->w = Brain.Screen.getStringWidth(text_label.c_str());
+    this->h = Brain.Screen.getStringHeight(text_label.c_str());
 };
 
-text::text(const std::string& text_label, int x, int y, vex::color hue, UI_distance_units units) :
-    text_label(text_label), x(x), y(y), hue(hue), units(units)
+text::text(const std::string& text_label, float x, float y, vex::color hue, UI_distance_units units) :
+    text_label(text_label), hue(hue), units(units)
 {
-    this->w = Brain.Screen.getStringHeight(text_label.c_str());
-    this->w = Brain.Screen.getStringWidth(text_label.c_str());
-    
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);
-    this->w = to_pixels(w, units);
-    this->h = to_pixels(h, units);
+    this->w = Brain.Screen.getStringWidth(text_label.c_str());
+    this->h = Brain.Screen.getStringHeight(text_label.c_str());
 };
 
 int text::get_x_pos() { return(x); }
 int text::get_y_pos() { return(y); }
-int text::get_width() { return(w); }
+int text::get_width() { return(Brain.Screen.getStringWidth(text_label.c_str())); }
 int text::get_height() { return(h); }
 std::string text::get_text() { return(text_label); }
 

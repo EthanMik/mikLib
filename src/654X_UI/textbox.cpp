@@ -1,7 +1,49 @@
 #include "vex.h"
 
+#define default_padding 10
+#define next_line 20
+
 textbox::textbox(std::string text, std::shared_ptr<drawable> box) :
-    text(text), box(box)
+    text(text), box(box), text_color(0x00FFFFFF), alignment(text_align::LEFT)
+{
+    unique_id = UI_create_ID(UI_Textbox_ID);
+    
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
+
+    wrap_text();
+};
+
+textbox::textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box) :
+    text(text), box(box), text_color(0x00FFFFFF), alignment(text_alignment)
+{
+    unique_id = UI_create_ID(UI_Textbox_ID);
+    
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
+
+    wrap_text();
+};
+
+textbox::textbox(std::string text, uint32_t text_color, std::shared_ptr<drawable> box) :
+    text(text), box(box), text_color(text_color), alignment(text_align::LEFT)
+{
+    unique_id = UI_create_ID(UI_Textbox_ID);
+    
+    this->x = get_x_pos();
+    this->y = get_y_pos();
+    this->w = get_width();
+    this->h = get_height();
+
+    wrap_text();
+};
+
+textbox::textbox(std::string text, uint32_t text_color, text_align text_alignment, std::shared_ptr<drawable> box) :
+    text(text), box(box), text_color(text_color), alignment(text_alignment)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
     
@@ -66,12 +108,13 @@ void textbox::wrap_text() {
     std::vector<std::string> words;
     std::istringstream iss(text);
     std::string word;
+
     while (iss >> word)
         words.push_back(word);
     
     std::string line;
     for (int i = 0; i < words.size(); ++i) {
-        if (Brain.Screen.getStringWidth((line + words[i] + " ").c_str()) > w-10) {
+        if (Brain.Screen.getStringWidth((line + words[i] + " ").c_str()) > w - default_padding) {
             wrapped_text.push_back(line);
             line = "";
         }
@@ -81,10 +124,16 @@ void textbox::wrap_text() {
 }
 
 void textbox::draw_text() {
-    int newline = 20;
+    int newline = next_line;
+    int x_pos = x + default_padding;
     for (int i = 0; i < wrapped_text.size(); ++i) {
-        Brain.Screen.printAt(x+10, y + newline, wrapped_text[i].c_str());
-        newline+=20;
+        if (alignment == text_align::CENTER) {
+            x_pos = x + ((w + default_padding) - Brain.Screen.getStringWidth(wrapped_text[i].c_str())) / 2;
+        }
+        Brain.Screen.setPenColor(text_color);
+        Brain.Screen.printAt(x_pos, y + newline, wrapped_text[i].c_str());
+        Brain.Screen.setPenColor(vex::color::white);
+        newline += next_line;
     }
 }
 

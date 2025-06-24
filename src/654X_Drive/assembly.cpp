@@ -2,7 +2,7 @@
 
 using namespace vex;
 
-manual_drive::manual_drive(hzn::motor_group LB_motors, int LB_encoder_port, hzn::motor intake_motor, int intake_encoder_port, int ring_color_sensor_port, int ring_distance_sensor_port, int mogo_clamp_piston_port, int doinker_piston_port, int rush_piston_port, int lift_piston_port) :
+Assembly::Assembly(mik::motor_group LB_motors, int LB_encoder_port, mik::motor intake_motor, int intake_encoder_port, int ring_color_sensor_port, int ring_distance_sensor_port, int mogo_clamp_piston_port, int doinker_piston_port, int rush_piston_port, int lift_piston_port) :
   LB_motors(LB_motors),
   LB_encoder(LB_encoder_port),
   intake_motor(intake_motor.mtr),
@@ -15,7 +15,7 @@ manual_drive::manual_drive(hzn::motor_group LB_motors, int LB_encoder_port, hzn:
   lift_piston(Brain.ThreeWirePort.Port[lift_piston_port])
 {};
 
-void manual_drive::init_LB() {
+void Assembly::init_LB() {
   assembly.LB_goto_state = INACTIVE;
 
   async_LB = vex::task([](){
@@ -35,18 +35,22 @@ void manual_drive::init_LB() {
   });
 }
 
-void manual_drive::initialize_user_control() {
+void Assembly::stop_motors(vex::brakeType brake) {
+  intake_motor.stop(brake);
+  LB_goto_state = INACTIVE;
+}
+
+void Assembly::initialize_user_control() {
   start_time = Brain.Timer.time(vex::timeUnits::sec);
   assembly.lift_piston.set(false);
   assembly.doinker_piston.set(false);
   LB_move_task.stop();
-  chassis.override_brake_type(vex::brakeType::undefined);  
 
   _unjam_intake_task.stop();
   unjam_intake_task();
 }
 
-void manual_drive::unjam_intake_task() {
+void Assembly::unjam_intake_task() {
   _unjam_intake_task = vex::task([](){
     while(1) {
       while (assembly.unjam_intake) {
@@ -68,7 +72,7 @@ void manual_drive::unjam_intake_task() {
   });
 }
 
-void manual_drive::intake() {
+void Assembly::intake() {
   if (Controller.ButtonL2.pressing() && Controller.ButtonR2.pressing()) {
     assembly.unjam_intake = true;
     assembly.is_intaking_ring_halfway = true;
@@ -127,13 +131,13 @@ void manual_drive::intake() {
   }
 }
 
-void manual_drive::select_ring_sort_mode(color_sort opposing_color) {
+void Assembly::select_ring_sort_mode(color_sort opposing_color) {
     switch (opposing_color)
     {
     case color_sort::NONE:
       is_sorting = false;
       opposing_color = color_sort::NONE;
-      Controller.Screen.setCursor(1, 1);
+      Controller.Screen.setCursor(3, 1);
       Controller.Screen.print("SORTING: NONE");
       break;
     case color_sort::RED:
@@ -141,7 +145,7 @@ void manual_drive::select_ring_sort_mode(color_sort opposing_color) {
       opposing_color = color_sort::RED;
       this->color_min = 0;
       this->color_max = 35;
-      Controller.Screen.setCursor(1, 1);
+      Controller.Screen.setCursor(3, 1);
       Controller.Screen.print("SORTING: RED ");
       break;
     case color_sort::BLUE:
@@ -149,12 +153,12 @@ void manual_drive::select_ring_sort_mode(color_sort opposing_color) {
       opposing_color = color_sort::BLUE;
       this->color_min = 180;
       this->color_max = 310;
-      Controller.Screen.setCursor(1, 1);
+      Controller.Screen.setCursor(3, 1);
       Controller.Screen.print("SORTING: BLUE");
     }
 }
 
-void manual_drive::select_ring_sort_mode() {
+void Assembly::select_ring_sort_mode() {
   if (Controller.ButtonLeft.pressing() && std::abs(Brain.Timer.time(msec) - color_swap_cooldown) > 500) {
     color_sort_mode++;
     if (color_sort_mode > 2) {
@@ -179,7 +183,7 @@ void manual_drive::select_ring_sort_mode() {
   }
 }
 
-bool manual_drive::ring_sort() {
+bool Assembly::ring_sort() {
   if (ring_distance_sensor.objectDistance(mm) < 50) {
     ring_distance_close = true;
     distance_start = intake_motor.position(vex::rotationUnits::deg);
@@ -218,7 +222,6 @@ bool manual_drive::ring_sort() {
     float error = target_position - angle;
 
     if (std::abs(error) < 5 || error < 0) {
-      float start = intake_motor.position(deg);
       assembly.intake_motor.spinFor(directionType::rev, 40, rotationUnits::deg, 600, velocityUnits::rpm, true);
 
       ring_detected = false;
@@ -233,17 +236,17 @@ bool manual_drive::ring_sort() {
   return false;
 }
 
-void manual_drive::lady_brown_manual() {
+void Assembly::lady_brown_manual() {
    if (Controller.ButtonL1.pressing()) {
-      LB_motors.spin(vex::fwd, 12, velocity_units::volt);
+      LB_motors.spin(vex::fwd, 12, VOLT);
     } else if (Controller.ButtonR1.pressing()) {
-      LB_motors.spin(vex::fwd, -12, velocity_units::volt);
+      LB_motors.spin(vex::fwd, -12, VOLT);
     } else {
       LB_motors.stop();
     }
 }
 
-void manual_drive::LB_state_manager(int state) {
+void Assembly::LB_state_manager(int state) {
   switch (state)
   {
   case ACTIVE:
@@ -283,7 +286,7 @@ void manual_drive::LB_state_manager(int state) {
   LB_reset_states();
 } 
 
-void manual_drive::LB_reset_states() {
+void Assembly::LB_reset_states() {
   bool prev = LB_states[LB_prev_state].get();
   for (int i = 0; i < LB_states.size(); ++i) {
     LB_states[i].get() = false;
@@ -292,7 +295,7 @@ void manual_drive::LB_reset_states() {
   LB_states[LB_prev_state].get() = prev;
 }
 
-void manual_drive::lady_brown() {
+void Assembly::lady_brown() {
     bool active_state = Controller.ButtonR1.pressing();
     bool scoring_state = Controller.ButtonL1.pressing();
     bool holding_state = Controller.ButtonB.pressing();
@@ -383,7 +386,7 @@ void manual_drive::lady_brown() {
     LB_state_manager(LB_queued_state);
 }
 
-void manual_drive::set_LB_constants(float LB_max_voltage, float LB_kp, float LB_ki, float LB_kd, float LB_starti, float LB_settle_error, float LB_settle_time, float LB_timeout) {
+void Assembly::set_LB_constants(float LB_max_voltage, float LB_kp, float LB_ki, float LB_kd, float LB_starti, float LB_settle_error, float LB_settle_time, float LB_timeout) {
   this->LB_max_voltage = LB_max_voltage;
   this->LB_kp = LB_kp;
   this->LB_ki = LB_ki;
@@ -394,11 +397,11 @@ void manual_drive::set_LB_constants(float LB_max_voltage, float LB_kp, float LB_
   this->LB_timeout = LB_timeout;
 }
 
-void manual_drive::move_LB_to_angle(float angle, bool buffer_data) {
+void Assembly::move_LB_to_angle(float angle, bool buffer_data) {
   move_LB_to_angle(angle, LB_max_voltage, LB_settle_error, LB_settle_error, LB_timeout, LB_kp, LB_ki, LB_kd, LB_starti, buffer_data);
 }
 
-void manual_drive::move_LB_to_angle(float angle, float LB_max_voltage, float LB_settle_error, float LB_settle_time, float LB_timeout, float LB_kp, float LB_ki, float LB_kd, float LB_starti, bool buffer_data) {
+void Assembly::move_LB_to_angle(float angle, float LB_max_voltage, float LB_settle_error, float LB_settle_time, float LB_timeout, float LB_kp, float LB_ki, float LB_kd, float LB_starti, bool buffer_data) {
   desired_angle = angle;
   float start_angle = reduce_0_to_360(LB_encoder.angle());
   PID turnPID(reduce_negative_180_to_180(angle - reduce_0_to_360(LB_encoder.angle())), LB_kp, LB_ki, LB_kd, LB_starti, LB_settle_error, LB_settle_time, LB_timeout);
@@ -414,7 +417,7 @@ void manual_drive::move_LB_to_angle(float angle, float LB_max_voltage, float LB_
         }
       }
     }
-    if (start_angle < angle && angle < 300 || start_angle > 300) {
+    if ((start_angle < angle && angle < 300) || start_angle > 300) {
       if (error < 0) {
         if (error < -25 || error > 25) {
           error = std::abs(error);
@@ -433,14 +436,14 @@ void manual_drive::move_LB_to_angle(float angle, float LB_max_voltage, float LB_
       break;
     }
 
-    LB_motors.spin(vex::fwd, output, velocity_units::volt);
+    LB_motors.spin(vex::fwd, output, VOLT);
     vex::task::sleep(10); 
   }
 
   LB_motors.stop(vex::brake);
 }
 
-void manual_drive::mogo_clamp() {
+void Assembly::mogo_clamp() {
   bool clamp_state = Controller.ButtonRight.pressing();
 
     if (clamp_state && !prev_clamp_state) {
@@ -451,7 +454,7 @@ void manual_drive::mogo_clamp() {
     prev_clamp_state = clamp_state;
 }
 
-void manual_drive::doinker() {
+void Assembly::doinker() {
   bool doinker_state = Controller.ButtonUp.pressing();
   bool rush_state = Controller.ButtonY.pressing();
   bool lift_state = false;
@@ -474,7 +477,7 @@ void manual_drive::doinker() {
   prev_doinker_state = doinker_state;
 }
 
-void manual_drive::match_timer() {
+void Assembly::match_timer() {
     int time_elapsed = Brain.Timer.time(vex::timeUnits::sec) - start_time; 
     time_remaining = 60 - time_elapsed;
     
@@ -497,16 +500,14 @@ void manual_drive::match_timer() {
   }
 }
 
-void manual_drive::align_robot() {
+void Assembly::align_robot() {
   bool align_state = Controller.ButtonA.pressing();
 
 
   if (align_state && !prev_align_state) {
     vex::task async_aligner([](){
       assembly.is_aligning = true;
-      chassis.brake_is_overrided = false;
-      chassis.drive_on_PID(-6.3);
-      chassis.override_brake_type(vex::brakeType::undefined);
+      chassis.drive(-6.3);
       vex::task::sleep(20);
       assembly.is_aligning = false;
       return 0;
@@ -515,7 +516,7 @@ void manual_drive::align_robot() {
 
   prev_align_state = align_state;
 
-  if (std::abs(deadband(Controller.Axis1.position(), 5) || std::abs(deadband(Controller.Axis3.position(), 5)) > 0)) {
+  if (deadband(Controller.Axis3.position(), 5) > 0) {
     assembly.is_aligning = false;
     async_aligner.stop();
   }

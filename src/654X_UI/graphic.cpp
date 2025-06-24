@@ -93,9 +93,15 @@ void graphic::add_graphic(std::shared_ptr<drawable> graphic) {
 }
 
 
-void graphic::modify_graphic(std::shared_ptr<drawable> graphic) {
+void graphic::replace_graphic(std::shared_ptr<drawable> new_graphic) {
     graphics.clear();
-    graphics.push_back(graphic);
+    graphics.push_back(new_graphic);
+    needs_render_update = true;
+}
+
+void graphic::replace_graphic(std::vector<std::shared_ptr<drawable>> new_graphics) {
+    graphics.clear();
+    graphics = new_graphics;
     needs_render_update = true;
 }
 

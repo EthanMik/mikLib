@@ -1,7 +1,7 @@
 #include "vex.h"
 
-label::label(const std::string& label, int x, int y, UI_distance_units units):
-    label_text(label), x(x), y(y), units(units), data_func([](){ return ""; } )
+label::label(const std::string& label, float x, float y, UI_distance_units units):
+    label_text(label), units(units), data_func([](){ return ""; } )
 {
     unique_id = UI_create_ID(UI_Label_ID);
 

@@ -5,11 +5,11 @@
 class rectangle : public drawable
 {
 public:
-    rectangle(int x, int y, int w, int h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units);
-    rectangle(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, vex::color fill_color, vex::color outline_color, UI_distance_units units);
 
-    rectangle(int x, int y, int w, int h, uint32_t hue, UI_distance_units units);
-    rectangle(int x, int y, int w, int h, vex::color hue, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, uint32_t hue, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, vex::color hue, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;

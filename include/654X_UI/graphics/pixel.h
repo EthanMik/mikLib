@@ -5,7 +5,7 @@
 class pixel : public drawable 
 {
 public:
-    pixel(int x, int y, uint32_t hue, UI_distance_units units);
+    pixel(float x, float y, uint32_t hue, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;

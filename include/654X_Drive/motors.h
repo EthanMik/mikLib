@@ -4,9 +4,9 @@
 #include "vex.h"
 
 // Enum for different velocity units
-enum class velocity_units {normalized, percent, volt};
+enum velocity_units : int {NORM = 0, PERCENT = 1, VOLT = 2};
 
-namespace hzn {
+namespace mik {
 
 class motor  {
     
@@ -24,7 +24,7 @@ class motor_group
 {
 public:
     // Constructor: initializes a variable amount of motor
-    motor_group(const std::vector<hzn::motor>& motor_constructor);
+    motor_group(const std::vector<mik::motor>& motors);
 
     vex::motor& get_motor(std::string motor_name);
 
@@ -50,21 +50,23 @@ public:
     // Stops the motors with the specified brake type
     void stop(vex::brakeType brake = vex::brakeType::brake);
 
+    void set_stopping(vex::brakeType brake);
+
     // Returns the last set speed in the specified units
     float get_set_speed(velocity_units velocityUnits);
 
     float setSpeed;  // Stores the last set speed
     
-    std::vector<hzn::motor> motor_constructor;
+    std::vector<mik::motor> motors;
     
-    std::vector<vex::motor> motors;
-    
-private:
+    private:
     // Converts speed from various units to voltage
     float to_volt(float speed, velocity_units velocityUnits);
-
+    
     // Converts voltage to the specified velocity units
     float from_volt(float volt, velocity_units velocityUnits);
+
+    std::vector<vex::motor> vex_motors;
 };
 }
 

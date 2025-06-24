@@ -48,6 +48,7 @@
 		"condition_variable": "cpp",
 		"mutex": "cpp",
 		"system_error": "cpp",
-		"thread": "cpp"
+		"thread": "cpp",
+		"cstddef": "cpp"
 	}
 }

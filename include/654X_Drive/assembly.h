@@ -6,12 +6,12 @@ enum class color_sort { RED, BLUE, NONE };
 enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
 enum LB_state : int { ACTIVE = 206, INACTIVE = 229, HOLDING = 170, SCORING = 43, HANG = 345, DESCORE_TOP = 79, DECSCORE_BOTTOM = 65 };
 
-class manual_drive {
+class Assembly {
 public:
-    manual_drive(
-        hzn::motor_group LB_motors, 
+    Assembly(
+        mik::motor_group LB_motors, 
         int LB_encoder_port, 
-        hzn::motor intake_motor,
+        mik::motor intake_motor,
         int intake_encoder_port,
         int ring_color_sensor_port,
         int ring_distance_sensor_port,
@@ -22,6 +22,7 @@ public:
     );
     void init_LB();
     void initialize_user_control();
+    void stop_motors(vex::brakeType brake);
 
     void intake();
     void unjam_intake_task();
@@ -43,7 +44,7 @@ public:
     void match_timer();
     void align_robot();
 
-    hzn::motor_group LB_motors;
+    mik::motor_group LB_motors;
     vex::rotation LB_encoder;
     vex::motor intake_motor; 
     vex::rotation intake_encoder;

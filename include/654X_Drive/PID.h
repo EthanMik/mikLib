@@ -21,6 +21,8 @@ public:
     float time_spent_settled = 0;
     float time_spent_running = 0;
 
+    PID();
+
     PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout);
 
     PID(float error, float kp, float ki, float kd, float starti);

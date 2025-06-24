@@ -2,18 +2,16 @@
 
 class motor;
 class motor_group;
-class auton_drive;
-class manual_drive;
+class Chassis;
+class Assembly;
 
 extern vex::brain Brain;
 extern vex::controller Controller;
 extern vex::competition Competition;
 extern bool disable_user_control;
 
-extern auton_drive chassis;
-extern manual_drive assembly;
+extern Chassis chassis;
+extern Assembly assembly;
 
 void init(void);
 void calibrate_inertial(void);
-void mogo_constants(void);
-void default_constants(void);

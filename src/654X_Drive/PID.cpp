@@ -1,5 +1,7 @@
 #include "vex.h"
 
+PID::PID() {};
+
 PID::PID(float error, float kp, float ki, float kd, float starti) :
   error(error),
   kp(kp),

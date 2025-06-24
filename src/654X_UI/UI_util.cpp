@@ -8,19 +8,20 @@ int UI_get_cursor_y_position() { return(cursor_position.second); }
 static int UI_id = 0;
 
 int UI_create_ID(int component_type, int toggle_group) {
-    // Assume component_type and toggle_group are in [0..99]
-    // We allocate two digits for component_type, two digits for toggle_group,
+    // Assume component_type and toggle_group are in [0..9]
+    // We allocate one digit for component_type, one digit for toggle_group,
     // and then UI_id is appended at the end.
     // Format: CC TT U...
-    // Example: component_type=1, toggle_group=1, UI_id=13 -> 1 * 10000 + 1 * 100 + 13 = 10113
+    // Example: component_type=1, toggle_group=1, UI_id=13 -> 1 * 10000 + 1 * 100 + 13 = 11013
     
-    if (component_type < 0 || component_type > 99 ||
-        toggle_group < 0 || toggle_group > 99) {
-            Brain.Screen.printAt(30, 30, "0-99 MAX");
-            exit(1);
+    if (component_type < 0 || component_type > 9 ||
+        toggle_group < 0 || toggle_group > 9) {
+            Brain.Screen.printAt(30, 30, "0-9 MAX");
+            print("0-9 MAX");
+            std::abort();
     }
 
-    int id = component_type * 10000 + toggle_group * 100 + ++UI_id;
+    int id = component_type * 10000 + toggle_group * 1000 + ++UI_id;
     return id;
 }
 
@@ -29,11 +30,11 @@ int UI_decode_component_type(int id) {
 }
 
 int UI_decode_toggle_group(int id) {
-    return((id % 10000) / 100);
+    return((id % 10000) / 1000);
 }
 
 int UI_decode_unique_id(int id) {
-    return ((id % 10000) % 100);
+    return ((id % 10000) % 1000);
 }
 
 std::shared_ptr<UI_component> UI_to_component(std::shared_ptr<UI_component> component) {
@@ -68,55 +69,41 @@ float to_pixels(float distance, UI_distance_units units) {
   }
 }
 
-void UI_img_exists(const std::string& file_name) {
-    if (!Brain.SDcard.isInserted()) {
-        Brain.Screen.printAt(30, 30, "SD CARD NOT INSERTED DUMMY");
-    }
-    else if (!Brain.SDcard.exists(file_name.c_str())) {
-        Brain.Screen.printAt(30, 30, (file_name + " IMG DOES NOT EXIST").c_str());
-    } else {
-        Brain.Screen.printAt(30, 30, "EXISTS");
-    }
-    Brain.Screen.render();
-
-    exit(1);
-}
-
 std::shared_ptr<drawable> UI_crt_img(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units) {
     return std::make_shared<image>(file_name, x, y, w, h, units);
 }
 
-std::shared_ptr<drawable> UI_crt_px(int x, int y, uint32_t hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_px(float x, float y, uint32_t hue, UI_distance_units units) {
     return std::make_shared<pixel>(x, y, hue, units);
 }
 
-std::shared_ptr<drawable> UI_crt_ln(int x1, int y1, int x2, int y2, uint32_t hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_ln(float x1, float y1, float x2, float y2, uint32_t hue, UI_distance_units units) {
     return std::make_shared<line>(x1, y1, x2, y2, hue, units);
 }
 
-std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, float x, float y, UI_distance_units units) {
     return std::make_shared<text>(text_label, x, y, units);
 }
-std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, float x, float y, uint32_t hue, UI_distance_units units) {
     return std::make_shared<text>(text_label, x, y, hue, units);
 }
-std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, int x, int y, vex::color hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_txt(const std::string& text_label, float x, float y, vex::color hue, UI_distance_units units) {
     return std::make_shared<text>(text_label, x, y, hue, units);
 }
 
-std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_rec(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, fill_color, outline_color, units);
 }
 
-std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_rec(float x, float y, float w, float h, vex::color fill_color, vex::color outline_color, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, fill_color, outline_color, units);
 }
 
-std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, uint32_t hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_rec(float x, float y, float w, float h, uint32_t hue, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, hue, units);
 }
 
-std::shared_ptr<drawable> UI_crt_rec(int x, int y, int w, int h, vex::color hue, UI_distance_units units) {
+std::shared_ptr<drawable> UI_crt_rec(float x, float y, float w, float h, vex::color hue, UI_distance_units units) {
     return std::make_shared<rectangle>(x, y, w, h, hue, units);
 }
 
@@ -132,6 +119,19 @@ std::shared_ptr<drawable> UI_crt_grp(std::vector<std::shared_ptr<drawable>> grap
 std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<drawable> box) {
     return std::make_shared<textbox>(text, box);
 }
+
+std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box) {
+    return std::make_shared<textbox>(text, text_alignment, box);
+}
+
+std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, uint32_t text_color, std::shared_ptr<drawable> box) {
+    return std::make_shared<textbox>(text, text_color, box);
+}
+
+std::shared_ptr<UI_component> UI_crt_txtbox(std::string text, uint32_t text_color, text_align text_alignment, std::shared_ptr<drawable> box) {
+    return std::make_shared<textbox>(text, text_color, text_alignment, box);
+}
+
 
 std::shared_ptr<UI_component> UI_crt_tgl(std::shared_ptr<drawable> toggle_graphic, std::function<void()> callback, int id) {
     return std::make_shared<toggle>(toggle_graphic, callback, id);
@@ -150,7 +150,7 @@ std::shared_ptr<UI_component> UI_crt_btn(std::shared_ptr<drawable> button_graphi
 }
 
 
-std::shared_ptr<UI_component> UI_crt_lbl(const std::string& label_text, int x, int y, UI_distance_units units) {
+std::shared_ptr<UI_component> UI_crt_lbl(const std::string& label_text, float x, float y, UI_distance_units units) {
     return std::make_shared<label>(label_text, x, y, units);
 }
 

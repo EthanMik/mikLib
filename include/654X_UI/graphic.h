@@ -21,7 +21,8 @@ public:
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
 
-    void modify_graphic(std::shared_ptr<drawable> graphic);
+    void replace_graphic(std::shared_ptr<drawable> graphic);
+    void replace_graphic(std::vector<std::shared_ptr<drawable>> graphic);
     void remove_first_graphic();
 
     void set_width(int w) override;
@@ -34,8 +35,8 @@ public:
 
 private:
     bool needs_render_update;
+    std::vector<std::shared_ptr<drawable>> graphics;
 
     int x, y, w, h;
     UI_distance_units units;
-    std::vector<std::shared_ptr<drawable>> graphics;
 };  

@@ -5,13 +5,13 @@
 class label : public UI_component
 {
 public:
-    label(const std::string& label, int x, int y, UI_distance_units units);
+    label(const std::string& label, float x, float y, UI_distance_units units);
 
     template<typename T>
-    label(const std::string& label, T& data, int x, int y, UI_distance_units units);
+    label(const std::string& label, T& data, float x, float y, UI_distance_units units);
     
     template<typename F>
-    label(const std::string& label, F&& data_func, int x, int y, UI_distance_units units);
+    label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -42,7 +42,7 @@ private:
 };
 
 template<typename T>
-label::label(const std::string& label, T& data, int x, int y, UI_distance_units units): 
+label::label(const std::string& label, T& data, float x, float y, UI_distance_units units): 
     label_text(label),
     data_func([&data]() {
         std::ostringstream oss;
@@ -52,7 +52,7 @@ label::label(const std::string& label, T& data, int x, int y, UI_distance_units 
         oss << data;
         return oss.str();
     }),
-    x(x), y(y), units(units)
+    units(units)
 {
     unique_id = UI_create_ID(UI_Label_ID);
 
@@ -64,7 +64,7 @@ label::label(const std::string& label, T& data, int x, int y, UI_distance_units 
 
 
 template<typename F>
-label::label(const std::string& label, F&& data_func, int x, int y, UI_distance_units units): 
+label::label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units): 
     label_text(label),
     data_func([data_func = std::forward<F>(data_func)]() {
         std::ostringstream oss;
@@ -75,7 +75,7 @@ label::label(const std::string& label, F&& data_func, int x, int y, UI_distance_
         oss << value;
         return oss.str();
     }),
-    x(x), y(y), units(units) 
+    units(units) 
 {
     unique_id = UI_create_ID(UI_Label_ID);
 

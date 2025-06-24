@@ -9,41 +9,35 @@ std::shared_ptr<screen> UI_graph_screen::get_graph_screen() {
 }
 
 void UI_graph_screen::UI_crt_graph_scr() {
-    float range = y_max_bound - y_min_bound;
-
     UI_graph_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
     auto bg = UI_crt_bg(UI_crt_rec(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45, vex::color::black, UI_distance_units::pixels));
-
+    
     auto legend_box = UI_crt_gfx(UI_crt_img("legend_box.png", 360, 54, 0, 0, UI_distance_units::pixels));
     auto graph_table = UI_crt_gfx(UI_crt_img("graph_table.png", 0, 66, 0, 0, UI_distance_units::pixels));
-    auto graph_name = UI_crt_gfx(UI_crt_txt("PID Output", 140, 62, vex::color::white, UI_distance_units::pixels));
+    auto graph_name = UI_crt_gfx(UI_crt_txt("PID Output", 140, 62, vex::color::black, UI_distance_units::pixels));
     auto reset_btn = UI_crt_btn(UI_crt_img("graph_settings_btn.png", 366, 208, 98, 20, UI_distance_units::pixels), [this](){ reset_graph(); });
-        reset_btn->set_states(UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels), UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels));
-
-    auto y_axis = UI_crt_gfx({
-        UI_crt_txt(to_string_float(y_max_bound, 3), 10, 90, vex::color::white, UI_distance_units::pixels),
-        UI_crt_txt(to_string_float(y_min_bound + range * .75, 3), 10, 127, vex::color::white, UI_distance_units::pixels),
-        UI_crt_txt(to_string_float(y_min_bound + range * .5, 3), 10, 172, vex::color::white, UI_distance_units::pixels),
-        UI_crt_txt(to_string_float(y_min_bound + range * .25, 3), 10, 215, vex::color::white, UI_distance_units::pixels),
-    });
+    reset_btn->set_states(UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels), UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels));
     
+    auto _y_axis = UI_crt_gfx(UI_crt_img("", 0, 0, 0, 0, UI_distance_units::pixels));
+    y_axis = static_cast<graphic*>(_y_axis.get());
+
     auto _legend_labels = UI_crt_gfx({UI_crt_px(-1, -1, 0, UI_distance_units::pixels)});
     legend_labels = static_cast<graphic*>(_legend_labels.get());
 
     auto _graph_lines = UI_crt_gfx(UI_crt_px(-1, -1, 0, UI_distance_units::pixels));
     graph_lines = static_cast<graphic*>(_graph_lines.get());
 
-    UI_graph_scr->add_UI_components({bg, legend_box, graph_table, graph_name, y_axis, _legend_labels, reset_btn, _graph_lines});
+    UI_graph_scr->add_UI_components({bg, legend_box, graph_table, graph_name, _y_axis, _legend_labels, reset_btn, _graph_lines});
 }
 
 void UI_graph_screen::reset_graph() {
-    graph_lines->modify_graphic({UI_crt_px(-1, -1, 0, UI_distance_units::pixels)});
-    legend_labels->modify_graphic({UI_crt_px(-1, -1, 0, UI_distance_units::pixels)});
+    graph_lines->replace_graphic({UI_crt_px(-1, -1, 0, UI_distance_units::pixels)});
+    legend_labels->replace_graphic({UI_crt_px(-1, -1, 0, UI_distance_units::pixels)});
     UI_graph_scr->refresh();
     graph();
 }
 
-void UI_graph_screen::set_plot_bounds(float y_max_bound, float y_min_bound, float x_min_bound, float x_max_bound, float x_step, float tick_rate_ms, int graphic_buffer) {
+void UI_graph_screen::set_plot_bounds(float y_min_bound, float y_max_bound, float x_min_bound, float x_max_bound, float x_step, float tick_rate_ms, int graphic_buffer) {
     this->y_max_bound = y_max_bound;
     this->y_min_bound = y_min_bound;
     this->x_min_bound = x_min_bound;
@@ -51,6 +45,14 @@ void UI_graph_screen::set_plot_bounds(float y_max_bound, float y_min_bound, floa
     this->x_step = x_step;
     this->tick_rate_ms = tick_rate_ms;
     this->graphic_buffer = graphic_buffer;
+
+    float range = y_max_bound - y_min_bound;
+    y_axis->replace_graphic({
+        UI_crt_txt(to_string_float(y_max_bound, 3), 10, 90, vex::color::black, UI_distance_units::pixels),
+        UI_crt_txt(to_string_float(y_min_bound + range * .75, 3), 10, 127, vex::color::black, UI_distance_units::pixels),
+        UI_crt_txt(to_string_float(y_min_bound + range * .5, 3), 10, 172, vex::color::black, UI_distance_units::pixels),
+        UI_crt_txt(to_string_float(y_min_bound + range * .25, 3), 10, 215, vex::color::black, UI_distance_units::pixels),
+    });
 }
 
 void UI_graph_screen::set_plot(const std::vector<std::function<float(float)>>& plots, const std::vector<std::pair<std::string, uint32_t>>& labels) {

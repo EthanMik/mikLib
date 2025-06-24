@@ -1,5 +1,16 @@
 #include "vex.h"
 
+#define test_slot_color 0x00323232
+#define test_slot_border_color 0x00666666
+
+#define data_slot_color 0x00232323
+#define data_slot_border_color 0x00666666
+
+#define macro_slot_color 0
+#define macro_slot_border_color 0x00666666
+
+#define text_alignment text_align::CENTER
+
 UI_config_screen::UI_config_screen() {
     UI_crt_config_scr();
     UI_crt_pnematics_scr();
@@ -15,104 +26,91 @@ void UI_config_screen::UI_crt_config_scr() {
     auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, vex::color::black, UI_distance_units::pixels));
 
 
-    auto macro_1 = UI_crt_txtbox("Run Auto", UI_crt_rec(6, 54, 150, 31, 0x00550A27, UI_distance_units::pixels));
-    auto macro_1_bg = UI_crt_btn(UI_crt_rec(4, 52, 154, 35, 0x00666666, UI_distance_units::pixels), [this, macro_1](){ 
-        countdown(macro_1, [](){ 
-            disable_user_control = true;
-            auton_scr->start_auton();
-            disable_user_control = false;
-        });
-    });
-    macro_1_bg->set_states(UI_crt_rec(4, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_1 = UI_crt_txtbox("Run Auto", text_alignment, UI_crt_rec(6, 54, 150, 31, macro_slot_color, UI_distance_units::pixels));
+    auto macro_1_bg = UI_crt_btn(UI_crt_rec(4, 52, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [this, macro_1](){ countdown(macro_1, [](){ auton_scr->start_auton(); }); });
+        macro_1_bg->set_states(UI_crt_rec(4, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
 
-
-    auto macro_2_bg = UI_crt_btn(UI_crt_rec(163, 52, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ config_motor_wattage(); });
+    auto macro_2_bg = UI_crt_btn(UI_crt_rec(163, 52, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ run_diagnostic(); config_error_data(); });
         macro_2_bg->set_states(UI_crt_rec(163, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_2 = UI_crt_txtbox("Motor Wattage", UI_crt_rec(165, 54, 150, 31, 0x0039174E, UI_distance_units::pixels));
-
-
-    auto macro_3_bg = UI_crt_btn(UI_crt_rec(322, 52, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
-        macro_3_bg->set_states(UI_crt_rec(322, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_3 = UI_crt_txtbox("Test Drive", UI_crt_rec(324, 54, 150, 31, 0x00191658, UI_distance_units::pixels));
-
-
-    auto macro_4_bg_tgl = UI_crt_tgl(UI_crt_rec(4, 91, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
-    auto macro_4_bg = UI_crt_btn(UI_crt_rec(4, 91, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ auton_scr->enable_time_limit(); });
-        macro_4_bg_tgl->set_states(UI_crt_rec(4, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_4 = UI_crt_txtbox("Time Cap Auto", UI_crt_rec(6, 93, 150, 31, 0x00550A27, UI_distance_units::pixels));
-
-
-    auto macro_5_bg = UI_crt_btn(UI_crt_rec(163, 91, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ config_motor_temp(); });
-        macro_5_bg->set_states(UI_crt_rec(163, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_5 = UI_crt_txtbox("Motor Temps", UI_crt_rec(165, 93, 150, 31, 0x0039174E, UI_distance_units::pixels));
-
-
-    auto macro_6_bg = UI_crt_btn(UI_crt_rec(322, 91, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
-        macro_6_bg->set_states(UI_crt_rec(322, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_6 = UI_crt_txtbox("Test Turn", UI_crt_rec(324, 93, 150, 31, 0x00191658, UI_distance_units::pixels));
-
-
-    auto macro_7_bg = UI_crt_btn(UI_crt_rec(4, 91+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ config_skills_driver_run(); });
-        macro_7_bg->set_states(UI_crt_rec(4, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_7 = UI_crt_txtbox("Driver Skills", UI_crt_rec(6, 93+39, 150, 31, 0x00550A27, UI_distance_units::pixels));
-
-
-    auto macro_8_bg = UI_crt_btn(UI_crt_rec(163, 91+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ config_odom_data(); });
-        macro_8_bg->set_states(UI_crt_rec(163, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_8 = UI_crt_txtbox("Odom Data", UI_crt_rec(165, 93+39, 150, 31, 0x0039174E, UI_distance_units::pixels));
-
-
-    auto macro_9_bg = UI_crt_btn(UI_crt_rec(322, 91+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
-        macro_9_bg->set_states(UI_crt_rec(322, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_9 = UI_crt_txtbox("Test Swing", UI_crt_rec(324, 93+39, 150, 31, 0x00191658, UI_distance_units::pixels));
-
+    auto macro_2 = UI_crt_txtbox("Error Data", text_alignment, UI_crt_rec(165, 54, 150, 31, data_slot_color, UI_distance_units::pixels));
     
-    auto macro_10_bg_tgl = UI_crt_tgl(UI_crt_rec(4, 91+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ });
-    auto macro_10_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ auton_scr->UI_select_auton(autons::OFF_SKILLS); });
-        macro_10_bg_tgl->set_states(UI_crt_rec(4, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_10 = UI_crt_txtbox("Auto Skills", UI_crt_rec(6, 93+39+39, 150, 31, 0x00550A27, UI_distance_units::pixels));
+
+    auto macro_3_bg = UI_crt_btn(UI_crt_rec(322, 52, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ config_test_drive(); });
+        macro_3_bg->set_states(UI_crt_rec(322, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 52, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_3 = UI_crt_txtbox("Test Drive", text_alignment, UI_crt_rec(324, 54, 150, 31, test_slot_color, UI_distance_units::pixels));
 
 
-    auto macro_11_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
+    macro_4_bg_tgl = UI_crt_tgl(UI_crt_rec(4, 91, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){});
+    auto macro_4_bg = UI_crt_btn(UI_crt_rec(4, 91, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ auton_scr->enable_time_limit(); auton_scr->flip_toggle_controller({3, 0}, auton_scr->time_limit); auton_scr->save_auton_SD(); });
+        macro_4_bg_tgl->set_states(UI_crt_rec(4, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_4 = UI_crt_txtbox("Time Cap Auto", text_alignment, UI_crt_rec(6, 93, 150, 31, macro_slot_color, UI_distance_units::pixels));
+
+
+    auto macro_5_bg = UI_crt_btn(UI_crt_rec(163, 91, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ config_motor_temp(); });
+        macro_5_bg->set_states(UI_crt_rec(163, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_5 = UI_crt_txtbox("Motor Temps", text_alignment, UI_crt_rec(165, 93, 150, 31, data_slot_color, UI_distance_units::pixels));
+
+
+    auto macro_6_bg = UI_crt_btn(UI_crt_rec(322, 91, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ config_test_turn(); });
+        macro_6_bg->set_states(UI_crt_rec(322, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_6 = UI_crt_txtbox("Test Turn", text_alignment, UI_crt_rec(324, 93, 150, 31, test_slot_color, UI_distance_units::pixels));
+
+
+    auto macro_7_bg = UI_crt_btn(UI_crt_rec(4, 91+39, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ config_skills_driver_run(); });
+        macro_7_bg->set_states(UI_crt_rec(4, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_7 = UI_crt_txtbox("Driver Skills", text_alignment, UI_crt_rec(6, 93+39, 150, 31, macro_slot_color, UI_distance_units::pixels));
+
+
+    auto macro_8_bg = UI_crt_btn(UI_crt_rec(163, 91+39, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ config_motor_wattage(); });
+    macro_8_bg->set_states(UI_crt_rec(163, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_8 = UI_crt_txtbox("Motor Wattage", text_alignment, UI_crt_rec(165, 93+39, 150, 31, data_slot_color, UI_distance_units::pixels));
+    
+    
+    auto macro_9_bg = UI_crt_btn(UI_crt_rec(322, 91+39, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ config_test_swing(); });
+    macro_9_bg->set_states(UI_crt_rec(322, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_9 = UI_crt_txtbox("Test Swing", text_alignment, UI_crt_rec(324, 93+39, 150, 31, test_slot_color, UI_distance_units::pixels));
+    
+    
+    macro_10_bg_tgl = UI_crt_tgl(UI_crt_rec(4, 91+39+39, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){});
+    auto macro_10_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ auton_scr->UI_select_auton(autons::OFF_SKILLS); auton_scr->flip_toggle_controller({1, 1}, auton_scr->off_skills); auton_scr->save_auton_SD(); });
+    macro_10_bg_tgl->set_states(UI_crt_rec(4, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_10 = UI_crt_txtbox("Auto Skills", text_alignment, UI_crt_rec(6, 93+39+39, 150, 31, macro_slot_color, UI_distance_units::pixels));
+    
+    
+    auto macro_11_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ config_odom_data(); });
         macro_11_bg->set_states(UI_crt_rec(163, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_11 = UI_crt_txtbox("data_slot_4", UI_crt_rec(165, 93+39+39, 150, 31, 0x0039174E, UI_distance_units::pixels));
+    auto macro_11 = UI_crt_txtbox("Odom Data", text_alignment, UI_crt_rec(165, 93+39+39, 150, 31, data_slot_color, UI_distance_units::pixels));
 
-
-    auto macro_12_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
-        macro_12_bg->set_states(UI_crt_rec(322, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_12 = UI_crt_txtbox("Test Full", UI_crt_rec(324, 93+39+39, 150, 31, 0x00191658, UI_distance_units::pixels));
-
-
-    auto macro_13_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ config_spin_all_motors(); });
-        macro_13_bg->set_states(UI_crt_rec(4, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_13 = UI_crt_txtbox("Spin Motors", UI_crt_rec(6, 93+39+39+39, 150, 31, 0x00550A27, UI_distance_units::pixels));
-
-
-    auto macro_14_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
+    auto macro_12_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ test_full(); });
+    macro_12_bg->set_states(UI_crt_rec(322, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_12 = UI_crt_txtbox("Test Full", text_alignment, UI_crt_rec(324, 93+39+39, 150, 31, test_slot_color, UI_distance_units::pixels));
+    
+    
+    auto macro_13_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39+39, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ config_spin_all_motors(); });
+    macro_13_bg->set_states(UI_crt_rec(4, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_13 = UI_crt_txtbox("Spin Motors", text_alignment, UI_crt_rec(6, 93+39+39+39, 150, 31, macro_slot_color, UI_distance_units::pixels));
+    
+    auto macro_14_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39+39, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ config_add_pid_output_SD_console(); });
         macro_14_bg->set_states(UI_crt_rec(163, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_14 = UI_crt_txtbox("data_slot_5", UI_crt_rec(165, 93+39+39+39, 150, 31, 0x0039174E, UI_distance_units::pixels));
-
-
-    auto macro_15_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){ });
-        macro_15_bg->set_states(UI_crt_rec(322, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_15 = UI_crt_txtbox("Test Odom", UI_crt_rec(324, 93+39+39+39, 150, 31, 0x00191658, UI_distance_units::pixels));
-
-
-    auto macro_16_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [this](){ UI_swap_screens({UI_pnematics_scr}); disable_user_control = true; });
-        macro_16_bg->set_states(UI_crt_rec(4, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_16 = UI_crt_txtbox("Pnematic Menu", UI_crt_rec(6, 93+39+39+39+39, 150, 31, 0x00550A27, UI_distance_units::pixels));
-
-
-    auto macro_17_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
+    auto macro_14 = UI_crt_txtbox("PID Data", text_alignment, UI_crt_rec(165, 93+39+39+39, 150, 31, data_slot_color, UI_distance_units::pixels));
+    
+    auto macro_15_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39+39, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ test_odom(); });
+    macro_15_bg->set_states(UI_crt_rec(322, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_15 = UI_crt_txtbox("Test Odom", text_alignment, UI_crt_rec(324, 93+39+39+39, 150, 31, test_slot_color, UI_distance_units::pixels));
+    
+    
+    auto macro_16_bg = UI_crt_btn(UI_crt_rec(4, 91+39+39+39+39, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [this](){ UI_swap_screens({UI_pnematics_scr}); disable_user_control = true; });
+    macro_16_bg->set_states(UI_crt_rec(4, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(4, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    auto macro_16 = UI_crt_txtbox("Pnematic Menu", text_alignment, UI_crt_rec(6, 93+39+39+39+39, 150, 31, macro_slot_color, UI_distance_units::pixels));
+    
+    auto macro_17_bg = UI_crt_btn(UI_crt_rec(163, 91+39+39+39+39, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ wipe_SD_file("PID_data.txt"); });
         macro_17_bg->set_states(UI_crt_rec(163, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(163, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_17 = UI_crt_txtbox("data_slot_6", UI_crt_rec(165, 93+39+39+39+39, 150, 31, 0x0039174E, UI_distance_units::pixels));
+    auto macro_17 = UI_crt_txtbox("Wipe PID Data", text_alignment, UI_crt_rec(165, 93+39+39+39+39, 150, 31, data_slot_color, UI_distance_units::pixels));
 
 
-    auto macro_18_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39+39+39, 154, 35, 0x00666666, UI_distance_units::pixels), [](){});
+    auto macro_18_bg = UI_crt_btn(UI_crt_rec(322, 91+39+39+39+39, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ config_test_heading(); });
         macro_18_bg->set_states(UI_crt_rec(322, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(322, 91+39+39+39+39, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
-    auto macro_18 = UI_crt_txtbox("test_slot_6", UI_crt_rec(324, 93+39+39+39+39, 150, 31, 0x00191658, UI_distance_units::pixels));
-
-    // print(macro_2_bg->get_ID());
+    auto macro_18 = UI_crt_txtbox("test_slot_6", text_alignment, UI_crt_rec(324, 93+39+39+39+39, 150, 31, test_slot_color, UI_distance_units::pixels));
 
     UI_config_scr->add_UI_components({bg, 
         macro_1_bg, macro_1, macro_2_bg, macro_2, macro_3_bg, macro_3,
@@ -181,7 +179,7 @@ void UI_config_screen::countdown(std::shared_ptr<UI_component> txtbox, std::func
         int count = 3;
         std::string original_txt = config_scr->txtbox_task_data->get_text();
         while(count >= 0) {
-            config_scr->txtbox_task_data->set_text(to_string_int(count));
+            config_scr->txtbox_task_data->set_text(to_string(count));
             vex::task::sleep(1000);
             count--;
         }

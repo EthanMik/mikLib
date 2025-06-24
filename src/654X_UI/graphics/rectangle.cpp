@@ -1,7 +1,6 @@
 #include "vex.h"
 
-rectangle::rectangle(int x, int y, int w, int h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) :
-    x(x), y(y), w(w), h(h),
+rectangle::rectangle(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) :
     fill_color(fill_color),
     outline_color(outline_color)
 {
@@ -11,8 +10,7 @@ rectangle::rectangle(int x, int y, int w, int h, uint32_t fill_color, uint32_t o
     this->h = to_pixels(h, units);
 };
 
-rectangle::rectangle(int x, int y, int w, int h, vex::color fill_color, vex::color outline_color, UI_distance_units units) :
-    x(x), y(y), w(w), h(h),
+rectangle::rectangle(float x, float y, float w, float h, vex::color fill_color, vex::color outline_color, UI_distance_units units) :
     fill_color(fill_color),
     outline_color(outline_color)
 {
@@ -22,8 +20,7 @@ rectangle::rectangle(int x, int y, int w, int h, vex::color fill_color, vex::col
     this->h = to_pixels(h, units);
 };
 
-rectangle::rectangle(int x, int y, int w, int h, uint32_t hue, UI_distance_units units) : 
-    x(x), y(y), w(w), h(h),
+rectangle::rectangle(float x, float y, float w, float h, uint32_t hue, UI_distance_units units) : 
     fill_color(hue),
     outline_color(hue)
 {
@@ -33,8 +30,7 @@ rectangle::rectangle(int x, int y, int w, int h, uint32_t hue, UI_distance_units
     this->h = to_pixels(h, units);
 };
 
-rectangle::rectangle(int x, int y, int w, int h, vex::color hue, UI_distance_units units) : 
-    x(x), y(y), w(w), h(h),
+rectangle::rectangle(float x, float y, float w, float h, vex::color hue, UI_distance_units units) : 
     fill_color(hue),
     outline_color(hue)
 {

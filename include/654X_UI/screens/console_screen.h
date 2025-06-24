@@ -8,8 +8,9 @@ public:
     UI_console_screen();
  
     std::shared_ptr<screen> get_console_screen();
+    void reset();
 
-    void add(const std::string& label_text);
+    void add(const std::string& label_text, bool txt);
 
     template <typename F>
     void add(const std::string& label_text, F&& data);
@@ -81,7 +82,8 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
 
     remove_lbl_btn->set_callback([this, btn_id, lbl_id, lbl](){ 
         UI_reposition_text(lbl->get_y_pos());
-        this->UI_console_scr->remove_UI_component({lbl_id, btn_id}); 
+        this->UI_console_scr->remove_UI_component({lbl_id, btn_id});
+        UI_console_scr->refresh(); 
     });
     remove_lbl_btn->set_states(UI_crt_rec(10, delta_button_y_pos, button_width, 20, 0x006B6B6B, UI_distance_units::pixels), nullptr);
 

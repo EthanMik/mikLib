@@ -5,9 +5,9 @@
 class text : public drawable 
 {
 public:
-    text(const std::string& text_label, int x, int y, UI_distance_units units);
-    text(const std::string& text_label, int x, int y, uint32_t hue, UI_distance_units units);
-    text(const std::string& text_label, int x, int y, vex::color hue, UI_distance_units units);
+    text(const std::string& text_label, float x, float y, UI_distance_units units);
+    text(const std::string& text_label, float x, float y, uint32_t hue, UI_distance_units units);
+    text(const std::string& text_label, float x, float y, vex::color hue, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;

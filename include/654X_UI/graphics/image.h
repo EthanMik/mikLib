@@ -23,6 +23,8 @@ public:
 
 private:
     std::string file_name;
+    bool no_image_found = false;
+    std::shared_ptr<drawable> image_no_texture;
     int x;
     int y;
     int w;

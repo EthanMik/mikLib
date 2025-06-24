@@ -10,12 +10,17 @@
 #include <string.h>
 #include <algorithm>
 #include <functional>
+#include <random>
+#include <chrono>
 #include <unordered_map>
 #include <iomanip>
 #include <memory>
 #include <atomic>
+#include <tuple>
 #include <sstream>
-#include <iostream>
+#include <type_traits>
+#include <iostream> 
+#include <cstddef>
 
 #include "v5.h"
 #include "v5_vcs.h"
@@ -24,10 +29,10 @@
 #include "654X_Drive/motors.h"
 #include "654X_Drive/odom.h"
 #include "654X_Drive/PID.h"
-#include "654X_Drive/manual_drive.h"
-#include "654X_Drive/auton_drive.h"
+#include "654X_Drive/assembly.h"
+#include "654X_Drive/chassis.h"
 #include "654X_Drive/auton_drive_methods.h"
-#include "654X_Drive/autons.h"
+#include "autons.h"
 #include "robot-config.h"
 
 #include "654X_UI/graphics/drawable.h"
@@ -54,4 +59,4 @@
 #include "654X_UI/screens/graph_screen.h"
 
 #include "654X_UI/UI_manager.h"
-#include "654X_Drive/test.h"
+#include "test.h"

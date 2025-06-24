@@ -4,6 +4,7 @@
 
 enum class UI_distance_units {inches, centimeters, pixels};
 enum class input_type { CONTROLLER, TOUCHSCREEN };
+enum class text_align { LEFT, CENTER };
 
 #define UI_Graphic_ID    1
 #define UI_Background_ID 2

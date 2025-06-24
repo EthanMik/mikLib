@@ -6,6 +6,9 @@ class textbox : public UI_component
 {
 public:
     textbox(std::string text, std::shared_ptr<drawable> box);
+    textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box);
+    textbox(std::string text, uint32_t text_color, std::shared_ptr<drawable> box);
+    textbox(std::string text, uint32_t text_color, text_align text_alignment, std::shared_ptr<drawable> box);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -34,6 +37,8 @@ private:
     int x, y, w, h;
     UI_distance_units units;
     std::string text;
-    std::vector<std::string> wrapped_text;
     std::shared_ptr<drawable> box;
+    uint32_t text_color;
+    text_align alignment;
+    std::vector<std::string> wrapped_text;
 };

@@ -12,7 +12,6 @@ static std::shared_ptr<UI_component> auton_tgl;
 static std::shared_ptr<UI_component> graph_tgl;
 static std::shared_ptr<UI_component> config_tgl;
 
-
 static bool is_screen_swapping = false;
 
 static bool local_needs_render_update = false;
@@ -22,7 +21,7 @@ static std::vector<std::shared_ptr<screen>> temp;
 static std::shared_ptr<screen> selector_panel_scr;
 
 void UI_init() {
-  auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, UI_distance_units::pixels));
+  auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, 0, 0, UI_distance_units::pixels));
   auto main_bg_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   main_bg_scr->add_UI_component(main_bg);
 
@@ -51,8 +50,7 @@ void UI_init() {
     UI_crt_rec(0, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
     UI_crt_txt("Config", 48, 23, 0x00434343, UI_distance_units::pixels)}));
   config_tgl->set_callback([=](){ 
-      UI_execute_selector_toggles(config_tgl, selector_panel_scr, true);
-      UI_swap_screens({config_scr->get_config_screen(), selector_panel_scr}); 
+      UI_select_scr(config_scr->get_config_screen());
     } 
   );
 
@@ -77,8 +75,7 @@ void UI_init() {
     UI_crt_rec(160, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
     UI_crt_txt("Autons", 48+160, 23, 0x00434343, UI_distance_units::pixels)}));
   auton_tgl->set_callback([=](){ 
-      UI_execute_selector_toggles(auton_tgl, selector_panel_scr, true);
-      UI_swap_screens({auton_scr->get_auton_screen(), selector_panel_scr}); 
+      UI_select_scr(auton_scr->get_auton_screen());
     } 
   );
 
@@ -103,8 +100,7 @@ void UI_init() {
     UI_crt_rec(320, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
     UI_crt_txt("Graph", 56+160+160, 23, 0x00434343, UI_distance_units::pixels)}));
   graph_tgl->set_callback([=](){ 
-      UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
-      UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
+      UI_select_scr(graph_scr->get_graph_screen());
     } 
   );
 
@@ -129,8 +125,7 @@ void UI_init() {
     UI_crt_rec(480, 35, 160, 5, 0x00999999, UI_distance_units::pixels),
     UI_crt_txt("Console", 48+160+160+160, 23, 0x00434343, UI_distance_units::pixels)}));
   console_tgl->set_callback([=](){ 
-      UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
-      UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr}); 
+      UI_select_scr(console_scr->get_console_screen());
     } 
   );
 
@@ -145,25 +140,25 @@ void UI_init() {
 
 void UI_select_scr(std::shared_ptr<screen> scr) {
   if (scr == console_scr->get_console_screen()) {
-    UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
-    UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr});
     auto* tgl = static_cast<toggle*>(console_tgl.get());
     tgl->press();
+    UI_execute_selector_toggles(console_tgl, selector_panel_scr, true);
+    UI_swap_screens({console_scr->get_console_screen(), selector_panel_scr});
   } else if (scr == config_scr->get_config_screen()) {
-    UI_execute_selector_toggles(config_tgl, selector_panel_scr, true);
-    UI_swap_screens({config_scr->get_config_screen(), selector_panel_scr});
     auto* tgl = static_cast<toggle*>(config_tgl.get());
     tgl->press(); 
+    UI_execute_selector_toggles(config_tgl, selector_panel_scr, true);
+    UI_swap_screens({config_scr->get_config_screen(), selector_panel_scr});
   } else if (scr == auton_scr->get_auton_screen()) {
-    UI_execute_selector_toggles(auton_tgl, selector_panel_scr, true);
-    UI_swap_screens({auton_scr->get_auton_screen(), selector_panel_scr}); 
     auto* tgl = static_cast<toggle*>(auton_tgl.get());
     tgl->press();
+    UI_execute_selector_toggles(auton_tgl, selector_panel_scr, true);
+    UI_swap_screens({auton_scr->get_auton_screen(), selector_panel_scr}); 
   } else if (scr == graph_scr->get_graph_screen()) {
-    UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
-    UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
     auto* tgl = static_cast<toggle*>(graph_tgl.get());
     tgl->press();
+    UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
+    UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
   }
 }
 
@@ -214,6 +209,7 @@ void UI_render() {
 
 void UI_execute_selector_toggles(std::shared_ptr<UI_component> tgl, std::shared_ptr<screen> scr, bool lock_toggles) {
   int tgl_id = UI_decode_toggle_group(tgl->get_ID());
+  int tgl_unique_id = tgl->get_ID();
 
   if (tgl_id <= 0) { return; }
 
@@ -224,7 +220,9 @@ void UI_execute_selector_toggles(std::shared_ptr<UI_component> tgl, std::shared_
   }
 
   for (const auto& component : scr->get_UI_components()) {
-    if (component == tgl) continue;
+    if (component->get_ID() == tgl_unique_id) {
+      continue;
+    }
     if (tgl_id == UI_decode_toggle_group(component->get_ID())) {
       auto* toggle_component = static_cast<toggle*>(component.get());
       toggle_component->unpress();

@@ -1,7 +1,7 @@
 #include "vex.h"
 
-pixel::pixel(int x, int y, uint32_t hue, UI_distance_units units) :
-    x(x), y(y), hue(hue)
+pixel::pixel(float x, float y, uint32_t hue, UI_distance_units units) :
+    hue(hue)
 {
     this->x = to_pixels(x, units);
     this->y = to_pixels(y, units);

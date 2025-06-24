@@ -7,9 +7,10 @@ vex::task UI;
 void pre_auton() {
   init();
   default_constants();
-
+  
   UI = vex::task([](){
     UI_init();
+    auton_scr->enable_controller_overlay();
     UI_render();
     return 0;
   });
@@ -20,11 +21,13 @@ void auton(void) {
 }
 
 void user_control(void) {
+  auton_scr->end_auton();
   assembly.initialize_user_control();
-  
-  while(1) {
+  chassis.set_brake_type(vex::brakeType::coast);
+
+  while (1) {
     if (!disable_user_control) {
-      chassis.split_arcade();
+      chassis.control(drive_mode::SPLIT_ARCADE);
       assembly.select_ring_sort_mode();
       assembly.intake();
       assembly.lady_brown();
@@ -37,18 +40,13 @@ void user_control(void) {
   }
 }
 
-
-void run_competition() {
+int main() {
   Competition.autonomous(auton);
   Competition.drivercontrol(user_control);
-
+  
   pre_auton();
 
-  while (true) {
-    vex::wait(100, vex::msec);
+  while (1) {
+    task::sleep(100);
   }
-}
-
-int main() {
-  run_competition();
 }
