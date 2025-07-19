@@ -13,6 +13,7 @@
 #include <random>
 #include <chrono>
 #include <unordered_map>
+#include <sstream>
 #include <iomanip>
 #include <memory>
 #include <atomic>
@@ -30,8 +31,8 @@
 #include "654X_Drive/odom.h"
 #include "654X_Drive/PID.h"
 #include "654X_Drive/assembly.h"
+#include "654X_Drive/example_assembly.h"
 #include "654X_Drive/chassis.h"
-#include "654X_Drive/auton_drive_methods.h"
 #include "autons.h"
 #include "robot-config.h"
 

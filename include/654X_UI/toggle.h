@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class toggle : public UI_component
 {
 public:
@@ -61,3 +63,4 @@ private:
     const int cooldown_msec = 300;
     bool cooldown = false;
 };
+}

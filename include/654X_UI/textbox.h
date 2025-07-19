@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class textbox : public UI_component
 {
 public:
@@ -42,3 +44,4 @@ private:
     text_align alignment;
     std::vector<std::string> wrapped_text;
 };
+}

@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 pixel::pixel(float x, float y, uint32_t hue, UI_distance_units units) :
     hue(hue)
 {

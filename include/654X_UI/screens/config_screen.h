@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class UI_config_screen {
 public:
     UI_config_screen();
@@ -20,3 +22,4 @@ private:
     std::shared_ptr<screen> UI_config_scr = nullptr;
     std::shared_ptr<screen> UI_pnematics_scr = nullptr;
 };
+}

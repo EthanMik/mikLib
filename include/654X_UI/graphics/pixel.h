@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class pixel : public drawable 
 {
 public:
@@ -26,3 +28,4 @@ private:
     int y;
     uint32_t hue;
 };
+}

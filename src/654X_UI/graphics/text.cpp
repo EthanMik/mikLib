@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 text::text(const std::string& text_label, float x, float y, UI_distance_units units) :
     text_label(text_label), hue(vex::color::black), units(units)
 {

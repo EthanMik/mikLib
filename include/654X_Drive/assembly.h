@@ -3,7 +3,6 @@
 #include "vex.h"
 
 enum class color_sort { RED, BLUE, NONE };
-enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PORT_F = 5, PORT_G = 6, PORT_H = 7 };
 enum LB_state : int { ACTIVE = 206, INACTIVE = 229, HOLDING = 170, SCORING = 43, HANG = 345, DESCORE_TOP = 79, DECSCORE_BOTTOM = 65 };
 
 class Assembly {
@@ -20,6 +19,7 @@ public:
         int rush_piston_port,
         int list_piston_port
     );
+    
     void init_LB();
     void initialize_user_control();
     void stop_motors(vex::brakeType brake);
@@ -45,8 +45,8 @@ public:
     void align_robot();
 
     mik::motor_group LB_motors;
+    mik::motor intake_motor; 
     vex::rotation LB_encoder;
-    vex::motor intake_motor; 
     vex::rotation intake_encoder;
     vex::optical ring_color_sensor;
     vex::distance ring_distance_sensor;

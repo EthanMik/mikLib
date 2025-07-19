@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class drawable 
 {
 public:
@@ -25,3 +27,4 @@ public:
     virtual void set_text(const std::string text_label) {}
     virtual std::string get_text() {}
 };
+}

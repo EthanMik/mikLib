@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class UI_console_screen
 {
 public:
@@ -96,4 +98,5 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
     }
 
     text_start_pos_y += 20;    
+}
 }

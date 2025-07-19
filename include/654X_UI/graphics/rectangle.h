@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class rectangle : public drawable
 {
 public:
@@ -30,3 +32,4 @@ private:
     uint32_t fill_color;
     uint32_t outline_color;
 };
+}

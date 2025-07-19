@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 UI_graph_screen::UI_graph_screen() {
     UI_crt_graph_scr();
 }

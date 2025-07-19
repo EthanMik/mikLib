@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 toggle::toggle(std::shared_ptr<drawable> toggle_graphic) :
     toggle_graphic(toggle_graphic)
 {

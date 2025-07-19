@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class line : public drawable 
 {
 public:
@@ -28,3 +30,4 @@ private:
     int h;
     uint32_t hue;
 };
+}

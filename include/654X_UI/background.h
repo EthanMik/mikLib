@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class background : public UI_component 
 {
 public:
@@ -25,3 +27,4 @@ private:
     int x, y, w, h;
     bool position_is_set = false;
 };
+}

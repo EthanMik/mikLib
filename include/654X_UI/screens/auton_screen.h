@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 enum class autons { RED_BLUE, RINGS_GOAL, QUALS_ELIMS, OFF_SAWP, OFF_SKILLS };
 
 class controller_btn {
@@ -97,3 +99,4 @@ public:
     std::function<void()> auton;
     std::shared_ptr<screen> UI_auton_scr = nullptr;
 };
+}

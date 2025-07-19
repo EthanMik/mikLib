@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class group : public drawable
 {
 public:
@@ -30,4 +32,5 @@ private:
     int x, y, w, h;
     UI_distance_units units;
     std::vector<std::shared_ptr<drawable>> graphics;
-};  
+};
+}  

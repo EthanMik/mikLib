@@ -9,6 +9,11 @@ void mogo_constants(void);
 void default_constants(void);
 void odom_constants(void);
 
+/** @brief Only use when you need to get to places on the field fast with low accuracy.
+ * To make the movements exit earlier, increase settle error.
+ */
+void motion_chaining_constants(void);
+
 std::string template_auto(bool calibrate = false, auto_variation var = auto_variation::ONE, bool get_name = false, bool get_lineup = false);
 std::string template_auto_other_variation(bool calibrate, bool get_name, bool get_lineup);
 

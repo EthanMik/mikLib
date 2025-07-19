@@ -1,48 +1,96 @@
 #include "vex.h"
 
 using namespace vex;
+using namespace mik;
 
 void test_drive() {
-  chassis.drive(6);
-  chassis.drive(12);
-  chassis.drive(18);
-  chassis.drive(-36);
-}
-
-void test_turn() {
-  chassis.turn(5);
-  chassis.turn(30);
-  chassis.turn(90);
-  chassis.turn(225);
-  chassis.turn(360);
-}
-
-void test_swing() {
-  chassis.left_swing(110);
-  chassis.right_swing(0);
+  chassis.drive_distance(6);
+  chassis.drive_distance(12);
+  chassis.drive_distance(18);
+  chassis.drive_distance(-36);
 }
 
 void test_heading() {
-  chassis.drive(10, 15.0f);
-  chassis.drive(20, 45.0f);
-  chassis.drive(-30, 0.0f);
+  // odom_constants();
+  // chassis.set_coordinates(0, 0, 0);
+  // chassis.drive_to_point(6, 12);
+  // chassis.drive_to_point(24, 24);
+  // chassis.drive_to_point(0, 0);
+
+  chassis.drive_distance(10, { .heading = 15 });
+  chassis.drive_distance(20, { .heading = 45 });
+  chassis.drive_distance(-30, { .heading = 0 });
 }
+
+void test_turn() {
+  chassis.turn_to_angle(5, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+  chassis.turn_to_angle(30, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+  chassis.turn_to_angle(90, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+  chassis.turn_to_angle(225, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+  chassis.turn_to_angle(360, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+}
+
+void test_swing() {
+  chassis.left_swing_to_angle(110);
+  chassis.right_swing_to_angle(0);
+}
+
 
 void test_full() {
-  chassis.drive(24);
-  chassis.turn(-45);
-  chassis.drive(-36);
-  chassis.right_swing(-90);
-  chassis.drive(24);
-  chassis.turn(0);
+  chassis.drive_distance(24);
+  chassis.turn_to_angle(-45);
+  chassis.drive_distance(-36);
+  chassis.right_swing_to_angle(-90);
+  chassis.drive_distance(24);
+  chassis.turn_to_angle(0);
 }
 
-void test_odom() {
+void test_odom_drive() {
   chassis.set_coordinates(0, 0, 0);
-  chassis.turn_to_point(24, 24);
-  chassis.drive_to_point(24, 24);
+  chassis.drive_to_point(0, 6);
+  chassis.drive_to_point(0, 18);
+  chassis.drive_to_point(0, 36);
   chassis.drive_to_point(0, 0);
-  chassis.turn(0);
+}
+
+void test_odom_turn() {
+  chassis.set_coordinates(0, 0, 0);
+  chassis.turn_to_point( 9.96,  0.87);
+  chassis.turn_to_point( 8.66,  5);
+  chassis.turn_to_point( 0, 10);
+  chassis.turn_to_point(-7.07, -7.07);
+  chassis.turn_to_point(10,  0);
+}
+
+void test_odom() {}
+
+void test_odom_heading() {
+  chassis.set_coordinates(0, 0, 0);
+  chassis.drive_to_point(5, 18);
+  chassis.drive_to_point(20, 35);
+  chassis.drive_to_point(0, 0);
+}
+
+void test_odom_boomerang() {
+  odom_constants();
+  chassis.set_coordinates(0, 0, 0);
+  chassis.drive_settle_error = 1;
+  chassis.drive_to_pose(24, 24, 90);
+  // chassis.drive_to_pose(0, 24, 90);
+  // chassis.drive_to_pose(24, 0, 135);
+  // chassis.drive_to_point(0, 0);
+  // chassis.turn_to_angle(0);
+}
+ 
+void test_odom_full() {
+  odom_constants();
+  chassis.set_coordinates(0, 0, 0);
+  chassis.drive_to_point(0, 24);
+  chassis.turn_to_point(26.833, 0, { .angle_offset = 180 });
+  chassis.drive_to_point(26.833, 0);
+  chassis.turn_to_point(0, 0);
+  chassis.drive_to_point(0, 0);
+  chassis.turn_to_angle(0);
 }
 
 pid_data data;
@@ -93,8 +141,8 @@ void config_test_turn() {
     {"turn_stl_tm: ", chassis.turn_settle_time}, {"turn_tmout: ", chassis.turn_timeout}, {"turn_starti: ", chassis.turn_starti}, {"turn_max_volt: ", chassis.turn_max_voltage} };
   graph_scr->set_plot_bounds(-10, 370, 0, 5000, 1, 1);
   graph_scr->set_plot({
-    [](double x){ return chassis.inertial.rotation(); }, 
-    [](double x){ return chassis.desired_heading; }},
+    [](double x){ return chassis.get_absolute_heading(); }, 
+    [](double x){ return chassis.desired_angle; }},
     {{"Actual", 0x002E8B59}, 
     {"SetPoint", 0x00FA8072}}
   );
@@ -117,7 +165,7 @@ void config_test_swing() {
   graph_scr->set_plot_bounds(0, 360, 0, 3000, 1, 1);
   graph_scr->set_plot({
     [](double x){ return chassis.get_absolute_heading(); }, 
-    [](double x){ return chassis.desired_heading; }},
+    [](double x){ return chassis.desired_angle; }},
     {{"Actual", 0x002E8B59}, 
     {"SetPoint", 0x00FA8072}}
   );
@@ -306,6 +354,22 @@ void PID_tuner() {
   });
 }
 
+static std::vector<mik::motor> motors_;
+
+void config_add_motors(std::vector<std::vector<mik::motor>> motor_groups) {
+  for (auto& motors : motor_groups) {
+    for (auto& motor : motors) {
+      motors_.push_back(motor);
+    }
+  }
+}
+
+void config_add_motors(std::vector<mik::motor> motors) {
+  for (auto& motor : motors) {
+    motors_.push_back(motor);
+  }
+}
+
 int run_diagnostic() {
   error_data.clear();
   int errors = 0;
@@ -314,33 +378,25 @@ int run_diagnostic() {
     errors++;
   }
   if (!chassis.inertial.installed()) {
-    std::string port = to_string(chassis.inertial_port + 1);
+    std::string port = to_string(chassis.inertial.index() + 1);
     error_data.push_back("Inertial [PORT" + port + "] is disconnected");
     errors++;
   }
   if (!chassis.forward_tracker.installed()) {
-    std::string port = to_string(chassis.forward_tracker_port + 1);
+    std::string port = to_string(chassis.forward_tracker.index() + 1);
     error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
     errors++;
   }
   if (!chassis.sideways_tracker.installed()) {
-    std::string port = to_string(chassis.sideways_tracker_port + 1);
+    std::string port = to_string(chassis.sideways_tracker.index() + 1);
     error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
     errors++;
   }
-  for (auto& motor : chassis.left_drive.motors) {
-    if (!motor.mtr.installed()) {
-      std::string port = to_string(motor.port + 1);
-      error_data.push_back(motor.name + " [PORT " + port +  "] is disconnected");
+  for (auto& motor : motors_) {
+    if (!motor.installed()) {
+      error_data.push_back(motor.name() + " [" + motor.port() +  "] is disconnected");
       errors++;
-    }
-  }
-  for (auto& motor : chassis.right_drive.motors) {
-    if (!motor.mtr.installed()) {
-      std::string port = to_string(motor.port + 1);
-      error_data.push_back(motor.name + " [PORT " + port +  "] is disconnected");
-      errors++;
-    }
+    }   
   }
   if (errors <= 0) {
     error_data.push_back("No issues found");
@@ -355,16 +411,10 @@ void config_add_pid_output_SD_console() {
   console_scr->reset();
   vex::task e([](){
     task::sleep(500);
-    std::vector<char> data_arr = get_SD_file_char("auton.txt");
-    std::string data_line;
-  
-    std::size_t end = data_arr.size();
-    for (std::size_t i = data_arr.size(); i-- > 0; ) {
-      if (data_arr[i] == '\n') {
-        data_line.assign(data_arr.begin() + i + 1, data_arr.begin() + end);
-        console_scr->add(data_line, false);
-        end = i;
-      }
+
+    std::vector<std::string> data_arr = get_SD_file_txt("auton.txt");
+    for (const auto& line : data_arr) {
+      console_scr->add(line, false);
     }
     return 0;
   });
@@ -376,20 +426,12 @@ void config_spin_all_motors() {
   disable_user_control = true;
   vex::task spin_mtrs([](){
     task::sleep(500);
-    for (mik::motor& motor : chassis.left_drive.motors) { 
-      std::string data = (motor.name + ": PORT" + to_string((motor.mtr.index() + 1)) + ", Dir: fwd");
+    for (mik::motor& motor : motors_) { 
+      std::string data = (motor.name() + ": " + motor.port() + ", fwd, 6 volt");
       console_scr->add(std::string(data), [](){ return ""; });
-      motor.mtr.spin(fwd, 5, volt);
+      motor.spin(fwd, 6, volt);
       vex::task::sleep(1000);
-      motor.mtr.stop();
-      vex::task::sleep(1000);
-    }
-    for (mik::motor& motor : chassis.right_drive.motors) {      
-      std::string data = (motor.name + ": PORT" + to_string((motor.mtr.index() + 1)) + ", Dir: fwd");
-      console_scr->add(std::string(data), [](){ return ""; });
-      motor.mtr.spin(fwd, 5, volt);
-      vex::task::sleep(1000);
-      motor.mtr.stop();
+      motor.stop();
       vex::task::sleep(1000);
     }
     disable_user_control = false;
@@ -398,35 +440,37 @@ void config_spin_all_motors() {
 }
 
 void config_motor_wattage() {
-  console_scr->add("right_drive: ", []() { return chassis.right_drive.get_wattage(); });
-  console_scr->add("left_drive: ", []() { return chassis.left_drive.get_wattage(); });
-
-  for (size_t i = 0; i < chassis.left_drive.motors.size(); ++i) {
-    size_t index = i;
-    console_scr->add(chassis.left_drive.motors[index].name + ": ", [index]() { return chassis.left_drive.motors[index].mtr.power(); });
-  }
-  for (size_t i = 0; i < chassis.right_drive.motors.size(); ++i) {
-    size_t index = i;
-    console_scr->add(chassis.right_drive.motors[index].name + ": ", [index]() { return chassis.right_drive.motors[index].mtr.power(); });
-  }
-
+  console_scr->reset();
   UI_select_scr(console_scr->get_console_screen()); 
+
+  vex::task watt([](){
+    task::sleep(500);
+    console_scr->add("right_drive: ", []() { return chassis.right_drive.averagePower(); });
+    console_scr->add("left_drive: ", []() { return chassis.left_drive.averagePower(); });
+  
+    for (auto& motor : motors_) {
+      console_scr->add(motor.name() + ": ", [&motor]() { return motor.power(); });
+    }
+    return 0;
+  });
 }
 
 void config_motor_temp() {
-  console_scr->add("right_drive: ", []() { return chassis.right_drive.get_temp(); });
-  console_scr->add("left_drive: ", []() { return chassis.left_drive.get_temp(); });
-
-  for (size_t i = 0; i < chassis.left_drive.motors.size(); ++i) {
-    size_t index = i;
-    console_scr->add(chassis.left_drive.motors[index].name + ": ", [index]() { return chassis.left_drive.motors[index].mtr.temperature(vex::temperatureUnits::fahrenheit); });
-  }
-  for (size_t i = 0; i < chassis.right_drive.motors.size(); ++i) {
-    size_t index = i;
-    console_scr->add(chassis.right_drive.motors[index].name + ": ", [index]() { return chassis.right_drive.motors[index].mtr.temperature(vex::temperatureUnits::fahrenheit); });
-  }
-
+  console_scr->reset();
   UI_select_scr(console_scr->get_console_screen()); 
+
+  
+  vex::task temp([](){
+    task::sleep(500);
+    
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated"; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated"; });
+    for (auto& motor : motors_) {
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.temperature(), 0, true) + "%% overheated"; });
+    }
+    return 0;
+  });
+
 }
 
 void config_odom_data() {
@@ -502,7 +546,7 @@ void config_skills_driver_run() {
         break;
       case 0:
         Controller.rumble(("."));
-        chassis.stop_drive(vex::brake);
+        chassis.stop_drive(vex::coast);
         disable_user_control = true;
         std::abort();
         break;

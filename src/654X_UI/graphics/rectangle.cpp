@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 rectangle::rectangle(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units) :
     fill_color(fill_color),
     outline_color(outline_color)

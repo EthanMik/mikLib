@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 screen::screen(int x, int y, int w, int h) :
     x(x), y(y), w(w), h(h)
 {
@@ -8,8 +10,8 @@ screen::screen(int x, int y, int w, int h) :
 
 void screen::check_bounds() {
     if (w > SCREEN_WIDTH && h  > SCREEN_HEIGHT) {
-        Brain.Screen.printAt(30, 30, "BOTH SCREEN SIZE BOUNDS LARGER THAN DISPLAY");
-        exit(1);
+        print("screen::check_bounds() - BOTH SCREEN SIZE BOUNDS LARGER THAN DISPLAY");
+        std::abort();
     }
 
     if (h > SCREEN_HEIGHT - y) {

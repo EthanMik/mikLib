@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class image : public drawable 
 {
 public:
@@ -31,3 +33,4 @@ private:
     int h;
     UI_distance_units units;
 };
+}

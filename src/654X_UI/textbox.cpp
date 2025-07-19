@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 #define default_padding 10
 #define next_line 20
 

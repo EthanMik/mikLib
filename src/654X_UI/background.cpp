@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 background::background(std::shared_ptr<drawable> graphic) { 
     this->graphic = graphic;
     unique_id = UI_create_ID(UI_Background_ID);

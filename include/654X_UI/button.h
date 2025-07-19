@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class button : public UI_component 
 {
 public:
@@ -43,3 +45,4 @@ private:
     const int cooldown_msec = 200;
     bool cooldown = false;
 };
+}

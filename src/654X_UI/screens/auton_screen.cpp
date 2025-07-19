@@ -1,5 +1,6 @@
 #include "vex.h"
 
+using namespace mik;
 using namespace vex;
 
 controller_btn::controller_btn(bool is_btn, std::string unpressed_state, std::string pressed_state, std::function<void()> callback) :
@@ -350,7 +351,6 @@ void UI_auton_screen::save_auton_SD(int count) {
         return;
     }
     if (auton_scr->control_panel[r][c].get_state()) {
-        print("e");
         write_to_SD_file("auton.txt", id_full);
     } else {
         remove_duplicates_SD_file("auton.txt", id);
@@ -535,7 +535,7 @@ void UI_auton_screen::enable_controller_overlay() {
          {controller_btn(true, "[Run]", "[##]", [](){ auton_scr->start_auton(); })}},
 
         {{controller_btn(false, "[Off]", "[Time Limit]", [this](){ enable_time_limit(); flip_toggle(config_scr->macro_4_bg_tgl, time_limit); save_auton_SD(); } )}, 
-         {controller_btn(true, "[_]", "[#]", [](){} )}, 
+         {controller_btn(true, "[Inertial]", "[...]", [](){ calibrate_inertial(); } )}, 
          {controller_btn(true, "[_]", "[#]", [](){} )}}
     };
     
@@ -596,7 +596,14 @@ void UI_auton_screen::restart_controller_overlay() {
                 is_exiting = false;
             }
             prev_exiting_state = is_exiting;
-            if ((is_exiting && Brain.Timer.time(vex::timeUnits::msec) - exit_start_time > 600) || Controller.ButtonX.pressing()) {
+            if ((is_exiting && Brain.Timer.time(vex::timeUnits::msec) - exit_start_time > 600) 
+                || Controller.ButtonX.pressing()
+                || std::abs(deadband(vex::controller(vex::primary).Axis1.value(), 15)) > 0
+                || std::abs(deadband(vex::controller(vex::primary).Axis2.value(), 15)) > 0
+                || std::abs(deadband(vex::controller(vex::primary).Axis3.value(), 15)) > 0
+                || std::abs(deadband(vex::controller(vex::primary).Axis4.value(), 15)) > 0
+            ) 
+            {
                 task::sleep(200);
                 auton_scr->disable_controller_overlay();
                 auton_scr->controller_default_scr();

@@ -46,11 +46,11 @@ float PID::compute(float error) {
 
 bool PID::is_settled(){
   if (time_spent_running > timeout && timeout != 0) {
-    return(true);
+    return true;
   }
   if (time_spent_settled > settle_time) {
-    return(true);
+    return true;
   }
-  return(false);
+  return false;
 }
 

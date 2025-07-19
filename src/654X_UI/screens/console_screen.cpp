@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 UI_console_screen::UI_console_screen() {
     UI_crt_console_scr();
 }

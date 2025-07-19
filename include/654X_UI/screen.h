@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+    
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 240
 
@@ -75,3 +77,4 @@ private:
     int render_index;
     input_type input_type = input_type::TOUCHSCREEN;
 };
+}

@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 graphic::graphic() {
     unique_id = UI_create_ID(UI_Graphic_ID);
 };

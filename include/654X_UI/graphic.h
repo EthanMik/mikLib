@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class graphic : public UI_component
 {
 public:
@@ -40,3 +42,4 @@ private:
     int x, y, w, h;
     UI_distance_units units;
 };  
+}

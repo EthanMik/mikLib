@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class text : public drawable 
 {
 public:
@@ -34,3 +36,4 @@ private:
     uint32_t hue;
     UI_distance_units units;
 };
+}

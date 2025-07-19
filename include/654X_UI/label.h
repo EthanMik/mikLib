@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class label : public UI_component
 {
 public:
@@ -40,9 +42,10 @@ private:
     const int update_interval_ms = 15;
 
 };
+}
 
 template<typename T>
-label::label(const std::string& label, T& data, float x, float y, UI_distance_units units): 
+mik::label::label(const std::string& label, T& data, float x, float y, UI_distance_units units): 
     label_text(label),
     data_func([&data]() {
         std::ostringstream oss;
@@ -64,7 +67,7 @@ label::label(const std::string& label, T& data, float x, float y, UI_distance_un
 
 
 template<typename F>
-label::label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units): 
+mik::label::label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units): 
     label_text(label),
     data_func([data_func = std::forward<F>(data_func)]() {
         std::ostringstream oss;

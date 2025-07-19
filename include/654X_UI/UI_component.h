@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 enum class UI_distance_units {inches, centimeters, pixels};
 enum class input_type { CONTROLLER, TOUCHSCREEN };
 enum class text_align { LEFT, CENTER };
@@ -44,3 +46,4 @@ public:
     virtual void blacklist_ID() { unique_id = unique_id > 0 ? unique_id * -1 : unique_id; }
     virtual void whitelist_ID() { unique_id = unique_id < 0 ? unique_id * -1 : unique_id; }
 };
+}

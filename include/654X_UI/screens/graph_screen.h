@@ -2,6 +2,8 @@
 
 #include "vex.h"
 
+namespace mik {
+
 class UI_graph_screen {
 public:
     UI_graph_screen();
@@ -49,3 +51,4 @@ private:
 
     std::shared_ptr<screen> UI_graph_scr = nullptr;
 };
+}

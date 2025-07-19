@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 image::image(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units) :
     file_name(file_name), units(units)
 {

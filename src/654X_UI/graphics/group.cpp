@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 group::group() {};
 
 group::group(std::shared_ptr<drawable> graphic) {    

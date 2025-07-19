@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 button::button(std::shared_ptr<drawable> button_graphic, std::function<void()> on_click_func) :
     button_graphic(button_graphic),
     on_click(std::move(on_click_func))

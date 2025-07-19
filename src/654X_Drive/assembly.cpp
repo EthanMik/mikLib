@@ -5,7 +5,7 @@ using namespace vex;
 Assembly::Assembly(mik::motor_group LB_motors, int LB_encoder_port, mik::motor intake_motor, int intake_encoder_port, int ring_color_sensor_port, int ring_distance_sensor_port, int mogo_clamp_piston_port, int doinker_piston_port, int rush_piston_port, int lift_piston_port) :
   LB_motors(LB_motors),
   LB_encoder(LB_encoder_port),
-  intake_motor(intake_motor.mtr),
+  intake_motor(intake_motor),
   intake_encoder(intake_encoder_port),
   ring_color_sensor(ring_color_sensor_port),
   ring_distance_sensor(ring_distance_sensor_port),
@@ -238,9 +238,9 @@ bool Assembly::ring_sort() {
 
 void Assembly::lady_brown_manual() {
    if (Controller.ButtonL1.pressing()) {
-      LB_motors.spin(vex::fwd, 12, VOLT);
+      LB_motors.spin(vex::fwd, 12, volt);
     } else if (Controller.ButtonR1.pressing()) {
-      LB_motors.spin(vex::fwd, -12, VOLT);
+      LB_motors.spin(vex::fwd, -12, volt);
     } else {
       LB_motors.stop();
     }
@@ -436,7 +436,7 @@ void Assembly::move_LB_to_angle(float angle, float LB_max_voltage, float LB_sett
       break;
     }
 
-    LB_motors.spin(vex::fwd, output, VOLT);
+    LB_motors.spin(vex::fwd, output, volt);
     vex::task::sleep(10); 
   }
 
@@ -507,7 +507,7 @@ void Assembly::align_robot() {
   if (align_state && !prev_align_state) {
     vex::task async_aligner([](){
       assembly.is_aligning = true;
-      chassis.drive(-6.3);
+      chassis.drive_distance(-6.3);
       vex::task::sleep(20);
       assembly.is_aligning = false;
       return 0;

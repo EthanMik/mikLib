@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 label::label(const std::string& label, float x, float y, UI_distance_units units):
     label_text(label), units(units), data_func([](){ return ""; } )
 {

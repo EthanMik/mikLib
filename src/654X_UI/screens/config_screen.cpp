@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 #define test_slot_color 0x00323232
 #define test_slot_border_color 0x00666666
 
