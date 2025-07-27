@@ -4,18 +4,36 @@
 
 /** @brief Robot should drive and end in starting position. */
 void test_drive();
+/** @brief Robot should drive and end in starting position. */
+void test_odom_drive();
+
 /** @brief Robot should drive in curves and end in starting position. */
 void test_heading();
+/** @brief Robot should drive in curves and end in starting position. */
+void test_odom_heading();
+
 /** @brief Robot should turn and end in starting position. */
 void test_turn();
+/** @brief Robot should turn and end in starting position. */
+void test_odom_turn();
+
 /** @brief Robot should swing and end in start heading. */
 void test_swing();
+/** @brief Robot should swing and end close to start heading. */
+void test_odom_swing();
+
 /** @brief Robot should drive, turn, and swing and end in starting position. */
 void test_full();
-/** @brief Robot should drive with odom and end in starting position. */
-void test_odom();
+/** @brief Robot should drive, turn, and swing and end in starting position. */
+void test_odom_full();
 
-void test_odom_boomerang();
+/** @brief Robot should drive in curves and end in starting position. */
+void test_boomerang();
+
+/** @brief Robot should drive in an S shape forwards and backwards and end in starting position.
+ * Play around with settle error and lookahead distance if robot is driving sporadic.
+ */
+void test_pursuit();
 
 /**
  * @brief Enables a PID tuner suite.  
@@ -23,7 +41,15 @@ void test_odom_boomerang();
  * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
  * Check `PID_tuner()`'s documentation to see controls.
  */
-void config_test_drive();
+void config_tune_drive();
+
+/**
+ * @brief Enables a PID tuner suite.  
+ * `test_heading()` can be run on controller and Actual and Setpoint values will be graphed on brain.  
+ * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
+ * Check `PID_tuner()`'s documentation to see controls.
+ */
+void config_tune_heading();
 
 /**
  * @brief Enables a PID tuner suite.  
@@ -31,7 +57,7 @@ void config_test_drive();
  * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
  * Check `PID_tuner()`'s documentation to see controls.
  */
-void config_test_turn();
+void config_tune_turn();
 
 /**
  * @brief Enables a PID tuner suite.  
@@ -39,31 +65,15 @@ void config_test_turn();
  * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
  * Check `PID_tuner()`'s documentation to see controls.
  */
-void config_test_swing(); 
+void config_tune_swing(); 
 
-/**
- * @brief Enables a PID tuner suite.  
- * `test_heading()` can be run on controller and Actual and Setpoint values will be graphed on brain.  
- * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
- * Check `PID_tuner()`'s documentation to see controls.
+/** Swaps the tuning configuration for config_test_...() functions.
+ * Swaps odom_constants to default_constants and swaps test_drive to test_odom_drive etc.
  */
-void config_test_heading();
+bool config_swap_test_mode();
 
-/**
- * @brief Enables a PID tuner suite.  
- * `test_heading()` can be run on controller and Actual and Setpoint values will be graphed on brain.  
- * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
- * Check `PID_tuner()`'s documentation to see controls.
- */
-void config_test_full();
-
-/**
- * @brief Enables a PID tuner suite.  
- * `test_odom()` can be run on controller and Actual and Setpoint values will be graphed on brain.  
- * Adjust `set_plot_bounds()`’s `x_max_bound` if the trace doesn’t fit.
- * Check `PID_tuner()`'s documentation to see controls.
- */
-void config_test_odom();
+/** @returns True if odom testing mode is selected */
+bool config_is_testing_odom();
 
 struct pid_data {
   std::vector<std::pair<std::string, std::reference_wrapper<float>>> variables = {};
@@ -107,8 +117,14 @@ extern std::vector<std::string> error_data;
  */
 void PID_tuner();
 
-void config_add_motors(std::vector<std::vector<mik::motor>> motor_groups);
-void config_add_motors(std::vector<mik::motor> motors);
+/** @brief Allows UI to interface with all of robots motors */
+void config_add_motors(std::vector<mik::motor_group> motor_groups, std::vector<mik::motor> motors);
+
+/** @brief Stops all motors connected to robot. Used when disabling user control. */
+void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);
+
+/** @brief Changes braketype to all motors connected to robot. Used when disabling user control. */
+void set_brake_all_motors(vex::brakeType mode);  
 
 /** @brief Logs errors during robot calibration, checks inertial, SD, and drivetrain motors
  * It is recommended to add other motors and devices to this function
@@ -121,21 +137,27 @@ void config_add_pid_output_SD_console();
 /** @brief Spins all drivetrain motors one at a time.
  * Useful for debugging the spin direction of motors as motors may be flipped in drivetrain.
  * Intended behavior is for all motors to spin forward.
- * It is recommended to add other motors to this function
  */
 void config_spin_all_motors();
 
 /** @brief Adds motor wattage values into UI console, 
  * Used for checking motor friction. around 0.5~ is good for one side of a 6 motor drivetrain. 
- * It is recommended to add other motors to this function
  */
 void config_motor_wattage();
 
 /** @brief Adds motor temperature values into UI console, 
  * around 80% is when the motors become cooked 
- * It is recommended to add other motors to this function
  */
 void config_motor_temp();
+
+/** Adds motor torque values to UI console */
+void config_motor_torque();
+
+/** Adds motor efficency % values to UI console */
+void config_motor_efficiency();
+
+/** Adds motor current values to UI console */
+void config_motor_current();
 
 /** @brief Adds odometry data into the UI console, will start position tracking if not already done so
  * useful for debugging tracking pods

@@ -7,8 +7,8 @@ class Assembly;
 extern vex::brain Brain;
 extern vex::controller Controller;
 extern vex::competition Competition;
+
 extern bool calibrating;
-extern bool disable_user_control;
 extern bool force_calibrate_inertial;
 
 extern Chassis chassis;
@@ -18,3 +18,7 @@ enum port : int { PORT_A = 0, PORT_B = 1, PORT_C = 2, PORT_D = 3, PORT_E = 4, PO
 
 void init(void);
 void calibrate_inertial(void);
+
+void disable_user_control(void);
+void enable_user_control(void);
+bool control_disabled(void);

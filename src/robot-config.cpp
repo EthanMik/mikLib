@@ -1,13 +1,13 @@
 #include "vex.h"
 
 using namespace vex;
+using namespace mik;
 
 vex::brain Brain;
 vex::controller Controller;
 vex::competition Competition;
 
 bool calibrating = false;
-bool disable_user_control = false;
 
 // Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
 bool force_calibrate_inertial = true;
@@ -40,37 +40,29 @@ Chassis chassis(
 
     PORT15,  // Sideways tracker port
     2,       // Sideways tracker wheel diameter in inches (negative flips direction)
-    0.3      // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
+    0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
+
+    mik::distance_reset({
+      // A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center 
+      mik::distance(PORT17, rear_sensor, 5, 3.5)
+    })
 );
 
 Assembly assembly(
-  // Lady Brown motors
   mik::motor_group({
-    mik::motor(PORT13, true, "left_LB_motor"),
-    mik::motor(PORT20, false, "right_LB_motor") 
-  }), 
+    mik::motor(PORT13, true, "left_lift_motor"),
+    mik::motor(PORT20, false, "right_lift_motor")
+  }),
 
-  PORT11, // Lady Brown rotation sensor port
-
-  mik::motor(PORT16, true, "intake_motor"),
-  PORT8, // Intake rotation sensor port
-  PORT14, // Ring color sensor port
-  PORT12, // Ring distance sensor port
-
-  PORT_A,  // Mogo clamp piston
-  PORT_D,  // Doinker piston
-  PORT_C,  // Rush piston  
-  PORT_B   // Lift piston
+  mik::motor(PORT16, false, "intake_motor"),
+  vex::rotation(PORT11),
+  mik::piston(PORT_A)
 );
 
-/** Allows UI to display motor values */
+/** Allows UI to display all motor values */
 void log_motors() {
-  // mik motor groups
-  config_add_motors({chassis.left_drive.getMotors(), chassis.right_drive.getMotors(), assembly.LB_motors.getMotors()});
-  // mik motors
-  config_add_motors({assembly.intake_motor});
+  config_add_motors({chassis.left_drive, chassis.right_drive, assembly.lift_arm_motors}, {assembly.intake_motor});
 }
-
 
 void calibrate_inertial(void) {
   calibrating = true;
@@ -104,7 +96,7 @@ void init(void) {
       task::sleep(200);
       calibrate.append(".");
       count++;
-      if (count > 4) {
+    if (count > 4) {
         count = 0;
         calibrate = "Calibrating";
         Brain.Screen.printAt(164, 220, (calibrate + "     ").c_str());
@@ -147,13 +139,21 @@ void init(void) {
   Brain.Screen.setPenWidth(1);
   Brain.Screen.setPenColor(vex::color::white);
   
-  UI_init();
+  enable_user_control();
+}
 
-  disable_user_control = false;
-  
-  // assembly.doinker_piston.set(true);
-  // assembly.lift_piston.set(true);
-  assembly.intake_encoder.resetPosition();
-  assembly.ring_color_sensor.setLightPower(80, pct);
-  assembly.init_LB();
+static bool user_control_disabled = false;
+
+void disable_user_control(void) {
+  user_control_disabled = true;
+  stop_all_motors(vex::brakeType::hold);
+  set_brake_all_motors(vex::brakeType::coast);
+}
+
+void enable_user_control(void) {
+  user_control_disabled = false;
+}
+
+bool control_disabled(void) {
+  return user_control_disabled;
 }

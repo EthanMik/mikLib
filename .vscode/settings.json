@@ -49,6 +49,7 @@
 		"mutex": "cpp",
 		"system_error": "cpp",
 		"thread": "cpp",
-		"cstddef": "cpp"
+		"cstddef": "cpp",
+		"random": "cpp"
 	}
 }

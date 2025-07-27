@@ -11,23 +11,19 @@ void test_drive() {
 }
 
 void test_heading() {
-  // odom_constants();
-  // chassis.set_coordinates(0, 0, 0);
-  // chassis.drive_to_point(6, 12);
-  // chassis.drive_to_point(24, 24);
-  // chassis.drive_to_point(0, 0);
-
   chassis.drive_distance(10, { .heading = 15 });
   chassis.drive_distance(20, { .heading = 45 });
   chassis.drive_distance(-30, { .heading = 0 });
 }
 
 void test_turn() {
-  chassis.turn_to_angle(5, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
-  chassis.turn_to_angle(30, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
-  chassis.turn_to_angle(90, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
-  chassis.turn_to_angle(225, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
-  chassis.turn_to_angle(360, {.min_voltage = 5, .settle_time = 0, .settle_error = 3});
+  chassis.turn_to_angle(5);
+  chassis.turn_to_angle(30);
+  chassis.turn_to_angle(90);
+  chassis.turn_to_angle(225);
+  chassis.turn_to_angle(360);
+  chassis.turn_to_angle(180, { .turn_direction = ccw });
+  chassis.turn_to_angle(0, { .turn_direction = cw });
 }
 
 void test_swing() {
@@ -35,8 +31,10 @@ void test_swing() {
   chassis.right_swing_to_angle(0);
 }
 
-
 void test_full() {
+  default_constants();
+  chassis.set_heading(0);
+
   chassis.drive_distance(24);
   chassis.turn_to_angle(-45);
   chassis.drive_distance(-36);
@@ -46,52 +44,93 @@ void test_full() {
 }
 
 void test_odom_drive() {
-  chassis.set_coordinates(0, 0, 0);
   chassis.drive_to_point(0, 6);
   chassis.drive_to_point(0, 18);
   chassis.drive_to_point(0, 36);
   chassis.drive_to_point(0, 0);
 }
 
-void test_odom_turn() {
-  chassis.set_coordinates(0, 0, 0);
-  chassis.turn_to_point( 9.96,  0.87);
-  chassis.turn_to_point( 8.66,  5);
-  chassis.turn_to_point( 0, 10);
-  chassis.turn_to_point(-7.07, -7.07);
-  chassis.turn_to_point(10,  0);
-}
-
-void test_odom() {}
-
 void test_odom_heading() {
-  chassis.set_coordinates(0, 0, 0);
   chassis.drive_to_point(5, 18);
   chassis.drive_to_point(20, 35);
   chassis.drive_to_point(0, 0);
+  chassis.turn_to_angle(0);
 }
 
-void test_odom_boomerang() {
-  odom_constants();
-  chassis.set_coordinates(0, 0, 0);
-  chassis.drive_settle_error = 1;
-  chassis.drive_to_pose(24, 24, 90);
-  // chassis.drive_to_pose(0, 24, 90);
-  // chassis.drive_to_pose(24, 0, 135);
-  // chassis.drive_to_point(0, 0);
-  // chassis.turn_to_angle(0);
+void test_odom_turn() {
+  chassis.turn_to_point(0.437,  5);
+  chassis.turn_to_point(2.887,  5);
+  chassis.turn_to_point(5, 0);
+  chassis.turn_to_point(-5, -5);
+  chassis.turn_to_point(0,  5);
+  chassis.turn_to_point(0,  -5, {.turn_direction = ccw});
+  chassis.turn_to_point(0,  5, {.turn_direction = cw});
 }
- 
+
+void test_odom_swing() {
+  chassis.left_swing_to_point(24, 12);
+  chassis.right_swing_to_point(12, 24);
+}
+
 void test_odom_full() {
   odom_constants();
   chassis.set_coordinates(0, 0, 0);
+
   chassis.drive_to_point(0, 24);
-  chassis.turn_to_point(26.833, 0, { .angle_offset = 180 });
-  chassis.drive_to_point(26.833, 0);
-  chassis.turn_to_point(0, 0);
+  chassis.turn_to_point(24, 0, { .angle_offset = 180 });
+  chassis.drive_to_point(24, 0);
+  chassis.right_swing_to_point(0, 0);
   chassis.drive_to_point(0, 0);
   chassis.turn_to_angle(0);
 }
+
+void test_boomerang() {
+  odom_constants();
+  chassis.set_coordinates(0, 0, 0);
+
+  chassis.drive_to_pose(24, 24, 90, {.lead = .4});
+  chassis.drive_to_pose(24, 0, 0, {.lead = .2});
+  chassis.drive_to_pose(0, 24, 315);
+  chassis.drive_to_pose(0, 0, 0);
+}
+
+std::vector<point> path = {
+    {  0.000,   0.000 },
+    { -0.098,   1.997 },
+    { -0.004,   3.993 },
+    {  0.419,   5.944 },
+    {  1.314,   7.722 },
+    {  2.789,   9.053 },
+    {  4.622,   9.831 },
+    {  6.588,  10.189 },
+    {  8.582,  10.324 },
+    { 10.582,  10.364 },
+    { 12.582,  10.406 },
+    { 14.576,  10.542 },
+    { 16.547,  10.871 },
+    { 18.439,  11.506 },
+    { 20.138,  12.549 },
+    { 21.491,  14.014 },
+    { 22.444,  15.768 },
+    { 23.037,  17.676 },
+    { 23.393,  19.643 },
+    { 23.536,  21.637 },
+    { 23.554,  23.664 },
+    { 23.554,  23.664 },
+    { 24.554,  24.664 },
+};
+
+void test_pursuit() {
+  odom_constants();
+  chassis.set_coordinates(0, 0, 0);
+
+  chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
+  // Reversing path
+  std::vector<point> reversed_path(path.rbegin(), path.rend());
+  chassis.follow_path(reversed_path, {.lookahead_distance = 4, .settle_error = 3});
+  chassis.turn_to_angle(0);
+}
+
 
 pid_data data;
 std::vector<std::string> error_data;
@@ -102,67 +141,150 @@ static vex::task test_movements_task;
 static float predicted_distance = 0;
 static float prev_desired_distance = 0;
 static std::function<void()> test_movements_func;
+static bool testing_odom = false;
 
-void config_test_drive() {
+
+bool config_swap_test_mode() {
+  testing_odom = !testing_odom;
+  if (testing_odom) {
+    odom_constants();
+  } else {
+    default_constants();
+  }
+  return testing_odom;
+}
+
+bool config_is_testing_odom() {
+  return testing_odom;
+}
+
+void config_tune_drive() {
   data.variables = { {"drive_kp: ", chassis.drive_kp}, {"drive_ki: ", chassis.drive_ki}, {"drive_kd: ", chassis.drive_kd}, {"drive_stl_err: ", chassis.drive_settle_error}, 
     {"drive_stl_tm: ", chassis.drive_settle_time}, {"drive_tmout: ", chassis.drive_timeout}, {"drive_starti: ", chassis.drive_starti}, {"drive_max_volt: ", chassis.drive_max_voltage}
   };
-  graph_scr->set_plot_bounds(-30, 50, 0, 15000, 1, 1);
-  graph_scr->set_plot({
-      [](double x){ return chassis.get_ForwardTracker_position(); }, 
-      [](double x){ 
-        if (chassis.desired_distance != prev_desired_distance) {
-          predicted_distance += chassis.desired_distance;
-          prev_desired_distance = chassis.desired_distance; 
-        }
-        return predicted_distance; 
-      }
-    },
-    {{"Actual", 0x002E8B59}, 
-    {"SetPoint", 0x00FA8072}}
-  );
+
+  std::function<float(double)> actual_plot = [](double x){ return chassis.get_ForwardTracker_position(); };
+
+  std::function<float(double)> set_point_plot = [](double x){ 
+    if (chassis.desired_distance != prev_desired_distance) {
+      predicted_distance += chassis.desired_distance;
+      prev_desired_distance = chassis.desired_distance; 
+    }
+    return predicted_distance; 
+  };
+
+  if (testing_odom) {
+    actual_plot = [](double x){ return hypot(chassis.get_X_position(), chassis.get_Y_position()); };
+    set_point_plot = [](double x){ return hypot(chassis.desired_X_position, chassis.desired_Y_position); };
+  }
+
+  int y_min = -30;
+  int y_max = 50;
+  int time_spent_graphing_ms = 5000; 
+
+  graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
+  graph_scr->set_plot({actual_plot, set_point_plot}, {{"Actual", 0x002E8B59}, {"SetPoint", 0x00FA8072}});
+
   UI_select_scr(graph_scr->get_graph_screen()); 
 
   test_movements_func = [](){
     chassis.forward_tracker.resetPosition();
+    chassis.set_coordinates(0, 0, 0);
     predicted_distance = 0;
     prev_desired_distance = 0;
     graph_scr->reset_graph();
     graph_scr->graph();
 
-    test_drive();
+    if (testing_odom) {
+      test_odom_drive();
+    } else {
+      test_drive();
+    }
   };
 
   PID_tuner();
 }
 
-void config_test_turn() {  
-  data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd}, {"turn_stl_err: ", chassis.turn_settle_error}, 
-    {"turn_stl_tm: ", chassis.turn_settle_time}, {"turn_tmout: ", chassis.turn_timeout}, {"turn_starti: ", chassis.turn_starti}, {"turn_max_volt: ", chassis.turn_max_voltage} };
-  graph_scr->set_plot_bounds(-10, 370, 0, 5000, 1, 1);
+void config_tune_heading() {
+  data.variables = { {"heading_kp: ", chassis.heading_kp}, {"heading_ki: ", chassis.heading_ki}, {"heading_kd: ", chassis.heading_kd}, {"heading_starti: ", chassis.heading_starti}, {"max_volt: ", chassis.heading_max_voltage} };
+
+  int y_min = -30;
+  int y_max = 60;
+  int time_spent_graphing_ms = 3000; 
+
+  graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({
-    [](double x){ return chassis.get_absolute_heading(); }, 
-    [](double x){ return chassis.desired_angle; }},
+    [](double x){ return chassis.inertial.rotation(); }, 
+    [](double x){
+      float heading = chassis.desired_heading;
+      if (heading < 0) {
+        // Accounting for when drive_to_point() drives backwards
+        return heading + 180;
+      }
+      return heading;
+    }},
     {{"Actual", 0x002E8B59}, 
     {"SetPoint", 0x00FA8072}}
   );
   UI_select_scr(graph_scr->get_graph_screen()); 
 
   test_movements_func = [](){
-    chassis.set_heading(0);
+    chassis.set_coordinates(0, 0, 0);
     graph_scr->reset_graph();
     graph_scr->graph();
 
-    test_turn();
+    if (testing_odom) {
+      test_odom_heading();
+    } else {
+      test_heading();
+    }
   };
 
   PID_tuner();
 }
 
-void config_test_swing() {
+
+void config_tune_turn() {  
+  data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd}, {"turn_stl_err: ", chassis.turn_settle_error}, 
+    {"turn_stl_tm: ", chassis.turn_settle_time}, {"turn_tmout: ", chassis.turn_timeout}, {"turn_starti: ", chassis.turn_starti}, {"turn_max_volt: ", chassis.turn_max_voltage} };
+
+  int y_min = -10;
+  int y_max = 370;
+  int time_spent_graphing_ms = 5000; 
+
+  graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
+  graph_scr->set_plot({
+    [](double x){ return chassis.get_absolute_heading(); }, 
+    [](double x){ return reduce_0_to_360(chassis.desired_angle); }},
+    {{"Actual", 0x002E8B59}, 
+    {"SetPoint", 0x00FA8072}}
+  );
+  UI_select_scr(graph_scr->get_graph_screen()); 
+
+  test_movements_func = [](){
+    chassis.set_coordinates(0, 0, 0);
+    graph_scr->reset_graph();
+    graph_scr->graph();
+
+    if (testing_odom) {
+      test_odom_turn();
+    } else {
+      test_turn();
+    }
+  };
+
+  PID_tuner();
+}
+
+void config_tune_swing() {
   data.variables = { {"swing_kp: ", chassis.swing_kp }, {"swing_ki: ", chassis.swing_ki }, {"swing_kd: ", chassis.swing_kd}, {"swing_stl_err: ", chassis.swing_settle_error}, 
     {"swing_stle_tm: ", chassis.swing_settle_time}, {"swing_tmout: ", chassis.swing_timeout}, {"swing_starti: ", chassis.swing_starti}, {"swing_max_volt: ", chassis.turn_max_voltage} };
-  graph_scr->set_plot_bounds(0, 360, 0, 3000, 1, 1);
+
+  int y_min = 0;
+  int y_max = 360;
+  int time_spent_graphing_ms = 3000; 
+
+  graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({
     [](double x){ return chassis.get_absolute_heading(); }, 
     [](double x){ return chassis.desired_angle; }},
@@ -172,40 +294,18 @@ void config_test_swing() {
   UI_select_scr(graph_scr->get_graph_screen()); 
 
   test_movements_func = [](){
-    chassis.set_heading(0);
+    chassis.set_coordinates(0, 0, 0);
     graph_scr->reset_graph();
     graph_scr->graph();
     
-    test_swing();
+    if (testing_odom) {
+      test_odom_swing();
+    } else {
+      test_swing();
+    }
   };
 
   PID_tuner();
-}
-
-void config_test_heading() {
-  data.variables = { {"heading_kp: ", chassis.heading_kp}, {"heading_ki: ", chassis.heading_ki}, {"heading_kd: ", chassis.heading_kd}, {"heading_starti: ", chassis.heading_starti}, {"max_volt: ", chassis.heading_max_voltage} };
-  graph_scr->set_plot_bounds(-30, 60, 0, 3000, 1, 1);
-  graph_scr->set_plot({
-    [](double x){ return chassis.inertial.rotation(); }, 
-    [](double x){ return chassis.desired_heading; }},
-    {{"Actual", 0x002E8B59}, 
-    {"SetPoint", 0x00FA8072}}
-  );
-  UI_select_scr(graph_scr->get_graph_screen()); 
-
-  test_movements_func = [](){
-    chassis.set_heading(0);
-    graph_scr->reset_graph();
-    graph_scr->graph();
-
-    test_heading();
-  };
-
-  PID_tuner();
-}
-
-void config_test_odom() {
-
 }
 
 inline int get_flicker_index(const std::string& value_str, float place) {
@@ -238,7 +338,7 @@ inline int get_power(float n) {
 
 void PID_tuner() {
   auton_scr->disable_controller_overlay();
-  disable_user_control = true;
+  disable_user_control();
   vex::task test;
 
   user_control_task = vex::task([](){
@@ -301,52 +401,45 @@ void PID_tuner() {
   });
   update_controller_scr = vex::task([](){
     while(1) {
-      if (Controller.ButtonUp.pressing()) {
+      if (btnUp_new_press(Controller.ButtonUp.pressing())) {
         if (data.index > 0) { data.index--; }
         data.modifer_scale = 1;
-        task::sleep(200);
       }
-      if (Controller.ButtonDown.pressing()) {
+      if (btnDown_new_press(Controller.ButtonDown.pressing())) {
         if (data.index < data.variables.size() - 1) { data.index++; }
         data.modifer_scale = 1;
-        task::sleep(200);
       }
-      if (Controller.ButtonRight.pressing()) {
+      if (btnRight_new_press(Controller.ButtonRight.pressing())) {
         data.modifier = 1 / data.modifer_scale;
         data.needs_update = true;
-        task::sleep(200);
       }
-      if (Controller.ButtonLeft.pressing()) {
+      if (btnLeft_new_press(Controller.ButtonLeft.pressing())) {
         data.modifier = -1 / data.modifer_scale;
         data.needs_update = true;
-        task::sleep(200);
       }
-      if (Controller.ButtonY.pressing()) {
+      if (btnY_new_press(Controller.ButtonY.pressing())) {
         data.modifer_scale /= 10;
         if (data.modifer_scale < (1 / data.var_upper_size)) {
           data.modifer_scale = (1 / data.var_upper_size);
         }
-        task::sleep(200);
       }
-      if (Controller.ButtonA.pressing()) {
+      if (btnA_new_press(Controller.ButtonA.pressing())) {
         data.modifer_scale *= 10;
         if (data.modifer_scale > 1000) {
           data.modifer_scale = 1000;
         }
-        task::sleep(200);
       }
-      if (Controller.ButtonX.pressing()) {
+      if (btnX_new_press(Controller.ButtonX.pressing())) {
         user_control_task.suspend();
         test_movements_task = vex::task([](){
           test_movements_func();
           return 0;
         });
       }
-      if (Controller.ButtonB.pressing()) {
+      if (btnB_new_press(Controller.ButtonB.pressing())) {
         user_control_task.resume();
         test_movements_task.stop();
         chassis.stop_drive(vex::coast);
-        task::sleep(200);
       }
       task::sleep(20);
     }
@@ -356,17 +449,26 @@ void PID_tuner() {
 
 static std::vector<mik::motor> motors_;
 
-void config_add_motors(std::vector<std::vector<mik::motor>> motor_groups) {
-  for (auto& motors : motor_groups) {
-    for (auto& motor : motors) {
+void config_add_motors(std::vector<mik::motor_group> motor_groups, std::vector<mik::motor> motors) {
+  for (auto& motor_group: motor_groups)  {
+    for (auto& motor : motor_group.getMotors()) {
       motors_.push_back(motor);
     }
   }
-}
-
-void config_add_motors(std::vector<mik::motor> motors) {
   for (auto& motor : motors) {
     motors_.push_back(motor);
+  }
+}
+
+void stop_all_motors(vex::brakeType mode) {
+  for (auto& motor : motors_) {
+    motor.stop(mode);
+  }
+}
+
+void set_brake_all_motors(vex::brakeType mode) {  
+  for (auto& motor : motors_) {
+    motor.setBrake(mode);
   }
 }
 
@@ -398,6 +500,12 @@ int run_diagnostic() {
       errors++;
     }   
   }
+  for (auto& distance : chassis.reset_sensors.get_distance_sensors()) {
+    if (!distance.installed()) {
+      error_data.push_back(distance.name() + " [" + distance.port() +  "] is disconnected");
+      errors++;
+    }
+  }
   if (errors <= 0) {
     error_data.push_back("No issues found");
   }
@@ -412,7 +520,7 @@ void config_add_pid_output_SD_console() {
   vex::task e([](){
     task::sleep(500);
 
-    std::vector<std::string> data_arr = get_SD_file_txt("auton.txt");
+    std::vector<std::string> data_arr = get_SD_file_txt("pid_data.txt");
     for (const auto& line : data_arr) {
       console_scr->add(line, false);
     }
@@ -423,7 +531,7 @@ void config_add_pid_output_SD_console() {
 void config_spin_all_motors() {
   UI_select_scr(console_scr->get_console_screen()); 
   console_scr->reset();
-  disable_user_control = true;
+  disable_user_control();
   vex::task spin_mtrs([](){
     task::sleep(500);
     for (mik::motor& motor : motors_) { 
@@ -434,7 +542,7 @@ void config_spin_all_motors() {
       motor.stop();
       vex::task::sleep(1000);
     }
-    disable_user_control = false;
+    enable_user_control();
     return 0;
   });
 }
@@ -445,11 +553,11 @@ void config_motor_wattage() {
 
   vex::task watt([](){
     task::sleep(500);
-    console_scr->add("right_drive: ", []() { return chassis.right_drive.averagePower(); });
-    console_scr->add("left_drive: ", []() { return chassis.left_drive.averagePower(); });
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
   
     for (auto& motor : motors_) {
-      console_scr->add(motor.name() + ": ", [&motor]() { return motor.power(); });
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.power(), 5, false) + " Watts    "; });
     }
     return 0;
   });
@@ -458,19 +566,68 @@ void config_motor_wattage() {
 void config_motor_temp() {
   console_scr->reset();
   UI_select_scr(console_scr->get_console_screen()); 
-
   
   vex::task temp([](){
     task::sleep(500);
     
-    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated"; });
-    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated"; });
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated    "; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated    "; });
     for (auto& motor : motors_) {
-      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.temperature(), 0, true) + "%% overheated"; });
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.temperature(), 0, true) + "%% overheated    "; });
     }
     return 0;
   });
 
+}
+
+void config_motor_torque() {
+  console_scr->reset();
+  UI_select_scr(console_scr->get_console_screen()); 
+  
+  vex::task temp([](){
+    task::sleep(500);
+    
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 5, false) + " Nm    "; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 5, false) + " Nm    "; });
+    for (auto& motor : motors_) {
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.torque(), 5, false) + " Nm    "; });
+    }
+    return 0;
+  });
+
+}
+
+void config_motor_efficiency() {
+  console_scr->reset();
+  UI_select_scr(console_scr->get_console_screen()); 
+  
+  vex::task temp([](){
+    task::sleep(500);
+    
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 5, false) + "%% Eff    "; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 5, false) + "%% Eff     "; });
+    for (auto& motor : motors_) {
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.efficiency(), 5, false) + "%% Eff    "; });
+    }
+    return 0;
+  });
+
+}
+
+void config_motor_current() {
+  console_scr->reset();
+  UI_select_scr(console_scr->get_console_screen()); 
+  
+  vex::task temp([](){
+    task::sleep(500);
+    
+    console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 5, false) + " Amps    "; });
+    console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 5, false) + " Amps    "; });
+    for (auto& motor : motors_) {
+      console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.current(), 5, false) + " Amps    "; });
+    }
+    return 0;
+  });
 }
 
 void config_odom_data() {
@@ -547,7 +704,7 @@ void config_skills_driver_run() {
       case 0:
         Controller.rumble(("."));
         chassis.stop_drive(vex::coast);
-        disable_user_control = true;
+        disable_user_control();
         std::abort();
         break;
       default:
