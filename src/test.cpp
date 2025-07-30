@@ -638,6 +638,7 @@ void config_odom_data() {
   console_scr->add("X: ", [](){ return chassis.get_X_position(); });
   console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
   console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+  console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
   console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
   console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
 

@@ -134,7 +134,7 @@ void Chassis::stop_drive(vex::brakeType brake) {
 }
 
 float Chassis::get_absolute_heading(){ 
-  return(reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale)); 
+  return reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale); 
 }
 
 void Chassis::mirror_all_auton_angles() {
@@ -154,11 +154,11 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_ForwardTracker_position() {
-    return(forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio);
+    return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
 }
 
 float Chassis::get_SidewaysTracker_position() {
-    return(sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio);
+    return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
 }
 
 void Chassis::position_track() {
@@ -193,11 +193,11 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
 }
 
 float Chassis::get_X_position() {
-  return(odom.position.x);
+  return odom.position.x;
 }
 
 float Chassis::get_Y_position() {
-  return(odom.position.y);
+  return odom.position.y;
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {
