@@ -8,11 +8,26 @@ class piston {
 
 public:
     /**
-    * @brief Creates a new pneumatics object on the port specified in the parameter.
-    * @param port A reference to a three wire port.
-    */
+     * @brief Creates a new piston object on the port specified in the parameter.
+     * @param triport Triport in "PORT_A" format.
+     */
     piston(int triport);
 
+    /**
+     * @brief Creates a new piston object on the port specified in the parameter.
+     * @param triport Triport in "PORT_A" format.
+     * @param state The state to start the piston at True → open, false → close.
+    */
+    piston(int triport, bool state);
+    
+    /**
+     * @brief Creates a new piston object on a triport expander.
+     * @param expander_port Port in "PORT1" format.
+     * @param solenoid_port Triport in "PORT_A" format.
+     * @param state The state to start the piston at True → open, false → close.
+    */
+    piston(int expander_port, int solenoid_port, bool state);
+    
     /** @returns The state of the solenoid. True is open, false is closed. */
     bool state() const;
 
@@ -33,6 +48,7 @@ public:
 
 private:
     vex::digital_out solenoid;
+    vex::triport triport_expander;
     bool state_;
 };
 } 

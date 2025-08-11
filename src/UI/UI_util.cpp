@@ -81,6 +81,11 @@ std::shared_ptr<mik::drawable> UI_crt_ln(float x1, float y1, float x2, float y2,
     return std::make_shared<mik::line>(x1, y1, x2, y2, hue, units);
 }
 
+std::shared_ptr<mik::drawable> UI_crt_ln(float x1, float y1, float x2, float y2, const std::string& hex, mik::UI_distance_units units) {
+    return std::make_shared<mik::line>(x1, y1, x2, y2, hex, units);
+}
+
+
 std::shared_ptr<mik::drawable> UI_crt_txt(const std::string& text_label, float x, float y, mik::UI_distance_units units) {
     return std::make_shared<mik::text>(text_label, x, y, units);
 }
@@ -90,21 +95,34 @@ std::shared_ptr<mik::drawable> UI_crt_txt(const std::string& text_label, float x
 std::shared_ptr<mik::drawable> UI_crt_txt(const std::string& text_label, float x, float y, uint32_t text_color, uint32_t bg_color, mik::UI_distance_units units) {
     return std::make_shared<mik::text>(text_label, x, y, text_color, bg_color, units);
 }
+std::shared_ptr<mik::drawable> UI_crt_txt(const std::string& text_label, float x, float y, const std::string& bg_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::text>(text_label, x, y, bg_color, units);
+}
+std::shared_ptr<mik::drawable> UI_crt_txt(const std::string& text_label, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::text>(text_label, x, y, text_color, bg_color, units);
+}
 
 std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, mik::UI_distance_units units) {
     return std::make_shared<mik::rectangle>(x, y, w, h, fill_color, outline_color, units);
 }
 
-std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, vex::color fill_color, vex::color outline_color, mik::UI_distance_units units) {
-    return std::make_shared<mik::rectangle>(x, y, w, h, fill_color, outline_color, units);
+std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, const std::string& fill_color, const std::string& outline_color, int pen_width, mik::UI_distance_units units) {
+    return std::make_shared<mik::rectangle>(x, y, w, h, fill_color, outline_color, pen_width, units);
 }
 
 std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, uint32_t hue, mik::UI_distance_units units) {
     return std::make_shared<mik::rectangle>(x, y, w, h, hue, units);
 }
 
-std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, vex::color hue, mik::UI_distance_units units) {
+std::shared_ptr<mik::drawable> UI_crt_rec(float x, float y, float w, float h, const std::string& hue, mik::UI_distance_units units) {
     return std::make_shared<mik::rectangle>(x, y, w, h, hue, units);
+}
+
+std::shared_ptr<mik::drawable> UI_crt_cir(float x, float y, float w, float h, uint32_t fill_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::circle>(x, y, w, h, fill_color, units);
+}
+std::shared_ptr<mik::drawable> UI_crt_cir(float x, float y, float w, float h, const std::string& fill_color_hex, mik::UI_distance_units units) {
+    return std::make_shared<mik::circle>(x, y, w, h, fill_color_hex, units);
 }
 
 std::shared_ptr<mik::drawable> UI_crt_grp(std::shared_ptr<mik::drawable> graphic_) {

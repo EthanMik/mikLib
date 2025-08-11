@@ -96,6 +96,11 @@ void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_se
   this->swing_timeout = swing_timeout;
 }
 
+
+void Chassis::set_tracking_offsets(float forward_tracker_center_distance, float sideways_tracker_center_distance) {
+  odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
+}
+
 void Chassis::set_brake_type(vex::brakeType brake) {
   left_drive.setStopping(brake);
   right_drive.setStopping(brake);
@@ -210,12 +215,24 @@ bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_p
     
     if (reset_x && std::abs(new_pos - odom_x) < max_reset_distance) {
         chassis.set_coordinates(new_pos, odom_y, get_absolute_heading());
+        print("Reset Odom X Position Sucessfully", mik::green);
+        print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(new_pos) + ", " + to_string(odom_y) + ")", mik::bright_green);
         return true;
     }
     if (!reset_x && std::abs(new_pos - odom_y) < max_reset_distance) {
         chassis.set_coordinates(odom_x, new_pos, get_absolute_heading());
+        print("Reset Odom Y Position Sucessfully", mik::green);
+        print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(odom_x) + ", " + to_string(new_pos) + ")", mik::bright_green);
         return true;
-    } 
+      } 
+      
+    if (reset_x) {
+      print("Reset Odom X Position Failed", mik::red);
+      print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(new_pos) + ", " + to_string(odom_y) + ")", mik::bright_green);
+    } else {
+      print("Reset Odom Y Position Failed", mik::red);
+      print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(odom_x) + ", " + to_string(new_pos) + ")", mik::bright_green);
+    }
 
     return false;
 }
@@ -228,7 +245,7 @@ void Chassis::enable_control() {
   control_disabled = false;
 }
 
-inline float curve(float input, float deadband, float min_output, float curve_gain) {
+static float curve(float input, float deadband, float min_output, float curve_gain) {
   if (fabs(input) <= deadband) { return 0; }
   const float g = fabs(input) - deadband;
   const float g_max = 100 - deadband;

@@ -3,11 +3,16 @@
 using namespace mik;
 
 mik::motor::motor(int port, bool reversed, std::string name) :
-    vex::motor(port, reversed), port_(port), reversed_(reversed), name_(std::move(name))
+    vex::motor(port, ratio6_1, reversed), port_(port), gear_cartridge_(ratio6_1), reversed_(reversed), name_(std::move(name))
+{};
+
+mik::motor::motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name) :
+    vex::motor(port, gear_cartridge, reversed), port_(port), gear_cartridge_(gear_cartridge), reversed_(reversed), name_(std::move(name))
 {};
 
 const std::string mik::motor::port() const { return "PORT" + to_string(port_ + 1); }
 bool mik::motor::reversed() const { return reversed_; }
+vex::gearSetting mik::motor::gear_cartridge() const { return gear_cartridge_; }
 std::string& mik::motor::name() { return name_; }
 const std::string mik::motor::name() const { return name_; }
 

@@ -20,8 +20,26 @@ static std::vector<std::shared_ptr<mik::screen>> temp;
 
 static std::shared_ptr<mik::screen> selector_panel_scr;
 
+static void create_UI_files() {
+  if (!Brain.SDcard.isInserted()) {
+    return;
+  }
+  if (!Brain.SDcard.exists("pid_data.txt")) {
+    Brain.SDcard.savefile("pid_data.txt", nullptr, 0);
+  }
+  if (!Brain.SDcard.exists("auton.txt")) {
+    Brain.SDcard.savefile("auton.txt", nullptr, 0);
+  }
+
+}
+
 void UI_init() {
-  auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, 0, 0, mik::UI_distance_units::pixels));
+  create_UI_files();
+  // auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, 0, 0, mik::UI_distance_units::pixels));
+
+  std::shared_ptr<mik::drawable> main_bg_img = std::make_shared<mik::image>(mikLib_logo, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mik::UI_distance_units::pixels);
+  std::shared_ptr<mik::UI_component> main_bg = std::make_shared<mik::graphic>(main_bg_img);
+  
   auto main_bg_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   main_bg_scr->add_UI_component(main_bg);
 

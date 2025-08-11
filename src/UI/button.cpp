@@ -67,7 +67,7 @@ void button::set_states(std::shared_ptr<drawable> pressing_state, std::shared_pt
     }
 }
 
-void button::set_callback(std::function<void()> cb) {
+void button::set_callback(std::function<void()> cb, bool call_once) {
     on_click = cb;
 }
 

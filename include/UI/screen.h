@@ -4,9 +4,6 @@
 
 namespace mik {
     
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 240
-
 class screen 
 {
 public:

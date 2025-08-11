@@ -4,11 +4,11 @@
 
 namespace mik {
 
-class line : public drawable 
+class circle : public drawable
 {
 public:
-    line(float x1, float y1, float x2, float y2, uint32_t hue, UI_distance_units units);
-    line(float x1, float y1, float x2, float y2, const std::string& hex, UI_distance_units units);
+    circle(float x, float y, float w, float h, uint32_t fill_color, UI_distance_units units);
+    circle(float x, float y, float w, float h, const std::string& fill_color_hex, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -18,19 +18,17 @@ public:
     void set_x_pos(int x) override;
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
-    
+
     void set_width(int w) override;
     void set_height(int h) override;
 
     void render() override;
 
 private:
-    int x;
-    int y;
-    int w;
-    int h;
-    uint32_t hue;
-    const std::string hex;
-    bool using_hex;
+    int x, y;
+    float r;
+    uint32_t fill_color;
+    const std::string fill_color_hex;
+    bool using_hex = false;
 };
 }

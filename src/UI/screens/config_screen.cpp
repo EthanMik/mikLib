@@ -2,7 +2,6 @@
 
 using namespace mik;
 
-
 UI_config_screen::UI_config_screen() {
     UI_crt_config_scr();
     UI_crt_pnematics_scr();
@@ -32,10 +31,11 @@ std::shared_ptr<screen> UI_config_screen::get_config_screen() {
 
 void UI_config_screen::UI_crt_config_scr() {
     UI_config_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + y_offset*2 + 5);
-    UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 3, 40, 0x00434343, UI_distance_units::pixels), screen::alignment::RIGHT);
+    UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 1, 40, ClrWhite, UI_distance_units::pixels), screen::alignment::RIGHT);
     auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, vex::color::black, UI_distance_units::pixels));
 
-
+    std::string pressing_clr = "#FFFFFF";
+    std::string pressed_clr = "#ff0000";
 // MACRO SLOTS
 
     // Runs selected auto in test mode, with 3 second countdown
@@ -43,7 +43,7 @@ void UI_config_screen::UI_crt_config_scr() {
     auto macro_1_bg = UI_crt_btn(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*1, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [this, macro_1](){ 
         countdown(macro_1, [](){ auton_scr->start_auton_test(); });
     });
-    macro_1_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_1_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*1, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*1, 154, 35, pressed_clr, UI_distance_units::pixels));
 
     // Adds a 15 or 60 second limiter to autons
     macro_4_bg_tgl = UI_crt_tgl(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*2, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){});
@@ -52,14 +52,14 @@ void UI_config_screen::UI_crt_config_scr() {
         auton_scr->flip_toggle_controller({3, 0}, auton_scr->time_limit); 
         auton_scr->save_auton_SD();
     });
-    macro_4_bg_tgl->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_4_bg_tgl->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*2, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*2, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_4 = UI_crt_txtbox("Time Cap Auto", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*2, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
     // Runs a driver skills match
     auto macro_7_bg = UI_crt_btn(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*3, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ 
         config_skills_driver_run(); 
     });
-    macro_7_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_7_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*3, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*3, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_7 = UI_crt_txtbox("Driver Skills", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*3, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
     // Selects auto skills to be run
@@ -69,14 +69,14 @@ void UI_config_screen::UI_crt_config_scr() {
         auton_scr->flip_toggle_controller({1, 1}, auton_scr->off_skills); 
         auton_scr->save_auton_SD(); 
     });
-    macro_10_bg_tgl->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_10_bg_tgl->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*4, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*4, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_10 = UI_crt_txtbox("Auto Skills", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*4, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
     // Spins each motor forwards for half a second
     auto macro_13_bg = UI_crt_btn(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*5, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ 
         config_spin_all_motors(); 
     });
-    macro_13_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_13_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*5, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*5, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_13 = UI_crt_txtbox("Spin Motors", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*5, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
     // Opens pnematic menu
@@ -84,21 +84,21 @@ void UI_config_screen::UI_crt_config_scr() {
         UI_swap_screens({UI_pnematics_scr}); 
         disable_user_control(); 
     });
-    macro_16_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_16_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*6, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*6, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_16 = UI_crt_txtbox("Pnematic Menu", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*6, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
 
     auto macro_19_bg = UI_crt_btn(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*7, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ 
         wipe_SD_file("pid_data.txt"); 
     });
-    macro_19_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_19_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*7, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*7, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_19 = UI_crt_txtbox("Wipe PID Data", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*7, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
 
     auto macro_22_bg = UI_crt_btn(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*8, 154, 35, macro_slot_border_color, UI_distance_units::pixels), [](){ 
         wipe_SD_file("auton.txt"); 
     });
-    macro_22_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_22_bg->set_states(UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*8, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(macro_slot_x_position, y_start_position+y_offset*8, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_22 = UI_crt_txtbox("Wipe Sel Auto", text_alignment, macro_slot_color, UI_crt_rec(macro_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*8, 150, 31, macro_slot_color, UI_distance_units::pixels));
 
 
@@ -109,56 +109,56 @@ void UI_config_screen::UI_crt_config_scr() {
     auto macro_2_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*1, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_error_data();
      });
-    macro_2_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_2_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*1, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*1, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_2 = UI_crt_txtbox("Error Data", text_alignment, data_slot_color, UI_crt_rec(data_slot_x_position+text_box_offset, 54, 150, 31, data_slot_color, UI_distance_units::pixels));
 
      // Add motor tempurature values to console
     auto macro_5_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*2, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_motor_temp(); 
     });
-    macro_5_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_5_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*2, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*2, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_5 = UI_crt_txtbox("Motor Temps", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*2, 150, 31, data_slot_color, UI_distance_units::pixels));
 
     // Add motor wattage values to console
     auto macro_8_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*3, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_motor_wattage(); 
     });
-    macro_8_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_8_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*3, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*3, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_8 = UI_crt_txtbox("Motor Wattage", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*3, 150, 31, data_slot_color, UI_distance_units::pixels));
 
     // Add odom data to console
     auto macro_11_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*4, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_odom_data(); 
     });
-    macro_11_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_11_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*4, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*4, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_11 = UI_crt_txtbox("Odom Data", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*4, 150, 31, data_slot_color, UI_distance_units::pixels));
 
     // Add updated pid values from pid_tuner to console
     auto macro_14_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_add_pid_output_SD_console(); 
     });
-    macro_14_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_14_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_14 = UI_crt_txtbox("PID Data", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*5, 150, 31, data_slot_color, UI_distance_units::pixels));
 
 
     auto macro_17_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*6, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_motor_torque();
     });
-    macro_17_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_17_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*6, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*6, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_17 = UI_crt_txtbox("Motor Torque", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*6, 150, 31, data_slot_color, UI_distance_units::pixels));
 
 
     auto macro_20_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*7, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_motor_efficiency();
     });
-    macro_20_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_20_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*7, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*7, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_20 = UI_crt_txtbox("Motor Eff", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*7, 150, 31, data_slot_color, UI_distance_units::pixels));
 
 
     auto macro_23_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*8, 154, 35, data_slot_border_color, UI_distance_units::pixels), [](){ 
         config_motor_current();
     });
-    macro_23_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_23_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*8, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*8, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_23 = UI_crt_txtbox("Motor Current", text_alignment, data_slot_color,UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*8, 150, 31, data_slot_color, UI_distance_units::pixels));
 
 
@@ -168,34 +168,34 @@ void UI_config_screen::UI_crt_config_scr() {
         bool mode = config_swap_test_mode();
         swap_mode(macro_3, mode);
     });
-    macro_3_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*1, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_3_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*1, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*1, 154, 35, pressed_clr, UI_distance_units::pixels));
 
 
     auto macro_6_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         config_tune_drive(); 
     });
-    macro_6_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_6_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_6 = UI_crt_txtbox("Tune Drive", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*2, 150, 31, test_slot_color, UI_distance_units::pixels));
 
 
     auto macro_9_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*3, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         config_tune_heading(); 
     });
-    macro_9_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*3, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_9_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*3, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*3, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_9 = UI_crt_txtbox("Tune Heading", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*3, 150, 31, test_slot_color, UI_distance_units::pixels));
     
 
     auto macro_12_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*4, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         config_tune_turn(); 
     });
-    macro_12_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*4, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_12_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*4, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*4, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_12 = UI_crt_txtbox("Tune Turn", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*4, 150, 31, test_slot_color, UI_distance_units::pixels));
     
 
     auto macro_15_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*5, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         config_tune_swing(); 
     });
-    macro_15_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*5, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_15_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*5, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*5, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_15 = UI_crt_txtbox("Tune Swing", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*5, 150, 31, test_slot_color, UI_distance_units::pixels));
     
 
@@ -206,21 +206,21 @@ void UI_config_screen::UI_crt_config_scr() {
             test_full(); 
         }
     });
-    macro_18_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*6, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_18_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*6, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*6, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_18 = UI_crt_txtbox("Test Full", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*6, 150, 31, test_slot_color, UI_distance_units::pixels));
 
 
     auto macro_21_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         test_boomerang(); 
     });
-    macro_21_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_21_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_21 = UI_crt_txtbox("Test Boomeran", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*7, 150, 31, test_slot_color, UI_distance_units::pixels));
 
 
     auto macro_24_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*8, 154, 35, test_slot_border_color, UI_distance_units::pixels), [](){ 
         test_pursuit(); 
     });
-    macro_24_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*8, 154, 35, 0x00B6B6B6, UI_distance_units::pixels));
+    macro_24_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*8, 154, 35, pressing_clr, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*8, 154, 35, pressed_clr, UI_distance_units::pixels));
     auto macro_24 = UI_crt_txtbox("Test Pursuit", text_alignment, test_slot_color, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*8, 150, 31, test_slot_color, UI_distance_units::pixels));
 
 
@@ -247,37 +247,97 @@ void UI_config_screen::UI_crt_pnematics_scr() {
 
     auto title_txt = UI_crt_gfx(UI_crt_txt("Pneumatics Menu", 169, 30, UI_distance_units::pixels));
 
-    auto port_A_btn = UI_crt_btn(UI_crt_img("", .12*96, .51*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_A); });
-    auto port_A = UI_crt_tgl(UI_crt_grp({UI_crt_rec(.12*96, .51*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_A_triangle.png", .27, .64, 1, .83, UI_distance_units::inches)}), [](){});
-        port_A->set_states(UI_crt_img("port_A_triangle_bg.png", .12, .51, 1, .83, UI_distance_units::inches), UI_crt_img("port_A_triangle_bg.png", .12, .51, 1, .83, UI_distance_units::inches));
+    const float txt_x = .34;
+    const float txt_y = .45; 
 
-    auto port_B_btn = UI_crt_btn(UI_crt_img("", 1.33*96, .51*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_B); });
-    auto port_B = UI_crt_tgl(UI_crt_grp({UI_crt_rec(1.33*96, .51*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_B_triangle.png", 1.48, .64, 1, .83, UI_distance_units::inches)}), [](){});
-        port_B->set_states(UI_crt_img("port_B_triangle_bg.png", 1.33, .51, 1, .83, UI_distance_units::inches), UI_crt_img("port_B_triangle_bg.png", 1.33, .51, 1, .83, UI_distance_units::inches));
+    std::string clr = "#303030";
+    float x = .23;
+    float y = .56;
 
-    auto port_C_btn = UI_crt_btn(UI_crt_img("", 2.59*96, .51*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_C); });
-    auto port_C = UI_crt_tgl(UI_crt_grp({UI_crt_rec(2.59*96, .51*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_C_triangle.png", 2.74, .64, 1, .83, UI_distance_units::inches)}), [](){});
-        port_C->set_states(UI_crt_img("port_C_triangle_bg.png", 2.59, .51, 1, .83, UI_distance_units::inches), UI_crt_img("port_C_triangle_bg.png", 2.59, .51, 1, .83, UI_distance_units::inches));
+    auto port_A_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_A); });
+    auto port_A = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_A->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
 
-    auto port_D_btn = UI_crt_btn(UI_crt_img("", 3.87*96, .51*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_D); });
-    auto port_D = UI_crt_tgl(UI_crt_grp({UI_crt_rec(3.87*96, .51*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_D_triangle.png", 4.01, .64, 1, .83, UI_distance_units::inches)}), [](){});
-        port_D->set_states(UI_crt_img("port_D_triangle_bg.png", 3.87, .51, 1, .83, UI_distance_units::inches), UI_crt_img("port_D_triangle_bg.png", 3.87, .51, 1, .83, UI_distance_units::inches));
+    clr = "#595959";
+    x = 1.48;
+    y = .56;
 
-    auto port_E_btn = UI_crt_btn(UI_crt_img("", .12*96, 1.38*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_E); });
-    auto port_E = UI_crt_tgl(UI_crt_grp({UI_crt_rec(.12*96, 1.38*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_E_triangle.png", .27, 1.47, 1, .83, UI_distance_units::inches)}), [](){});
-        port_E->set_states(UI_crt_img("port_E_triangle_bg.png", .12, 1.38, 1, .83, UI_distance_units::inches), UI_crt_img("port_E_triangle_bg.png", .12, 1.38, 1, .83, UI_distance_units::inches));
+    auto port_B_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_B); });
+    auto port_B = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_B->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
 
-    auto port_F_btn = UI_crt_btn(UI_crt_img("", 1.33*96, 1.38*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_F); });
-    auto port_F = UI_crt_tgl(UI_crt_grp({UI_crt_rec(1.33*96, 1.38*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_F_triangle.png", 1.48, 1.47, 1, .83, UI_distance_units::inches)}), [](){});
-        port_F->set_states(UI_crt_img("port_F_triangle_bg.png", 1.33, 1.38, 1, .83, UI_distance_units::inches), UI_crt_img("port_F_triangle_bg.png", 1.33, 1.38, 1, .83, UI_distance_units::inches));
-        
-    auto port_G_btn = UI_crt_btn(UI_crt_img("", 2.59*96, 1.38*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_G); });
-    auto port_G = UI_crt_tgl(UI_crt_grp({UI_crt_rec(2.59*96, 1.38*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_G_triangle.png", 2.74, 1.47, 1, .83, UI_distance_units::inches)}), [](){});
-        port_G->set_states(UI_crt_img("port_G_triangle_bg.png", 2.59, 1.38, 1, .83, UI_distance_units::inches), UI_crt_img("port_G_triangle_bg.png", 2.59, 1.38, 1, .83, UI_distance_units::inches));
+    clr = "#858585";
+    x = 2.73;
+    y = .56;
 
-    auto port_H_btn = UI_crt_btn(UI_crt_img("", 3.87*96, 1.38*96, 1*96, .83*96, UI_distance_units::pixels), [](){ config_test_three_wire_port(PORT_H); });
-    auto port_H = UI_crt_tgl(UI_crt_grp({UI_crt_rec(3.87*96, 1.38*96, 1*96, .83*96, vex::black, UI_distance_units::pixels), UI_crt_img("port_H_triangle.png", 4.01, 1.47, 1, .83, UI_distance_units::inches)}), [](){});
-        port_H->set_states(UI_crt_img("port_H_triangle_bg.png", 3.87, 1.38, 1, .83, UI_distance_units::inches), UI_crt_img("port_H_triangle_bg.png", 3.87, 1.38, 1, .83, UI_distance_units::inches));
+    auto port_C_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_C); });
+    auto port_C = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_C->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
+    clr = "#cccccc";
+    x = 3.98;
+    y = .56;
+
+    auto port_D_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_D); });
+    auto port_D = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_D->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
+    clr = "#303030";
+    x = .23;
+    y = 1.62;
+
+    auto port_E_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_E); });
+    auto port_E = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_E->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
+    clr = "#595959";
+    x = 1.48;
+    y = 1.62;
+
+    auto port_F_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_F); });
+    auto port_F = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_F->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
+    clr = "#858585";
+    x = 2.73;
+    y = 1.62;
+
+    auto port_G_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_G); });
+    auto port_G = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_G->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
+    clr = "#cccccc";
+    x = 3.98;
+    y = 1.62;
+
+    auto port_H_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [](){ config_test_three_wire_port(PORT_H); });
+    auto port_H = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#000000", 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}), [](){});
+    port_H->set_states(
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#FFFFFF", 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, clr, UI_distance_units::inches)}),
+        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, clr, "#ff0000", 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, clr, UI_distance_units::inches)})
+    );
+
     
     auto exit_bg = UI_crt_btn(UI_crt_rec(0, 0, 40, 40, 0x00666666, UI_distance_units::pixels), [](){ UI_select_scr(config_scr->get_config_screen()); enable_user_control(); });
         exit_bg->set_states(UI_crt_rec(0, 0, 40, 40, 0x00B6B6B6, UI_distance_units::pixels), UI_crt_rec(0, 0, 40, 40, 0x00B6B6B6, UI_distance_units::pixels));

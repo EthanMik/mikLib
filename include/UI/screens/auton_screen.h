@@ -6,8 +6,6 @@
 
 namespace mik {
 
-enum class autons { RED_BLUE, RINGS_GOAL, QUALS_ELIMS, OFF_SAWP, OFF_SKILLS };
-
 class controller_btn {
 public:
     controller_btn(bool is_btn, std::string unpressed_state, std::string pressed_state, std::function<void()> callback);
@@ -37,12 +35,12 @@ class UI_auton_screen {
 public:
     UI_auton_screen();
     std::shared_ptr<screen> get_auton_screen();
-    
+
     void start_auton();
     void start_auton_test();
     void enable_time_limit();
     void enable_odom_display();
-    void UI_select_auton(autons auton);
+    void UI_select_auton(mik::autons auton);
     void enable_controller_overlay();
     void disable_controller_overlay();
     void flip_toggle_controller(std::pair<int, int> cursor_position);

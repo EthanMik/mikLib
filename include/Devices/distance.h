@@ -2,21 +2,6 @@
 
 #include "vex.h"
   
-enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
-enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL };
-
-namespace mik {
-    constexpr distance_position front_sensor = distance_position::FRONT_SENSOR;
-    constexpr distance_position rear_sensor = distance_position::REAR_SENSOR;
-    constexpr distance_position left_sensor = distance_position::LEFT_SENSOR;
-    constexpr distance_position right_sensor = distance_position::RIGHT_SENSOR;
-
-    constexpr wall_position top_wall = wall_position::TOP_WALL;
-    constexpr wall_position bottom_wall = wall_position::BOTTOM_WALL;
-    constexpr wall_position left_wall = wall_position::LEFT_WALL;
-    constexpr wall_position right_wall = wall_position::RIGHT_WALL;
-}
-
 namespace mik {
 
 class distance : public vex::distance {
@@ -29,13 +14,13 @@ public:
      * @param x_center_offset The horizontal offset from the tracking center, right is +, left is -
      * @param y_center_offset The vertical offset from the tracking center, forward is +, backwards is -
      */
-    distance(int port, distance_position position, float x_center_offset, float y_center_offset);
+    distance(int port, mik::distance_position position, float x_center_offset, float y_center_offset);
 
     /** @return The port in PORT# format. */
     const std::string port() const;
 
     /** @return The position of the distance sensor. */
-    distance_position position() const;
+    mik::distance_position position() const;
 
     /** @return The horizontal offset */
     float x_center_offset() const;
@@ -53,10 +38,10 @@ public:
     const std::string name() const;
     
 private:
-    std::string to_sensor_name(distance_position sensor_pos);
+    std::string to_sensor_name(mik::distance_position sensor_pos);
         
     int port_;
-    distance_position position_;
+    mik::distance_position position_;
     float x_center_offset_;
     float y_center_offset_;
     std::string name_;
@@ -82,15 +67,15 @@ public:
      * 
      * @return A new x or y coordinate based on the wall desired sensor is faced at.
      */
-    float get_reset_axis_pos(distance_position sensor_pos, wall_position wall_pos, float angle);
+    float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float angle);
     
     /** @returns vector containing all mik::distance sensors. */
     std::vector<mik::distance>& get_distance_sensors();
     
 private:
-    float to_sensor_offset_constant(distance_position sensor_pos);
-    float to_wall_pos_constant(wall_position wall_pos);
-    float to_wall_angle_constant(wall_position wall_pos);
+    float to_sensor_offset_constant(mik::distance_position sensor_pos);
+    float to_wall_pos_constant(mik::wall_position wall_pos);
+    float to_wall_angle_constant(mik::wall_position wall_pos);
 
     std::vector<mik::distance> distance_sensors;
 };

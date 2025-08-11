@@ -26,6 +26,7 @@
 #include "v5.h"
 #include "v5_vcs.h"
 
+#include "globals.h"
 #include "Drive/util.h"
 #include "Devices/motors.h"
 #include "Devices/distance.h"
@@ -43,6 +44,8 @@
 #include "UI/UI_util.h"
 #include "UI/graphics/image.h"
 #include "UI/graphics/rectangle.h"
+#include "UI/graphics/logo.h"
+#include "UI/graphics/circle.h"
 #include "UI/graphics/text.h"
 #include "UI/graphics/pixel.h"
 #include "UI/graphics/line.h"

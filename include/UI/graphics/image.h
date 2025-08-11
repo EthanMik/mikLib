@@ -8,6 +8,8 @@ class image : public drawable
 {
 public:
     image(const std::string& file_name, float x, float y, float w, float h, UI_distance_units units);
+    image(uint8_t* img_binary, float x, float y, float w, float h, UI_distance_units units);
+    // ~image();
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -25,7 +27,9 @@ public:
 
 private:
     std::string file_name;
+    uint8_t* img_binary;
     bool no_image_found = false;
+    bool using_SD;
     std::shared_ptr<drawable> image_no_texture;
     int x;
     int y;

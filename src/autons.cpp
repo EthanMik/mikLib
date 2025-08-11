@@ -6,11 +6,13 @@ using namespace mik;
 void default_constants(void) {
   chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019);
 
+  // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
   chassis.set_turn_constants(12, .437, .0215, 3.686, 15);
   chassis.set_drive_constants(10, 1.5, 0, 10, 0);
   chassis.set_heading_constants(6, .4, 0, 1, 0);
   chassis.set_swing_constants(12, .437, .0295, 3.486, 15);
   
+  // Each exit condition set is in the form of (settle_error, settle_time, timeout).
   chassis.set_turn_exit_conditions(1.5, 75, 2000);
   chassis.set_drive_exit_conditions(1, 75, 3000);
   chassis.set_swing_exit_conditions(1.25, 75, 3000);
@@ -26,23 +28,13 @@ void odom_constants(void) {
   chassis.drive_min_voltage = 0;
 }
 
-void motion_chaining_constants(void) {
-  odom_constants();
-  chassis.drive_settle_error = 5;
-  chassis.drive_settle_time = 0;
-  chassis.drive_min_voltage = 3;
-  chassis.turn_settle_error = 3;
-  chassis.turn_settle_time = 0;
-  // Whenever motion chaining make sure to add `chassis.stop_drive(hold);` at end of auton
-}
-
 std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
   /* The first variation will be this auto */
-  if (var == ONE) {}
+  if (var == one) {}
 
   /* We declare and allow a second variation of this auto; 
   You may want this if you want a different movements in the same starting configuration */
-  if (var == TWO) { return template_auto_other_variation(calibrate, get_name); }
+  if (var == two) { return template_auto_other_variation(calibrate, get_name); }
 
   if (get_name) { /* Give a desciption of your auto */ return "template auto 1 (3 objs)"; }
   if (calibrate) {
@@ -85,12 +77,6 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
     return "";
   }
 
-  chassis.drive_max_voltage = 6;
-  for (size_t i = 0; i < 30; ++i) {
-    chassis.drive_distance(20);
-    chassis.drive_distance(-20);
-  }
-
   return "";
 }
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) { 
@@ -100,9 +86,6 @@ std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) {
 
     return "";
   }
-
-  chassis.drive_distance(20);
-  chassis.drive_distance(-20);
 
   return "";
 }

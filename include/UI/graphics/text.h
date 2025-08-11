@@ -11,6 +11,9 @@ public:
     text(const std::string& text_label, float x, float y, uint32_t bg_color, UI_distance_units units);
     text(const std::string& text_label, float x, float y, uint32_t text_color, uint32_t bg_color, UI_distance_units units);
 
+    text(const std::string& text_label, float x, float y, const std::string& bg_color, UI_distance_units units);
+    text(const std::string& text_label, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units);
+
     int get_x_pos() override;
     int get_y_pos() override;
     int get_width() override;
@@ -29,12 +32,15 @@ public:
 
 private:
     std::string text_label;
+    bool using_hex;
     int x;
     int y;
     int w;
     int h;
     uint32_t text_color;
     uint32_t bg_color;
+    const std::string text_color_hex;
+    const std::string bg_color_hex;
     UI_distance_units units;
 };
 }

@@ -10,6 +10,8 @@ image::image(const std::string& file_name, float x, float y, float w, float h, U
     this->w = to_pixels(w, units);
     this->h = to_pixels(h, units);
 
+    using_SD = true;
+
     if (!Brain.SDcard.exists(file_name.c_str()) && file_name != "") {  
         no_image_found = true;
         static std::mt19937 gen(
@@ -19,6 +21,17 @@ image::image(const std::string& file_name, float x, float y, float w, float h, U
         image_no_texture = UI_crt_rec(x, y, w, h, color, units);
     }
 };
+
+image::image(uint8_t* img_binary, float x, float y, float w, float h, UI_distance_units units) :
+    file_name(""), img_binary(img_binary), units(units)
+{
+    this->x = to_pixels(x, units);
+    this->y = to_pixels(y, units);
+    this->w = to_pixels(w, units);
+    this->h = to_pixels(h, units);
+    
+    using_SD = false;
+}
 
 int image::get_x_pos() { return(x); }
 int image::get_y_pos() { return(y); }
@@ -59,7 +72,12 @@ void image::set_height(int h) {
 void image::render() {
     if (no_image_found) {
         image_no_texture->render();
-    } else {
-        Brain.Screen.drawImageFromFile(file_name.c_str(), x, y);
+        return;
     }
+    if (using_SD) {
+        Brain.Screen.drawImageFromFile(file_name.c_str(), x, y);
+        return;
+    }
+    Brain.Screen.drawImageFromBuffer(img_binary, x, y, w * h);
+
 }

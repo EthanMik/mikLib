@@ -87,8 +87,9 @@ void toggle::set_position(int x, int y) {
     set_y_pos(y);
 }
 
-void toggle::set_callback(std::function<void()> cb) {
+void toggle::set_callback(std::function<void()> cb, bool call_once) {
     callback = cb;
+    this->call_once = call_once;
 }
 void toggle::set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered) {
     pressing_toggle_graphic = pressing_state; 
@@ -237,6 +238,10 @@ void toggle::press() {
 }
 
 void toggle::execute() {
+    if (callback && !call_once) {
+        callback();
+        return;
+    }
     if (callback && is_toggled) {
         callback();
     }

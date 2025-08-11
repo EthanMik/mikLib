@@ -14,11 +14,19 @@ void UI_graph_screen::UI_crt_graph_scr() {
     UI_graph_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
     auto bg = UI_crt_bg(UI_crt_rec(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45, vex::color::black, UI_distance_units::pixels));
     
-    auto legend_box = UI_crt_gfx(UI_crt_img("legend_box.png", 360, 54, 0, 0, UI_distance_units::pixels));
-    auto graph_table = UI_crt_gfx(UI_crt_img("graph_table.png", 0, 66, 0, 0, UI_distance_units::pixels));
+    auto legend_box = UI_crt_gfx(UI_crt_rec(3.72, .56, 1.19, 1.88, "#000000", "#666666", 2, UI_distance_units::inches));
+
+    auto graph_table = UI_crt_gfx({UI_crt_rec(0.05, .73, 3.58, 1.71, "#000000", "#666666", 1, UI_distance_units::inches),
+        UI_crt_ln(0.05, 1.13, 3.6, 1.13, "#666666", UI_distance_units::inches),
+        UI_crt_ln(0.05, 1.59, 3.6, 1.59, "#666666", UI_distance_units::inches),
+        UI_crt_ln(0.05, 2.04, 3.6, 2.04, "#666666", UI_distance_units::inches)
+    });
+
     auto graph_name = UI_crt_gfx(UI_crt_txt("PID Output", 140, 62, vex::color::black, UI_distance_units::pixels));
-    auto reset_btn = UI_crt_btn(UI_crt_img("graph_settings_btn.png", 366, 208, 98, 20, UI_distance_units::pixels), [this](){ reset_graph(); });
-    reset_btn->set_states(UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels), UI_crt_img("graph_settings_btn_pressed.png", 366, 208, 98, 20, UI_distance_units::pixels));
+    
+    auto reset_btn = UI_crt_btn(UI_crt_grp({UI_crt_rec(366, 205, 98, 20, "#000000", "#666666", 2, UI_distance_units::pixels), UI_crt_txt("Reset", 392, 221, UI_distance_units::pixels)}), 
+        [this](){ reset_graph(); });
+    reset_btn->set_states(UI_crt_grp({UI_crt_rec(366, 205, 98, 20, "#666666", "#999999", 2, UI_distance_units::pixels), UI_crt_txt("Reset", 392, 221, "#666666", UI_distance_units::pixels)}), nullptr);
     
     auto _y_axis = UI_crt_gfx(UI_crt_img("", 0, 0, 0, 0, UI_distance_units::pixels));
     y_axis = static_cast<graphic*>(_y_axis.get());

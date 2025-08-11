@@ -2,7 +2,7 @@
 
 using namespace vex;
 
-// Pass in the ports of the devices we want to use
+// Pass in the devices we want to use
 Assembly::Assembly(
     mik::motor_group lift_arm_motors,
     mik::motor intake_motor, 
@@ -13,7 +13,7 @@ Assembly::Assembly(
     lift_arm_motors(lift_arm_motors),
     intake_motor(intake_motor),
     lift_arm_encoder(lift_arm_encoder),
-    long_piston(long_piston) // Make sure when using a 3 wire device you convert the port
+    long_piston(long_piston) // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`.
 {};
 
 // You want to call this function once in the user control function in main.
@@ -23,7 +23,7 @@ void Assembly::init() {
         assembly.move_lift_arm();
         return 0;
     });
-    // To stop the task do `ex_assembly.lift_task.stop();`
+    // To stop the task do `assembly.lift_task.stop();`
 } 
 
 // You want to put this function inside the user control loop in main.

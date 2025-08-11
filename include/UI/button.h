@@ -18,7 +18,7 @@ public:
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
     void set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered_state) override;
-    void set_callback(std::function<void()> cb) override;
+    void set_callback(std::function<void()> cb, bool call_once = true) override;
 
     void render() override;
     bool needs_update() override;

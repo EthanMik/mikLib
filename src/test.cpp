@@ -3,6 +3,14 @@
 using namespace vex;
 using namespace mik;
 
+void relative_mode_constants() {
+  default_constants();
+}
+
+void odom_mode_constants() {
+  odom_constants();
+}
+
 void test_drive() {
   chassis.drive_distance(6);
   chassis.drive_distance(12);
@@ -21,7 +29,6 @@ void test_turn() {
   chassis.turn_to_angle(30);
   chassis.turn_to_angle(90);
   chassis.turn_to_angle(225);
-  chassis.turn_to_angle(360);
   chassis.turn_to_angle(180, { .turn_direction = ccw });
   chassis.turn_to_angle(0, { .turn_direction = cw });
 }
@@ -62,7 +69,6 @@ void test_odom_turn() {
   chassis.turn_to_point(2.887,  5);
   chassis.turn_to_point(5, 0);
   chassis.turn_to_point(-5, -5);
-  chassis.turn_to_point(0,  5);
   chassis.turn_to_point(0,  -5, {.turn_direction = ccw});
   chassis.turn_to_point(0,  5, {.turn_direction = cw});
 }
@@ -159,8 +165,8 @@ bool config_is_testing_odom() {
 }
 
 void config_tune_drive() {
-  data.variables = { {"drive_kp: ", chassis.drive_kp}, {"drive_ki: ", chassis.drive_ki}, {"drive_kd: ", chassis.drive_kd}, {"drive_stl_err: ", chassis.drive_settle_error}, 
-    {"drive_stl_tm: ", chassis.drive_settle_time}, {"drive_tmout: ", chassis.drive_timeout}, {"drive_starti: ", chassis.drive_starti}, {"drive_max_volt: ", chassis.drive_max_voltage}
+  data.variables = { {"drive_kp: ", chassis.drive_kp}, {"drive_ki: ", chassis.drive_ki}, {"drive_kd: ", chassis.drive_kd}, {"drive_starti: ", chassis.drive_starti}, 
+  {"drive_max_volt: ", chassis.drive_max_voltage}, {"drive_stl_err: ", chassis.drive_settle_error}, {"drive_stl_tm: ", chassis.drive_settle_time}, {"drive_tmout: ", chassis.drive_timeout}, 
   };
 
   std::function<float(double)> actual_plot = [](double x){ return chassis.get_ForwardTracker_position(); };
@@ -180,7 +186,7 @@ void config_tune_drive() {
 
   int y_min = -30;
   int y_max = 50;
-  int time_spent_graphing_ms = 5000; 
+  int time_spent_graphing_ms = 6000; 
 
   graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({actual_plot, set_point_plot}, {{"Actual", 0x002E8B59}, {"SetPoint", 0x00FA8072}});
@@ -210,7 +216,7 @@ void config_tune_heading() {
 
   int y_min = -30;
   int y_max = 60;
-  int time_spent_graphing_ms = 3000; 
+  int time_spent_graphing_ms = 5000; 
 
   graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({
@@ -245,12 +251,12 @@ void config_tune_heading() {
 
 
 void config_tune_turn() {  
-  data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd}, {"turn_stl_err: ", chassis.turn_settle_error}, 
-    {"turn_stl_tm: ", chassis.turn_settle_time}, {"turn_tmout: ", chassis.turn_timeout}, {"turn_starti: ", chassis.turn_starti}, {"turn_max_volt: ", chassis.turn_max_voltage} };
+  data.variables = { {"turn_kp: ", chassis.turn_kp}, {"turn_ki: ", chassis.turn_ki}, {"turn_kd: ", chassis.turn_kd}, {"turn_starti: ", chassis.turn_starti}, 
+  {"turn_max_volt: ", chassis.turn_max_voltage}, {"turn_stl_err: ", chassis.turn_settle_error}, {"turn_stl_tm: ", chassis.turn_settle_time}, {"turn_tmout: ", chassis.turn_timeout} };
 
   int y_min = -10;
   int y_max = 370;
-  int time_spent_graphing_ms = 5000; 
+  int time_spent_graphing_ms = 10000; 
 
   graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({
@@ -277,12 +283,12 @@ void config_tune_turn() {
 }
 
 void config_tune_swing() {
-  data.variables = { {"swing_kp: ", chassis.swing_kp }, {"swing_ki: ", chassis.swing_ki }, {"swing_kd: ", chassis.swing_kd}, {"swing_stl_err: ", chassis.swing_settle_error}, 
-    {"swing_stle_tm: ", chassis.swing_settle_time}, {"swing_tmout: ", chassis.swing_timeout}, {"swing_starti: ", chassis.swing_starti}, {"swing_max_volt: ", chassis.turn_max_voltage} };
+  data.variables = { {"swing_kp: ", chassis.swing_kp }, {"swing_ki: ", chassis.swing_ki }, {"swing_kd: ", chassis.swing_kd}, {"swing_starti: ", chassis.swing_starti}, 
+  {"swing_max_volt: ", chassis.turn_max_voltage}, {"swing_stl_err: ", chassis.swing_settle_error}, {"swing_stl_tm: ", chassis.swing_settle_time}, {"swing_tmout: ", chassis.swing_timeout}};
 
   int y_min = 0;
   int y_max = 360;
-  int time_spent_graphing_ms = 3000; 
+  int time_spent_graphing_ms = 5000; 
 
   graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
   graph_scr->set_plot({
@@ -308,7 +314,7 @@ void config_tune_swing() {
   PID_tuner();
 }
 
-inline int get_flicker_index(const std::string& value_str, float place) {
+static int get_flicker_index(const std::string& value_str, float place) {
   int dot_pos = value_str.find('.');
   if (dot_pos == (int)std::string::npos) {
       int idx = value_str.size() - 1 - place; 
@@ -326,7 +332,7 @@ inline int get_flicker_index(const std::string& value_str, float place) {
   }
 }
 
-inline int get_power(float n) {
+static int get_power(float n) {
     if (n <= 0) { return 1; }
     int power = 1;
     while (n >= 10) {
@@ -338,7 +344,7 @@ inline int get_power(float n) {
 
 void PID_tuner() {
   auton_scr->disable_controller_overlay();
-  disable_user_control();
+  disable_user_control(true);
   vex::task test;
 
   user_control_task = vex::task([](){
@@ -531,7 +537,7 @@ void config_add_pid_output_SD_console() {
 void config_spin_all_motors() {
   UI_select_scr(console_scr->get_console_screen()); 
   console_scr->reset();
-  disable_user_control();
+  disable_user_control(true);
   vex::task spin_mtrs([](){
     task::sleep(500);
     for (mik::motor& motor : motors_) { 
@@ -705,7 +711,7 @@ void config_skills_driver_run() {
       case 0:
         Controller.rumble(("."));
         chassis.stop_drive(vex::coast);
-        disable_user_control();
+        disable_user_control(true);
         std::abort();
         break;
       default:
@@ -721,7 +727,7 @@ void config_skills_driver_run() {
   });
 }
 
-void config_test_three_wire_port(port port) {
+void config_test_three_wire_port(int port) {
   vex::digital_out dig_out = Brain.ThreeWirePort.Port[port];
   dig_out.set(!dig_out.value());
 }

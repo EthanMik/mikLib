@@ -19,7 +19,7 @@ public:
     void set_x_pos(int x) override;
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
-    void set_callback(std::function<void()> cb) override;
+    void set_callback(std::function<void()> cb, bool call_once = true) override;
     void set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered) override;
     
     bool is_locked();
@@ -55,6 +55,7 @@ private:
     int id;
 
     bool locked = false;
+    bool call_once = true;
 
     bool pressed = false;
     bool is_toggled = false;

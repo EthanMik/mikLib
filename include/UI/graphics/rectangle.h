@@ -8,10 +8,10 @@ class rectangle : public drawable
 {
 public:
     rectangle(float x, float y, float w, float h, uint32_t fill_color, uint32_t outline_color, UI_distance_units units);
-    rectangle(float x, float y, float w, float h, vex::color fill_color, vex::color outline_color, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, const std::string& fill_color, const std::string& outline_color, int pen_width, UI_distance_units units);
 
     rectangle(float x, float y, float w, float h, uint32_t hue, UI_distance_units units);
-    rectangle(float x, float y, float w, float h, vex::color hue, UI_distance_units units);
+    rectangle(float x, float y, float w, float h, const std::string& hue, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -29,7 +29,13 @@ public:
 
 private:
     int x, y, w, h;
+    int pen_width;
     uint32_t fill_color;
     uint32_t outline_color;
+    
+    const std::string fill_color_hex;
+    const std::string outline_color_hex;
+
+    bool using_hex = false;
 };
 }

@@ -106,7 +106,7 @@ void UI_auton_screen::start_auton_test() {
     auton_run = vex::task([](){
         auton_scr->disable_controller_overlay();
         auton_scr->exit_auton_task();
-        disable_user_control();
+        disable_user_control(true);
         auton_scr->auto_running = true;
         Controller.Screen.clearScreen();
         Controller.Screen.setCursor(1, 1);
@@ -139,7 +139,7 @@ void UI_auton_screen::exit_auton_task() {
         if (btnB_new_press(Controller.ButtonB.pressing())) {
             if (!auton_scr->auto_running) {
                 auton_scr->restart_controller_overlay();
-                disable_user_control();
+                disable_user_control(true);
             } else {
                 auton_scr->auto_running = false;
                 auton_scr->end_card = true;
@@ -155,70 +155,182 @@ void UI_auton_screen::exit_auton_task() {
 void UI_auton_screen::UI_crt_auton_scr() {
     UI_auton_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
 
-    auto bg = UI_crt_bg(UI_crt_rec(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45, vex::color::black, UI_distance_units::pixels));
-    auto red_blue_tgl_lbl = UI_crt_gfx(UI_crt_img("red_blue_toggle_label.png", 13, 49, 204, 41, UI_distance_units::pixels));
-    auto red_blue_tgl_txt = UI_crt_gfx({UI_crt_txt("Blue", 37, 78, UI_distance_units::pixels), UI_crt_txt("Red", 165, 78, UI_distance_units::pixels)});
-    
-    auto rings_goal_tgl_lbl = UI_crt_gfx(UI_crt_img("rings_goal_toggle_label.png", 13, 97, 204, 41, UI_distance_units::pixels));
-    auto rings_goal_tgl_txt = UI_crt_gfx({UI_crt_txt("Left ", 37, 78+49, UI_distance_units::pixels), UI_crt_txt("Right", 155, 78+49, UI_distance_units::pixels)});
-    
-    auto quals_elims_tgl_lbl = UI_crt_gfx(UI_crt_img("quals_elims_toggle_label.png", 13, 145, 204, 41, UI_distance_units::pixels));
-    auto quals_elims_tgl_txt = UI_crt_gfx({UI_crt_txt("Quals ", 34, 78+49+47, UI_distance_units::pixels), UI_crt_txt("Elims", 155, 78+49+47, UI_distance_units::pixels)});
-    
-    auto off_sawp_tgl_lbl = UI_crt_gfx(UI_crt_img("off_skills_toggle_label.png", 13, 193, 204, 41, UI_distance_units::pixels));
-    auto off_sawp_tgl_txt = UI_crt_gfx({UI_crt_txt("Off ", 43, 78+49+47+48, UI_distance_units::pixels), UI_crt_txt("Sawp", 162, 78+49+47+48, UI_distance_units::pixels)});
+    auto tgl_outline_1 = UI_crt_grp({
+        UI_crt_rec(0.13, .5, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(2.26, .5, 0.03, 0.45, "#666666", UI_distance_units::inches),
+        UI_crt_rec(.13, .93, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(0.13, .5, .03, 0.45, "#666666", UI_distance_units::inches),
+    });
+    auto tgl_outline_2 = UI_crt_grp({
+        UI_crt_rec(0.13, .5+.5, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(2.26, .5+.5, 0.03, 0.45, "#666666", UI_distance_units::inches),
+        UI_crt_rec(.13, .93+.5, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(0.13, .5+.5, .03, 0.45, "#666666", UI_distance_units::inches),
+    });
+    auto tgl_outline_3 = UI_crt_grp({
+        UI_crt_rec(0.13, .5+1, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(2.26, .5+1, 0.03, 0.45, "#666666", UI_distance_units::inches),
+        UI_crt_rec(.13, .93+1, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(0.13, .5+1, .03, 0.45, "#666666", UI_distance_units::inches),
+    });
+    auto tgl_outline_4 = UI_crt_grp({
+        UI_crt_rec(0.13, .5+1.5, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(2.26, .5+1.5, 0.03, 0.45, "#666666", UI_distance_units::inches),
+        UI_crt_rec(.13, .93+1.5, 2.14, 0.03, "#666666", UI_distance_units::inches),
+        UI_crt_rec(0.13, .5+1.5, .03, 0.45, "#666666", UI_distance_units::inches),
+    });
 
-    auto red_blue_btn = UI_crt_btn(UI_crt_img("", 94, 60, 43, 24, UI_distance_units::pixels), [this](){  UI_select_auton(autons::RED_BLUE); flip_toggle_controller({0, 0}, red_blue); save_auton_SD(); });
-    red_blue_tgl = UI_crt_tgl(UI_crt_img("blue_toggle.png", 94, 60, 43, 24, UI_distance_units::pixels));
-    red_blue_tgl->set_states(UI_crt_img("default_toggle.png", 94, 60, 43, 24, UI_distance_units::pixels), UI_crt_img("red_toggle.png", 94, 60, 43, 24, UI_distance_units::pixels));
+    auto bg = UI_crt_bg(UI_crt_rec(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45, vex::color::black, UI_distance_units::pixels));
     
-    auto rings_goal_btn = UI_crt_btn(UI_crt_img("", 94, 108, 43, 24, UI_distance_units::pixels), [this](){ UI_select_auton(autons::RINGS_GOAL); flip_toggle_controller({0, 1}, rings_goal); save_auton_SD(); });
-    rings_goal_tgl = UI_crt_tgl(UI_crt_img("rings_toggle.png", 94, 108, 43, 24, UI_distance_units::pixels));
-    rings_goal_tgl->set_states(UI_crt_img("default_toggle.png", 94, 108, 43, 24, UI_distance_units::pixels), UI_crt_img("goal_toggle.png", 94, 108, 43, 24, UI_distance_units::pixels));
+    auto red_blue_tgl_lbl = UI_crt_gfx(tgl_outline_1);
+    auto red_blue_tgl_txt = UI_crt_gfx({UI_crt_txt("Blue", 37, 76, UI_distance_units::pixels), UI_crt_txt("Red", 165, 76, UI_distance_units::pixels)});
     
-    auto quals_elims_btn = UI_crt_btn(UI_crt_img("", 94, 156, 43, 24, UI_distance_units::pixels), [this](){ UI_select_auton(autons::QUALS_ELIMS); flip_toggle_controller({0, 2}, quals_elims); save_auton_SD(); });
-    quals_elims_tgl = UI_crt_tgl(UI_crt_img("quals_toggle.png", 94, 156, 43, 24, UI_distance_units::pixels));
-    quals_elims_tgl->set_states(UI_crt_img("default_toggle.png", 94, 156, 43, 24, UI_distance_units::pixels), UI_crt_img("elims_toggle.png", 94, 156, 43, 24, UI_distance_units::pixels));
+
+    auto rings_goal_tgl_lbl = UI_crt_gfx(tgl_outline_2);
+    auto rings_goal_tgl_txt = UI_crt_gfx({UI_crt_txt("Left ", 37, 76+49, UI_distance_units::pixels), UI_crt_txt("Right", 155, 76+49, UI_distance_units::pixels)});
     
-    auto off_sawp_btn = UI_crt_btn(UI_crt_img("", 94, 204, 43, 24, UI_distance_units::pixels), [this](){ UI_select_auton(autons::OFF_SAWP); flip_toggle_controller({1, 0}, off_sawp); save_auton_SD(); });
-    off_sawp_tgl = UI_crt_tgl(UI_crt_img("off_toggle.png", 94, 204, 43, 24, UI_distance_units::pixels));
-        off_sawp_tgl->set_states(UI_crt_img("default_toggle.png", 94, 204, 43, 24, UI_distance_units::pixels), UI_crt_img("skills_toggle.png", 94, 204, 43, 24, UI_distance_units::pixels));
+    auto quals_elims_tgl_lbl = UI_crt_gfx(tgl_outline_3);
+    auto quals_elims_tgl_txt = UI_crt_gfx({UI_crt_txt("Quals ", 34, 76+49+47, UI_distance_units::pixels), UI_crt_txt("Elims", 155, 76+49+47, UI_distance_units::pixels)});
+    
+    auto off_sawp_tgl_lbl = UI_crt_gfx(tgl_outline_4);
+    auto off_sawp_tgl_txt = UI_crt_gfx({UI_crt_txt("Off ", 43, 76+49+47+48, UI_distance_units::pixels), UI_crt_txt("Sawp", 162, 76+49+47+48, UI_distance_units::pixels)});
+
+    red_blue_tgl = UI_crt_tgl(UI_crt_grp({
+        UI_crt_cir(1.19, .6, .25, .25, "#25a3e3", UI_distance_units::inches),
+        UI_crt_rec(1.09, .6, .25, .27, "#25a3e3", UI_distance_units::inches),
+        UI_crt_cir(0.98, .6, .25, .25, "#FFFFFF", UI_distance_units::inches)
+    }));
+
+    red_blue_tgl->set_states(
+        UI_crt_grp({
+            UI_crt_rec(1.09, .6, .25, .27, "#999999", UI_distance_units::inches),
+            UI_crt_cir(0.98, .6, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.19, .6, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.08, .6, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        }),
+        
+        UI_crt_grp({
+            UI_crt_rec(1.09, .6, .25, .27, "#f14a41", UI_distance_units::inches),
+            UI_crt_cir(0.98, .6, .25, .25, "#f14a41", UI_distance_units::inches),
+            UI_crt_cir(1.19, .6, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        })
+    );
+    red_blue_tgl->set_callback([this](){  UI_select_auton(autons::RED_BLUE); flip_toggle_controller({0, 0}, red_blue); save_auton_SD(); }, false);
+    
+    rings_goal_tgl = UI_crt_tgl(UI_crt_grp({
+        UI_crt_cir(1.19, 1.1, .25, .25, "#6410a4", UI_distance_units::inches),
+        UI_crt_rec(1.09, 1.1, .25, .27, "#6410a4", UI_distance_units::inches),
+        UI_crt_cir(0.98, 1.1, .25, .25, "#FFFFFF", UI_distance_units::inches)        
+    }));
+
+    rings_goal_tgl->set_states(
+        UI_crt_grp({
+            UI_crt_rec(1.09, 1.1, .25, .27, "#999999", UI_distance_units::inches),
+            UI_crt_cir(0.98, 1.1, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.19, 1.1, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.08, 1.1, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        }),
+        
+        UI_crt_grp({
+            UI_crt_rec(1.09, 1.1, .25, .27, "#d4e404", UI_distance_units::inches),
+            UI_crt_cir(0.98, 1.1, .25, .25, "#d4e404", UI_distance_units::inches),
+            UI_crt_cir(1.19, 1.1, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        })        
+    );
+    rings_goal_tgl->set_callback([this](){ UI_select_auton(autons::RINGS_GOAL); flip_toggle_controller({0, 1}, rings_goal); save_auton_SD(); }, false);
+    
+    quals_elims_tgl = UI_crt_tgl(UI_crt_grp({
+        UI_crt_cir(1.19, 1.6, .25, .25, "#33e013", UI_distance_units::inches),
+        UI_crt_rec(1.09, 1.6, .25, .27, "#33e013", UI_distance_units::inches),
+        UI_crt_cir(0.98, 1.6, .25, .25, "#FFFFFF", UI_distance_units::inches)                
+    }));
+
+    quals_elims_tgl->set_states(
+        UI_crt_grp({
+            UI_crt_rec(1.09, 1.6, .25, .27, "#999999", UI_distance_units::inches),
+            UI_crt_cir(0.98, 1.6, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.19, 1.6, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.08, 1.6, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        }),
+        
+        UI_crt_grp({
+            UI_crt_rec(1.09, 1.6, .25, .27, "#ff0000", UI_distance_units::inches),
+            UI_crt_cir(0.98, 1.6, .25, .25, "#ff0000", UI_distance_units::inches),
+            UI_crt_cir(1.19, 1.6, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        })        
+    );
+    quals_elims_tgl->set_callback([this](){ UI_select_auton(autons::QUALS_ELIMS); flip_toggle_controller({0, 2}, quals_elims); save_auton_SD(); }, false);
+    
+    off_sawp_tgl = UI_crt_tgl(UI_crt_grp({
+        UI_crt_cir(1.19, 2.1, .25, .25, "#666666", UI_distance_units::inches),
+        UI_crt_rec(1.09, 2.1, .25, .27, "#666666", UI_distance_units::inches),
+        UI_crt_cir(0.98, 2.1, .25, .25, "#FFFFFF", UI_distance_units::inches)                
+    }));
+
+    off_sawp_tgl->set_states(
+        UI_crt_grp({
+            UI_crt_rec(1.09, 2.1, .25, .27, "#999999", UI_distance_units::inches),
+            UI_crt_cir(0.98, 2.1, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.19, 2.1, .25, .25, "#999999", UI_distance_units::inches),
+            UI_crt_cir(1.08, 2.1, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        }),
+        
+        UI_crt_grp({
+            UI_crt_rec(1.09, 2.1, .25, .27, "#ff9900", UI_distance_units::inches),
+            UI_crt_cir(0.98, 2.1, .25, .25, "#ff9900", UI_distance_units::inches),
+            UI_crt_cir(1.19, 2.1, .25, .25, "#FFFFFF", UI_distance_units::inches),
+        })        
+    );        
+    off_sawp_tgl->set_callback([this](){ UI_select_auton(autons::OFF_SAWP); flip_toggle_controller({1, 0}, off_sawp); save_auton_SD(); }, false);
     off_sawp_ID = off_sawp_tgl->get_ID();
     
-    auto show_alignment_btn = UI_crt_btn(UI_crt_img("show_alignment_button.png", 278-10, 200, 172, 30, UI_distance_units::pixels), nullptr);
-        show_alignment_btn->set_states(UI_crt_img("show_alignment_button_pressed.png", 278-10, 200, 172, 30, UI_distance_units::pixels), nullptr); 
+    auto show_alignment_btn = UI_crt_btn(UI_crt_grp({
+        UI_crt_rec(2.8, 2.09, 1.8, .32, "#666666", "#FFFFFF", 2, UI_distance_units::inches), 
+        UI_crt_txt("Calibrate", 310, 220, "#666666", UI_distance_units::pixels),
+    }), nullptr);
+        show_alignment_btn->set_states(UI_crt_grp({
+            UI_crt_rec(2.8, 2.09, 1.8, .32, "#b7b7b7", "#FFFFFF", 2, UI_distance_units::inches),
+            UI_crt_txt("Calibrate", 310, 220, "#b7b7b7", UI_distance_units::pixels),
+        }), UI_crt_grp({
+            UI_crt_rec(2.8, 2.09, 1.8, .32, "#b7b7b7", "#ff0000", 2, UI_distance_units::inches),
+            UI_crt_txt("Calibrate", 310, 220, "#b7b7b7", UI_distance_units::pixels),
+        }));
         show_alignment_btn->set_callback([this](){ queue_autons(true, false); });
 
-    auto heading_btn = UI_crt_btn(UI_crt_img("heading_bg.png", 276-10, 50, 170, 76, UI_distance_units::pixels), [](){ calibrate_inertial(); });
-        heading_btn->set_states(UI_crt_img("heading_bg_calibrate.png", 276-10, 50, 170, 76, UI_distance_units::pixels), UI_crt_img("heading_bg_calibrate.png", 276-10, 50, 170, 76, UI_distance_units::pixels));
+    auto heading_btn = UI_crt_btn(UI_crt_rec(268, 50, 170, 76, "#000000", "#FFFFFF", 2, UI_distance_units::pixels), [](){ calibrate_inertial(); });
+        heading_btn->set_states(UI_crt_rec(268, 50, 170, 76, "#000000", "#ff0000", 2, UI_distance_units::pixels), UI_crt_rec(268, 50, 170, 76, "#000000", "#ff0000", 2, UI_distance_units::pixels));
 
+    auto label_label = UI_crt_gfx({UI_crt_txt("A:", 278, 75, UI_distance_units::pixels), UI_crt_txt("X:", 278, 95, UI_distance_units::pixels), UI_crt_txt("Y:", 278, 115, UI_distance_units::pixels)});
     auto heading_lbl = UI_crt_lbl("", [](){ return chassis.get_absolute_heading(); }, 350-10, 75, UI_distance_units::pixels);
     auto x_lbl = UI_crt_lbl("", [](){ return chassis.get_X_position(); }, 350-10, 95, UI_distance_units::pixels);
     auto y_lbl = UI_crt_lbl("", [](){ return chassis.get_Y_position(); }, 350-10, 115, UI_distance_units::pixels);
 
-    auto description_box_btn = UI_crt_btn(UI_crt_img("description_text_box.png", 278-10, 138, 173, 51, UI_distance_units::pixels), [](){});
-        description_box_btn->set_states(UI_crt_img("description_text_box_pressed.png", 278-10, 138, 173, 51, UI_distance_units::pixels), UI_crt_img("description_text_box_pressed.png", 278-10, 138, 173, 90, UI_distance_units::pixels));
+    auto description_box_btn = UI_crt_gfx(UI_crt_rec(278-10, 138, 173, 51, "#000000", "#666666", 2, UI_distance_units::pixels));
 
     auto description_box = UI_crt_txtbox("", text_align::LEFT, UI_crt_img("", 278-10, 138, 173, 90, UI_distance_units::pixels));
         description_textbox = static_cast<textbox*>(description_box.get());
 
-    auto prev_auto_var_btn = UI_crt_btn(UI_crt_img("left_auton_arrow.png", 2.48, 1.225, .45, 1, UI_distance_units::inches), [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); });
-        prev_auto_var_btn->set_states(UI_crt_img("left_auton_arrow_pressed.png", 2.48, 1.225, .45, .5, UI_distance_units::inches), UI_crt_img("left_auton_arrow_pressed.png", 2.48, 1.225, .45, .5, UI_distance_units::inches));
+    auto prev_auto_var_btn = UI_crt_btn(UI_crt_grp({
+        UI_crt_rec(2.47, 1.16, .27, 1, "#000000", UI_distance_units::inches),
+        UI_crt_rec(2.45, 1.45, .27, .52, "#000000", "#666666", 2, UI_distance_units::inches),
+    }), [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); });
+
+    prev_auto_var_btn->set_states(UI_crt_grp({
+        UI_crt_rec(2.45, 1.45, .27, .52, "#000000", "#FFFFFF", 2, UI_distance_units::inches),
+    }), nullptr);
     
-    auto auto_var_num_txt_ = UI_crt_gfx({UI_crt_txt("", 2.625, 1.76, 0x00434343, UI_distance_units::inches)});
+    auto auto_var_num_txt_ = UI_crt_gfx({UI_crt_txt("", 243, 169, "#000000", UI_distance_units::pixels)});
     auto_var_num_txt = static_cast<graphic*>(auto_var_num_txt_.get());
-    // 0x00434343
-    // 0x00999999
 
     UI_auton_scr->add_UI_components({bg, red_blue_tgl_lbl, red_blue_tgl_txt, rings_goal_tgl_lbl, rings_goal_tgl_txt, quals_elims_tgl_lbl, quals_elims_tgl_txt,
-        off_sawp_tgl_lbl, off_sawp_tgl_txt, red_blue_btn, red_blue_tgl, rings_goal_btn, rings_goal_tgl, quals_elims_btn, quals_elims_tgl, 
-        off_sawp_btn, off_sawp_tgl, show_alignment_btn, prev_auto_var_btn, auto_var_num_txt_, description_box_btn, description_box, heading_btn, heading_lbl, x_lbl, y_lbl});
+        off_sawp_tgl_lbl, off_sawp_tgl_txt, red_blue_tgl, rings_goal_tgl, quals_elims_tgl, 
+        off_sawp_tgl, show_alignment_btn, prev_auto_var_btn, auto_var_num_txt_, description_box_btn, description_box, heading_btn, label_label, heading_lbl, x_lbl, y_lbl});
     
     set_description();
 }
 
 void UI_auton_screen::update_var_display() {
-    auto_var_num_txt->replace_graphic(UI_crt_txt(to_string(var_num), 2.625, 1.76, 0x00434343, UI_distance_units::inches));
+    auto_var_num_txt->replace_graphic(UI_crt_txt(to_string(var_num), 243, 169, "#000000", UI_distance_units::pixels));
 }
 
 

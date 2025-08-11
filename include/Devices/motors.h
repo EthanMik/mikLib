@@ -18,12 +18,16 @@ public:
      * @param reverse Sets the reverse flag for the new motor object.
      * @param name Sets the name for the motor
      */
+    motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name);
+
     motor(int port, bool reversed, std::string name);
 
     /** @return The port in PORT# format */
     const std::string port() const;
     /** @return True is motor is reversed */
     bool reversed() const;
+    /** @return The gear cartidge used in mik::motor, default is 6 to 1 */
+    vex::gearSetting gear_cartridge() const;
     /** @return The name given to mik::motor */
     std::string& name();
     /** @return The name given to mik::motor */
@@ -31,6 +35,7 @@ public:
 
 private:
     int port_;
+    vex::gearSetting gear_cartridge_;
     bool reversed_;
     std::string name_;
 };

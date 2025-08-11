@@ -2,6 +2,12 @@
 
 #include "vex.h"
 
+/** @brief Constants used while tuning relative motions */
+void relative_mode_constants();
+
+/** @brief Constants used while tuning odom motions */
+void odom_mode_constants();
+
 /** @brief Robot should drive and end in starting position. */
 void test_drive();
 /** @brief Robot should drive and end in starting position. */
@@ -111,9 +117,9 @@ extern std::vector<std::string> error_data;
  * 
  * - Y – Shift the digit cursor one place to the left
  * 
- * - B – Start the auton test, reset the graph, and begin re-plotting
+ * - X – Start the auton test, reset the graph, and begin re-plotting
  * 
- * - X – Cancel the auton run and re-enable user control
+ * - B – Cancel the auton run and re-enable user control
  */
 void PID_tuner();
 
@@ -171,4 +177,4 @@ void config_error_data();
 void config_skills_driver_run();
 
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
-void config_test_three_wire_port(port port);
+void config_test_three_wire_port(int port);

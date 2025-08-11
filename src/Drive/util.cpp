@@ -1,5 +1,6 @@
 #include "vex.h"
 
+
 float clamp(float input, float min, float max) {
   if (input > max) { return max; }
   if (input < min) { return min; }
@@ -65,13 +66,13 @@ float mirror_angle(float angle, bool mirror) {
   return angle;
 }
 
-direction mirror_direction(direction dir, bool mirror) {
+mik::direction mirror_direction(mik::direction dir, bool mirror) {
   if (mirror) {
-    if (dir == direction::CW) {
-      return direction::CCW;
+    if (dir == mik::direction::CW) {
+      return mik::direction::CCW;
     }
-    if (dir == direction::CCW) {
-      return direction::CW;
+    if (dir == mik::direction::CCW) {
+      return mik::direction::CW;
     }
   }
   return dir;
@@ -91,14 +92,14 @@ float mirror_y(float y, bool mirror) {
   return y;
 }
 
-float angle_error(float error, direction dir) {
+float angle_error(float error, mik::direction dir) {
   switch (dir)
   {
-  case direction::CW:
+  case mik::direction::CW:
     return error < 0 ? error + 360 : error;
-    case direction::CCW:
+    case mik::direction::CCW:
     return error > 0 ? error - 360 : error;
-    case direction::FASTEST:
+    case mik::direction::FASTEST:
     return reduce_negative_180_to_180(error);
   }
 }
@@ -220,7 +221,7 @@ void write_to_SD_file(const std::string& file_name, const std::string& data) {
   Brain.SDcard.appendfile(file_name.c_str(), name_buffer.data(), name_buffer.size());
 }
 
-inline std::vector<char> get_SD_file_char(const std::string& file_name) {
+static std::vector<char> get_SD_file_char(const std::string& file_name) {
   if (!SD_text_file_exists(file_name)) { return {' '}; }
 
   int file_size = Brain.SDcard.size(file_name.c_str());
@@ -271,7 +272,7 @@ std::vector<std::string> get_SD_file_txt(const std::string& file_name) {
   return sd_output;
 }
 
-inline const char* to_ansi(mik::color clr) {
+static const char* to_ansi(mik::color clr) {
   switch (clr) {
   case mik::color::BLACK:          return "\x1b[30m";
   case mik::color::RED:            return "\x1b[31m";

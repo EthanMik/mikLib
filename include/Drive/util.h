@@ -3,15 +3,8 @@
 #include "vex.h"
 
 typedef struct point{
-  double x;
-  double y;
-};
-
-/** @brief Explicitly specifies rotation direction when turning or swinging. */
-enum class direction {
-    FASTEST, // Direction chosen automatically (shortest path)
-    CW,      // Clockwise rotation
-    CCW      // Counter‑clockwise rotation
+    double x;
+    double y;
 };
 
 /**
@@ -119,7 +112,7 @@ float mirror_angle(float angle, bool mirror);
  * @param mirror Whether to apply mirroring.
  * @return Mirrored (or original) direction value.
  */
-direction mirror_direction(direction dir, bool mirror);
+mik::direction mirror_direction(mik::direction dir, bool mirror);
 
 /**
  * @brief Conditionally mirror an X coordinate (negate when mirrored).
@@ -151,7 +144,7 @@ float mirror_y(float y, bool mirror);
  * @param dir Direction preference: CW, CCW, or FASTEST (default).
  * @return Normalized angular error in degrees consistent with `dir`.
  */
-float angle_error(float error, direction dir = direction::FASTEST);
+float angle_error(float error, mik::direction dir = mik::direction::FASTEST);
 
 /**
  * @brief Settling control for odometry functions.
@@ -262,26 +255,6 @@ void remove_duplicates_SD_file(const std::string& file_name, const std::string& 
  * @return A vector that contains each line of the text file
  */
 std::vector<std::string> get_SD_file_txt(const std::string& file_name);
-
-namespace mik {
-    enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
-    constexpr color black         = color::BLACK;
-    constexpr color red           = color::RED;
-    constexpr color green         = color::GREEN;
-    constexpr color yellow        = color::YELLOW;
-    constexpr color blue          = color::BLUE;
-    constexpr color magenta       = color::MAGENTA;
-    constexpr color cyan          = color::CYAN;
-    constexpr color white         = color::WHITE;
-    constexpr color bright_black  = color::BRIGHT_BLACK;
-    constexpr color bright_red    = color::BRIGHT_RED;
-    constexpr color bright_green  = color::BRIGHT_GREEN;
-    constexpr color bright_yellow = color::BRIGHT_YELLOW;
-    constexpr color bright_blue   = color::BRIGHT_BLUE;
-    constexpr color bright_magenta= color::BRIGHT_MAGENTA;
-    constexpr color bright_cyan   = color::BRIGHT_CYAN;
-    constexpr color bright_white  = color::BRIGHT_WHITE;
-}
 
 /** @brief Prints to terminal via serial.
  * @param data The datatype to be printed to terminal.
