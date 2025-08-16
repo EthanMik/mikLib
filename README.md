@@ -13,7 +13,7 @@ An easy to use odometry VEXcode template with UI support.
    - Drive to pose via boomerang
    - Follow path via pure pursuit
    - Motion Chaining
-- Driver control
+- User control
    - Split Aracde
    - Tank
    - Drive curve versions
