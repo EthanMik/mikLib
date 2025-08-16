@@ -19,7 +19,7 @@ An easy to use odometry VEXcode template with UI support.
 1. Download and install Visual Studio Code [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
 2. Install the VEX Robotics Extension in VSCode
-   - Open the Extensions view (`Ctrl/Cmd+Shift+X`)
+   - Open the Extensions view (`Ctrl+Shift+X`)
    - Search for and install **"VEX Robotics Extension"** by VEX Robotics
    
 3. Download the project by downloading the "mikLib.zip" file [here](https://github.com/EthanMik/mikLib/releases/latest).
