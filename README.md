@@ -3,17 +3,25 @@ An easy to use odometry VEXcode template with UI support.
 
 ## Features
 - Generic PID class
-- Two tracker Inertial Odometry
-- Turn to heading and point
-- Swing to heading and point
-- Drive inches and to point
-- Drive to pose via boomerang
-- Follow path via pure pursuit
-- Motion Chaining
-- Chassis control with drive curves
-- Realtime PID graphing and tuning
-- Controller and Brain Auton Selector
-- Config Macros
+- Odometry
+   - Two tracker inertial
+   - Wall resetting
+- Drive motions
+   - Turn to heading and point
+   - Swing to heading and point
+   - Drive inches and to point
+   - Drive to pose via boomerang
+   - Follow path via pure pursuit
+   - Motion Chaining
+- Driver control
+   - Split Aracde
+   - Tank
+   - Drive curve versions
+- UI
+   - Realtime PID graphing and tuning
+   - Controller and Brain Auton Selector
+   - SD card selected auton and PID value saving
+   - Config Macros
 
 ## Installation
 1. Download and install Visual Studio Code [https://code.visualstudio.com/](https://code.visualstudio.com/)
@@ -25,6 +33,8 @@ An easy to use odometry VEXcode template with UI support.
 3. Download the project by downloading the "mikLib.zip" file [here](https://github.com/EthanMik/mikLib/releases/latest).
 
 5. Import the project opening the VEX extension and selecting "Import" from the file menu and selecting the mikLib.zip file you downloaded.
+
+6. Configure your robot through robot-config.cpp
 
 ## Tutorials
 - [How to setup Tracking Wheels](https://youtu.be/ZLTW1LMl5fk)
