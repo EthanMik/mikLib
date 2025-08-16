@@ -4,6 +4,8 @@
 
 using namespace vex;
 
+enum lift_positions : int { IDLE = 229, LOADING = 206, SCORING = 99 };
+
 class Assembly {
 public:
     Assembly(
@@ -21,7 +23,6 @@ public:
     void intake_motors_control();
     void long_piston_control();
 
-    enum lift_positions : int { IDLE = 229, LOADING = 206, SCORING = 99 };
     int lift_arm_position = IDLE;
     vex::task lift_task;
     

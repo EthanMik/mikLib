@@ -1,0 +1,81 @@
+{
+  "title": "mikLib",
+  "description": "mikLib-v1.1.1        Press X to hide auton selector",
+  "icon": "USER911x.bmp",
+  "version": "22.03.0110",
+  "sdk": "20220215_18_00_00",
+  "language": "cpp",
+  "competition": false,
+  "files": [
+    { "name": "include/vex.h", "type": "File", "specialType": "" },
+    { "name": "include/assembly.h", "type": "File", "specialType": "" },
+    { "name": "include/autons.h", "type": "File", "specialType": "" },
+    { "name": "include/robot-config.h", "type": "File", "specialType": "" },
+    { "name": "include/test.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/globals.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/Drive/util.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Drive/odom.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Drive/PID.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Drive/chassis.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/Devices/motors.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Devices/distance.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Devices/piston.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/UI/UI_component.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/UI_util.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/UI_manager.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/button.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/toggle.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/label.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphic.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/background.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/textbox.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/screen.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/UI/screens/console_screen.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/screens/auton_screen.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/screens/config_screen.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/screens/graph_screen.h", "type": "File", "specialType": "" },
+
+    { "name": "include/mikLib/UI/graphics/drawable.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/image.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/rectangle.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/logo.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/circle.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/text.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/pixel.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/line.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/graphics/group.h", "type": "File", "specialType": "" },
+
+    { "name": "makefile", "type": "File", "specialType": "" },
+    { "name": "src/main.cpp", "type": "File", "specialType": "" },
+    { "name": "src/robot-config.cpp", "type": "File", "specialType": "device_config" },
+    { "name": "src/autons.cpp", "type": "File", "specialType": "" },
+
+    { "name": "vex/mkenv.mk", "type": "File", "specialType": "" },
+    { "name": "vex/mkrules.mk", "type": "File", "specialType": "" },
+
+    { "name": "include", "type": "Directory" },
+    { "name": "include/mikLib", "type": "Directory" },
+    { "name": "include/mikLib/Drive", "type": "Directory" },
+    { "name": "include/mikLib/Devices", "type": "Directory" },
+    { "name": "include/mikLib/UI", "type": "Directory" },
+    { "name": "include/mikLib/UI/screens", "type": "Directory" },
+    { "name": "include/mikLib/UI/graphics", "type": "Directory" },
+    { "name": "src", "type": "Directory" },
+    { "name": "vex", "type": "Directory" }
+  ],
+  "device": {
+    "slot": 1,
+    "uid": "276-4810",
+    "options": {}
+  },
+  "isExpertMode": true,
+  "isExpertModeRC": false,
+  "isVexFileImport": false,
+  "robotconfig": [],
+  "neverUpdate": null
+}
