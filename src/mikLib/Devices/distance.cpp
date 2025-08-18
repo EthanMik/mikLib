@@ -7,8 +7,8 @@ using namespace mik;
 #define WALL_LEFT_X   -70
 #define WALL_RIGHT_X   70
 
-#define WALL_TOP_ANGLE_OFFSET    180
-#define WALL_BOTTOM_ANGLE_OFFSET 180
+#define WALL_TOP_ANGLE_OFFSET    270
+#define WALL_BOTTOM_ANGLE_OFFSET 270
 #define WALL_LEFT_ANGLE_OFFSET    90
 #define WALL_RIGHT_ANGLE_OFFSET   90
 
@@ -51,7 +51,17 @@ float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position,
     const float y_offset = distance_sensors[index].y_center_offset();
     const float theta = angle + wall_offset + sensor_offset; 
 
-    return (wall_pos + (cos(to_rad(theta)) * (distance + y_offset)) + (sin(to_rad(angle - wall_offset)) * x_offset));
+    const bool reset_x = (wall_position == wall_position::LEFT_WALL || wall_position == wall_position::RIGHT_WALL);
+    const bool reset_y = (wall_position == wall_position::TOP_WALL || wall_position == wall_position::BOTTOM_WALL);
+    
+    if (reset_x) {
+        return wall_pos + (cos(to_rad(theta)) * distance) - (cos(to_rad(angle)) * x_offset) - (sin(to_rad(angle)) * y_offset);
+    }
+    if (reset_y) {
+        return wall_pos + (sin(to_rad(theta)) * distance) + (sin(to_rad(angle)) * x_offset) - (cos(to_rad(angle)) * y_offset);
+    }
+
+    return NAN;
 }
 
 std::vector<mik::distance>& mik::distance_reset::get_distance_sensors() {
