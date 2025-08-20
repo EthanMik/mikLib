@@ -38,7 +38,7 @@ An easy to use odometry VEXcode template with UI support.
 
 ## Tutorials
 - [How to setup Tracking Wheels](https://youtu.be/ZLTW1LMl5fk)
-- [Configuring Chassis]()
-- [Configuring Assembly]()
-- [Tuning PID]()
-- [Writing Autonoumous]()
+- [Configuring Chassis](https://youtu.be/JFp0QZ64V_E)
+- [Configuring Assembly](https://youtu.be/loy014PUDp0)
+- [Tuning PID](https://youtu.be/89Jj4shI0hc)
+- [Writing Autonoumous](https://youtu.be/HA26axr4WG8)
