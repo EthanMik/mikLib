@@ -8,7 +8,7 @@ void relative_mode_constants() {
 }
 
 void odom_mode_constants() {
-	  odom_constants();
+	odom_constants();
 }
 
 void test_drive() {
