@@ -153,9 +153,9 @@ static bool testing_odom = false;
 bool config_swap_test_mode() {
 	testing_odom = !testing_odom;
 	if (testing_odom) {
-		odom_constants();
+		odom_mode_constants();
 	} else {
-		default_constants();
+		relative_mode_constants();
 	}
 	return testing_odom;
 }
