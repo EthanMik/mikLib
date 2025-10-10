@@ -60,6 +60,41 @@ namespace mik {
 
 // UI Globals
 
+    // Selector panel colors
+    const std::string selector_text_color = "#ffffff";
+    const std::string selector_bg_color = "#000000";
+    const std::string selector_scroll_bar_color = "#434343";
+    const std::string selector_bg_pressing_color = "#666666";
+    const std::string selector_bg_pressed_color = "#434343";
+    const std::string selector_outline_color = "#434343";
+    const std::string selector_outline_pressing_color = "#999999";
+    const std::string selector_outline_pressed_color = "#999999";
+
+    // Config screen colors
+    const std::string config_bg_color = "#000000";
+    const std::string config_scroll_bar_color = "#ffffff";
+
+    const std::string config_macro_btn_text_color = "#ffffff";
+    const std::string config_macro_btn_bg_color = "#000000";
+    const std::string config_macro_btn_outline_color = "#666666";
+    const std::string config_macro_btn_outline_pressing_color = "#ffffff";
+    const std::string config_macro_btn_outline_pressed_color = "#ff0000";
+
+    const std::string config_data_btn_text_color = "#ffffff";
+    const std::string config_data_btn_bg_color = "#232323";
+    const std::string config_data_btn_outline_color = "#666666";
+    const std::string config_data_btn_outline_pressing_color = "#ffffff";
+    const std::string config_data_btn_outline_pressed_color = "#ff0000";
+
+    const std::string config_test_btn_text_color = "#ffffff";
+    const std::string config_test_btn_bg_color = "#323232";
+    const std::string config_test_btn_outline_color = "#666666";
+    const std::string config_test_btn_outline_pressing_color = "#ffffff";
+    const std::string config_test_btn_outline_pressed_color = "#ff0000";
+
+    // Auton screen colors
+    const std::string auton_bg_color = "#000000";
+
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
     inline constexpr color black          = color::BLACK;
