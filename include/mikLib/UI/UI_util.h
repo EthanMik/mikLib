@@ -48,25 +48,25 @@ std::shared_ptr<mik::UI_component> UI_crt_tgl(std::shared_ptr<mik::drawable> tog
 
 std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<mik::drawable> box);
 std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box);
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, uint32_t bg_color, std::shared_ptr<mik::drawable> box);
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, uint32_t text_color, uint32_t bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box);
 
 std::shared_ptr<mik::UI_component> UI_crt_btn(std::shared_ptr<mik::drawable> button_graphic, std::function<void()> on_click);
 
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, float x, float y, mik::UI_distance_units units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units);
 template <typename T>
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, T& data, float x, float y, mik::UI_distance_units units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units);
 template <typename F>
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, F&& data_func, float x, float y, mik::UI_distance_units units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units);
 
 template <typename T>
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, T& data, float x, float y, mik::UI_distance_units units) {
-    return std::make_shared<mik::label>(label_text, data, x, y, units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::label>(label_text, data, x, y, text_color, bg_color, units);
 }
 
 template <typename F>
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, F&& data_func, float x, float y, mik::UI_distance_units units) {
-    return std::make_shared<mik::label>(label_text, std::forward<F>(data_func), x, y, units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::label>(label_text, std::forward<F>(data_func), x, y, text_color, bg_color, units);
 }
 
 std::shared_ptr<mik::UI_component> UI_crt_gfx(std::shared_ptr<mik::drawable> graphic_);

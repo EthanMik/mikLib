@@ -70,12 +70,12 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
     int delta_button_y_pos = text_start_pos_y + this->UI_console_scr->get_component_delta_pos() + this->UI_console_scr->get_y_pos() - 15;
     int screen_increase_factor = 20;
 
-    auto lbl = UI_crt_lbl(label_text, std::forward<data_type>(data), text_start_pos_x, delta_label_y_pos, UI_distance_units::pixels);
+    auto lbl = UI_crt_lbl(label_text, std::forward<data_type>(data), text_start_pos_x, delta_label_y_pos, console_text_color, console_bg_color, UI_distance_units::pixels);
 
     int button_width = std::max(lbl->get_width(), 50);
 
     auto remove_lbl_btn = UI_crt_btn(
-        UI_crt_rec(10, delta_button_y_pos, button_width, 20, 0x00000000, UI_distance_units::pixels),
+        UI_crt_rec(10, delta_button_y_pos, button_width, 20, console_bg_color, UI_distance_units::pixels),
         nullptr
     );
 
@@ -87,7 +87,7 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
         this->UI_console_scr->remove_UI_component({lbl_id, btn_id});
         UI_console_scr->refresh(); 
     });
-    remove_lbl_btn->set_states(UI_crt_rec(10, delta_button_y_pos, button_width, 20, 0x006B6B6B, UI_distance_units::pixels), nullptr);
+    remove_lbl_btn->set_states(UI_crt_rec(10, delta_button_y_pos, button_width, 20, console_text_bg_color, UI_distance_units::pixels), nullptr);
 
     this->UI_console_scr->add_UI_components({remove_lbl_btn, lbl});
 

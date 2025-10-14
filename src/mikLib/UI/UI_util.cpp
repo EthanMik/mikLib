@@ -142,11 +142,11 @@ std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_ali
     return std::make_shared<mik::textbox>(text, text_alignment, box);
 }
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, uint32_t bg_color, std::shared_ptr<mik::drawable> box) {
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box) {
     return std::make_shared<mik::textbox>(text, text_alignment, bg_color, box);
 }
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, uint32_t text_color, uint32_t bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box) {
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box) {
     return std::make_shared<mik::textbox>(text, text_color, bg_color, text_alignment, box);
 }
 
@@ -167,8 +167,8 @@ std::shared_ptr<mik::UI_component> UI_crt_btn(std::shared_ptr<mik::drawable> but
 }
 
 
-std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, float x, float y, mik::UI_distance_units units) {
-    return std::make_shared<mik::label>(label_text, x, y, units);
+std::shared_ptr<mik::UI_component> UI_crt_lbl(const std::string& label_text, float x, float y, const std::string& text_color, const std::string& bg_color, mik::UI_distance_units units) {
+    return std::make_shared<mik::label>(label_text, x, y, text_color, bg_color, units);
 }
 
 

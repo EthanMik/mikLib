@@ -9,8 +9,8 @@ class textbox : public UI_component
 public:
     textbox(std::string text, std::shared_ptr<drawable> box);
     textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box);
-    textbox(std::string text, text_align text_alignment, uint32_t bg_color, std::shared_ptr<drawable> box);
-    textbox(std::string text, uint32_t text_color, uint32_t bg_color, text_align text_alignment, std::shared_ptr<drawable> box);
+    textbox(std::string text, text_align text_alignment, const std::string& bg_color, std::shared_ptr<drawable> box);
+    textbox(std::string text, const std::string& text_color, const std::string& bg_color, text_align text_alignment, std::shared_ptr<drawable> box);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -40,8 +40,8 @@ private:
     UI_distance_units units;
     std::string text;
     std::shared_ptr<drawable> box;
-    uint32_t text_color;
-    uint32_t bg_color;
+    std::string text_color;
+    std::string bg_color;
     text_align alignment;
     std::vector<std::string> wrapped_text;
 };

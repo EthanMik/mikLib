@@ -15,22 +15,22 @@ std::shared_ptr<screen> UI_console_screen::get_console_screen() {
 }
 
 void UI_console_screen::UI_crt_console_scr() {
-    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45, 0x00000000, UI_distance_units::pixels));
+    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45, console_bg_color, UI_distance_units::pixels));
 
     this->UI_console_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
-    UI_console_scr->add_scroll_bar(UI_crt_rec(0, 0, 3, 40, 0x00434343, UI_distance_units::pixels), screen::alignment::RIGHT);
+    UI_console_scr->add_scroll_bar(UI_crt_rec(0, 0, 3, 40, console_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
 
-    auto top_border = UI_crt_rec(3, 5, 465, 3, 0x00666666, UI_distance_units::pixels);
-    auto left_border = UI_crt_rec(3, 5, 3, 180, 0x00666666, UI_distance_units::pixels);
-    auto right_border = UI_crt_rec(465, 5, 3, 180, 0x00666666, UI_distance_units::pixels);
-    auto bottom_border = UI_crt_rec(3, 185, 465, 3, 0x00666666, UI_distance_units::pixels);
+    auto top_border = UI_crt_rec(3, 5, 465, 3, console_outline_color, UI_distance_units::pixels);
+    auto left_border = UI_crt_rec(3, 5, 3, 180, console_outline_color, UI_distance_units::pixels);
+    auto right_border = UI_crt_rec(465, 5, 3, 180, console_outline_color, UI_distance_units::pixels);
+    auto bottom_border = UI_crt_rec(3, 185, 465, 3, console_outline_color, UI_distance_units::pixels);
 
     auto screen_border_top = UI_crt_gfx({top_border});
     UI_console_scr_border_sides = UI_crt_gfx({left_border, right_border});
     UI_console_scr_border_bottom = UI_crt_gfx({bottom_border});
     this->UI_console_scr->add_UI_components({bg, screen_border_top, UI_console_scr_border_sides, UI_console_scr_border_bottom});
 }
-
+    
 void UI_console_screen::reset() {
     std::vector<int> remove_components;
     for (const auto& component : this->UI_console_scr->get_UI_components()) {

@@ -2,8 +2,8 @@
 
 using namespace mik;
 
-label::label(const std::string& label, float x, float y, UI_distance_units units):
-    label_text(label), units(units), data_func([](){ return ""; } )
+label::label(const std::string& label, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units):
+    label_text(label), text_color(text_color), bg_color(bg_color), units(units), data_func([](){ return ""; } )
 {
     unique_id = UI_create_ID(UI_Label_ID);
 
@@ -52,8 +52,8 @@ bool label::needs_update() {
 } 
 
 void label::render() {
-    Brain.Screen.setPenColor(vex::color::white);
-    Brain.Screen.setFillColor(vex::color::black);
+    Brain.Screen.setPenColor(text_color.c_str());
+    Brain.Screen.setFillColor(bg_color.c_str());
     Brain.Screen.printAt(x, y, (label_text + formatted_data).c_str());
 }
 

@@ -7,13 +7,13 @@ namespace mik {
 class label : public UI_component
 {
 public:
-    label(const std::string& label, float x, float y, UI_distance_units units);
+    label(const std::string& label, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units);
 
     template<typename T>
-    label(const std::string& label, T& data, float x, float y, UI_distance_units units);
+    label(const std::string& label, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units);
     
     template<typename F>
-    label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units);
+    label(const std::string& label, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -29,6 +29,8 @@ public:
 
 private:
     std::string label_text;
+    std::string text_color;
+    std::string bg_color;
     int x, y, w, h;
     UI_distance_units units;
     std::function<std::string()> data_func;
@@ -45,7 +47,7 @@ private:
 }
 
 template<typename T>
-mik::label::label(const std::string& label, T& data, float x, float y, UI_distance_units units): 
+mik::label::label(const std::string& label, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units): 
     label_text(label),
     data_func([&data]() {
         std::ostringstream oss;
@@ -55,6 +57,8 @@ mik::label::label(const std::string& label, T& data, float x, float y, UI_distan
         oss << data;
         return oss.str();
     }),
+    text_color(text_color),
+    bg_color(bg_color),
     units(units)
 {
     unique_id = UI_create_ID(UI_Label_ID);
@@ -67,7 +71,7 @@ mik::label::label(const std::string& label, T& data, float x, float y, UI_distan
 
 
 template<typename F>
-mik::label::label(const std::string& label, F&& data_func, float x, float y, UI_distance_units units): 
+mik::label::label(const std::string& label, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units): 
     label_text(label),
     data_func([data_func = std::forward<F>(data_func)]() {
         std::ostringstream oss;
@@ -78,6 +82,8 @@ mik::label::label(const std::string& label, F&& data_func, float x, float y, UI_
         oss << value;
         return oss.str();
     }),
+    text_color(text_color),
+    bg_color(bg_color),
     units(units) 
 {
     unique_id = UI_create_ID(UI_Label_ID);
