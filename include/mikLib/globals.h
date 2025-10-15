@@ -60,6 +60,121 @@ namespace mik {
 
 // UI Globals
 
+    // UI main color palette
+    inline const std::string UI_white =      "#ffffff"; // Text and secondary primary outline color
+    inline const std::string UI_light_gray = "#999999"; // Secondary outline color
+    inline const std::string UI_med_gray =   "#666666"; // Primary outline color
+    inline const std::string UI_dark_gray =  "#434343"; // Secondary background color
+    inline const std::string UI_black =      "#000000"; // Primary background color
+    inline const std::string UI_red =        "#ff0000"; // Tertiary outline color
+
+    // Loading screen
+    inline const std::string& loading_text_bg_color = UI_dark_gray; 
+    inline const std::string& loading_text_color = UI_white; 
+
+    // Selector panel colors
+    inline const std::string& selector_text_color = UI_white;
+    inline const std::string& selector_bg_color = UI_black;
+    inline const std::string& selector_scroll_bar_color = UI_dark_gray;
+    
+    inline const std::string& selector_bg_pressing_color = UI_med_gray;
+    inline const std::string& selector_bg_pressed_color = UI_dark_gray;
+    inline const std::string& selector_outline_color = UI_dark_gray;
+    inline const std::string& selector_outline_pressing_color = UI_light_gray;
+    inline const std::string& selector_outline_pressed_color = UI_light_gray;
+
+    // Config screen colors
+    inline const std::string& config_text_color = UI_white;
+    inline const std::string& config_bg_color = UI_black;
+    inline const std::string& config_scroll_bar_color = UI_med_gray;
+
+    inline const std::string& config_btn_outline_color = UI_med_gray;
+    inline const std::string& config_btn_outline_pressing_color = UI_white;
+    inline const std::string& config_btn_outline_pressed_color = UI_red;
+    
+    inline const std::string config_macro_btn_bg_color = "#000000";
+    inline const std::string config_data_btn_bg_color =  "#232323";
+    inline const std::string config_test_btn_bg_color =  "#323232";
+
+    // Pnematic screen colors
+    inline const std::string& pnematic_bg_color = UI_black;
+    inline const std::string& pnematic_text_color = UI_white;
+    
+    inline const std::string& pnematic_port_btn_outline_color = UI_dark_gray;
+    inline const std::string& pnematic_port_btn_outline_pressing_color = UI_light_gray;
+    inline const std::string& pnematic_port_btn_outline_pressed_color = UI_red;
+
+    inline const std::string& pnematic_close_btn_bg_color = UI_black;
+    inline const std::string& pnematic_close_btn_outline_color = UI_med_gray;
+    inline const std::string& pnematic_close_btn_pressing_color = UI_light_gray;
+    inline const std::string& pnematic_close_btn_pressed_color = UI_red;
+    
+    inline const std::string pnematic_A_btn_bg_color = "#303030";
+    inline const std::string pnematic_B_btn_bg_color = "#595959";
+    inline const std::string pnematic_C_btn_bg_color = "#858585";
+    inline const std::string pnematic_D_btn_bg_color = "#cccccc";
+    inline const std::string pnematic_E_btn_bg_color = "#303030";
+    inline const std::string pnematic_F_btn_bg_color = "#595959";
+    inline const std::string pnematic_G_btn_bg_color = "#858585";
+    inline const std::string pnematic_H_btn_bg_color = "#858585";
+
+    // Auton screen colors
+    inline const std::string& auton_bg_color = UI_black;
+    inline const std::string& auton_text_color = UI_white;
+
+    inline const std::string& auton_toggle_panel_outline_color = UI_med_gray;
+    inline const std::string& auton_toggle_knob_color = UI_white;
+    inline const std::string& auton_pressing_toggle_bg_color = UI_light_gray;
+
+    inline const std::string auton_toggle_blue_bg_color =  "#25a3e3";
+    inline const std::string auton_toggle_red_bg_color =   "#f14a41";
+    inline const std::string auton_toggle_left_bg_color =  "#d4e404";
+    inline const std::string auton_toggle_right_bg_color = "#6410a4"; 
+    inline const std::string auton_toggle_quals_bg_color = "#ff0000";
+    inline const std::string auton_toggle_elims_bg_color = "#33e013";
+    inline const std::string auton_toggle_off_bg_color =   "#666666";
+    inline const std::string auton_toggle_sawp_bg_color =  "#ff9900";
+    
+    inline const std::string& auton_data_bg_color = UI_black;
+    inline const std::string& auton_data_outline_color = UI_white;
+    inline const std::string& auton_data_pressing_color = UI_red;
+    inline const std::string& auton_data_pressed_color = UI_red;
+
+    inline const std::string& auton_num_bg_color = UI_black;
+    inline const std::string& auton_num_outline_color = UI_med_gray;
+    inline const std::string& auton_num_pressing_color = UI_light_gray;
+    inline const std::string& auton_num_pressed_color = UI_red;
+
+    inline const std::string& auton_description_bg_color = UI_black;
+    inline const std::string& auton_description_outline_color = UI_med_gray;
+
+    inline const std::string& auton_calibrate_bg_color = UI_med_gray;
+    inline const std::string& auton_calibrate_bg_pressing_color = UI_light_gray;
+    inline const std::string& auton_calibrate_outline_color = UI_white;
+    inline const std::string& auton_calibrate_outline_pressing_color = UI_white;
+    inline const std::string& auton_calibrate_outline_pressed_color = UI_red;
+
+    // Graph screen colors
+    inline const std::string& graph_bg_color = UI_black;
+    inline const std::string& graph_text_color = UI_white;
+
+    inline const std::string& graph_chart_bg_color = UI_black;
+    inline const std::string& graph_chart_outline_color = UI_med_gray;
+    inline const std::string& graph_legend_bg_color = UI_black;
+    inline const std::string& graph_legend_outline_color = UI_med_gray;
+    
+    inline const std::string& graph_reset_btn_bg_color = UI_black;
+    inline const std::string& graph_reset_btn_outline_color = UI_med_gray;
+    inline const std::string& graph_reset_btn_pressing_color = UI_white;
+    inline const std::string& graph_reset_btn_pressed_color = UI_red;
+
+    // Console screen colors
+    inline const std::string& console_bg_color = UI_black;
+    inline const std::string& console_text_color = UI_white;
+    inline const std::string& console_text_bg_color = UI_med_gray;
+    inline const std::string& console_outline_color = UI_med_gray;
+    inline const std::string& console_scroll_bar_color = UI_med_gray;
+    
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
     inline constexpr color black          = color::BLACK;

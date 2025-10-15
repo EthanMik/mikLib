@@ -1,5 +1,7 @@
 #include "vex.h"
 
+using namespace mik;
+
 std::vector<std::shared_ptr<mik::screen>> UI_render_queue = {};
 static std::vector<std::shared_ptr<mik::screen>> UI_render_buffer;
 
@@ -45,28 +47,28 @@ void UI_init() {
 
     // Initialize selector panel
     selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160, 45);
-    selector_panel_scr->add_scroll_bar(UI_crt_rec(0, 0, 40, 3, 0x00434343, mik::UI_distance_units::pixels), mik::screen::alignment::BOTTOM);
+    selector_panel_scr->add_scroll_bar(UI_crt_rec(0, 0, 40, 3, selector_scroll_bar_color, mik::UI_distance_units::pixels), mik::screen::alignment::BOTTOM);
 
     // Init config selector toggle
     config_tgl = UI_crt_tgl(UI_crt_grp({
-        UI_crt_rec(0, 0, 160, 45, vex::color::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(0, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(159, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(0, 35, 160, 5, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_txt("Config", 48, 23, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(0, 0, 160, 45, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(0, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(159, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(0, 35, 160, 5, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Config", 48, 23, selector_text_color, selector_bg_color, mik::UI_distance_units::pixels)}),
         nullptr, 1
     );
     config_tgl->set_states(UI_crt_grp({
-        UI_crt_rec(0, 0, 160, 45, 0x00666666, mik::UI_distance_units::pixels),
-        UI_crt_rec(0, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(0, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Config", 48, 23, 0x00666666, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(0, 0, 160, 45, selector_bg_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(0, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(0, 35, 160, 5, selector_outline_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Config", 48, 23, selector_text_color, selector_bg_pressing_color, mik::UI_distance_units::pixels)}),
         
         UI_crt_grp({
-        UI_crt_rec(0, 0, 160, 45, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_rec(0, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(0, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Config", 48, 23, 0x00434343, mik::UI_distance_units::pixels)}));
+        UI_crt_rec(0, 0, 160, 45, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(0, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(0, 35, 160, 5, selector_outline_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Config", 48, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
     config_tgl->set_callback([=](){ 
         UI_select_scr(config_scr->get_config_screen());
     } 
@@ -74,24 +76,24 @@ void UI_init() {
 
     // Init auton selector toggle
     auton_tgl = UI_crt_tgl(UI_crt_grp({
-        UI_crt_rec(160, 0, 160, 45, vex::color::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(160, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(159+160, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(160, 35, 160, 5, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_txt("Autons", 48+160, 23, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(160, 0, 160, 45, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(159+160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(160, 35, 160, 5, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Autons", 48+160, 23, selector_text_color, selector_bg_color, mik::UI_distance_units::pixels)}),
         nullptr, 1
     );
     auton_tgl->set_states(UI_crt_grp({
-        UI_crt_rec(160, 0, 160, 45, 0x00666666, mik::UI_distance_units::pixels),
-        UI_crt_rec(160, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(160, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Autons", 48+160, 23, 0x00666666, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(160, 0, 160, 45, selector_bg_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(160, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(160, 35, 160, 5, selector_outline_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Autons", 48+160, 23, selector_text_color, selector_bg_pressing_color, mik::UI_distance_units::pixels)}),
         
         UI_crt_grp({
-        UI_crt_rec(160, 0, 160, 45, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_rec(160, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(160, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Autons", 48+160, 23, 0x00434343, mik::UI_distance_units::pixels)}));
+        UI_crt_rec(160, 0, 160, 45, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(160, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(160, 35, 160, 5, selector_outline_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Autons", 48+160, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
     auton_tgl->set_callback([=](){ 
         UI_select_scr(auton_scr->get_auton_screen());
     } 
@@ -99,24 +101,24 @@ void UI_init() {
 
     // Init graph selector toggle
     graph_tgl = UI_crt_tgl(UI_crt_grp({
-        UI_crt_rec(320, 0, 160, 45, vex::color::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(320, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(159+160+160, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(320, 35, 160, 5, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_txt("Graph", 56+160+160, 23, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(320, 0, 160, 45, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(320, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(159+160+160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(320, 35, 160, 5, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Graph", 56+160+160, 23, selector_text_color, selector_bg_color, mik::UI_distance_units::pixels)}),
         nullptr, 1
     );
     graph_tgl->set_states(UI_crt_grp({
-        UI_crt_rec(320, 0, 160, 45, 0x00666666, mik::UI_distance_units::pixels),
-        UI_crt_rec(320, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(320, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Graph", 56+160+160, 23, 0x00666666, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(320, 0, 160, 45, selector_bg_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(320, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(320, 35, 160, 5, selector_outline_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Graph", 56+160+160, 23, selector_text_color, selector_bg_pressing_color, mik::UI_distance_units::pixels)}),
         
         UI_crt_grp({
-        UI_crt_rec(320, 0, 160, 45, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_rec(320, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(320, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Graph", 56+160+160, 23, 0x00434343, mik::UI_distance_units::pixels)}));
+        UI_crt_rec(320, 0, 160, 45, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(320, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(320, 35, 160, 5, selector_outline_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Graph", 56+160+160, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
     graph_tgl->set_callback([=](){ 
         UI_select_scr(graph_scr->get_graph_screen());
     } 
@@ -124,24 +126,24 @@ void UI_init() {
 
     // Init console selector toggle
     console_tgl = UI_crt_tgl(UI_crt_grp({
-        UI_crt_rec(480, 0, 160, 45, vex::color::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(480, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(159+160+160+160, 0, 1, 35, 0x00434343, mik::UI_distance_units::pixels), 
-        UI_crt_rec(480, 35, 160, 5, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_txt("Console", 48+160+160+160, 23, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(480, 0, 160, 45, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(159+160+160+160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(480, 35, 160, 5, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Console", 48+160+160+160, 23, selector_text_color, selector_bg_color, mik::UI_distance_units::pixels)}),
         nullptr, 1
     );
     console_tgl->set_states(UI_crt_grp({
-        UI_crt_rec(480, 0, 160, 45, 0x00666666, mik::UI_distance_units::pixels),
-        UI_crt_rec(480, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(480, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Console", 48+160+160+160, 23, 0x00666666, mik::UI_distance_units::pixels)}),
+        UI_crt_rec(480, 0, 160, 45, selector_bg_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480, 35, 160, 5, selector_outline_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Console", 48+160+160+160, 23, selector_text_color, selector_bg_pressing_color, mik::UI_distance_units::pixels)}),
         
         UI_crt_grp({
-        UI_crt_rec(480, 0, 160, 45, 0x00434343, mik::UI_distance_units::pixels),
-        UI_crt_rec(480, 40, 160, 5, vex::black, mik::UI_distance_units::pixels),
-        UI_crt_rec(480, 35, 160, 5, 0x00999999, mik::UI_distance_units::pixels),
-        UI_crt_txt("Console", 48+160+160+160, 23, 0x00434343, mik::UI_distance_units::pixels)}));
+        UI_crt_rec(480, 0, 160, 45, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480, 35, 160, 5, selector_outline_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Console", 48+160+160+160, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
     console_tgl->set_callback([=](){ 
         UI_select_scr(console_scr->get_console_screen());
     } 

@@ -6,7 +6,7 @@ using namespace mik;
 #define next_line 20
 
 textbox::textbox(std::string text, std::shared_ptr<drawable> box) :
-    text(text), box(box), text_color(ClrWhite), bg_color(ClrBlack), alignment(text_align::LEFT)
+    text(text), box(box), text_color("#ffffff"), bg_color("#000000"), alignment(text_align::LEFT)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
     
@@ -19,7 +19,7 @@ textbox::textbox(std::string text, std::shared_ptr<drawable> box) :
 };
 
 textbox::textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box) :
-    text(text), box(box), text_color(ClrWhite), bg_color(ClrBlack), alignment(text_alignment)
+    text(text), box(box), text_color("#ffffff"), bg_color("#000000"), alignment(text_alignment)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
     
@@ -31,8 +31,8 @@ textbox::textbox(std::string text, text_align text_alignment, std::shared_ptr<dr
     wrap_text();
 };
 
-textbox::textbox(std::string text, text_align text_alignment, uint32_t bg_color, std::shared_ptr<drawable> box) :
-    text(text), box(box), text_color(ClrWhite), bg_color(bg_color), alignment(text_alignment)
+textbox::textbox(std::string text, text_align text_alignment, const std::string& bg_color, std::shared_ptr<drawable> box) :
+    text(text), box(box), text_color("#ffffff"), bg_color(bg_color), alignment(text_alignment)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
     
@@ -44,7 +44,7 @@ textbox::textbox(std::string text, text_align text_alignment, uint32_t bg_color,
     wrap_text();
 };
 
-textbox::textbox(std::string text, uint32_t text_color, uint32_t bg_color, text_align text_alignment, std::shared_ptr<drawable> box) :
+textbox::textbox(std::string text, const std::string& text_color, const std::string& bg_color, text_align text_alignment, std::shared_ptr<drawable> box) :
     text(text), box(box), text_color(text_color), bg_color(bg_color), alignment(text_alignment)
 {
     unique_id = UI_create_ID(UI_Textbox_ID);
@@ -133,8 +133,8 @@ void textbox::draw_text() {
             x_pos = x + ((w + default_padding) - Brain.Screen.getStringWidth(wrapped_text[i].c_str())) / 2;
         }
         
-        Brain.Screen.setPenColor(text_color);
-        Brain.Screen.setFillColor(bg_color);
+        Brain.Screen.setPenColor(text_color.c_str());
+        Brain.Screen.setFillColor(bg_color.c_str());
         Brain.Screen.printAt(x_pos, y + newline, wrapped_text[i].c_str());
         // Brain.Screen.setPenColor(vex::color::white);
         newline += next_line;

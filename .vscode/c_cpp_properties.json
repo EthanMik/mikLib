@@ -21,7 +21,7 @@
 			],
 			"compilerPath": "${vex_compilerPath}",
 			"cStandard": "gnu99",
-			"cppStandard": "gnu++20",
+			"cppStandard": "gnu++11",
 			"intelliSenseMode": "windows-clang-x86"
 		},
 		{
@@ -31,7 +31,7 @@
 			],
 			"compilerPath": "${vex_compilerPath}",
 			"cStandard": "gnu99",
-			"cppStandard": "gnu++20",
+			"cppStandard": "gnu++11",
 			"intelliSenseMode": "macos-clang-x86"
 		},
 		{
@@ -41,7 +41,7 @@
 			],
 			"compilerPath": "",
 			"cStandard": "gnu99",
-			"cppStandard": "gnu++20",
+			"cppStandard": "gnu++11",
 			"intelliSenseMode": "linux-clang-x86"
 		}
 	],

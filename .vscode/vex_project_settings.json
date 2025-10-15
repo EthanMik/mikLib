@@ -1,12 +1,12 @@
 {
 	"extension": {
-		"version": "0.6.1",
+		"version": "0.7.2025041600",
 		"json": 2
 	},
 	"project": {
 		"name": "mikLib",
 		"description": "",
-		"creationDate": "Thu, 21 Nov 2024 02:10:53 GMT",
+		"creationDate": "10/13/2025, 6:01:29 PM",
 		"platform": "V5",
 		"language": "cpp",
 		"slot": 1,

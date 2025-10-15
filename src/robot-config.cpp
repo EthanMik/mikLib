@@ -105,7 +105,8 @@ static void loading_screen(bool stop) {
 	
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
-		Brain.Screen.setFillColor("#3d3d3d");
+		Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
+		Brain.Screen.setPenColor(mik::loading_text_color.c_str());
 		int count = 0;
 		while(1) {
 			Brain.Screen.printAt(184, 220, calibrate.c_str());

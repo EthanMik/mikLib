@@ -2,16 +2,16 @@
 	"C_Cpp.default.systemIncludePath": [
 		"${config:vexrobotics.vexcode.Cpp.Sdk.Home}\\V5\\V5_20240802_15_00_00\\vexv5\\gcc\\include\\sys"
 	],
-	"git.ignoreLimitWarning": true,
 	"files.associations": {
 		"algorithm": "cpp",
 		"array": "cpp",
-		"*.tcc": "cpp",
+		"atomic": "cpp",
 		"cctype": "cpp",
 		"chrono": "cpp",
 		"clocale": "cpp",
 		"cmath": "cpp",
 		"cstdarg": "cpp",
+		"cstddef": "cpp",
 		"cstdint": "cpp",
 		"cstdio": "cpp",
 		"cstdlib": "cpp",
@@ -25,7 +25,9 @@
 		"fstream": "cpp",
 		"functional": "cpp",
 		"initializer_list": "cpp",
+		"iomanip": "cpp",
 		"iosfwd": "cpp",
+		"iostream": "cpp",
 		"istream": "cpp",
 		"limits": "cpp",
 		"new": "cpp",
@@ -38,18 +40,6 @@
 		"tuple": "cpp",
 		"type_traits": "cpp",
 		"utility": "cpp",
-		"typeinfo": "cpp",
-		"iostream": "cpp",
-		"string": "cpp",
-		"*.bin": "cpp",
-		"list": "cpp",
-		"iomanip": "cpp",
-		"atomic": "cpp",
-		"condition_variable": "cpp",
-		"mutex": "cpp",
-		"system_error": "cpp",
-		"thread": "cpp",
-		"cstddef": "cpp",
-		"random": "cpp"
+		"typeinfo": "cpp"
 	}
 }
