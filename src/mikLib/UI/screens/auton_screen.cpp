@@ -316,8 +316,8 @@ void UI_auton_screen::UI_crt_auton_scr() {
     }), [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); });
 
     prev_auto_var_btn->set_states(UI_crt_grp({
-        UI_crt_rec(2.45, 1.45, .27, .52, auton_num_bg_color, auton_num_pressed_color, 2, UI_distance_units::inches),
-    }), UI_crt_rec(2.45, 1.45, .27, .52, auton_num_bg_color, auton_num_pressing_color, 2, UI_distance_units::inches));
+        UI_crt_rec(2.45, 1.45, .27, .52, auton_num_bg_color, auton_num_pressing_color, 2, UI_distance_units::inches),
+    }), UI_crt_rec(2.45, 1.45, .27, .52, auton_num_bg_color, auton_num_pressed_color, 2, UI_distance_units::inches));
     
     auto auto_var_num_txt_ = UI_crt_gfx({UI_crt_txt("", 243, 169, auton_text_color, auton_num_bg_color, UI_distance_units::pixels)});
     auto_var_num_txt = static_cast<graphic*>(auto_var_num_txt_.get());

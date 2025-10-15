@@ -60,13 +60,17 @@ namespace mik {
 
 // UI Globals
 
-    // UI color theme
-    inline const std::string UI_white = "#ffffff";
-    inline const std::string UI_light_gray = "#999999";
-    inline const std::string UI_med_gray = "#666666";
-    inline const std::string UI_dark_gray = "#434343";
-    inline const std::string UI_black = "#000000";
-    inline const std::string UI_red = "#ff0000";
+    // UI main color palette
+    inline const std::string UI_white =      "#ffffff"; // Text and secondary primary outline color
+    inline const std::string UI_light_gray = "#999999"; // Secondary outline color
+    inline const std::string UI_med_gray =   "#666666"; // Primary outline color
+    inline const std::string UI_dark_gray =  "#434343"; // Secondary background color
+    inline const std::string UI_black =      "#000000"; // Primary background color
+    inline const std::string UI_red =        "#ff0000"; // Tertiary outline color
+
+    // Loading screen
+    inline const std::string& loading_text_bg_color = UI_dark_gray; 
+    inline const std::string& loading_text_color = UI_white; 
 
     // Selector panel colors
     inline const std::string& selector_text_color = UI_white;
@@ -89,8 +93,8 @@ namespace mik {
     inline const std::string& config_btn_outline_pressed_color = UI_red;
     
     inline const std::string config_macro_btn_bg_color = "#000000";
-    inline const std::string config_data_btn_bg_color = "#232323";
-    inline const std::string config_test_btn_bg_color = "#323232";
+    inline const std::string config_data_btn_bg_color =  "#232323";
+    inline const std::string config_test_btn_bg_color =  "#323232";
 
     // Pnematic screen colors
     inline const std::string& pnematic_bg_color = UI_black;
@@ -122,14 +126,14 @@ namespace mik {
     inline const std::string& auton_toggle_knob_color = UI_white;
     inline const std::string& auton_pressing_toggle_bg_color = UI_light_gray;
 
-    inline const std::string auton_toggle_blue_bg_color = "#25a3e3";
-    inline const std::string auton_toggle_red_bg_color = "#f14a41";
-    inline const std::string auton_toggle_left_bg_color = "#d4e404";
+    inline const std::string auton_toggle_blue_bg_color =  "#25a3e3";
+    inline const std::string auton_toggle_red_bg_color =   "#f14a41";
+    inline const std::string auton_toggle_left_bg_color =  "#d4e404";
     inline const std::string auton_toggle_right_bg_color = "#6410a4"; 
     inline const std::string auton_toggle_quals_bg_color = "#ff0000";
     inline const std::string auton_toggle_elims_bg_color = "#33e013";
-    inline const std::string auton_toggle_off_bg_color = "#666666";
-    inline const std::string auton_toggle_sawp_bg_color = "#ff9900";
+    inline const std::string auton_toggle_off_bg_color =   "#666666";
+    inline const std::string auton_toggle_sawp_bg_color =  "#ff9900";
     
     inline const std::string& auton_data_bg_color = UI_black;
     inline const std::string& auton_data_outline_color = UI_white;
