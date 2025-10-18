@@ -55,10 +55,11 @@ std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
     return "";
 }
 std::string template_auto_other_variation(bool calibrate, bool get_name) {
+    if (get_name) { return "template auto 2 (4 objs)"; }
+    
     // Mirror template_auto() from the x-axis
     chassis.mirror_all_auton_y_pos();
-
-    if (get_name) { return "template auto 2 (4 objs)"; }
+    
     if (calibrate) {
         // Coordinates will be set to (55, -23.5) as y_pos is mirrored
         template_auto(calibrate, one, get_name);
