@@ -549,6 +549,7 @@ public:
 
     bool motion_running;
     float distance_traveled;
+    float percent_traveled;
     
     bool position_tracking;
     bool control_disabled;
@@ -569,6 +570,9 @@ private:
     bool angles_mirrored_ = false;
     bool x_pos_mirrored_ = false;
     bool y_pos_mirrored_ = false;
+
+    float total_distance = 0;
+    bool callback_fired = false;
 
     float inertial_scale;
 
@@ -660,6 +664,8 @@ struct drive_to_point_params {
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
+    float callback_after_percent = 0;
+    std::function<void()> callback = [](){};
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};
@@ -1153,6 +1159,8 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
 
     motion_running = true;
     distance_traveled = 0;
+    total_distance = hypot(X_position - get_X_position(), Y_position - get_Y_position());
+    percent_traveled = distance_traveled / total_distance * 100;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1172,6 +1180,11 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
     
             drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
+            chassis.percent_traveled = chassis.distance_traveled / chassis.total_distance * 100;
+            if (chassis.percent_traveled >= p.callback_after_percent && !chassis.callback_fired) {
+                p.callback();
+                chassis.callback_fired = true;
+            }
             prev_drive_error = drive_error;
 
             float heading_error = reduce_negative_180_to_180(to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position())) - chassis.get_absolute_heading());
@@ -1194,6 +1207,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         }
 
         chassis.motion_running = false;
+        chassis.callback_fired = false;
         if (p.min_voltage == 0) { chassis.stop_drive(hold); }
 
         return 0;
