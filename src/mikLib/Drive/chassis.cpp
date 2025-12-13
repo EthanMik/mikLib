@@ -12,18 +12,18 @@ drive_to_point_params g_drive_to_point_params_buffer{};
 drive_to_pose_params g_drive_to_pose_params_buffer{};
 follow_path_params g_follow_path_params_buffer{};
 
-Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-    float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors):
+Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, float forward_tracker_diameter, 
+    float forward_tracker_center_distance, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors):
     
-    forward_tracker(forward_tracker_port),
-    sideways_tracker(sideways_tracker_port),
+    forward_tracker(Brain.ThreeWirePort.C),
+    sideways_tracker(Brain.ThreeWirePort.G),
     inertial(inertial_port),
     
     left_drive(left_drive),
     right_drive(right_drive),
 
     reset_sensors(reset_sensors),
-
+    
     inertial_scale(inertial_scale),
     
     forward_tracker_diameter(forward_tracker_diameter),
@@ -165,11 +165,11 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_ForwardTracker_position() {
-    return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
+    return forward_tracker.position(vex::rotationUnits::raw) * (360.0 / 8192.0) *  forward_tracker_inch_to_deg_ratio;
 }
 
 float Chassis::get_SidewaysTracker_position() {
-    return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
+    return sideways_tracker.position(vex::rotationUnits::raw) * (360.0 / 8192.0) * sideways_tracker_inch_to_deg_ratio;
 }
 
 void Chassis::position_track() {
@@ -190,8 +190,8 @@ void Chassis::set_heading(float orientation_deg){
 
 void Chassis::set_coordinates(float X_position, float Y_position, float orientation_deg) {
     position_tracking = true;
-    forward_tracker.resetPosition();
-    sideways_tracker.resetPosition();
+    forward_tracker.resetRotation();
+    sideways_tracker.resetRotation();
 
     orientation_deg = mirror_angle(orientation_deg, angles_mirrored_);
     X_position = mirror_x(X_position, x_pos_mirrored_);

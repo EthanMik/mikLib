@@ -29,21 +29,21 @@ void user_control(void) {
     // How you want your drivetrain to stop during driver
     chassis.set_brake_type(brakeType::coast);
     
-    assembly.init();
+    // assembly.init();
 
     while (true) {
         if (!control_disabled()) {
             // Add your user control code here
             chassis.control(drive_mode::SPLIT_ARCADE_CURVED);
-            assembly.control();
+            // assembly.control();
         }
         task::sleep(5);
     }
 }
 
 int main() {
-    Competition.autonomous(auton);
-    Competition.drivercontrol(user_control);
+    // Competition.autonomous(auton);
+    // Competition.drivercontrol(user_control);
 
     pre_auton();
 

@@ -201,7 +201,7 @@ void config_tune_drive() {
 	UI_select_scr(graph_scr->get_graph_screen()); 
 
 	test_movements_func = [](){
-	chassis.forward_tracker.resetPosition();
+	chassis.forward_tracker.resetRotation();
 	chassis.set_coordinates(0, 0, 0);
 	predicted_distance = 0;
 	prev_desired_distance = 0;
@@ -519,16 +519,16 @@ int run_diagnostic() {
 		error_data.push_back("Inertial [PORT" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.forward_tracker.installed()) {
-		std::string port = to_string(chassis.forward_tracker.index() + 1);
-		error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
-		errors++;
-	}
-	if (!chassis.sideways_tracker.installed()) {
-		std::string port = to_string(chassis.sideways_tracker.index() + 1);
-		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
-		errors++;
-	}
+	// if (!chassis.forward_tracker.installed()) {
+	// 	std::string port = to_string(chassis.forward_tracker.index() + 1);
+	// 	error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
+	// 	errors++;
+	// }
+	// if (!chassis.sideways_tracker.installed()) {
+	// 	std::string port = to_string(chassis.sideways_tracker.index() + 1);
+	// 	error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
+	// 	errors++;
+	// }
 	for (auto& motor : motors_) {
 		if (!motor.installed()) {
 			error_data.push_back(motor.name() + " [" + motor.port() +  "] is disconnected");

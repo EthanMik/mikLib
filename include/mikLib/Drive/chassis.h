@@ -89,7 +89,7 @@ public:
      * @param sideways_tracker_center_distance Distance from the chassis centre to the sideways tracker (in).
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
-    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors);
+    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, float forward_tracker_diameter, float forward_tracker_center_distance, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors);
 
     /**
      * @brief Reset default joystick control constants for throttle and turn.
@@ -538,8 +538,8 @@ public:
      */
     void control(mik::drive_mode dm);
     
-    vex::rotation forward_tracker;
-    vex::rotation sideways_tracker;
+    vex::encoder forward_tracker;
+    vex::encoder sideways_tracker;
     vex::inertial inertial;
     
     mik::motor_group left_drive;
@@ -586,7 +586,7 @@ private:
 
     PID pid; // Primary PID controller.
     PID pid_2; // Secondary PID controller (heading).
-    odom odom;
+    odom45 odom;
 
     vex::task odom_task;
     vex::task drive_task;
