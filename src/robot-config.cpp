@@ -34,11 +34,11 @@ Chassis chassis(
     PORT14, // Inertia sensor port
     360,    // Inertial scale, value that reads after turning robot a full 360
 
-    // to_triport(PORT_B), // Forward Tracker Port
+    PORT_C, // Forward Tracker Port
     2.46,     // Forward Tracker wheel diameter in inches (negative flips direction)
     0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
-    // to_triport(PORT_G),  // Sideways tracker port
+    PORT_G,  // Sideways tracker port
     2.46,       // Sideways tracker wheel diameter in inches (negative flips direction)
     0,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
