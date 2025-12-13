@@ -4,10 +4,6 @@ class motor;
 class motor_group;
 class Assembly;
 
-extern vex::brain Brain;
-extern vex::controller Controller;
-extern vex::competition Competition;
-
 extern bool calibrating;
 extern bool force_calibrate_inertial;
 

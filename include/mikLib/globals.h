@@ -3,8 +3,11 @@
 #include "v5.h"
 #include "v5_api.h"
 
-namespace mik {
+inline vex::brain Brain;
+inline vex::controller Controller;
+inline vex::competition Competition;
 
+namespace mik {
 // Drive Globals
     /** @brief Enumerates the available driver‑control schemes. */
     enum class drive_mode {

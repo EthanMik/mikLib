@@ -3,10 +3,6 @@
 using namespace vex;
 using namespace mik;
 
-vex::brain Brain;
-vex::controller Controller;
-vex::competition Competition;
-
 bool calibrating = false;
 
 // Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
@@ -21,15 +17,19 @@ static const float MINIMUN_INERTIAL_CALIBRATION_ERROR = .05;
 Chassis chassis(
     // Drivetrain motors
     mik::motor_group({
-		mik::motor(PORT4, false, blue_6_1, "left_front_motor"), 
-		mik::motor(PORT8, true, blue_6_1, "left_middle_motor"), 
-		mik::motor(PORT6, true, blue_6_1, "left_back_motor")
+		mik::motor(PORT1, false, blue_6_1, "right_front_motor"), 
+		mik::motor(PORT2, true, blue_6_1, "right_middle_motor"), 
+		mik::motor(PORT3, true, blue_6_1, "right_back_motor"),
+		mik::motor(PORT5, false, blue_6_1, "right_back_motor"),
+		mik::motor(PORT15, false, blue_6_1, "right_back_motor"),
     }),
     mik::motor_group({
-		mik::motor(PORT5, false, blue_6_1, "right_front_motor"), 
-		mik::motor(PORT9, true, blue_6_1, "right_middle_motor"), 
-		mik::motor(PORT10, false, blue_6_1, "right_back_motor")
-    }),
+		mik::motor(PORT8, false, blue_6_1, "left_front_motor"), 
+		mik::motor(PORT9, false, blue_6_1, "left_middle_motor"), 
+		mik::motor(PORT10, true, blue_6_1, "left_back_motor"),
+		mik::motor(PORT17, true, blue_6_1, "left_back_motor"),
+		mik::motor(PORT20, true, blue_6_1, "left_back_motor")
+	}),
 
     PORT14, // Inertia sensor port
     360,    // Inertial scale, value that reads after turning robot a full 360
@@ -48,16 +48,7 @@ Chassis chassis(
     })
 );
 
-Assembly assembly(
-	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "left_lift_motor"),
-		mik::motor(PORT20, false, green_18_1, "right_lift_motor")
-	}),
-
-	mik::motor(PORT16, false, blue_6_1, "intake_motor"),
-	vex::rotation(PORT11),
-	mik::piston(PORT_A)
-);
+Assembly assembly;
 
 /** Allows UI to display all motor values */
 void log_motors() {
@@ -65,11 +56,11 @@ void log_motors() {
 		// Add all mik motor groups in here
 		chassis.left_drive, 
 		chassis.right_drive, 
-		assembly.lift_arm_motors
+		// assembly.lift_arm_motors
     }, 
 	{
 		// Add all mik motors in here
-		assembly.intake_motor
+		// assembly.intake_motor
     }
   );
 }

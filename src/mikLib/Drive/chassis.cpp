@@ -17,16 +17,16 @@ Chassis::Chassis(
     mik::motor_group right_drive, 
     int inertial_port, 
     float inertial_scale, 
-    float forward_tracker_port,
+    int forward_tracker_port,
     float forward_tracker_diameter, 
     float forward_tracker_center_distance, 
-    float sideways_tracker_port,
+    int sideways_tracker_port,
     float sideways_tracker_diameter,
     float sideways_tracker_center_distance, 
     mik::distance_reset reset_sensors):
     
-    forward_tracker(to_triport(forward_tracker_port)),
-    sideways_tracker(to_triport(sideways_tracker_port)),
+    forward_tracker(Brain.ThreeWirePort.Port[forward_tracker_port]),
+    sideways_tracker(Brain.ThreeWirePort.Port[sideways_tracker_port]),
     inertial(inertial_port),
     
     left_drive(left_drive),

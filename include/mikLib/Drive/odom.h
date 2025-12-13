@@ -1,7 +1,6 @@
 #pragma once
 
-#include "util.h"
-
+#include "vex.h"
 /**
  * @brief General-use odometry class with X_position, Y_position, and
  * orientation_deg being the relevant outputs. This works for one

@@ -21,60 +21,60 @@ class Chassis {
 public:
     /** ALL CONSTANTS USED IN MOTIONS. */
 
-    float drive_min_voltage = 0; // Minimum voltage on the drive, used for chaining movements.
-    float drive_max_voltage; // Max voltage out of 12.
+    float drive_min_voltage{}; // Minimum voltage on the drive, used for chaining movements.
+    float drive_max_voltage{}; // Max voltage out of 12.
 
-    float drive_kp; // Proportional constant.
-    float drive_ki; // Integral constant.
-    float drive_kd; // Derivative constant.
-    float drive_starti; // Minimum distance in inches for integral to begin
+    float drive_kp{}; // Proportional constant.
+    float drive_ki{}; // Integral constant.
+    float drive_kd{}; // Derivative constant.
+    float drive_starti{}; // Minimum distance in inches for integral to begin
 
-    float drive_settle_error; // Error to be considered settled in degrees.
-    float drive_settle_time; // Time to be considered settled in milliseconds.
-    float drive_timeout; // Time before quitting and move on in milliseconds.
+    float drive_settle_error{}; // Error to be considered settled in degrees.
+    float drive_settle_time{}; // Time to be considered settled in milliseconds.
+    float drive_timeout{}; // Time before quitting and move on in milliseconds.
 
-    float heading_max_voltage; // Max voltage out of 12.
-    float heading_kp; // Proportional constant.
-    float heading_ki; // Integral constant.
-    float heading_kd; // Derivative constant.
-    float heading_starti; // Minimum distance in degrees for integral to begin
+    float heading_max_voltage{}; // Max voltage out of 12.
+    float heading_kp{}; // Proportional constant.
+    float heading_ki{}; // Integral constant.
+    float heading_kd{}; // Derivative constant.
+    float heading_starti{}; // Minimum distance in degrees for integral to begin
 
-    float turn_min_voltage = 0; // Minimum voltage for turning out of 12.
-    float turn_max_voltage; // Max voltage out of 12.
+    float turn_min_voltage{}; // Minimum voltage for turning out of 12.
+    float turn_max_voltage{}; // Max voltage out of 12.
 
-    float turn_kp; // Proportional constant.
-    float turn_ki; // Integral constant.
-    float turn_kd; // Derivative constant.
-    float turn_starti; // Minimum angle in degrees for integral to begin.
+    float turn_kp{}; // Proportional constant.
+    float turn_ki{}; // Integral constant.
+    float turn_kd{}; // Derivative constant.
+    float turn_starti{}; // Minimum angle in degrees for integral to begin.
 
-    float turn_settle_error; // Error to be considered settled in degrees.
-    float turn_settle_time; // Time to be considered settled in milliseconds.
-    float turn_timeout; // Time before quitting and move on in milliseconds.
+    float turn_settle_error{}; // Error to be considered settled in degrees.
+    float turn_settle_time{}; // Time to be considered settled in milliseconds.
+    float turn_timeout{}; // Time before quitting and move on in milliseconds.
 
-    float swing_min_voltage = 0; // Minimum voltage for swinging out of 12.
-    float swing_max_voltage; // Max voltage out of 12.
+    float swing_min_voltage{}; // Minimum voltage for swinging out of 12.
+    float swing_max_voltage{}; // Max voltage out of 12.
 
-    float swing_kp; // Proportional constant.
-    float swing_ki; // Integral constant.
-    float swing_kd; // Derivative constant.
-    float swing_starti; // Minimum distance in degrees for integral to begin
+    float swing_kp{}; // Proportional constant.
+    float swing_ki{}; // Integral constant.
+    float swing_kd{}; // Derivative constant.
+    float swing_starti{}; // Minimum distance in degrees for integral to begin
     
-    float swing_settle_error; // Error to be considered settled in degrees.
-    float swing_settle_time; // Time to be considered settled in milliseconds.
-    float swing_timeout; // Time before quitting and move on in milliseconds.
+    float swing_settle_error{}; // Error to be considered settled in degrees.
+    float swing_settle_time{}; // Time to be considered settled in milliseconds.
+    float swing_timeout{}; // Time before quitting and move on in milliseconds.
     
-    float boomerang_lead; // Constant scale factor that determines how far away the carrot point is. 
-    float boomerang_setback; // Distance in inches from target by which the carrot is always pushed back.
+    float boomerang_lead{}; // Constant scale factor that determines how far away the carrot point is. 
+    float boomerang_setback{}; // Distance in inches from target by which the carrot is always pushed back.
 
-    float pursuit_lookahead_distance; // Radius of the look-ahead circle, in inches.
+    float pursuit_lookahead_distance{}; // Radius of the look-ahead circle, in inches.
 
-    float control_throttle_deadband; // Deadband percent for the throttle axis.
-    float control_throttle_min_output; // Minimum throttle output percent after deadband.
-    float control_throttle_curve_gain; // Expo gain for throttle axis (1 linear, 1.06 very curvy).
+    float control_throttle_deadband{}; // Deadband percent for the throttle axis.
+    float control_throttle_min_output{}; // Minimum throttle output percent after deadband.
+    float control_throttle_curve_gain{}; // Expo gain for throttle axis (1 linear, 1.06 very curvy).
     
-    float control_turn_deadband; // Deadband percent for the turn axis.
-    float control_turn_min_output; // Minimum turn output percent after deadband.
-    float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
+    float control_turn_deadband{}; // Deadband percent for the turn axis.
+    float control_turn_min_output{}; // Minimum turn output percent after deadband.
+    float control_turn_curve_gain{}; // Expo gain for turn axis (1 linear, 1.06 very curvy).
 
     /**
      * @param left_drive  Motor group on the robot's left side.
@@ -93,10 +93,10 @@ public:
         mik::motor_group right_drive, 
         int inertial_port, 
         float inertial_scale, 
-        float forward_tracker_port, 
+        int forward_tracker_port, 
         float forward_tracker_diameter, 
         float forward_tracker_center_distance, 
-        float sideways_tracker_port, 
+        int sideways_tracker_port, 
         float sideways_tracker_diameter, 
         float sideways_tracker_center_distance, 
         mik::distance_reset reset_sensors);
