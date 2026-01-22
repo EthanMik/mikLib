@@ -4,6 +4,7 @@
 - callback percent injection
 - Distance Reset auto detect wall
 - Readthedocs.io
+- optional empty mikLib template project
 - optional no assembly class
 - measure velocity and accel button
 - port changing (delayed)
