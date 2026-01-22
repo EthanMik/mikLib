@@ -1,0 +1,12 @@
+- Slew into drive motion
+- Tracking param into drive motions, wheel diam and wheel ratio inside chassis
+- to_point direction forcing
+- callback percent injection
+- Distance Reset auto detect wall
+- Readthedocs.io
+- optional no assembly class
+- measure velocity and accel button
+- port changing (delayed)
+- code cleanup (auton selector turn off during skills)
+- Auton selector toggle in robot-config
+  
