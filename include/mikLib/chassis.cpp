@@ -13,11 +13,7 @@ drive_to_pose_params g_drive_to_pose_params_buffer{};
 follow_path_params g_follow_path_params_buffer{};
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-    float forward_tracker_center_distance, mik::tracker_mode tracker_mode, float wheel_diameter, float wheel_ratio, int sideways_tracker_port, float sideways_tracker_diameter, 
-    float sideways_tracker_center_distance, mik::distance_reset reset_sensors
-):
-    
-    tracker_mode(tracker_mode),
+    float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors):
     
     forward_tracker(forward_tracker_port),
     sideways_tracker(sideways_tracker_port),
@@ -25,14 +21,10 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     
     left_drive(left_drive),
     right_drive(right_drive),
-    
-    reset_sensors(reset_sensors),
-    
-    inertial_scale(inertial_scale),
 
-    wheel_diameter(wheel_diameter),
-    wheel_ratio(wheel_ratio),
-    drive_in_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
+    reset_sensors(reset_sensors),
+
+    inertial_scale(inertial_scale),
     
     forward_tracker_diameter(forward_tracker_diameter),
     forward_tracker_center_distance(forward_tracker_center_distance),
@@ -173,9 +165,6 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_ForwardTracker_position() {
-    if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
-        return right_drive.position(deg) * drive_in_to_deg_ratio;
-    }
     return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
 }
 

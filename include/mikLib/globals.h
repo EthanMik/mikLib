@@ -24,6 +24,7 @@ namespace mik {
     enum auto_variation : int { ONE = 1, TWO = 2, THREE = 3, FOUR = 4 };
     enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
     enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL };
+    enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
     
     inline constexpr unsigned int PORT_A = 0;
     inline constexpr unsigned int PORT_B = 1;
@@ -38,6 +39,9 @@ namespace mik {
     inline constexpr distance_position rear_sensor = distance_position::REAR_SENSOR;
     inline constexpr distance_position left_sensor = distance_position::LEFT_SENSOR;
     inline constexpr distance_position right_sensor = distance_position::RIGHT_SENSOR;
+
+    inline constexpr tracker_mode forward_tracker = tracker_mode::FORWARD_TRACKER;
+    inline constexpr tracker_mode motor_encoder = tracker_mode::MOTOR_ENCODER;
 
     inline constexpr wall_position top_wall = wall_position::TOP_WALL;
     inline constexpr wall_position bottom_wall = wall_position::BOTTOM_WALL;

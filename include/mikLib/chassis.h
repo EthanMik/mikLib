@@ -76,8 +76,6 @@ public:
     float control_turn_min_output; // Minimum turn output percent after deadband.
     float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
 
-    mik::tracker_mode tracker_mode; // Type of tracker to use on the drivetrain
-
     /**
      * @param left_drive  Motor group on the robot's left side.
      * @param right_drive Motor group on the robot's right side.
@@ -91,10 +89,7 @@ public:
      * @param sideways_tracker_center_distance Distance from the chassis centre to the sideways tracker (in).
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
-    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-        float forward_tracker_center_distance, mik::tracker_mode tracker_mode, float wheel_diameter, float wheel_ratio, int sideways_tracker_port, float sideways_tracker_diameter, 
-        float sideways_tracker_center_distance, mik::distance_reset reset_sensors
-    );
+    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors);
 
     /**
      * @brief Reset default joystick control constants for throttle and turn.
@@ -576,10 +571,6 @@ private:
     bool y_pos_mirrored_ = false;
 
     float inertial_scale;
-
-    float wheel_diameter;
-    float wheel_ratio;
-    float drive_in_to_deg_ratio;
 
     float forward_tracker_diameter;
     float forward_tracker_center_distance;

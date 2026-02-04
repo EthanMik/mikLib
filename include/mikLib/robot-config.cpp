@@ -12,8 +12,10 @@ bool calibrating = false;
 // Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
 bool force_calibrate_inertial = true;
 
-// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value. 
-// If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
+// After inertial sensor calibration the program waits 1 second and checks 
+// to see if the angle has changed more than this value. If so, it will recalibrate 
+// the inertial sensor and vibrate the controller. The lower the value the less likelihood
+// of a failed calibration.
 static const float MINIMUN_INERTIAL_CALIBRATION_ERROR = .05;
 
 Chassis chassis(
@@ -36,7 +38,7 @@ Chassis chassis(
     -2,     // Forward Tracker wheel diameter in inches (negative flips direction)
     0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
-	forward_tracker, // Whether or not you are using forward tracker, plug in "motor_encoder" if you do not have a forward tracker
+	forward_tracker, // Whether or not you are using forward tracker, plug in "motor_encoder" if you do not have a forward tracker and are using motor encoders
 	2.75,            // The wheel diameter of drivetrain, only needed if you are using motor encoders
 	0.75,            // The gear ratio of the drivetrain, EX: 36T driving a 48T is 0.75, only needed if you are using motor encoders
 
@@ -48,6 +50,8 @@ Chassis chassis(
 		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center 
 		mik::distance(PORT17, rear_sensor, 5, 3.5)
     })
+
+
 );
 
 Assembly assembly(
