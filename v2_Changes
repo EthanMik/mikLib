@@ -1,5 +1,5 @@
 - Slew into drive motion
-- to_point direction forcing
+- to_point direction forcing ||
 - callback percent injection
 - Distance Reset auto detect wall
 - Readthedocs.io
@@ -11,3 +11,4 @@
 - Auton selector toggle in robot-config
 - swing to angle does not get stuck in a loop
 - add a measure accel and measure velo button
+- Tracking param into drive motions, wheel diam and wheel ratio inside chassis ||
