@@ -37,6 +37,8 @@ std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
 
     if (get_name) { /* Give a desciption of your auto */ return "template auto 1 (3 objs)"; }
     if (calibrate) {
+        odom_constants(); // Make sure to call odom constants at the start of auto if you are using it!
+
         /* Initialize robots starting position "https://path.jerryio.com/" and/or add extra movements to line up robots 
         starting position **IF MOVING DURING CALIBRATION DO BEFORE FIELD CONTROLLER PLUG IN** */
         chassis.set_coordinates(55, 23.5, 90);
