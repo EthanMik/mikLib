@@ -28,6 +28,7 @@ public:
     float drive_ki; // Integral constant.
     float drive_kd; // Derivative constant.
     float drive_starti; // Minimum distance in inches for integral to begin
+    float drive_slew; 
 
     float drive_settle_error; // Error to be considered settled in degrees.
     float drive_settle_time; // Time to be considered settled in milliseconds.
@@ -38,6 +39,7 @@ public:
     float heading_ki; // Integral constant.
     float heading_kd; // Derivative constant.
     float heading_starti; // Minimum distance in degrees for integral to begin
+    float heading_slew;
 
     float turn_min_voltage = 0; // Minimum voltage for turning out of 12.
     float turn_max_voltage; // Max voltage out of 12.
@@ -46,6 +48,7 @@ public:
     float turn_ki; // Integral constant.
     float turn_kd; // Derivative constant.
     float turn_starti; // Minimum angle in degrees for integral to begin.
+    float turn_slew;
 
     float turn_settle_error; // Error to be considered settled in degrees.
     float turn_settle_time; // Time to be considered settled in milliseconds.
@@ -58,6 +61,7 @@ public:
     float swing_ki; // Integral constant.
     float swing_kd; // Derivative constant.
     float swing_starti; // Minimum distance in degrees for integral to begin
+    float swing_slew;
     
     float swing_settle_error; // Error to be considered settled in degrees.
     float swing_settle_time; // Time to be considered settled in milliseconds.
