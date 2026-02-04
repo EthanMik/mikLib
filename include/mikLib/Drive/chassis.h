@@ -645,7 +645,7 @@ struct drive_distance_params {
 };
 
 struct turn_to_angle_params {
-    mik::direction turn_direction = mik::direction::FASTEST;
+    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float min_voltage = chassis.turn_min_voltage;
     float max_voltage = chassis.turn_max_voltage;
     float settle_error = chassis.turn_settle_error;
@@ -656,7 +656,7 @@ struct turn_to_angle_params {
 };
 
 struct swing_to_angle_params {
-    mik::direction turn_direction = mik::direction::FASTEST;
+    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
     float settle_error = chassis.swing_settle_error;
@@ -667,18 +667,21 @@ struct swing_to_angle_params {
 };
 
 struct drive_to_point_params {
+    mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.drive_max_voltage;
     float heading_max_voltage = chassis.heading_max_voltage;
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
+
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};
 };
 
 struct drive_to_pose_params {
+    mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
     float lead = chassis.boomerang_lead;
     float setback = chassis.boomerang_setback;
     float min_voltage = chassis.drive_min_voltage;
@@ -693,7 +696,7 @@ struct drive_to_pose_params {
 };
 
 struct turn_to_point_params {
-    mik::direction turn_direction = mik::direction::FASTEST;
+    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float angle_offset = 0;
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.turn_max_voltage;
@@ -705,7 +708,7 @@ struct turn_to_point_params {
 };
 
 struct swing_to_point_params {
-    mik::direction turn_direction = mik::direction::FASTEST;
+    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float angle_offset = 0;
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
@@ -1182,16 +1185,27 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
             line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
             if (line_settled && !prev_line_settled) { break; }
             prev_line_settled = line_settled;
-    
+
+            float desired_heading = to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position()));
+            int drive_sign = 1;
+
+            if (p.drive_direction == mik::drive_direction::REV) {
+                desired_heading = reduce_negative_180_to_180(desired_heading + 180);
+                drive_sign = -1;
+            }
+
             drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
+
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
             prev_drive_error = drive_error;
 
-            float heading_error = reduce_negative_180_to_180(to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position())) - chassis.get_absolute_heading());
+            float heading_error = reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading());
             float drive_output = chassis.pid.compute(drive_error);
     
             float heading_scale_factor = cos(to_rad(heading_error));
-            drive_output *= heading_scale_factor;
+            if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
+            
+            drive_output *= heading_scale_factor * drive_sign;
             heading_error = reduce_negative_90_to_90(heading_error);
             float heading_output = chassis.pid_2.compute(heading_error);
             
@@ -1267,6 +1281,12 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
             carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
     
             drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
+
+            float heading_error = reduce_negative_180_to_180(
+                to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading()
+            );
+            int drive_sign = 1;
+
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
             prev_drive_error = drive_error;
 
@@ -1276,12 +1296,20 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
                 heading_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading()); 
                 drive_error = target_distance;
             }
+
+            if (p.drive_direction == mik::drive_direction::REV) {
+                heading_error = reduce_negative_180_to_180(heading_error + 180);
+                drive_sign = -1;
+            }
             
             float drive_output = chassis.pid.compute(drive_error);
     
             float heading_scale_factor = cos(to_rad(heading_error));
-            drive_output *= heading_scale_factor;
-            heading_error = reduce_negative_90_to_90(heading_error);
+            if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
+
+            drive_output *= heading_scale_factor * drive_sign;
+
+            if (p.drive_direction == mik::drive_direction::FASTEST) heading_error = reduce_negative_90_to_90(heading_error);
             float heading_output = chassis.pid_2.compute(heading_error);
     
             drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);

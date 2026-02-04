@@ -15,10 +15,16 @@ namespace mik {
     };
 
     /** @brief Explicitly specifies rotation direction when turning or swinging. */
-    enum class direction {
+    enum class turn_direction {
         FASTEST, // Direction chosen automatically (shortest path)
         CW,      // Clockwise rotation
         CCW      // Counter‑clockwise rotation
+    };
+
+    enum class drive_direction {
+        FASTEST,  // Direction chosen automatically (shortest path)
+        FWD,      // Drives to point in forward direction
+        REV       // Drives it point in reverse direction
     };
 
     enum auto_variation : int { ONE = 1, TWO = 2, THREE = 3, FOUR = 4 };
@@ -52,10 +58,13 @@ namespace mik {
     inline constexpr vex::gearSetting green_18_1 = vex::gearSetting::ratio18_1;
     inline constexpr vex::gearSetting red_36_1   = vex::gearSetting::ratio36_1;
 
-    inline constexpr direction clockwise         = direction::CW;
-    inline constexpr direction counter_clockwise = direction::CCW;
-    inline constexpr direction cw                = direction::CW;
-    inline constexpr direction ccw               = direction::CCW;
+    inline constexpr turn_direction clockwise         = turn_direction::CW;
+    inline constexpr turn_direction counter_clockwise = turn_direction::CCW;
+    inline constexpr turn_direction cw                = turn_direction::CW;
+    inline constexpr turn_direction ccw               = turn_direction::CCW;
+
+    inline constexpr drive_direction forwards     = drive_direction::FWD;
+    inline constexpr drive_direction reversed     = drive_direction::REV;
 
     inline constexpr auto_variation one   = auto_variation::ONE;
     inline constexpr auto_variation two   = auto_variation::TWO;
