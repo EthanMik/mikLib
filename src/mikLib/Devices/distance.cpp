@@ -14,8 +14,8 @@ using namespace mik;
 
 #define SENSOR_FRONT_ANGLE_OFFSET   0
 #define SENSOR_BACK_ANGLE_OFFSET  180
-#define SENSOR_LEFT_ANGLE_OFFSET   90
-#define SENSOR_RIGHT_ANGLE_OFFSET 270
+#define SENSOR_LEFT_ANGLE_OFFSET   270
+#define SENSOR_RIGHT_ANGLE_OFFSET 90
 
 mik::distance::distance(int port, distance_position position, float x_center_offset, float y_center_offset) :
     vex::distance(port), port_(port), position_(position), x_center_offset_(x_center_offset), y_center_offset_(y_center_offset), name_(to_sensor_name(position))
