@@ -10,3 +10,4 @@
 - code cleanup (auton selector turn off during skills)
 - Auton selector toggle in robot-config
 - swing to angle does not get stuck in a loop
+- add a measure accel and measure velo button
