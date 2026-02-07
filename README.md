@@ -47,4 +47,4 @@ An easy to use odometry VEXcode template with UI support.
 - [Writing Autonoumous](https://youtu.be/HA26axr4WG8)
 
 ## Notice
-v2.0.0 is being worked on and contains breaking changes to mikLib, you can view what is being on by switching branches
+v2.0.0 is being worked on and contains breaking changes to mikLib, you can view what is new by switching branches
