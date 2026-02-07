@@ -14,7 +14,7 @@ An easy to use odometry VEXcode template with UI support.
    - Follow path via pure pursuit
    - Motion Chaining
 - User control
-   - Split Aracde
+   - Split Arcade
    - Tank
    - Drive curve versions
 - UI
@@ -45,3 +45,6 @@ An easy to use odometry VEXcode template with UI support.
 - [Configuring Assembly](https://youtu.be/loy014PUDp0)
 - [Tuning PID](https://youtu.be/89Jj4shI0hc)
 - [Writing Autonoumous](https://youtu.be/HA26axr4WG8)
+
+## Notice
+v2.0.0 is being worked on and contains breaking changes to mikLib, you can view what is being on by switching branches
