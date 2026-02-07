@@ -1,4 +1,12 @@
-#include "vex.h"
+#include <stdio.h>
+#include <vector>
+#include <cmath>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include "mikLib/Drive/util.h"
+#include "mikLib/globals.h"
+#include "robot-config.h"
 
 
 float clamp(float input, float min, float max) {
@@ -66,13 +74,13 @@ float mirror_angle(float angle, bool mirror) {
     return angle;
 }
 
-mik::direction mirror_direction(mik::direction dir, bool mirror) {
+mik::turn_direction mirror_direction(mik::turn_direction dir, bool mirror) {
     if (mirror) {
-        if (dir == mik::direction::CW) {
-            return mik::direction::CCW;
+        if (dir == mik::turn_direction::CW) {
+            return mik::turn_direction::CCW;
         }
-        if (dir == mik::direction::CCW) {
-            return mik::direction::CW;
+        if (dir == mik::turn_direction::CCW) {
+            return mik::turn_direction::CW;
         }
     }
     return dir;
@@ -92,14 +100,14 @@ float mirror_y(float y, bool mirror) {
     return y;
 }
 
-float angle_error(float error, mik::direction dir) {
+float angle_error(float error, mik::turn_direction dir) {
     switch (dir)
     {
-    case mik::direction::CW:
+    case mik::turn_direction::CW:
         return error < 0 ? error + 360 : error;
-    case mik::direction::CCW:
+    case mik::turn_direction::CCW:
         return error > 0 ? error - 360 : error;
-    case mik::direction::FASTEST:
+    case mik::turn_direction::FASTEST:
         return reduce_negative_180_to_180(error);
     }
 }

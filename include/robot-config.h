@@ -1,4 +1,7 @@
-#include "vex.h"
+#pragma once
+
+#include "v5.h"
+#include "v5_vcs.h"
 
 class motor;
 class motor_group;

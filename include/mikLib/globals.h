@@ -1,7 +1,12 @@
 #pragma once
 
 #include "v5.h"
-#include "v5_api.h"
+#include "v5_vcs.h"
+
+typedef struct point{
+    double x;
+    double y;
+};
 
 namespace mik {
 

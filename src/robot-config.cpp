@@ -12,20 +12,20 @@ bool calibrating = false;
 // Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR
 bool force_calibrate_inertial = true;
 
-// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value. 
+// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
 // If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
 static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
 
 Chassis chassis(
     // Drivetrain motors
     mik::motor_group({
-		mik::motor(PORT4, false, blue_6_1, "left_front_motor"), 
-		mik::motor(PORT8, true, blue_6_1, "left_middle_motor"), 
+		mik::motor(PORT4, false, blue_6_1, "left_front_motor"),
+		mik::motor(PORT8, true, blue_6_1, "left_middle_motor"),
 		mik::motor(PORT6, true, blue_6_1, "left_back_motor")
     }),
     mik::motor_group({
-		mik::motor(PORT5, false, blue_6_1, "right_front_motor"), 
-		mik::motor(PORT9, true, blue_6_1, "right_middle_motor"), 
+		mik::motor(PORT5, false, blue_6_1, "right_front_motor"),
+		mik::motor(PORT9, true, blue_6_1, "right_middle_motor"),
 		mik::motor(PORT10, false, blue_6_1, "right_back_motor")
     }),
 
@@ -45,7 +45,7 @@ Chassis chassis(
     0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
     mik::distance_reset({
-		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center 
+		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center
 		mik::distance(PORT17, rear_sensor, 5, 3.5)
     })
 );
@@ -65,11 +65,11 @@ Assembly assembly(
 void log_motors() {
     config_add_motors({
 		// Add all mik motor groups in here, you can log assembly motor groups
-		chassis.left_drive, 
-		chassis.right_drive, 
+		chassis.left_drive,
+		chassis.right_drive,
 		// assembly.lift_arm_motors
 
-    }, 
+    },
 	{
 		// Add all mik motors in here, you can log assembly motors
 		// assembly.intake_motor
@@ -80,15 +80,15 @@ void log_motors() {
 void calibrate_inertial(void) {
 	calibrating = true;
 	chassis.inertial.calibrate();
-  
+
 	while (chassis.inertial.isCalibrating()) {
 		vex::task::sleep(25);
 	}
-  
+
   	// Recalibrate inertial until it is within calibration threshold
   	float starting_rotation = chassis.inertial.rotation();
   	task::sleep(1000);
-	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUM_INERTIAL_CALIBRATION_ERROR) { 
+	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUM_INERTIAL_CALIBRATION_ERROR) {
 		Controller.rumble("-");
 		calibrate_inertial();
   	}
@@ -97,7 +97,7 @@ void calibrate_inertial(void) {
 
 static void loading_screen(bool stop) {
 	static vex::task loading_bar;
-	
+
 	if (stop) {
 		loading_bar.stop();
 		return;
@@ -105,7 +105,7 @@ static void loading_screen(bool stop) {
 
 	Controller.Screen.setCursor(1, 1);
 	Brain.Screen.drawImageFromBuffer(mikLib_logo, 0, 0, sizeof(mikLib_logo));
-	
+
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
 		Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
@@ -131,7 +131,7 @@ static void loading_screen(bool stop) {
 }
 
 static void handle_disconnected_devices() {
-	int errors = run_diagnostic(); 
+	int errors = run_diagnostic();
 	if (errors > 0) {
 		Controller.rumble(".");
 		Controller.Screen.setCursor(1, 1);

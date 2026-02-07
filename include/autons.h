@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vex.h"
+#include "mikLib/globals.h"
 
 void default_constants(void);
 void odom_constants(void);

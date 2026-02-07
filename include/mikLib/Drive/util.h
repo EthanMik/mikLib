@@ -1,11 +1,7 @@
 #pragma once
 
-#include "vex.h"
-
-typedef struct point{
-    double x;
-    double y;
-};
+#include <sstream>
+#include "mikLib/globals.h"
 
 /**
  * @brief "Clamps" a number between a min and max.
@@ -112,7 +108,7 @@ float mirror_angle(float angle, bool mirror);
  * @param mirror Whether to apply mirroring.
  * @return Mirrored (or original) direction value.
  */
-mik::direction mirror_direction(mik::direction dir, bool mirror);
+mik::turn_direction mirror_direction(mik::turn_direction dir, bool mirror);
 
 /**
  * @brief Conditionally mirror an X coordinate (negate when mirrored).
@@ -144,7 +140,7 @@ float mirror_y(float y, bool mirror);
  * @param dir Direction preference: CW, CCW, or FASTEST (default).
  * @return Normalized angular error in degrees consistent with `dir`.
  */
-float angle_error(float error, mik::direction dir = mik::direction::FASTEST);
+float angle_error(float error, mik::turn_direction dir = mik::turn_direction::FASTEST);
 
 /**
  * @brief Settling control for odometry functions.

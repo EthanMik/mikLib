@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vex.h"
+#include "mikLib/drive.h"
 
 // Drive motions are at end of file
 
@@ -1282,15 +1282,12 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
     
             drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
 
-            float heading_error = reduce_negative_180_to_180(
-                to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading()
-            );
+            float heading_error = reduce_negative_180_to_180(to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading());
             int drive_sign = 1;
 
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
             prev_drive_error = drive_error;
 
-            float heading_error = reduce_negative_180_to_180(to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading());
     
             if (drive_error < p.settle_error || crossed_center_line || drive_error < p.setback) { 
                 heading_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading()); 
