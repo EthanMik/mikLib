@@ -9,12 +9,12 @@ vex::competition Competition;
 
 bool calibrating = false;
 
-// Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
+// Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR
 bool force_calibrate_inertial = true;
 
 // After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value. 
 // If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
-static const float MINIMUN_INERTIAL_CALIBRATION_ERROR = .05;
+static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
 
 Chassis chassis(
     // Drivetrain motors
@@ -33,7 +33,7 @@ Chassis chassis(
     360,    // Inertial scale, value that reads after turning robot a full 360
 
     PORT19, // Forward Tracker Port
-    -2,     // Forward Tracker wheel diameter in inches (negative flips direction)
+    -2,     // Forward Tracker wheel diameter in inches (negative flips direction). Pushing robot forward at 0° should increase Y positively
     0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
 	forward_tracker, // Whether or not you are using forward tracker, plug in "motor_encoder" if you do not have a forward tracker
@@ -41,7 +41,7 @@ Chassis chassis(
 	0.75,            // The gear ratio of the drivetrain, EX: 36T driving a 48T is 0.75, only needed if you are using motor encoders
 
     PORT15,  // Sideways tracker port, leave as -1 if only running forward tracker
-    2,       // Sideways tracker wheel diameter in inches (negative flips direction)
+    2,       // Sideways tracker wheel diameter in inches (negative flips direction). Pushing robot to right at 0° should increase X positively
     0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
     mik::distance_reset({
@@ -64,14 +64,15 @@ Assembly assembly(
 /** Allows UI to display all motor values */
 void log_motors() {
     config_add_motors({
-		// Add all mik motor groups in here
+		// Add all mik motor groups in here, you can log assembly motor groups
 		chassis.left_drive, 
 		chassis.right_drive, 
-		assembly.lift_arm_motors
+		// assembly.lift_arm_motors
+
     }, 
 	{
-		// Add all mik motors in here
-		assembly.intake_motor
+		// Add all mik motors in here, you can log assembly motors
+		// assembly.intake_motor
     }
   );
 }
@@ -87,7 +88,7 @@ void calibrate_inertial(void) {
   	// Recalibrate inertial until it is within calibration threshold
   	float starting_rotation = chassis.inertial.rotation();
   	task::sleep(1000);
-	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUN_INERTIAL_CALIBRATION_ERROR) { 
+	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUM_INERTIAL_CALIBRATION_ERROR) { 
 		Controller.rumble("-");
 		calibrate_inertial();
   	}

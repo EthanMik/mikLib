@@ -98,7 +98,7 @@ void test_boomerang() {
 	chassis.drive_to_pose(24, 0, 0, {.lead = .2});
 	chassis.drive_to_pose(0, 24, 315);
 	chassis.drive_to_pose(0, 0, 0);
-	}
+}
 
 std::vector<point> path = {
 	{  0.000,   0.000 },

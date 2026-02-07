@@ -4,6 +4,8 @@
 
 using namespace vex;
 
+// The internals of this class is example code and can be deleted
+
 enum lift_positions : int { IDLE = 229, LOADING = 206, SCORING = 99 };
 
 class Assembly {

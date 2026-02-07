@@ -276,22 +276,22 @@ void Chassis::split_arcade_curved() {
     float turn = vex::controller(vex::primary).Axis1.value();
     throttle = std::round(curve(throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
     turn = std::round(curve(turn, control_turn_deadband, control_turn_min_output, control_turn_curve_gain));
-    chassis.left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
-    chassis.right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt); 
+    left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt); 
 }
 
 void Chassis::split_arcade() {
     float throttle = deadband(vex::controller(vex::primary).Axis3.value(), control_throttle_deadband);
     float turn = deadband(vex::controller(vex::primary).Axis1.value(), control_turn_deadband);
-    chassis.left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
-    chassis.right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
+    left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
 }
 
 void Chassis::tank() {
     float left_throttle = deadband(controller(primary).Axis3.value(), 5);
     float right_throttle = deadband(controller(primary).Axis2.value(), 5);
-    chassis.left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
-    chassis.right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
+    left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
+    right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
 
 void Chassis::tank_curved() {
@@ -299,18 +299,18 @@ void Chassis::tank_curved() {
     float right_throttle = controller(primary).Axis2.value();
     left_throttle = std::round(curve(left_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
     right_throttle = std::round(curve(right_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
-    chassis.left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
-    chassis.right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
+    left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
+    right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
 
 void Chassis::control(drive_mode dm) {
     if (control_disabled) { 
-        chassis.stop_drive(coast);
+        stop_drive(coast);
         return;
     }
     selected_drive_mode = dm;
 
-    switch (dm)
+switch (dm)
     {
     case drive_mode::SPLIT_ARCADE:
         split_arcade();

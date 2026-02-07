@@ -1,6 +1,9 @@
 #include "vex.h"
 
 using namespace vex;
+using namespace mik;
+
+// The code in this file is example and can be deleted
 
 // Pass in the devices we want to use
 Assembly::Assembly(
@@ -13,12 +16,12 @@ Assembly::Assembly(
     lift_arm_motors(lift_arm_motors),
     intake_motor(intake_motor),
     lift_arm_encoder(lift_arm_encoder),
-    long_piston(long_piston) // Make sure when using a 3 wire device that isnt mik::piston you convert the port. `to_triport(PORT_A)`.
+    long_piston(long_piston) // Make sure when using a 3 wire device that isn't mik::piston you convert the port. `to_triport(PORT_A)`.
 {};
 
 // You want to call this function once in the user control function in main.
 void Assembly::init() {
-    // Create the task to move the lift arm. We only want one task to be created
+    // Create the task to move the lift arm,. We only want one task to be created
     lift_task = vex::task([](){
         assembly.move_lift_arm();
         return 0;
