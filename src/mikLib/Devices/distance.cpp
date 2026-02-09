@@ -2,10 +2,10 @@
 
 using namespace mik;
 
-#define WALL_TOP_Y     70
-#define WALL_BOTTOM_Y -70
-#define WALL_LEFT_X   -70
-#define WALL_RIGHT_X   70
+#define WALL_TOP_Y     70.25
+#define WALL_BOTTOM_Y -70.25
+#define WALL_LEFT_X   -70.25
+#define WALL_RIGHT_X   70.25
 
 #define WALL_TOP_ANGLE_OFFSET    270
 #define WALL_BOTTOM_ANGLE_OFFSET 270
