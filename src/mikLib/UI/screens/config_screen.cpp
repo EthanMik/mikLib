@@ -22,6 +22,47 @@ std::shared_ptr<screen> UI_config_screen::get_config_screen() {
 
 #define text_alignment text_align::CENTER
 
+void UI_config_screen::add_button(int x, int row, std::string label, std::function<void()> func) {
+    int y = y_start_position + (y_offset * row);
+    auto tgl = UI_crt_tgl(UI_crt_rec(
+        x, y, 154, 35, 
+        config_btn_outline_color, 
+        UI_distance_units::pixels), 
+        [](){}
+    );
+
+    tgl->set_states(UI_crt_rec(
+        x, y, 154, 35, 
+        config_btn_outline_pressing_color, 
+        UI_distance_units::pixels
+    ), UI_crt_rec(
+        x, y, 154, 35, 
+        config_btn_outline_pressed_color, 
+        UI_distance_units::pixels));
+        
+    auto btn = UI_crt_btn(UI_crt_rec(
+        x, y, 154, 35, 
+        config_btn_outline_color, 
+        UI_distance_units::pixels), 
+        func
+    );
+    auto txt = UI_crt_txtbox(
+        label, 
+        config_text_color, 
+        config_macro_btn_bg_color, 
+        text_alignment, 
+        UI_crt_rec(
+            x + text_box_offset, 
+            y + text_box_offset, 
+            150, 31, 
+            config_macro_btn_bg_color, 
+            UI_distance_units::pixels)
+        );
+        
+    UI_config_scr->add_UI_components({btn, tgl, txt});
+}
+
+
 void UI_config_screen::UI_crt_config_scr() {
     UI_config_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + y_offset*2 + 5);
     UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 2, 40, config_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);

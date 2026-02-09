@@ -14,6 +14,7 @@ public:
     std::shared_ptr<UI_component> macro_10_bg_tgl;
     std::shared_ptr<UI_component> macro_4_bg_tgl;
 private:
+    void add_button(int x, int row, std::string label, std::function<void()> func);
     void countdown(std::shared_ptr<UI_component> txtbox, std::function<void()> func);
     void swap_mode(std::shared_ptr<UI_component> txtbox, bool mode);
 
