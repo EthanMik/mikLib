@@ -223,7 +223,7 @@ float Chassis::get_Y_position() {
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {
-    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_absolute_heading());
+    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_X_position(), get_Y_position(), get_absolute_heading());
 
     const bool reset_x = (wall_position == wall_position::TOP_WALL || wall_position == wall_position::BOTTOM_WALL) ? false : true; 
 

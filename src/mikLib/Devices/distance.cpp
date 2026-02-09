@@ -33,7 +33,31 @@ mik::distance_reset::distance_reset(const std::vector<mik::distance>& distance_s
     distance_sensors(distance_sensors)
 {};
 
-float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position, wall_position wall_position, float angle) {
+mik::wall_position mik::distance_reset::auto_detect_wall(
+    const float distance, const float sensor_offset,
+    const float x_offset, const float y_offset,  
+    float x, float y, float angle
+) {
+    const float dx = sin(to_rad(angle + sensor_offset));
+    const float dy = cos(to_rad(angle + sensor_offset));
+
+    const float sensor_x = x + x_offset * cos(to_rad(angle)) + y_offset * sin(to_rad(angle));
+    const float sensor_y = y - x_offset * sin(to_rad(angle)) + y_offset * cos(to_rad(angle));
+
+    const float t_right  = dx > 0 ? (WALL_RIGHT_X  - sensor_x) / dx : INFINITY;
+    const float t_left   = dx < 0 ? (WALL_LEFT_X   - sensor_x) / dx : INFINITY;
+    const float t_top    = dy > 0 ? (WALL_TOP_Y    - sensor_y) / dy : INFINITY;
+    const float t_bottom = dy < 0 ? (WALL_BOTTOM_Y - sensor_y) / dy : INFINITY;
+
+    const float tMin = std::min({t_right, t_left, t_top, t_bottom});
+
+    if (tMin == t_right)  return wall_position::RIGHT_WALL;
+    if (tMin == t_left)   return wall_position::LEFT_WALL;
+    if (tMin == t_top)    return wall_position::TOP_WALL;
+    return wall_position::BOTTOM_WALL;
+}
+
+float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position, wall_position wall_position, float x, float y, float angle) {
     int index = -1;
     for (size_t i = 0; i < distance_sensors.size(); ++i) {
         if (distance_sensors[i].position() == sensor_position) {
@@ -43,12 +67,17 @@ float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position,
     if (index < 0) { return 0; }
     
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
-    const float wall_offset = to_wall_angle_constant(wall_position);
-    const float wall_pos = to_wall_pos_constant(wall_position);
-    
     const float distance = distance_sensors[index].objectDistance(inches);
     const float x_offset = distance_sensors[index].x_center_offset();
     const float y_offset = distance_sensors[index].y_center_offset();
+
+    if (wall_position == wall_position::AUTO) {
+        wall_position = auto_detect_wall(distance, sensor_offset, x_offset, y_offset, x, y, angle);
+    }
+    
+    const float wall_offset = to_wall_angle_constant(wall_position);
+    const float wall_pos = to_wall_pos_constant(wall_position);
+    
     const float theta = angle + wall_offset + sensor_offset; 
 
     const bool reset_x = (wall_position == wall_position::LEFT_WALL || wall_position == wall_position::RIGHT_WALL);

@@ -34,7 +34,7 @@ namespace mik {
 
     enum auto_variation : int { ONE = 1, TWO = 2, THREE = 3, FOUR = 4 };
     enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
-    enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL };
+    enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, AUTO };
     enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
     
     inline constexpr unsigned int PORT_A = 0;
@@ -58,6 +58,7 @@ namespace mik {
     inline constexpr wall_position bottom_wall = wall_position::BOTTOM_WALL;
     inline constexpr wall_position left_wall = wall_position::LEFT_WALL;
     inline constexpr wall_position right_wall = wall_position::RIGHT_WALL;
+    inline constexpr wall_position auto_detect_wall = wall_position::AUTO;
 
     inline constexpr vex::gearSetting blue_6_1  = vex::gearSetting::ratio6_1;
     inline constexpr vex::gearSetting green_18_1 = vex::gearSetting::ratio18_1;
