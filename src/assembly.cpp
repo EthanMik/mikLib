@@ -5,84 +5,73 @@ using namespace mik;
 
 // The code in this file is example and can be deleted
 
-// Pass in the devices we want to use
+// This is example code for a push back robot with two 5.5W motors on the lower intake, /
+// 11W motor on the top intake, a scraper, and wing
+
+// Pass in the devices we want to use, make sure this follows the same order as assembly.h
 Assembly::Assembly(
-    mik::motor_group lift_arm_motors,
-    mik::motor intake_motor, 
-    vex::rotation lift_arm_encoder,
-    mik::piston long_piston
+    mik::motor_group lower_intake_motors,
+    mik::motor upper_intake_motor, 
+    mik::piston scraper_piston,
+    mik::piston wing_piston
 ) :
     // Assign the ports to the devices
-    lift_arm_motors(lift_arm_motors),
-    intake_motor(intake_motor),
-    lift_arm_encoder(lift_arm_encoder),
-    long_piston(long_piston) // Make sure when using a 3 wire device that isn't mik::piston you convert the port. `to_triport(PORT_A)`.
+    lower_intake_motors(lower_intake_motors),
+    upper_intake_motor(upper_intake_motor),
+    scraper_piston(scraper_piston),
+    wing_piston(wing_piston) // Make sure when using a 3 wire device that isn't mik::piston you convert the port. `to_triport(PORT_A)`.
 {};
 
 // You want to call this function once in the user control function in main.
 void Assembly::init() {
-    // Create the task to move the lift arm,. We only want one task to be created
-    lift_task = vex::task([](){
-        assembly.move_lift_arm();
-        return 0;
-    });
-    // To stop the task do `assembly.lift_task.stop();`
+    // You can declare a task that you want to always run in user control.
+
+    // For example a task that is always checking if the intake is moving forward while being told to,
+    // and detected not, then the intake will move in reverse to unjam itself
 } 
 
 // You want to put this function inside the user control loop in main.
 void Assembly::control() {
-    lift_arm_control();
-    intake_motors_control();
-    long_piston_control();
-}
-
-void Assembly::move_lift_arm() {
-    // Create a proportional controller. Increase the P just enough so there isn't much oscillation.
-    PID lift_PID(.1, 0, 0);
-    while (true) {
-        // How far we need to move until desired angle
-        float error = lift_arm_position - lift_arm_encoder.angle();
-        // Converting error into motor voltage
-        float output = lift_PID.compute(error);
-        lift_arm_motors.spin(fwd, output, volt);
-        vex::this_thread::sleep_for(20);
-    }
-}
-
-void Assembly::lift_arm_control() {
-    // new_press macro only allows input to go through when button is pressed. Resets after button is released.
-    if (btnX_new_press(Controller.ButtonX.pressing())) {
-        // If Up arrow is pressed it will swap lift positions between scoring and loading
-        if (lift_arm_position != SCORING) {
-            lift_arm_position = SCORING; // Lift task will read this value
-        } else {
-            lift_arm_position = LOADING;
-        }
-    } else if (btnUp_new_press(Controller.ButtonUp.pressing())) {
-        // If Up arrow is pressed it will swap lift positions between loading and idle
-        if (lift_arm_position != LOADING) {
-            lift_arm_position = LOADING;
-        } else {
-            lift_arm_position = IDLE;
-        }
-    }
+    lower_intake_control();
+    upper_intake_control();
+    wing_piston_control();
+    scraper_piston_control();
 }
 
 // Spins intake forward if L1 is being held, reverse if L2 is being held; stops otherwise
-void Assembly::intake_motors_control() {
+void Assembly::lower_intake_control() {
     if (Controller.ButtonL1.pressing()) {
-        intake_motor.spin(fwd, 12, volt);
+        lower_intake_motors.spin(fwd, 12, volt);
     } else if (Controller.ButtonL2.pressing()) {
-        intake_motor.spin(fwd, -12, volt);
+        lower_intake_motors.spin(fwd, -12, volt);
     } else {
-        intake_motor.stop();
+        lower_intake_motors.stop();
     }
 }
 
+// Spins intake forward if R2 is being held, reverse if Button Down is being held; stops otherwise
+void Assembly::upper_intake_control() {
+    if (Controller.ButtonR2.pressing()) {
+        upper_intake_motor.spin(fwd, 12, volt);
+    } else if (Controller.ButtonDown.pressing()) {
+        upper_intake_motor.spin(fwd, -12, volt);
+    } else {
+        upper_intake_motor.stop();
+    }
+}
 
-// Extends or retracts piston when button A is pressed, can only extend or retract again until button A is released and pressed again
-void Assembly::long_piston_control() {
+// Extends or retracts wing piston when button R1 is pressed, 
+// can only extend or retract again until button R1 is released and pressed again
+void Assembly::wing_piston_control() {
+    if (btnR1_new_press(Controller.ButtonR1.pressing())) {
+        wing_piston.toggle();
+    }
+}
+
+// Extends or retracts piston when button A is pressed, 
+// can only extend or retract again until button A is released and pressed again
+void Assembly::scraper_piston_control() {
     if (btnA_new_press(Controller.ButtonA.pressing())) {
-        long_piston.toggle();
+        scraper_piston.toggle();
     }
 }

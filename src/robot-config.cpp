@@ -40,7 +40,7 @@ Chassis chassis(
 	2.75,            // The wheel diameter of drivetrain, only needed if you are using motor encoders
 	0.75,            // The gear ratio of the drivetrain, EX: 36T driving a 48T is 0.75, only needed if you are using motor encoders
 
-    PORT15,  // Sideways tracker port, leave as -1 if only running forward tracker
+    PORT15,  // Sideways tracker port, leave as -1 if you do not have a sideways tracker
     2,       // Sideways tracker wheel diameter in inches (negative flips direction). Pushing robot to right at 0° should increase X positively
     0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
@@ -50,14 +50,15 @@ Chassis chassis(
     })
 );
 
+// Make sure devices are passed in the same order as they are declared in assembly.h and and assembly.cpp
 Assembly assembly(
 	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "left_lift_motor"),
-		mik::motor(PORT20, false, green_18_1, "right_lift_motor")
+		mik::motor(PORT13, true, green_18_1, "bottom_intake"),
+		mik::motor(PORT20, false, green_18_1, "middle_intake")
 	}),
 
-	mik::motor(PORT16, false, blue_6_1, "intake_motor"),
-	vex::rotation(PORT11),
+	mik::motor(PORT16, false, blue_6_1, "upper_intake"),
+	mik::piston(PORT_B),
 	mik::piston(PORT_A)
 );
 
@@ -67,12 +68,12 @@ void log_motors() {
 		// Add all mik motor groups in here, you can log assembly motor groups
 		chassis.left_drive,
 		chassis.right_drive,
-		// assembly.lift_arm_motors
+		// assembly.lower_intake_motors
 
     },
 	{
 		// Add all mik motors in here, you can log assembly motors
-		// assembly.intake_motor
+		// assembly.upper_intake_motor
     }
   );
 }
