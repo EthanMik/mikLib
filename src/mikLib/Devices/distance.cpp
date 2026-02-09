@@ -57,6 +57,23 @@ mik::wall_position mik::distance_reset::auto_detect_wall(
     return wall_position::BOTTOM_WALL;
 }
 
+std::string mik::distance_reset::get_wall_facing(distance_position sensor_position, float x, float y, float angle) {
+    int index = -1;
+    for (size_t i = 0; i < distance_sensors.size(); ++i) {
+        if (distance_sensors[i].position() == sensor_position) {
+            index = i;
+        }
+    }
+    if (index < 0) { return ""; }
+    
+    const float sensor_offset = to_sensor_offset_constant(sensor_position);
+    const float distance = distance_sensors[index].objectDistance(inches);
+    const float x_offset = distance_sensors[index].x_center_offset();
+    const float y_offset = distance_sensors[index].y_center_offset();
+
+    return to_wall_name(auto_detect_wall(distance, sensor_offset, x_offset, y_offset, x, y, angle));
+}
+
 float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position, wall_position wall_position, float x, float y, float angle) {
     int index = -1;
     for (size_t i = 0; i < distance_sensors.size(); ++i) {
@@ -97,6 +114,21 @@ std::vector<mik::distance>& mik::distance_reset::get_distance_sensors() {
     return distance_sensors;
 }
 
+std::string mik::distance_reset::to_wall_name(mik::wall_position wall_position) {
+    switch (wall_position) {
+        case wall_position::TOP_WALL:
+            return "top_wall";
+        case wall_position::LEFT_WALL:
+            return "left_wall";
+        case wall_position::RIGHT_WALL:
+            return "right_wall";
+        case wall_position::BOTTOM_WALL:
+            return "bottom_wall";
+        case wall_position::AUTO:
+            return "auto";
+    }
+}
+
 std::string mik::distance::to_sensor_name(distance_position sensor_pos) {
     switch (sensor_pos) {
         case distance_position::FRONT_SENSOR:
@@ -133,6 +165,8 @@ float mik::distance_reset::to_wall_pos_constant(wall_position wall_pos) {
             return WALL_LEFT_X;
         case wall_position::RIGHT_WALL:
             return WALL_RIGHT_X;
+        case wall_position::AUTO:
+            return 0;
     }
 }
 
@@ -146,5 +180,7 @@ float mik::distance_reset::to_wall_angle_constant(wall_position wall_pos) {
             return WALL_LEFT_ANGLE_OFFSET;
         case wall_position::RIGHT_WALL:
             return WALL_RIGHT_ANGLE_OFFSET;
+        case wall_position::AUTO:
+            return 0;
     }
 }

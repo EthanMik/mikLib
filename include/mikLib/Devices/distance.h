@@ -68,12 +68,15 @@ public:
      * @return A new x or y coordinate based on the wall desired sensor is faced at.
      */
     float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float x, float y, float angle);
+
+    std::string get_wall_facing(mik::distance_position sensor_pos, float x, float y, float angle);
     
     /** @returns vector containing all mik::distance sensors. */
     std::vector<mik::distance>& get_distance_sensors();
     
 private:
     float to_sensor_offset_constant(mik::distance_position sensor_pos);
+    std::string to_wall_name(mik::wall_position wall_position);
     float to_wall_pos_constant(mik::wall_position wall_pos);
     float to_wall_angle_constant(mik::wall_position wall_pos);
 

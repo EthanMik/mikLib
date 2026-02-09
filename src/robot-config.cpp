@@ -9,7 +9,7 @@ vex::competition Competition;
 
 bool calibrating = false;
 
-// Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR
+// Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR, will cause calibrating to take longer
 bool force_calibrate_inertial = true;
 
 // After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
@@ -33,7 +33,7 @@ Chassis chassis(
     360,    // Inertial scale, value that reads after turning robot a full 360
 
     PORT19, // Forward Tracker Port
-    -2,     // Forward Tracker wheel diameter in inches (negative flips direction). Pushing robot forward at 0° should increase Y positively
+    -2,     // Forward Tracker wheel diameter in inches (negative flips direction). Pushing the robot forward at 0° should increase Y positively
     0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
 
 	forward_tracker, // Whether or not you are using forward tracker, plug in "motor_encoder" if you do not have a forward tracker
@@ -41,7 +41,7 @@ Chassis chassis(
 	0.75,            // The gear ratio of the drivetrain, EX: 36T driving a 48T is 0.75, only needed if you are using motor encoders
 
     PORT15,  // Sideways tracker port, leave as -1 if you do not have a sideways tracker
-    2,       // Sideways tracker wheel diameter in inches (negative flips direction). Pushing robot to right at 0° should increase X positively
+    2,       // Sideways tracker wheel diameter in inches (negative flips direction). Pushing the robot to right at 0° should increase X positively
     0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
 
     mik::distance_reset({

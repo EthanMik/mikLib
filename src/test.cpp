@@ -667,18 +667,74 @@ void config_motor_current() {
 }
 
 void config_odom_data() {
-	if (!chassis.position_tracking) {
-		chassis.set_coordinates(0, 0, 0);
-	}
-
-	console_scr->add("X: ", [](){ return chassis.get_X_position(); });
-	console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
-	console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
-	console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-	console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
-	console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
-
+	console_scr->reset();
 	UI_select_scr(console_scr->get_console_screen()); 
+
+	vex::task temp([](){
+		task::sleep(500);
+
+		if (!chassis.position_tracking) {
+			chassis.set_coordinates(0, 0, 0);
+		}
+	
+		console_scr->add("X: ", [](){ return chassis.get_X_position(); });
+		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
+		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
+		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
+		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
+
+		return 0;
+	});
+
+}
+
+void config_reset_data() {
+	console_scr->reset();
+	UI_select_scr(console_scr->get_console_screen()); 
+
+	vex::task temp([](){
+		task::sleep(500);
+
+
+		if (!chassis.position_tracking) {
+			console_scr->add("The robot does know where it is, place `chassis.set_coordinates(inital_x, intial_y, inital_heading);`", [](){ return ""; });	
+			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
+			return 0;
+		}
+
+		console_scr->add("Odom X: ", [](){ return chassis.get_X_position(); });
+		console_scr->add("Odom Y: ", [](){ return chassis.get_Y_position(); });
+
+		for (auto& sensor : chassis.reset_sensors.get_distance_sensors()) {
+			auto sensor_pos = sensor.position();
+			
+			console_scr->add(sensor.name() + ", Facing: ", [sensor_pos](){
+				return chassis.reset_sensors.get_wall_facing(
+					sensor_pos, chassis.get_X_position(), 
+					chassis.get_Y_position(), 
+					chassis.get_absolute_heading()); 
+				});
+
+			console_scr->add(sensor.name() + ", Resetting ", [sensor_pos](){
+				auto wall = chassis.reset_sensors.get_wall_facing(
+					sensor_pos, chassis.get_X_position(),
+					chassis.get_Y_position(),
+					chassis.get_absolute_heading());
+
+				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
+
+				return axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(
+					sensor_pos,
+					auto_detect_wall,
+					chassis.get_X_position(),
+					chassis.get_Y_position(),
+					chassis.get_absolute_heading()), 3, false);
+			});
+		}
+
+		return 0;
+	});	
 }
 
 void config_error_data() {

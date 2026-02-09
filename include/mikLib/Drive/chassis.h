@@ -382,16 +382,17 @@ public:
      * @brief Resets an X or Y position of the robot based on the heading and distance from a wall.
      * The distance sensor must be facing the desired wall with no obstruction in order to work.
      * Choosing to reset off a top or bottom wall will reset the robots y positon, and a left or right
-     * wall resetting the robots x position.
+     * wall resetting the robots x position. The wall the robot is facing is automatically found by using its 
+     * absolute X, Y, and heading. Wall facing can be specified.
      * 
      * @param sensor_pos The side of the robot that the distance sensor is mounted.
-     * @param wall_pos The wall that is being looked at by desired distance sensor.
      * @param max_reset_distance The maxiumum allowed of distance in inches that an odom axis can be changed.
      * 
      * @return True if the desired axis was reset successfully.
      */
+    bool reset_axis(mik::distance_position sensor_pos, float max_reset_distance);
     bool reset_axis(mik::distance_position sensor_pos, mik::wall_position wall_pos, float max_reset_distance);
-    
+
     /**
      * @brief Turns to a specified point on the field.
      * Functions similarly to turn_to_angle() except with a point. The

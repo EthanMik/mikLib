@@ -222,6 +222,10 @@ float Chassis::get_Y_position() {
     return odom.position.y;
 }
 
+bool Chassis::reset_axis(distance_position sensor_position, float max_reset_distance) {
+    reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
+}
+
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {
     const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_X_position(), get_Y_position(), get_absolute_heading());
 
