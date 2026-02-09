@@ -1,8 +1,10 @@
 - Slew into drive motion
 - to_point direction forcing ||
 - callback percent injection
-- Distance Reset auto detect wall
+- Distance Reset auto detect wall ||
 - Readthedocs.io
+- create example code for push back
+- add a button that displays the sensors
 - optional empty mikLib template project
 - optional no assembly class
 - measure velocity and accel button
