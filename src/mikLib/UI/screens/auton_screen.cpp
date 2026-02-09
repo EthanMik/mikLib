@@ -338,28 +338,27 @@ void UI_auton_screen::update_var_display() {
 void UI_auton_screen::UI_select_auton(autons auton) {
     robot_is_calibrated = false;
 
-    switch (auton)
-    {
-    case autons::RED_BLUE:
-        auto_max_time = 15;
-        red_blue = !red_blue;
-        break;
+    switch (auton) {
+        case autons::RED_BLUE:
+            auto_max_time = 15;
+            red_blue = !red_blue;
+            break;
         case autons::RINGS_GOAL:
-        auto_max_time = 15;
-        rings_goal = !rings_goal;
-        break;
+            auto_max_time = 15;
+            rings_goal = !rings_goal;
+            break;
         case autons::QUALS_ELIMS:
-        auto_max_time = 15;
-        quals_elims = !quals_elims;
-        break;    
+            auto_max_time = 15;
+            quals_elims = !quals_elims;
+            break;    
         case autons::OFF_SAWP:
-        auto_max_time = 15;
-        off_sawp = !off_sawp;
-        break;
+            auto_max_time = 15;
+            off_sawp = !off_sawp;
+            break;
         case autons::OFF_SKILLS:
-        auto_max_time = 60;
-        off_skills = !off_skills;
-        break;
+            auto_max_time = 60;
+            off_skills = !off_skills;
+            break;
     }
 
     if (off_sawp && quals_elims) {
