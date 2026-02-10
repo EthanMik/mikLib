@@ -224,6 +224,37 @@ public:
     /** @brief Cancels the current motion the robot is in. Useful for chaining movements faster */
     void cancel_motion();
 
+    /** 
+     * @brief Changes the drive max voltage that is currently being used for a drive motion
+     * 
+     * Example: 
+     * chassis.drive_distance(12, {.drive_max_voltage = 12, .wait = false}); // Drives robot at 12 volts 
+     * chassis.wait_until(6); // Waits until robot has driven 6 inches at 12 volts
+     * update_drive_max_voltage(6); // Sets max speed to 6 volts
+     * chassis.wait(); // Finishes drive distance at 6 volts
+     * 
+     * @param drive_max_voltage voltage of the drive, 0-12.
+    */
+    void update_drive_max_voltage(float drive_max_voltage);
+
+    /** 
+     * @brief Changes the heading max voltage that is currently being used for a drive motion
+     * @param heading_max_voltage voltage of the heading, 0-12.
+    */
+    void update_heading_max_voltage(float heading_max_voltage);
+
+    /** 
+     * @brief Changes the turn max voltage that is currently being used for a drive motion
+     * @param turn_max_voltage voltage of the heading, 0-12.
+    */
+    void update_turn_max_voltage(float turn_max_voltage);
+
+    /** 
+     * @brief Changes the swing max voltage that is currently being used for a drive motion
+     * @param swing_max_voltage voltage of the heading, 0-12.
+    */
+    void update_swing_max_voltage(float swing_max_voltage);
+
     /**
      * @brief Drives each side of the chassis at the specified voltage.
      * 
@@ -756,7 +787,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
     drive_task = vex::task([](){
         const float distance = chassis.desired_distance;
         const float heading = chassis.desired_heading;
-        drive_distance_params p = g_drive_distance_params_buffer;
+        drive_distance_params& p = g_drive_distance_params_buffer;
 
         float drive_start_position = chassis.get_ForwardTracker_position();
         float current_position = drive_start_position;
@@ -805,7 +836,7 @@ inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = 
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
-        const turn_to_angle_params p = g_turn_to_angle_params_buffer;
+        turn_to_angle_params& p = g_turn_to_angle_params_buffer;
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
@@ -858,7 +889,7 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
-        const swing_to_angle_params p = g_swing_to_angle_params_buffer;
+        swing_to_angle_params& p = g_swing_to_angle_params_buffer;
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
@@ -913,7 +944,7 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
-        const swing_to_angle_params p = g_swing_to_angle_params_buffer;
+        swing_to_angle_params& p = g_swing_to_angle_params_buffer;
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
@@ -979,7 +1010,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
         const float x_pos = chassis.desired_X_position;
         const float y_pos = chassis.desired_Y_position;
         const float angle_offset = chassis.desired_angle_offset;
-        const turn_to_point_params p = g_turn_to_point_params_buffer;
+        turn_to_point_params& p = g_turn_to_point_params_buffer;
 
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
@@ -1044,7 +1075,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
         const float x_pos = chassis.desired_X_position;
         const float y_pos = chassis.desired_Y_position;
         const float angle_offset = chassis.desired_angle_offset;
-        const swing_to_point_params p = g_swing_to_point_params_buffer;
+        swing_to_point_params& p = g_swing_to_point_params_buffer;
 
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
@@ -1111,7 +1142,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
         const float x_pos = chassis.desired_X_position;
         const float y_pos = chassis.desired_Y_position;
         const float angle_offset = chassis.desired_angle_offset;
-        const swing_to_point_params p = g_swing_to_point_params_buffer;
+        swing_to_point_params& p = g_swing_to_point_params_buffer;
 
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
@@ -1175,7 +1206,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         const float x_pos = chassis.desired_X_position;
         const float y_pos = chassis.desired_Y_position;
         const float heading = chassis.desired_heading;
-        const drive_to_point_params p = g_drive_to_point_params_buffer;
+        drive_to_point_params& p = g_drive_to_point_params_buffer;
 
         bool line_settled = false;
         bool prev_line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
@@ -1252,7 +1283,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         const float x_pos = chassis.desired_X_position;
         const float y_pos = chassis.desired_Y_position;
         const float angle = chassis.desired_angle;
-        const drive_to_pose_params p = g_drive_to_pose_params_buffer;
+        drive_to_pose_params& p = g_drive_to_pose_params_buffer;
 
         bool line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
         bool prev_line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
@@ -1355,7 +1386,7 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
     
     drive_task = vex::task([](){
         std::vector<point> path = chassis.desired_path;
-        follow_path_params p = g_follow_path_params_buffer;
+        follow_path_params& p = g_follow_path_params_buffer;
 
         point target_intersection = chassis.odom.position; // The point on the path that we should target with PID.
 

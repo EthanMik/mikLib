@@ -136,6 +136,28 @@ void Chassis::cancel_motion() {
     if (drive_min_voltage == 0) { stop_drive(hold); }
 }
 
+void Chassis::update_drive_max_voltage(float drive_max_voltage) {
+    g_drive_distance_params_buffer.max_voltage = drive_max_voltage;
+    g_drive_to_point_params_buffer.max_voltage = drive_max_voltage;
+    g_drive_to_pose_params_buffer.max_voltage = drive_max_voltage;
+}
+
+void Chassis::update_heading_max_voltage(float heading_max_voltage) {
+    g_drive_distance_params_buffer.heading_max_voltage = heading_max_voltage;
+    g_drive_to_point_params_buffer.heading_max_voltage = heading_max_voltage;
+    g_drive_to_pose_params_buffer.heading_max_voltage = heading_max_voltage;
+}
+
+void Chassis::update_turn_max_voltage(float turn_max_voltage) {
+    g_turn_to_angle_params_buffer.max_voltage = turn_max_voltage;
+    g_turn_to_point_params_buffer.max_voltage = turn_max_voltage;
+}
+
+void Chassis::update_swing_max_voltage(float swing_max_voltage) {
+    g_swing_to_angle_params_buffer.max_voltage = swing_max_voltage;
+    g_swing_to_point_params_buffer.max_voltage = swing_max_voltage;
+}
+
 void Chassis::drive_with_voltage(float left_voltage, float right_voltage){
     left_drive.spin(vex::fwd, left_voltage, volt);
     right_drive.spin(vex::fwd, right_voltage, volt);
