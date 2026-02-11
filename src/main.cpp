@@ -7,7 +7,11 @@ task UI;
 
 static int run_UI() {
     UI_init();
-    UI_controller_auton_selector();
+
+    // Running the auton selector on the controller disables user control,
+    // press X on the controller to close auton selector and enable user control
+    UI_controller_auton_selector(); 
+
     UI_render();
     return 0;
 }

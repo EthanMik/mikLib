@@ -17,36 +17,43 @@ bool force_calibrate_inertial = true;
 static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
 
 Chassis chassis(
-    // Drivetrain motors
+    // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-		mik::motor(PORT4, false, blue_6_1, "left_front_motor"),
-		mik::motor(PORT8, true, blue_6_1, "left_middle_motor"),
-		mik::motor(PORT6, true, blue_6_1, "left_back_motor")
+        mik::motor(PORT1, false, blue_6_1, "left_front_motor"),
+        mik::motor(PORT2, true, blue_6_1, "left_middle_motor"),
+        mik::motor(PORT3, true, blue_6_1, "left_back_motor")
     }),
+    // Right drivetrain motors
     mik::motor_group({
-		mik::motor(PORT5, false, blue_6_1, "right_front_motor"),
-		mik::motor(PORT9, true, blue_6_1, "right_middle_motor"),
-		mik::motor(PORT10, false, blue_6_1, "right_back_motor")
+        mik::motor(PORT4, false, blue_6_1, "right_front_motor"),
+        mik::motor(PORT5, true, blue_6_1, "right_middle_motor"),
+        mik::motor(PORT6, false, blue_6_1, "right_back_motor")
     }),
+	
+    PORT10, // Inertial sensor port
+    360,    // Inertial scale (reading after a full 360° turn)
 
-    PORT18, // Inertia sensor port
-    360,    // Inertial scale, value that reads after turning robot a full 360
+    PORT19, // Forward tracker port
+    -2,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y.
+    0,      // Forward tracker center distance (in). Positive = right of center, negative = left. (Right from behind the robot)
 
-    PORT19, // Forward Tracker Port
-    -2,     // Forward Tracker wheel diameter in inches (negative flips direction). Pushing the robot forward at 0° should increase Y positively
-    0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
+    forward_tracker, // Use "motor_encoder" if no dedicated tracker
+    2.75,   // Drivetrain wheel diameter (in). Only needed with motor encoders.
+    0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders.
 
-	forward_tracker, // Whether or not you are using forward tracker, plug in "motor_encoder" if you do not have a forward tracker
-	2.75,            // The wheel diameter of drivetrain, only needed if you are using motor encoders
-	0.75,            // The gear ratio of the drivetrain, EX: 36T driving a 48T is 0.75, only needed if you are using motor encoders
+    PORT20, // Sideways tracker port. -1 if unused.
+    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X.
+    0.3,    // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
-    PORT15,  // Sideways tracker port, leave as -1 if you do not have a sideways tracker
-    2,       // Sideways tracker wheel diameter in inches (negative flips direction). Pushing the robot to right at 0° should increase X positively
-    0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
-
+    // Distance sensors mounted on a face of the robot
     mik::distance_reset({
-		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center
-		mik::distance(PORT17, rear_sensor, 5, 3.5)
+        // mik::distance(port, position, x_offset, y_offset)
+        mik::distance(PORT8,
+            front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
+            5,            // X offset from tracking center (in). Positive = right of center, negative = left.
+            3.5           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+        ),
+        mik::distance(PORT8, left_sensor, -2, -4)
     })
 );
 
