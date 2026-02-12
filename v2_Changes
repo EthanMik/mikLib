@@ -1,16 +1,17 @@
 - Slew into drive motion
-- to_point direction forcing ||
-- callback percent injection
-- Distance Reset auto detect wall ||
+- to_point direction forcing || needs testing
+- callback percent injection (delayed) 
+- Distance Reset auto detect wall || good
 - Readthedocs.io
-- create example code for push back
-- add a button that displays the sensors
+- create example code for push back || needs testing piston
+- add a button that displays the sensors || working
 - optional empty mikLib template project
 - optional no assembly class
-- measure velocity and accel button
+- measure velocity and accel button || needs testing
 - port changing (delayed)
 - code cleanup (auton selector turn off during skills)
-- Auton selector toggle in robot-config
-- swing to angle does not get stuck in a loop
-- add a measure accel and measure velo button
-- Tracking param into drive motions, wheel diam and wheel ratio inside chassis ||
+- Auton selector toggle in robot-config * unfinished
+- swing to angle does not get stuck in a loop * unfinished
+- add a measure accel and measure velo button || needs testing
+- Tracking param into drive motions, wheel diam and wheel ratio inside chassis || needs testing
+- test to get offsets for robot
