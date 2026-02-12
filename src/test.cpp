@@ -590,7 +590,7 @@ void config_motor_wattage() {
 	vex::task watt([](){
 		task::sleep(500);
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 5, false) + " Watts    "; });
 
 		for (auto& motor : motors_) {
 			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.power(), 5, false) + " Watts    "; });
@@ -808,7 +808,7 @@ void config_measure_offsets() {
 
 		int iterations = 10;
 	
-		double f_offset = 0.0, s_offset = 0.0;
+		float f_offset = 0.0, s_offset = 0.0;
 	
 		chassis.forward_tracker.resetPosition();
 		chassis.sideways_tracker.resetPosition();
@@ -819,16 +819,16 @@ void config_measure_offsets() {
 			chassis.sideways_tracker.resetPosition();
 	
 			float start_heading = chassis.inertial.rotation();
-			double target = i % 2 == 0 ? 90 : 270;
+			float target = i % 2 == 0 ? 90 : 270;
 	
 			chassis.turn_to_angle(target, { .max_voltage = 6 });
 			task::sleep(250);
 	
-			double t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
+			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
 	
 	
-			double f_delta = chassis.get_forward_tracker_position();
-			double s_delta = chassis.get_sideways_tracker_position();
+			float f_delta = chassis.get_forward_tracker_position();
+			float s_delta = chassis.get_sideways_tracker_position();
 	
 			f_offset += f_delta / t_delta;
 			s_offset += s_delta / t_delta;
@@ -843,6 +843,7 @@ void config_measure_offsets() {
 		console_scr->add("", [](){ return ""; });
 		console_scr->add("Offsets are a positive value, make sure to change their", [](){ return ""; });
 		console_scr->add("sign depending on where your trackers are located", [](){ return ""; });
+		
 		return 0;
 	});
 }

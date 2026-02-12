@@ -7,14 +7,8 @@ vex::brain Brain;
 vex::controller Controller;
 vex::competition Competition;
 
-bool calibrating = false;
-
-// Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR, will cause calibrating to take longer
-bool force_calibrate_inertial = true;
-
-// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
-// If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
-static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
+// Forces inertial sensor to recalibrate until it is within minimum threshold for 1 second
+bool force_calibrate_inertial = false;
 
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
@@ -76,7 +70,6 @@ void log_motors() {
 		chassis.left_drive,
 		chassis.right_drive,
 		// assembly.lower_intake_motors
-
     },
 	{
 		// Add all mik motors in here, you can log assembly motors
@@ -84,6 +77,13 @@ void log_motors() {
     }
   );
 }
+
+
+// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
+// If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
+static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
+
+bool calibrating = false;
 
 void calibrate_inertial(void) {
 	calibrating = true;
