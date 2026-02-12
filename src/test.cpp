@@ -201,7 +201,7 @@ void config_tune_drive() {
 	UI_select_scr(graph_scr->get_graph_screen()); 
 
 	test_movements_func = [](){
-	chassis.forward_tracker.resetPosition();
+	chassis.forward_tracker.resetRotation();
 	chassis.set_coordinates(0, 0, 0);
 	predicted_distance = 0;
 	prev_desired_distance = 0;
@@ -519,16 +519,16 @@ int run_diagnostic() {
 		error_data.push_back("Inertial [PORT" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.forward_tracker.installed()) {
-		std::string port = to_string(chassis.forward_tracker.index() + 1);
-		error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
-		errors++;
-	}
-	if (!chassis.sideways_tracker.installed()) {
-		std::string port = to_string(chassis.sideways_tracker.index() + 1);
-		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
-		errors++;
-	}
+	// if (!chassis.forward_tracker.installed()) {
+	// 	std::string port = to_string(chassis.forward_tracker.index() + 1);
+	// 	error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
+	// 	errors++;
+	// }
+	// if (!chassis.sideways_tracker.installed()) {
+	// 	std::string port = to_string(chassis.sideways_tracker.index() + 1);
+	// 	error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
+	// 	errors++;
+	// }
 	for (auto& motor : motors_) {
 		if (!motor.installed()) {
 			error_data.push_back(motor.name() + " [" + motor.port() +  "] is disconnected");
@@ -698,38 +698,23 @@ void config_reset_data() {
 
 
 		if (!chassis.position_tracking) {
-			console_scr->add("The robot does know where it is, place `chassis.set_coordinates(inital_x, intial_y, inital_heading);`", [](){ return ""; });	
+			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
+			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
 			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
 			return 0;
 		}
 
 		console_scr->add("Odom X: ", [](){ return chassis.get_X_position(); });
 		console_scr->add("Odom Y: ", [](){ return chassis.get_Y_position(); });
+		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
 
 		for (auto& sensor : chassis.reset_sensors.get_distance_sensors()) {
 			auto sensor_pos = sensor.position();
-			
-			console_scr->add(sensor.name() + ", Facing: ", [sensor_pos](){
-				return chassis.reset_sensors.get_wall_facing(
-					sensor_pos, chassis.get_X_position(), 
-					chassis.get_Y_position(), 
-					chassis.get_absolute_heading()); 
-				});
 
-			console_scr->add(sensor.name() + ", Resetting ", [sensor_pos](){
-				auto wall = chassis.reset_sensors.get_wall_facing(
-					sensor_pos, chassis.get_X_position(),
-					chassis.get_Y_position(),
-					chassis.get_absolute_heading());
-
+			console_scr->add(sensor.name() + ": ", [sensor_pos, &sensor](){
+				auto wall = chassis.reset_sensors.get_wall_facing(sensor_pos, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading());
 				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
-
-				return axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(
-					sensor_pos,
-					auto_detect_wall,
-					chassis.get_X_position(),
-					chassis.get_Y_position(),
-					chassis.get_absolute_heading()), 3, false);
+				return wall + " " + axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(sensor_pos, auto_detect_wall, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading()), 3, false) + " D: " + to_string_float(sensor.objectDistance(distanceUnits::in), 3, false);
 			});
 		}
 

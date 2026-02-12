@@ -30,30 +30,32 @@ Chassis chassis(
         mik::motor(PORT6, false, blue_6_1, "right_back_motor")
     }),
 	
-    PORT10, // Inertial sensor port
+    PORT5, // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 
-    PORT19, // Forward tracker port
-    -2,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y.
+    PORT_C, // Forward tracker port
+    -2.46,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y.
     0,      // Forward tracker center distance (in). Positive = right of center, negative = left. (Right from behind the robot)
 
     forward_tracker, // Use "motor_encoder" if no dedicated tracker
     2.75,   // Drivetrain wheel diameter (in). Only needed with motor encoders.
     0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders.
 
-    PORT20, // Sideways tracker port. -1 if unused.
-    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X.
-    0.3,    // Sideways tracker center distance (in). Positive = behind center, negative = in front.
+    PORT_G, // Sideways tracker port. -1 if unused.
+    -2.46,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X.
+    0.0,    // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
         // mik::distance(port, position, x_offset, y_offset)
-        mik::distance(PORT8,
+        mik::distance(PORT17,
             front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
-            5,            // X offset from tracking center (in). Positive = right of center, negative = left.
-            3.5           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+            0,            // X offset from tracking center (in). Positive = right of center, negative = left.
+            7           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
         ),
-        mik::distance(PORT8, left_sensor, -2, -4)
+        mik::distance(PORT19, right_sensor, 7.3, 3.5),
+		mik::distance(PORT16, rear_sensor, 2.5, -6.7),
+		mik::distance(PORT11, left_sensor, -7.3, -3.5),
     })
 );
 

@@ -170,6 +170,8 @@ void config_motor_current();
  */
 void config_odom_data();
 
+void config_reset_data();
+
 /** @brief Adds errors found into the UI console, errors are collected from run_diagnostic() */
 void config_error_data();
 

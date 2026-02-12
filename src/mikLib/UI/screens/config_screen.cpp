@@ -167,7 +167,7 @@ void UI_config_screen::UI_crt_config_scr() {
 
     // Add updated pid values from pid_tuner to console
     auto macro_14_bg = UI_crt_btn(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, config_btn_outline_color, UI_distance_units::pixels), [](){ 
-        config_add_pid_output_SD_console(); 
+        config_reset_data(); 
     });
     macro_14_bg->set_states(UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, config_btn_outline_pressing_color, UI_distance_units::pixels), UI_crt_rec(data_slot_x_position, y_start_position+y_offset*5, 154, 35, config_btn_outline_pressed_color, UI_distance_units::pixels));
     auto macro_14 = UI_crt_txtbox("PID Data", config_text_color, config_data_btn_bg_color, text_alignment, UI_crt_rec(data_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*5, 150, 31, config_data_btn_bg_color, UI_distance_units::pixels));

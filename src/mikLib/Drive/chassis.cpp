@@ -19,8 +19,8 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     
     tracker_mode(tracker_mode),
     
-    forward_tracker(forward_tracker_port),
-    sideways_tracker(sideways_tracker_port),
+    forward_tracker(Brain.ThreeWirePort.Port[forward_tracker_port]),
+    sideways_tracker(Brain.ThreeWirePort.Port[sideways_tracker_port]),
     inertial(inertial_port),
     
     left_drive(left_drive),
@@ -198,11 +198,11 @@ float Chassis::get_ForwardTracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
         return right_drive.position(deg) * drive_in_to_deg_ratio;
     }
-    return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
+    return forward_tracker.position(vex::rotationUnits::raw) * (360.0 / 8192.0) *  forward_tracker_inch_to_deg_ratio;
 }
 
 float Chassis::get_SidewaysTracker_position() {
-    return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
+    return sideways_tracker.position(vex::rotationUnits::raw) * (360.0 / 8192.0) * sideways_tracker_inch_to_deg_ratio;
 }
 
 void Chassis::position_track() {
@@ -223,8 +223,8 @@ void Chassis::set_heading(float orientation_deg){
 
 void Chassis::set_coordinates(float X_position, float Y_position, float orientation_deg) {
     position_tracking = true;
-    forward_tracker.resetPosition();
-    sideways_tracker.resetPosition();
+    forward_tracker.resetRotation();
+    sideways_tracker.resetRotation();
 
     orientation_deg = mirror_angle(orientation_deg, angles_mirrored_);
     X_position = mirror_x(X_position, x_pos_mirrored_);
@@ -245,7 +245,7 @@ float Chassis::get_Y_position() {
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, float max_reset_distance) {
-    reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
+    return reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {

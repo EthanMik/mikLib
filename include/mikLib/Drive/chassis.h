@@ -579,8 +579,8 @@ public:
      */
     void control(mik::drive_mode dm);
     
-    vex::rotation forward_tracker;
-    vex::rotation sideways_tracker;
+    vex::encoder forward_tracker;
+    vex::encoder sideways_tracker;
     vex::inertial inertial;
     
     mik::motor_group left_drive;
@@ -627,7 +627,7 @@ private:
 
     PID pid; // Primary PID controller.
     PID pid_2; // Secondary PID controller (heading).
-    odom odom;
+    odom45 odom;
 
     vex::task odom_task;
     vex::task drive_task;
