@@ -374,9 +374,9 @@ public:
     void right_swing_to_angle(float angle, const swing_to_angle_params& p);
 
     /** @return Position of the forward tracker in inches */ 
-    float get_ForwardTracker_position();
+    float get_forward_tracker_position();
     /** @return Position of the sideways tracker in inches */ 
-    float get_SidewaysTracker_position();
+    float get_sideways_tracker_position();
 
     /**
      * @brief Resets the robot's coordinates and heading.
@@ -789,14 +789,14 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
         const float heading = chassis.desired_heading;
         drive_distance_params& p = g_drive_distance_params_buffer;
 
-        float drive_start_position = chassis.get_ForwardTracker_position();
+        float drive_start_position = chassis.get_forward_tracker_position();
         float current_position = drive_start_position;
 
         float drive_error = distance + drive_start_position - current_position;
         float prev_drive_error = drive_error;
 
         while (chassis.pid.is_settled() == false) {
-            current_position = chassis.get_ForwardTracker_position();
+            current_position = chassis.get_forward_tracker_position();
     
             drive_error = distance + drive_start_position - current_position;
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);

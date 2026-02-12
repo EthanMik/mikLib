@@ -194,20 +194,20 @@ bool Chassis::angles_mirrored() { return angles_mirrored_; }
 bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
-float Chassis::get_ForwardTracker_position() {
+float Chassis::get_forward_tracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
         return right_drive.position(deg) * drive_in_to_deg_ratio;
     }
     return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
 }
 
-float Chassis::get_SidewaysTracker_position() {
+float Chassis::get_sideways_tracker_position() {
     return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
 }
 
 void Chassis::position_track() {
     while(1) {
-        odom.update_position(get_ForwardTracker_position(), get_SidewaysTracker_position(), get_absolute_heading());
+        odom.update_position(get_forward_tracker_position(), get_sideways_tracker_position(), get_absolute_heading());
         vex::task::sleep(5);
     }
 }
@@ -230,7 +230,7 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
     X_position = mirror_x(X_position, x_pos_mirrored_);
     Y_position = mirror_y(Y_position, y_pos_mirrored_);
 
-    odom.set_position({X_position, Y_position}, orientation_deg, get_ForwardTracker_position(), get_SidewaysTracker_position());
+    odom.set_position({X_position, Y_position}, orientation_deg, get_forward_tracker_position(), get_sideways_tracker_position());
     set_heading(orientation_deg);
     odom_task = vex::task(position_track_task);
     odom_task.setPriority(0);
@@ -245,7 +245,7 @@ float Chassis::get_Y_position() {
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, float max_reset_distance) {
-    reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
+    return reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {

@@ -60,11 +60,12 @@ void Assembly::upper_intake_control() {
     }
 }
 
-// Extends or retracts wing piston when button R1 is pressed, 
-// can only extend or retract again until button R1 is released and pressed again
+// Extends piston when button R1 is pressed, releases otherwise 
 void Assembly::wing_piston_control() {
-    if (btnR1_new_press(Controller.ButtonR1.pressing())) {
-        wing_piston.toggle();
+    if (Controller.ButtonR1.pressing()) {
+        wing_piston.open();
+    } else {
+        wing_piston.close();
     }
 }
 

@@ -176,7 +176,7 @@ void config_tune_drive() {
 		{"drive_tmout: ", chassis.drive_timeout}, 
 	};
 
-	std::function<float(double)> actual_plot = [](double x){ return chassis.get_ForwardTracker_position(); };
+	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
 
 	std::function<float(double)> set_point_plot = [](double x){ 
 		if (chassis.desired_distance != prev_desired_distance) {
@@ -681,8 +681,8 @@ void config_odom_data() {
 		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
 		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
 		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
-		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
+		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
+		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
 
 		return 0;
 	});
@@ -743,41 +743,108 @@ void config_measure_velocity_accel() {
     vex::task temp([](){
         task::sleep(500);
         std::vector<std::pair<float, float>> pos_time{};
-        chassis.drive_with_voltage(12, 12);
+		chassis.forward_tracker.resetPosition();
+		chassis.drive_distance(48, { .max_voltage = 12, .heading_max_voltage = 12 });
 
-        Brain.Timer.reset();
+		Brain.Timer.reset();
         while (Brain.Timer.time(msec) < 1500) {
-            float t = Brain.Timer.time(msec) / 1000.0f;
-            float pos = chassis.get_Y_position() / 12.0f;
-            pos_time.push_back({pos, t});
+			float t = Brain.Timer.time(msec);
+            float pos = chassis.get_forward_tracker_position() / 12.0f;
+            pos_time.push_back({pos, t / 1000.0f});
+
             task::sleep(10);
         }
         chassis.stop_drive(hold);
 
-        float max_vel = 0;
         std::vector<std::pair<float, float>> velocities;
-        for (int i = 1; i < pos_time.size(); i++) {
-            float dt = pos_time[i].second - pos_time[i-1].second;
-            if (dt <= 0) continue;
-            float v = (pos_time[i].first - pos_time[i-1].first) / dt;
-            float t_mid = (pos_time[i].second + pos_time[i-1].second) / 2.0f;
-            velocities.push_back({v, t_mid});
-            if (v > max_vel) max_vel = v;
+
+		for (size_t i = 1; i < pos_time.size(); ++i) {
+			float v = ((pos_time[i].first - pos_time[i - 1].first) / (pos_time[i].second - pos_time[i - 1].second));
+			velocities.push_back({v, pos_time[i].second});
+		}
+
+		std::vector<std::pair<float, float>> smoothed_velo;
+		
+        for (size_t i = 2; i < velocities.size() - 2; ++i) {
+			float avg_v = (velocities[i - 2].first + velocities[i - 1].first + 
+				velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
+			
+			smoothed_velo.push_back({avg_v, velocities[i].second});
         }
 
-        float max_acc = 0;
-        for (int i = 1; i < velocities.size(); i++) {
-            float dt = velocities[i].second - velocities[i-1].second;
-            if (dt <= 0) continue;
-            float a = (velocities[i].first - velocities[i-1].first) / dt;
-            if (a > max_acc) max_acc = a;
-        }
+		std::vector<std::pair<float, float>> acceling;
+		for (size_t i = 1; i < smoothed_velo.size(); ++i) {
+			if (smoothed_velo[i - 1].first > smoothed_velo[i].first) break;
+			acceling.push_back(smoothed_velo[i]);
+		}
+
+		float max_vel = acceling.back().first;
+
+		float sum_a = 0;
+		float sum_t = 0;
+
+		for (size_t i = 0; i < acceling.size(); ++i) {
+			float v = acceling[i].first;
+			float t = acceling[i].second;
+			sum_a += t * v;
+			sum_t += t * t;
+		}	
+
+		float constant_accel = sum_a / sum_t; 
 
         console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
-        console_scr->add("Max Accel: ", [max_acc](){ return to_string_float(max_acc, 3, false) + " ft/s^2"; });
+        console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
 
         return 0;
     });
+}
+
+void config_measure_offsets() {
+    console_scr->reset();
+    UI_select_scr(console_scr->get_console_screen());
+
+    vex::task temp([](){
+        task::sleep(500);
+
+		int iterations = 10;
+	
+		double f_offset = 0.0, s_offset = 0.0;
+	
+		chassis.forward_tracker.resetPosition();
+		chassis.sideways_tracker.resetPosition();
+	
+		for (int i = 0; i < iterations; i++) {
+			chassis.set_heading(0);
+			chassis.forward_tracker.resetPosition();
+			chassis.sideways_tracker.resetPosition();
+	
+			float start_heading = chassis.inertial.rotation();
+			double target = i % 2 == 0 ? 90 : 270;
+	
+			chassis.turn_to_angle(target, { .max_voltage = 6 });
+			task::sleep(250);
+	
+			double t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
+	
+	
+			double f_delta = chassis.get_forward_tracker_position();
+			double s_delta = chassis.get_sideways_tracker_position();
+	
+			f_offset += f_delta / t_delta;
+			s_offset += s_delta / t_delta;
+		}
+	
+		f_offset /= iterations;
+		s_offset /= iterations;
+
+		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(f_offset, 3, false) + " in"; });
+		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(s_offset, 3, false) + " in"; });
+
+		console_scr->add("", [](){ return ""; });
+		console_scr->add("Offsets are a positive value, make sure to change their", [](){ return ""; });
+		console_scr->add("sign depending on where your trackers are located", [](){ return ""; });
+		return 0;
+	});
 }
 
 void config_skills_driver_run() {
