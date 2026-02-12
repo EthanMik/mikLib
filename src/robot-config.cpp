@@ -10,7 +10,7 @@ vex::competition Competition;
 bool calibrating = false;
 
 // Allows recalibration of the inertial using MINIMUM_INERTIAL_CALIBRATION_ERROR, will cause calibrating to take longer
-bool force_calibrate_inertial = true;
+bool force_calibrate_inertial = false;
 
 // After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
 // If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
@@ -19,15 +19,15 @@ static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, false, blue_6_1, "left_front_motor"),
+        mik::motor(PORT3, true, blue_6_1, "left_front_motor"),
         mik::motor(PORT2, true, blue_6_1, "left_middle_motor"),
-        mik::motor(PORT3, true, blue_6_1, "left_back_motor")
+        mik::motor(PORT15, false, blue_6_1, "left_back_motor")
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT4, false, blue_6_1, "right_front_motor"),
-        mik::motor(PORT5, true, blue_6_1, "right_middle_motor"),
-        mik::motor(PORT6, false, blue_6_1, "right_back_motor")
+        mik::motor(PORT8, false, blue_6_1, "right_front_motor"),
+        mik::motor(PORT18, true, blue_6_1, "right_back_motor"),
+        mik::motor(PORT9, false, blue_6_1, "right_middle_motor"),
     }),
 	
     PORT5, // Inertial sensor port

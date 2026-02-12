@@ -165,6 +165,8 @@ void config_motor_efficiency();
 /** Adds motor current values to UI console */
 void config_motor_current();
 
+void config_measure_velocity_accel();
+
 /** @brief Adds odometry data into the UI console, will start position tracking if not already done so
  * useful for debugging tracking pods
  */
