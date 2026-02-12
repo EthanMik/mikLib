@@ -95,8 +95,10 @@ public:
      * @param sideways_tracker_center_distance Distance from the chassis centre to the sideways tracker (in).
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
-    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-        float forward_tracker_center_distance, mik::tracker_mode tracker_mode, float wheel_diameter, float wheel_ratio, int sideways_tracker_port, float sideways_tracker_diameter, 
+    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
+        float inertial_scale, mik::tracker_mode tracker_mode, float wheel_diameter, 
+        float wheel_ratio, int forward_tracker_port, float forward_tracker_diameter, 
+        float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
         float sideways_tracker_center_distance, mik::distance_reset reset_sensors
     );
 
