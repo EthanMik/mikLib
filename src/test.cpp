@@ -698,38 +698,23 @@ void config_reset_data() {
 
 
 		if (!chassis.position_tracking) {
-			console_scr->add("The robot does know where it is, place `chassis.set_coordinates(inital_x, intial_y, inital_heading);`", [](){ return ""; });	
+			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
+			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
 			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
 			return 0;
 		}
 
 		console_scr->add("Odom X: ", [](){ return chassis.get_X_position(); });
 		console_scr->add("Odom Y: ", [](){ return chassis.get_Y_position(); });
+		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
 
 		for (auto& sensor : chassis.reset_sensors.get_distance_sensors()) {
 			auto sensor_pos = sensor.position();
-			
-			console_scr->add(sensor.name() + ", Facing: ", [sensor_pos](){
-				return chassis.reset_sensors.get_wall_facing(
-					sensor_pos, chassis.get_X_position(), 
-					chassis.get_Y_position(), 
-					chassis.get_absolute_heading()); 
-				});
 
-			console_scr->add(sensor.name() + ", Resetting ", [sensor_pos](){
-				auto wall = chassis.reset_sensors.get_wall_facing(
-					sensor_pos, chassis.get_X_position(),
-					chassis.get_Y_position(),
-					chassis.get_absolute_heading());
-
+			console_scr->add(sensor.name() + ": ", [sensor_pos, &sensor](){
+				auto wall = chassis.reset_sensors.get_wall_facing(sensor_pos, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading());
 				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
-
-				return axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(
-					sensor_pos,
-					auto_detect_wall,
-					chassis.get_X_position(),
-					chassis.get_Y_position(),
-					chassis.get_absolute_heading()), 3, false);
+				return wall + " " + axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(sensor_pos, auto_detect_wall, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading()), 3, false) + " D: " + to_string_float(sensor.objectDistance(distanceUnits::in), 3, false);
 			});
 		}
 
@@ -742,12 +727,57 @@ void config_error_data() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task add_errors([](){
-	task::sleep(500);
-	for (const auto& error : error_data) {
-		console_scr->add(error);  
-	}
-	return 0;
+		task::sleep(500);
+		for (const auto& error : error_data) {
+			console_scr->add(error);  
+		}
+		return 0;
 	});
+}
+
+void config_measure_velocity_accel() {
+    chassis.set_coordinates(0, 0, 0);
+    console_scr->reset();
+    UI_select_scr(console_scr->get_console_screen());
+
+    vex::task temp([](){
+        task::sleep(500);
+        std::vector<std::pair<float, float>> pos_time{};
+        chassis.drive_with_voltage(12, 12);
+
+        Brain.Timer.reset();
+        while (Brain.Timer.time(msec) < 1500) {
+            float t = Brain.Timer.time(msec) / 1000.0f;
+            float pos = chassis.get_Y_position() / 12.0f;
+            pos_time.push_back({pos, t});
+            task::sleep(10);
+        }
+        chassis.stop_drive(hold);
+
+        float max_vel = 0;
+        std::vector<std::pair<float, float>> velocities;
+        for (int i = 1; i < pos_time.size(); i++) {
+            float dt = pos_time[i].second - pos_time[i-1].second;
+            if (dt <= 0) continue;
+            float v = (pos_time[i].first - pos_time[i-1].first) / dt;
+            float t_mid = (pos_time[i].second + pos_time[i-1].second) / 2.0f;
+            velocities.push_back({v, t_mid});
+            if (v > max_vel) max_vel = v;
+        }
+
+        float max_acc = 0;
+        for (int i = 1; i < velocities.size(); i++) {
+            float dt = velocities[i].second - velocities[i-1].second;
+            if (dt <= 0) continue;
+            float a = (velocities[i].first - velocities[i-1].first) / dt;
+            if (a > max_acc) max_acc = a;
+        }
+
+        console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
+        console_scr->add("Max Accel: ", [max_acc](){ return to_string_float(max_acc, 3, false) + " ft/s^2"; });
+
+        return 0;
+    });
 }
 
 void config_skills_driver_run() {

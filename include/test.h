@@ -170,6 +170,9 @@ void config_motor_current();
  */
 void config_odom_data();
 
+/** @brief Adds distance reset data from all the sensors to the config screen */
+void config_reset_data();
+
 /** @brief Adds errors found into the UI console, errors are collected from run_diagnostic() */
 void config_error_data();
 
