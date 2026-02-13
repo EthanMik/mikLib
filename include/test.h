@@ -179,5 +179,7 @@ void config_error_data();
 /** @brief Starts a practice driver skills run that will stop the robot after 60 seconds */
 void config_skills_driver_run();
 
+void config_measure_velocity_accel();
+
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
 void config_test_three_wire_port(int port);
