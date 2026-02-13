@@ -734,7 +734,6 @@ void config_error_data() {
 	return 0;
 	});
 }
-
 void config_measure_velocity_accel() {
     chassis.set_coordinates(0, 0, 0);
     console_scr->reset();
@@ -743,67 +742,57 @@ void config_measure_velocity_accel() {
     vex::task temp([](){
         task::sleep(500);
         std::vector<std::pair<float, float>> pos_time{};
-		chassis.drive_with_voltage(12, 12);
-        chassis.drive_distance(48, {.wait = false, .max_voltage = 12, .heading_max_voltage = 12});
+		chassis.forward_tracker.resetRotation();
+		chassis.drive_distance(48, { .max_voltage = 12, .heading_max_voltage = 12 });
 
-        Brain.Timer.reset();
+		Brain.Timer.reset();
         while (Brain.Timer.time(msec) < 1500) {
-            float t = Brain.Timer.time(msec) / 1000.0f;
+			float t = Brain.Timer.time(msec);
             float pos = chassis.get_Y_position() / 12.0f;
-            pos_time.push_back({pos, t});
+            pos_time.push_back({pos, t / 1000.0f});
+
             task::sleep(10);
         }
         chassis.stop_drive(hold);
 
-        float max_vel = 0;
-        std::vector<std::pair<float, float>> raw_velocities;
-        for (int i = 1; i < (int)pos_time.size(); i++) {
-            float dt = pos_time[i].second - pos_time[i-1].second;
-            if (dt <= 0) continue;
-            float v = (pos_time[i].first - pos_time[i-1].first) / dt;
-            float t_mid = (pos_time[i].second + pos_time[i-1].second) / 2.0f;
-            raw_velocities.push_back({v, t_mid});
-        }
-
-        // Moving average of 5 for velocity
-        const int avg_window = 5;
         std::vector<std::pair<float, float>> velocities;
-        for (int i = 0; i < (int)raw_velocities.size(); i++) {
-            float sum_v = 0, sum_t = 0;
-            int count = 0;
-            for (int j = std::max(0, i - avg_window + 1); j <= i; j++) {
-                sum_v += raw_velocities[j].first;
-                sum_t += raw_velocities[j].second;
-                count++;
-            }
-            float avg_v = sum_v / count;
-            float avg_t = sum_t / count;
-            velocities.push_back({avg_v, avg_t});
-            if (avg_v > max_vel) max_vel = avg_v;
+
+		for (size_t i = 1; i < pos_time.size(); ++i) {
+			float v = ((pos_time[i].first - pos_time[i - 1].first) / (pos_time[i].second - pos_time[i - 1].second));
+			velocities.push_back({v, pos_time[i].second});
+		}
+
+		std::vector<std::pair<float, float>> smoothed_velo;
+		
+        for (size_t i = 2; i < velocities.size() - 2; ++i) {
+			float avg_v = (velocities[i - 2].first + velocities[i - 1].first + 
+				velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
+			
+			smoothed_velo.push_back({avg_v, velocities[i].second});
         }
 
-        // Moving average of 5 for acceleration
-        float max_acc = 0;
-        std::vector<float> raw_accels;
-        for (int i = 1; i < (int)velocities.size(); i++) {
-            float dt = velocities[i].second - velocities[i-1].second;
-            if (dt <= 0) continue;
-            float a = (velocities[i].first - velocities[i-1].first) / dt;
-            raw_accels.push_back(a);
-        }
-        for (int i = 0; i < (int)raw_accels.size(); i++) {
-            float sum = 0;
-            int count = 0;
-            for (int j = std::max(0, i - avg_window + 1); j <= i; j++) {
-                sum += raw_accels[j];
-                count++;
-            }
-            float avg_a = sum / count;
-            if (avg_a > max_acc) max_acc = avg_a;
-        }
+		std::vector<std::pair<float, float>> acceling;
+		for (size_t i = 1; i < smoothed_velo.size(); ++i) {
+			if (smoothed_velo[i - 1].first > smoothed_velo[i].first) break;
+			acceling.push_back(smoothed_velo[i]);
+		}
+
+		float max_vel = acceling.back().first;
+
+		float sum_a = 0;
+		float sum_t = 0;
+
+		for (size_t i = 0; i < acceling.size(); ++i) {
+			float v = acceling[i].first;
+			float t = acceling[i].second;
+			sum_a += t * v;
+			sum_t += t * t;
+		}	
+
+		float constant_accel = sum_a / sum_t; 
 
         console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
-        console_scr->add("Max Accel: ", [max_acc](){ return to_string_float(max_acc, 3, false) + " ft/s^2"; });
+        console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
 
         return 0;
     });
