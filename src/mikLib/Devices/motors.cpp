@@ -65,11 +65,7 @@ void mik::motor_group::spin(vex::directionType dir, float voltage, vex::voltageU
     // TEMP FIX NEEDS TO BE TEST
 
     for (mik::motor& motor : motors) {
-        if (std::fabs(voltage) < 0.05f) {
-            motor.stop(coast);
-        } else {
-            motor.spin(dir, voltage, units);
-        }
+        motor.spin(dir, voltage, units);
     }
 }
 

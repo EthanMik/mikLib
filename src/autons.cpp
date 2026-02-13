@@ -78,11 +78,16 @@ std::string template_auto_other_variation(bool calibrate, bool get_name) {
 std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name) {
     if (get_name) { return "blue left winpoint"; }
     if (calibrate) {
-        chassis.set_coordinates(47, 47, 0);
+        chassis.set_coordinates(48.22, 15.55, 270);
 
         return "";
     }
-
+    chassis.turn_to_point(48.41, 46.92);
+    chassis.drive_to_point(48.41, 46.92);
+    chassis.turn_to_point(61.04, 46.92);
+    chassis.drive_to_point(61.04, 46.92);
+    chassis.drive_to_point(31.45, 47.12);
+    chassis.drive_to_pose(48.22, 15.55, 180);
     return "";
 }
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) { 

@@ -204,7 +204,7 @@ void UI_config_screen::UI_crt_config_scr() {
 
 
     auto macro_6_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, config_btn_outline_color, UI_distance_units::pixels), [](){ 
-        config_measure_velocity_accel(); 
+        config_tune_drive(); 
     });
     macro_6_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, config_btn_outline_pressing_color, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*2, 154, 35, config_btn_outline_pressed_color, UI_distance_units::pixels));
     auto macro_6 = UI_crt_txtbox("Tune Drive", config_text_color, config_test_btn_bg_color, text_alignment, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*2, 150, 31, config_test_btn_bg_color, UI_distance_units::pixels));
@@ -243,7 +243,7 @@ void UI_config_screen::UI_crt_config_scr() {
 
 
     auto macro_21_bg = UI_crt_btn(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, config_btn_outline_color, UI_distance_units::pixels), [](){ 
-        test_boomerang(); 
+        config_measure_velocity_accel(); 
     });
     macro_21_bg->set_states(UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, config_btn_outline_pressing_color, UI_distance_units::pixels), UI_crt_rec(test_slot_x_position, y_start_position+y_offset*7, 154, 35, config_btn_outline_pressed_color, UI_distance_units::pixels));
     auto macro_21 = UI_crt_txtbox("Test Boomeran", config_text_color, config_test_btn_bg_color, text_alignment, UI_crt_rec(test_slot_x_position+text_box_offset, y_start_position+text_box_offset+y_offset*7, 150, 31, config_test_btn_bg_color, UI_distance_units::pixels));

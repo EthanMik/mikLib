@@ -19,54 +19,58 @@ static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT3, true, blue_6_1, "left_front_motor"),
-        mik::motor(PORT2, true, blue_6_1, "left_middle_motor"),
-        mik::motor(PORT15, false, blue_6_1, "left_back_motor")
+        mik::motor(PORT1, true, blue_6_1, "Left 5 PORT1"),
+        mik::motor(PORT17, false, blue_6_1, "Left 4 PORT17"),
+        mik::motor(PORT18, true, blue_6_1, "Left 3 PORT18"),
+		mik::motor(PORT19, false, blue_6_1, "Left 2 PORT19"),
+		mik::motor(PORT20, true, blue_6_1, "Left 1 PORT 20"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT8, false, blue_6_1, "right_front_motor"),
-        mik::motor(PORT18, true, blue_6_1, "right_back_motor"),
-        mik::motor(PORT9, false, blue_6_1, "right_middle_motor"),
+        mik::motor(PORT11, false, blue_6_1, "Right 5 PORT11"),
+        mik::motor(PORT12, true, blue_6_1, "Right 4 PORT12"),
+        mik::motor(PORT13, false, blue_6_1, "Right 3 PORT13"),
+		mik::motor(PORT14, true, blue_6_1, "Right 2 PORT14"),
+		mik::motor(PORT15, false, blue_6_1, "Right 1 PORT15")
     }),
 	
-    PORT5, // Inertial sensor port
+    PORT2, // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 
-    PORT_C, // Forward tracker port
-    -2.46,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y.
-    0,      // Forward tracker center distance (in). Positive = right of center, negative = left. (Right from behind the robot)
+    PORT_F, // Forward tracker port
+    2.46,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y.
+    5.5,      // Forward tracker center distance (in). Positive = right of center, negative = left. (Right from behind the robot)
 
-    forward_tracker, // Use "motor_encoder" if no dedicated tracker
-    2.75,   // Drivetrain wheel diameter (in). Only needed with motor encoders.
-    0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders.
+    motor_encoder, // Use "motor_encoder" if no dedicated tracker
+    -2.5,   // Drivetrain wheel diameter (in). Only needed with motor encoders.
+    0.9375,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders.
 
     PORT_G, // Sideways tracker port. -1 if unused.
-    -2.46,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X.
+	2.46,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X.
     0.0,    // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
         // mik::distance(port, position, x_offset, y_offset)
-        mik::distance(PORT17,
+        mik::distance(-1,
             front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
             0,            // X offset from tracking center (in). Positive = right of center, negative = left.
             7           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
         ),
-        mik::distance(PORT19, right_sensor, 7.3, 3.5),
-		mik::distance(PORT16, rear_sensor, 2.5, -6.7),
-		mik::distance(PORT11, left_sensor, -7.3, -3.5),
+        mik::distance(-1, right_sensor, 7.3, 3.5),
+		mik::distance(-1, rear_sensor, 2.5, -6.7),
+		mik::distance(-1, left_sensor, -7.3, -3.5),
     })
 );
 
 // Make sure devices are passed in the same order as they are declared in assembly.h and and assembly.cpp
 Assembly assembly(
 	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "bottom_intake"),
-		mik::motor(PORT20, false, green_18_1, "middle_intake")
+		mik::motor(-1, true, green_18_1, "bottom_intake"),
+		mik::motor(-1, false, green_18_1, "middle_intake")
 	}),
 
-	mik::motor(PORT16, false, blue_6_1, "upper_intake"),
+	mik::motor(-1, false, blue_6_1, "upper_intake"),
 	mik::piston(PORT_B),
 	mik::piston(PORT_A)
 );
