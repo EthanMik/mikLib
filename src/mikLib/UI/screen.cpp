@@ -121,6 +121,8 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
 }
 
 bool screen::needs_update() {
+    component_mutex.lock();
+
     if (removal_scheduled) {
         execute_removal();
         removal_scheduled = false;
@@ -150,6 +152,8 @@ bool screen::needs_update() {
         }
     }
 
+    component_mutex.unlock();
+
     if (needs_render_update) {
         needs_render_update = false;
         return true;
@@ -170,6 +174,8 @@ void screen::refresh() {
 }
 
 void screen::render(bool full_refresh) {
+    component_mutex.lock();
+
     if (full_refresh || screen_needs_refresh) {
         render_index = 0;
         screen_needs_refresh = false;
@@ -189,6 +195,8 @@ void screen::render(bool full_refresh) {
         }
     }
     render_index = 0;
+
+    component_mutex.unlock();
 }
 
 bool screen::is_scrolling() {
@@ -277,21 +285,30 @@ int screen::get_touch_pos() {
 
 void screen::add_UI_component(std::shared_ptr<UI_component> component) {
     component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
+    component_mutex.lock();
     UI_components.push_back(component);
     id_to_index[component->get_ID()] = UI_components.size() - 1;
+    component_mutex.unlock();
 }
 
 void screen::add_UI_components(std::vector<std::shared_ptr<UI_component>> components) {
     for (const auto& component : components) {
         component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
+    }
+    component_mutex.lock();
+    for (const auto& component : components) {
         UI_components.push_back(component);
         id_to_index[component->get_ID()] = UI_components.size() - 1;
     }
+    component_mutex.unlock();
 }
 
 void screen::remove_UI_component(std::vector<int> id) {
+    component_mutex.lock();
     removal_id.swap(id);
-    removal_scheduled = true;
+    execute_removal();
+    screen_needs_full_refresh = true;
+    component_mutex.unlock();
 }
 
 void screen::execute_removal() {
@@ -314,7 +331,10 @@ void screen::execute_removal() {
 }
 
 const std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {
-    return UI_components;
+    component_mutex.lock();
+    auto copy = UI_components;
+    component_mutex.unlock();
+    return copy;
 }
 
 int screen::get_aligment_pos(alignment alignment, int scroll_bar_w, int scroll_bar_h) {
