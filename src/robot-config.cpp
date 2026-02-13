@@ -13,15 +13,21 @@ bool force_calibrate_inertial = false;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, false, blue_6_1, "left_front_motor"),
-        mik::motor(PORT2, true, blue_6_1, "left_middle_motor"),
-        mik::motor(PORT3, true, blue_6_1, "left_back_motor")
+        mik::motor(PORT1, true, blue_6_1, "Left 5 PORT1"),
+        mik::motor(PORT17, false, blue_6_1, "Left 4 PORT17"),
+        mik::motor(PORT18, true, blue_6_1, "Left 3 PORT18"),
+		mik::motor(PORT19, false, blue_6_1, "Left 2 PORT19"),
+		mik::motor(PORT20, true, blue_6_1, "Left 1 PORT 20"),
+
+
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT4, false, blue_6_1, "right_front_motor"),
-        mik::motor(PORT5, true, blue_6_1, "right_middle_motor"),
-        mik::motor(PORT6, false, blue_6_1, "right_back_motor")
+        mik::motor(PORT11, false, blue_6_1, "Right 5 PORT11"),
+        mik::motor(PORT12, true, blue_6_1, "Right 4 PORT12"),
+        mik::motor(PORT13, false, blue_6_1, "Right 3 PORT13"),
+		mik::motor(PORT14, true, blue_6_1, "Right 2 PORT14"),
+		mik::motor(PORT15, false, blue_6_1, "Right 1 PORT15")
     }),
 	
     PORT10, // Inertial sensor port
