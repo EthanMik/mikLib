@@ -736,65 +736,111 @@ void config_error_data() {
 }
 
 void config_measure_velocity_accel() {
-    chassis.set_coordinates(0, 0, 0);
     console_scr->reset();
     UI_select_scr(console_scr->get_console_screen());
 
+	disable_user_control();
+
     vex::task temp([](){
         task::sleep(500);
+
         std::vector<std::pair<float, float>> pos_time{};
-		chassis.forward_tracker.resetPosition();
-		chassis.drive_distance(48, { .max_voltage = 12, .heading_max_voltage = 12 });
+
+		chassis.drive_distance(80, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
 
 		Brain.Timer.reset();
-        while (Brain.Timer.time(msec) < 1500) {
-			float t = Brain.Timer.time(msec);
-            float pos = chassis.get_forward_tracker_position() / 12.0f;
-            pos_time.push_back({pos, t / 1000.0f});
+		chassis.right_drive.resetPosition();
+		chassis.forward_tracker.resetPosition();
 
+        while (Brain.Timer.time(msec) < 1500) {
+            float pos = chassis.get_forward_tracker_position() / 12.0f;
+			float t = Brain.Timer.time(msec) / 1000.0f;
+            pos_time.push_back({pos, t});
             task::sleep(10);
         }
+		chassis.cancel_motion();
         chassis.stop_drive(hold);
+		task::sleep(100);
+		chassis.set_brake_type(coast);
 
         std::vector<std::pair<float, float>> velocities;
-
 		for (size_t i = 1; i < pos_time.size(); ++i) {
 			float v = ((pos_time[i].first - pos_time[i - 1].first) / (pos_time[i].second - pos_time[i - 1].second));
 			velocities.push_back({v, pos_time[i].second});
 		}
 
 		std::vector<std::pair<float, float>> smoothed_velo;
-		
         for (size_t i = 2; i < velocities.size() - 2; ++i) {
-			float avg_v = (velocities[i - 2].first + velocities[i - 1].first + 
-				velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
-			
+			float avg_v = (velocities[i - 2].first + velocities[i - 1].first +
+			velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
 			smoothed_velo.push_back({avg_v, velocities[i].second});
         }
 
 		std::vector<std::pair<float, float>> acceling;
-		for (size_t i = 1; i < smoothed_velo.size(); ++i) {
-			if (smoothed_velo[i - 1].first > smoothed_velo[i].first) break;
-			acceling.push_back(smoothed_velo[i]);
+		float max_vel = -1.0;
+		size_t max_index = 0;
+
+		for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+			if (smoothed_velo[i].first > max_vel) {
+				max_vel = smoothed_velo[i].first;
+				max_index = i;
+			}
 		}
 
-		float max_vel = acceling.back().first;
+		for (size_t i = 0; i <= max_index; ++i) {
+            float v = smoothed_velo[i].first;
+            
+            if (v > max_vel * 0.10 && v < max_vel * 0.90) {
+                acceling.push_back(smoothed_velo[i]);
+            }
+        }
 
 		float sum_a = 0;
 		float sum_t = 0;
+		
+		float start_time = acceling[0].second;
 
-		for (size_t i = 0; i < acceling.size(); ++i) {
-			float v = acceling[i].first;
-			float t = acceling[i].second;
-			sum_a += t * v;
-			sum_t += t * t;
-		}	
-
+        for (size_t i = 0; i < acceling.size(); ++i) {
+            float v = acceling[i].first;
+            float t = acceling[i].second - start_time;
+            
+            sum_a += v * t;
+            sum_t += t * t;
+        }
 		float constant_accel = sum_a / sum_t; 
 
         console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
         console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
 
+		print("Start Data, Position (second, ft)");
+		for (const auto& p : pos_time) {
+			print(to_string_float(p.second, 3, false) + ", " + to_string_float(p.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		print("Start Data, Velocity (second, ft/s)");
+		for (const auto& v : velocities) {
+			print(to_string_float(v.second, 3, false) + ", " + to_string_float(v.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		print("Start Data, Smoothed Velocity (second, ft/s)");
+		for (const auto& s : smoothed_velo) {
+			print(to_string_float(s.second, 3, false) + ", " + to_string_float(s.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		print("Start Data, Acceleration Phase (second, ft/s)");
+		for (const auto& a : acceling) {
+			print(to_string_float(a.second, 3, false) + ", " + to_string_float(a.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		enable_user_control();
         return 0;
     });
 }
