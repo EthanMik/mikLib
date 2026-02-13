@@ -69,6 +69,7 @@ private:
     std::unordered_map<int, size_t> id_to_index;
     bool removal_scheduled = false;
     std::vector<int> removal_id;
+    vex::mutex component_mutex;
 
     bool screen_needs_refresh;
     bool screen_needs_full_refresh;
