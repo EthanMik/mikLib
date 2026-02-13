@@ -14,7 +14,7 @@ follow_path_params g_follow_path_params_buffer{};
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
     float inertial_scale, mik::tracker_mode tracker_mode, float wheel_diameter, 
-    float wheel_ratio, int forward_tracker_port, float forward_tracker_diameter, 
+    float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
     float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
     float sideways_tracker_center_distance, mik::distance_reset reset_sensors
 ):
@@ -34,6 +34,8 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
 
     wheel_diameter(wheel_diameter),
     wheel_ratio(wheel_ratio),
+    wheel_center_distance(wheel_center_distance),
+
     drive_in_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
     
     forward_tracker_diameter(forward_tracker_diameter),
@@ -44,7 +46,10 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     sideways_tracker_center_distance(sideways_tracker_center_distance),
     sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0)
 {
-    odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
+    odom.set_physical_distances(
+        tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? wheel_center_distance : forward_tracker_center_distance, 
+        sideways_tracker_center_distance
+    );
 }
 
 void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain) {

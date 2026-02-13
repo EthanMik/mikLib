@@ -27,11 +27,12 @@ Chassis chassis(
     PORT10, // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 	
-    forward_tracker, // Use "motor_encoder" if no forward tracker
-    2.75,   // Drivetrain wheel diameter (in). Only needed with motor encoders
+    forward_tracker, // Replace with "motor_encoder" if no forward tracker
+    2.75,   // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoders
     0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders
+	6,      // Drivetrain center distance, Half the track width (center-to-center distance between left and right wheels). Only needed with motor encoders
 
-    PORT19, // Forward tracker port
+    PORT19, // Forward tracker port. -1 if unused
     -2,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
     0,      // Forward tracker center distance (in). Positive = right of center, negative = left
 

@@ -97,7 +97,7 @@ public:
      */
     Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
         float inertial_scale, mik::tracker_mode tracker_mode, float wheel_diameter, 
-        float wheel_ratio, int forward_tracker_port, float forward_tracker_diameter, 
+        float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
         float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
         float sideways_tracker_center_distance, mik::distance_reset reset_sensors
     );
@@ -617,6 +617,7 @@ private:
 
     float wheel_diameter;
     float wheel_ratio;
+    float wheel_center_distance;
     float drive_in_to_deg_ratio;
 
     float forward_tracker_diameter;

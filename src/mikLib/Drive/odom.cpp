@@ -1,22 +1,22 @@
 #include "mikLib/drive.h"
 
-void odom::set_physical_distances(float ForwardTracker_center_distance, float SidewaysTracker_center_distance){
-    this->ForwardTracker_center_distance = ForwardTracker_center_distance;
-    this->SidewaysTracker_center_distance = SidewaysTracker_center_distance;
+void odom::set_physical_distances(float forward_tracker_center_distance, float sideways_tracker_center_distance){
+    this->forward_tracker_center_distance = forward_tracker_center_distance;
+    this->sideways_tracker_center_distance = sideways_tracker_center_distance;
 }
 
-void odom::set_position(point position, float orientation_deg, float ForwardTracker_position, float SidewaysTracker_position){
-    this->ForwardTracker_position = ForwardTracker_position;
-    this->SideWaysTracker_position = SidewaysTracker_position;
+void odom::set_position(point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position){
+    this->forward_tracker_position = forward_tracker_position;
+    this->sideways_tracker_position = sideways_tracker_position;
     this->position = position;
     this->orientation_deg = orientation_deg;
 }
 
-void odom::update_position(float ForwardTracker_position, float SidewaysTracker_position, float orientation_deg){
-    float Forward_delta = ForwardTracker_position - this->ForwardTracker_position;
-    float Sideways_delta = SidewaysTracker_position - this->SideWaysTracker_position;
-    this->ForwardTracker_position = ForwardTracker_position;
-    this->SideWaysTracker_position = SidewaysTracker_position;
+void odom::update_position(float forward_tracker_position, float sideways_tracker_position, float orientation_deg){
+    float Forward_delta = forward_tracker_position - this->forward_tracker_position;
+    float Sideways_delta = sideways_tracker_position - this->sideways_tracker_position;
+    this->forward_tracker_position = forward_tracker_position;
+    this->sideways_tracker_position = sideways_tracker_position;
     float orientation_rad = to_rad(orientation_deg);
     float prev_orientation_rad = to_rad(this->orientation_deg);
     float orientation_delta_rad = orientation_rad-prev_orientation_rad;
@@ -32,8 +32,8 @@ void odom::update_position(float ForwardTracker_position, float SidewaysTracker_
         local_X_position = Sideways_delta;
         local_Y_position = Forward_delta;
     } else {
-        local_X_position = (2 * sin(orientation_delta_rad / 2))*((Sideways_delta / orientation_delta_rad) + SidewaysTracker_center_distance); 
-        local_Y_position = (2 * sin(orientation_delta_rad / 2)) * ((Forward_delta / orientation_delta_rad) + ForwardTracker_center_distance);
+        local_X_position = (2 * sin(orientation_delta_rad / 2))*((Sideways_delta / orientation_delta_rad) + sideways_tracker_center_distance); 
+        local_Y_position = (2 * sin(orientation_delta_rad / 2)) * ((Forward_delta / orientation_delta_rad) + forward_tracker_center_distance);
     }
 
     float local_polar_angle;

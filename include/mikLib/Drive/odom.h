@@ -17,10 +17,10 @@ public:
 	 * If there's really no sideways wheel we set the center distance to 0 and
 	 * pretend the wheel never spins, which is equivalent to a no-drift robot.
 	 * 
-	 * @param ForwardTracker_center_distance A horizontal distance to the wheel center in inches.
-	 * @param SidewaysTracker_center_distance A vertical distance to the wheel center in inches.
+	 * @param forward_tracker_center_distance A horizontal distance to the wheel center in inches.
+	 * @param sideways_tracker_center_distance A vertical distance to the wheel center in inches.
 	 */
-	void set_physical_distances(float ForwardTracker_center_distance, float SidewaysTracker_center_distance);
+	void set_physical_distances(float forward_tracker_center_distance, float sideways_tracker_center_distance);
 
 	/**
 	 * Resets the position, including tracking wheels.
@@ -30,10 +30,10 @@ public:
 	 * 
 	 * @param position Field-centric x and y position of the robot.
 	 * @param orientation_deg Field-centered, clockwise-positive, orientation.
-	 * @param ForwardTracker_position Current position of the sensor in inches.
-	 * @param SidewaysTracker_position Current position of the sensor in inches.
+	 * @param forward_tracker_position Current position of the sensor in inches.
+	 * @param sideways_tracker_position Current position of the sensor in inches.
 	 */
-	void set_position(point position, float orientation_deg, float ForwardTracker_position, float SidewaysTracker_position);
+	void set_position(point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position);
 
 	/**
 	 * Does the odometry math to update position
@@ -42,18 +42,18 @@ public:
 	 * the input. Ultimately this all works to update the public member variable
 	 * X_position. This function needs to be run at 200Hz or so for best results.
 	 * 
-	 * @param ForwardTracker_position Current position of the sensor in inches.
-	 * @param SidewaysTracker_position Current position of the sensor in inches.
+	 * @param forward_tracker_position Current position of the sensor in inches.
+	 * @param sideways_tracker_position Current position of the sensor in inches.
 	 * @param orientation_deg Field-centered, clockwise-positive, orientation.
 	 */
-	void update_position(float ForwardTracker_position, float SidewaysTracker_position, float orientation_deg);
+	void update_position(float forward_tracker_position, float sideways_tracker_position, float orientation_deg);
 
 	point position;
 	float orientation_deg; 
 
 private:
-	float ForwardTracker_center_distance;
-	float SidewaysTracker_center_distance;
-	float ForwardTracker_position;
-	float SideWaysTracker_position;
+	float forward_tracker_center_distance;
+	float sideways_tracker_center_distance;
+	float forward_tracker_position;
+	float sideways_tracker_position;
 };
