@@ -15,3 +15,5 @@
 - add a measure accel and measure velo button || needs testing
 - Tracking param into drive motions, wheel diam and wheel ratio inside chassis || needs testing
 - test to get offsets for robot
+- Fix chassis constructor
+- Fix tune turn
