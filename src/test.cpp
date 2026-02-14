@@ -519,12 +519,12 @@ int run_diagnostic() {
 		error_data.push_back("Inertial [PORT" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.forward_tracker.installed()) {
+	if (!chassis.forward_tracker.installed() && chassis.tracker_mode == mik::tracker_mode::FORWARD_TRACKER) {
 		std::string port = to_string(chassis.forward_tracker.index() + 1);
 		error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.sideways_tracker.installed()) {
+	if (!chassis.sideways_tracker.installed() && chassis.sideways_tracker_used) {
 		std::string port = to_string(chassis.sideways_tracker.index() + 1);
 		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
 		errors++;
@@ -553,8 +553,6 @@ void config_add_pid_output_SD_console() {
 	UI_select_scr(console_scr->get_console_screen());
 	console_scr->reset();
 	vex::task e([](){
-		task::sleep(500);
-
 		std::vector<std::string> data_arr = get_SD_file_txt("pid_data.txt");
 		for (const auto& line : data_arr) {
 			console_scr->add(line, false);
@@ -568,8 +566,6 @@ void config_spin_all_motors() {
 	console_scr->reset();
 	disable_user_control(true);
 	vex::task spin_mtrs([](){
-		task::sleep(500);
-
 		for (mik::motor& motor : motors_) { 
 			std::string data = (motor.name() + ": " + motor.port() + ", fwd, 6 volt");
 			console_scr->add(std::string(data), [](){ return ""; });
@@ -588,7 +584,6 @@ void config_motor_wattage() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task watt([](){
-		task::sleep(500);
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 5, false) + " Watts    "; });
 
@@ -604,8 +599,6 @@ void config_motor_temp() {
 	UI_select_scr(console_scr->get_console_screen()); 
   
   	vex::task temp([](){
-		task::sleep(500);
-		
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated    "; });
 		for (auto& motor : motors_) {
@@ -620,9 +613,7 @@ void config_motor_torque() {
 	console_scr->reset();
 	UI_select_scr(console_scr->get_console_screen()); 
 	
-	vex::task temp([](){
-		task::sleep(500);
-		
+	vex::task temp([](){		
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 5, false) + " Nm    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 5, false) + " Nm    "; });
 		for (auto& motor : motors_) {
@@ -638,8 +629,6 @@ void config_motor_efficiency() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 5, false) + "%% Eff    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 5, false) + "%% Eff     "; });
 		for (auto& motor : motors_) {
@@ -655,8 +644,6 @@ void config_motor_current() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 5, false) + " Amps    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 5, false) + " Amps    "; });
 		for (auto& motor : motors_) {
@@ -671,8 +658,6 @@ void config_odom_data() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
 		if (!chassis.position_tracking) {
 			chassis.set_coordinates(0, 0, 0);
 		}
@@ -694,9 +679,6 @@ void config_reset_data() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
-
 		if (!chassis.position_tracking) {
 			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
 			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
@@ -727,7 +709,6 @@ void config_error_data() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task add_errors([](){
-		task::sleep(500);
 		for (const auto& error : error_data) {
 			console_scr->add(error);  
 		}
@@ -742,8 +723,6 @@ void config_measure_velocity_accel() {
 	disable_user_control();
 
     vex::task temp([](){
-        task::sleep(500);
-
         std::vector<std::pair<float, float>> pos_time{};
 
 		chassis.drive_distance(80, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
@@ -850,8 +829,6 @@ void config_measure_offsets() {
     UI_select_scr(console_scr->get_console_screen());
 
     vex::task temp([](){
-        task::sleep(500);
-
 		int iterations = 10;
 	
 		float f_offset = 0.0, s_offset = 0.0;

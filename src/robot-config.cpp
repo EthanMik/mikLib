@@ -18,8 +18,6 @@ Chassis chassis(
         mik::motor(PORT18, true, blue_6_1, "Left 3 PORT18"),
 		mik::motor(PORT19, false, blue_6_1, "Left 2 PORT19"),
 		mik::motor(PORT20, true, blue_6_1, "Left 1 PORT 20"),
-
-
     }),
     // Right drivetrain motors
     mik::motor_group({
@@ -38,11 +36,11 @@ Chassis chassis(
     0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders
 	6,      // Drivetrain center distance, Half the track width (center-to-center distance between left and right wheels). Only needed with motor encoders
 
-    PORT19, // Forward tracker port. -1 if unused
+    PORT19, // Forward tracker port. PORT0 if unused
     -2,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
     0,      // Forward tracker center distance (in). Positive = right of center, negative = left
 
-    PORT20, // Sideways tracker port. -1 if unused.
+    PORT1, // Sideways tracker port. PORT0 if unused.
     2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
     0.3,    // Sideways tracker center distance (in). Positive = behind center, negative = in front
 

@@ -42,6 +42,7 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     forward_tracker_center_distance(forward_tracker_center_distance),
     forward_tracker_inch_to_deg_ratio(M_PI * forward_tracker_diameter / 360.0),
     
+    sideways_tracker_used(sideways_tracker_port != PORT0),
     sideways_tracker_diameter(sideways_tracker_diameter),
     sideways_tracker_center_distance(sideways_tracker_center_distance),
     sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0)

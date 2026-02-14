@@ -250,7 +250,7 @@ void remove_duplicates_SD_file(const std::string& file_name, const std::string& 
         if (data_arr[i] == '\n') {
             data_line.assign(data_arr.begin() + i + 1, data_arr.begin() + end);
 
-            if (data_line.find(duplicate_word) != std::string::npos) {
+            if (data_line.find(duplicate_word) == 0) {
                 data_arr.erase(data_arr.begin() + i, data_arr.begin() + end);
             }
 

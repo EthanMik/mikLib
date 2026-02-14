@@ -45,6 +45,7 @@ namespace mik {
     inline constexpr unsigned int PORT_F = 5;
     inline constexpr unsigned int PORT_G = 6;
     inline constexpr unsigned int PORT_H = 7;
+    inline constexpr unsigned int PORT0 = -1; 
 
     inline constexpr distance_position front_sensor = distance_position::FRONT_SENSOR;
     inline constexpr distance_position rear_sensor = distance_position::REAR_SENSOR;

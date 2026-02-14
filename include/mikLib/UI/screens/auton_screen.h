@@ -100,6 +100,7 @@ private:
     auto_variation var = auto_variation::ONE;
 
     bool is_showing_auton;
+    bool restoring_from_sd = false;
     int off_sawp_ID = 0;
 
     std::shared_ptr<UI_component> red_blue_tgl;

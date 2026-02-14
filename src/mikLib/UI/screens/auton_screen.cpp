@@ -502,7 +502,7 @@ void UI_auton_screen::prev_var() {
 }
 
 void UI_auton_screen::save_auton_SD(int count) {
-    if (!Brain.SDcard.isInserted()) { return; }
+    if (!Brain.SDcard.isInserted() || restoring_from_sd) { return; }
     int r = auton_scr->cursor_position.first;
     int c = auton_scr->cursor_position.second;
     std::string id = to_string(r) + " " + to_string(c);
@@ -512,28 +512,58 @@ void UI_auton_screen::save_auton_SD(int count) {
         write_to_SD_file("auton.txt", id_full);
         return;
     }
+    remove_duplicates_SD_file("auton.txt", id);
     if (auton_scr->control_panel[r][c].get_state()) {
         write_to_SD_file("auton.txt", id_full);
     } else {
         remove_duplicates_SD_file("auton.txt", id);
     }
-}
-
-void UI_auton_screen::set_previous_selected_auto() {
+    
     std::vector<std::string> output = get_SD_file_txt("auton.txt");
-
+    print("Saving Auto");
     for (auto it = output.rbegin(); it != output.rend(); ++it) {
         int r = 0, c = 0, count = 0;
         std::stringstream ss(*it);
         if (ss >> r >> c >> count) {}
+        print(to_string(r) + "," + to_string(c) + "," + to_string(count));
+    }
+    print("End");
+}
+
+void UI_auton_screen::set_previous_selected_auto() {
+    red_blue = false;
+    rings_goal = false;
+    quals_elims = false;
+    off_sawp = false;
+    off_skills = false;
+    time_limit = false;
+    odom_display = false;
+    var_num = 1;
+    var = auto_variation::ONE;
+
+    flip_toggle(red_blue_tgl, false);
+    flip_toggle(rings_goal_tgl, false);
+    flip_toggle(quals_elims_tgl, false);
+    flip_toggle(off_sawp_tgl, false);
+
+    std::vector<std::string> output = get_SD_file_txt("auton.txt");
+
+    restoring_from_sd = true;
+    for (auto it = output.rbegin(); it != output.rend(); ++it) {
+        int r = 0, c = 0, count = 0;
+        std::stringstream ss(*it);
+        if (!(ss >> r >> c)) continue;
+        ss >> count;
 
         if (count > 0) {
             var_num = count;
+            var = int_to_auto_variation(var_num);
             auton_scr->control_panel[r][c].set_cycle_state();
         } else {
             auton_scr->control_panel[r][c].push();
         }
     }
+    restoring_from_sd = false;
     update_var_display();
 }
 

@@ -595,7 +595,8 @@ public:
     
     bool position_tracking;
     bool control_disabled;
-  
+    bool sideways_tracker_used;
+
     mik::drive_mode selected_drive_mode = mik::drive_mode::SPLIT_ARCADE;
 
     /** SET POINTS. USED FOR GRAPHING AND ACCESSING CHASSIS DATA IN ANOTHER TASK */
