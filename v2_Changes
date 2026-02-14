@@ -14,6 +14,9 @@
 - swing to angle does not get stuck in a loop * unfinished
 - add a measure accel and measure velo button || needs testing
 - Tracking param into drive motions, wheel diam and wheel ratio inside chassis || needs testing
+
 - test to get offsets for robot
 - Fix chassis constructor
 - Fix tune turn
+- test direction forcing
+- test slew
