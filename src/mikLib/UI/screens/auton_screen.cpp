@@ -737,7 +737,7 @@ void UI_auton_screen::enable_controller_overlay() {
          {controller_btn(true, "[Calib]", "[###]", [this](){ controller_calibrate_scr(); queue_autons(true, false); } )},
          {controller_btn(true, "[Run]", "[##]", [](){ auton_scr->start_auton_test(); })}},
 
-        {{controller_btn(false, "[Off]", "[Cap]", [this](){ enable_time_limit(); flip_toggle(config_scr->macro_4_bg_tgl, time_limit); save_auton_SD(); } )}, 
+        {{controller_btn(false, "[Off]", "[Cap]", [this](){ enable_time_limit(); flip_toggle(config_scr->time_cap_auto_tgl, time_limit); save_auton_SD(); } )}, 
          {controller_btn(true, "[RCal]", "[...]", [](){ calibrate_inertial(); } )}, 
          {controller_btn(false, "[Off]", "[Odom]", [this](){ enable_odom_display(); save_auton_SD(); } )}}
     };

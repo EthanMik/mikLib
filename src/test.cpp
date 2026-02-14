@@ -873,28 +873,28 @@ void config_measure_offsets() {
 
 void config_skills_driver_run() {
 	auton_scr->disable_controller_overlay();
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("SKILLS DRIVER RUN               ");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             3                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             2                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             1                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("            GO                 ");
-	Controller.rumble("-");
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("                               ");
-
 	vex::task timer([](){
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("SKILLS DRIVER RUN               ");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             3                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             2                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             1                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("            GO                 ");
+		Controller.rumble("-");
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("                               ");
+
 		float start_time = Brain.Timer.time(vex::timeUnits::sec);
 		float current_time = start_time;
 		float max_time = 60;
