@@ -1,0 +1,10 @@
+- Measure Velocity/Accel Button
+- Measure Offsets Button
+- Slew
+- No tracker odom
+- Forwards/Backwards Direction forcing
+- Motors Screen
+- Distance Reset Wall Detection
+- Max voltage can be changed during motion
+- Lots of UI tweaks/bug fixes
+- Documentation Website
