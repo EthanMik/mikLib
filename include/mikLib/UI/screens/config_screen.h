@@ -11,7 +11,7 @@ public:
 
     textbox* txtbox_task_data;
     std::function<void()> func_task;
-    std::shared_ptr<UI_component> macro_10_bg_tgl;
+    std::shared_ptr<UI_component> auto_skills_tgl;
     std::shared_ptr<UI_component> time_cap_auto_tgl;
 private:
     enum class slot { MACRO, DATA, TEST };
@@ -32,5 +32,6 @@ private:
 
     std::shared_ptr<screen> UI_config_scr = nullptr;
     std::shared_ptr<screen> UI_pnematics_scr = nullptr;
+    std::shared_ptr<screen> UI_motor_scr = nullptr;
 };
 }

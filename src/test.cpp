@@ -445,24 +445,24 @@ void PID_tuner() {
 			data.modifer_scale = 1;
 		}
 		if (btnRight_new_press(Controller.ButtonRight.pressing())) {
-			data.modifier = 1 / data.modifer_scale;
-			data.needs_update = true;
+			data.modifer_scale *= 10;
+			if (data.modifer_scale > 1000) {
+				data.modifer_scale = 1000;
+			}
 		}
 		if (btnLeft_new_press(Controller.ButtonLeft.pressing())) {
-			data.modifier = -1 / data.modifer_scale;
-			data.needs_update = true;
-		}
-		if (btnY_new_press(Controller.ButtonY.pressing())) {
 			data.modifer_scale /= 10;
 			if (data.modifer_scale < (1 / data.var_upper_size)) {
 				data.modifer_scale = (1 / data.var_upper_size);
 			}
 		}
+		if (btnY_new_press(Controller.ButtonY.pressing())) {
+			data.modifier = -1 / data.modifer_scale;
+			data.needs_update = true;
+		}
 		if (btnA_new_press(Controller.ButtonA.pressing())) {
-			data.modifer_scale *= 10;
-			if (data.modifer_scale > 1000) {
-				data.modifer_scale = 1000;
-			}
+			data.modifier = 1 / data.modifer_scale;
+			data.needs_update = true;
 		}
 		if (btnX_new_press(Controller.ButtonX.pressing())) {
 			user_control_task.suspend();
@@ -472,6 +472,18 @@ void PID_tuner() {
 			});
 		}
 		if (btnB_new_press(Controller.ButtonB.pressing())) {
+			static uint32_t last_b_press = 0;
+			uint32_t now = vex::timer::system();
+			if (now - last_b_press < 200) {
+				pid_tuner_task.stop();
+				user_control_task.stop();
+				test_movements_task.stop();
+				chassis.stop_drive(vex::coast);
+				auton_scr->enable_controller_overlay();
+				enable_user_control();
+				return 0;
+			}
+			last_b_press = now;
 			user_control_task.resume();
 			test_movements_task.stop();
 			chassis.stop_drive(vex::coast);

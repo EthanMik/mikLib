@@ -9,10 +9,12 @@ std::shared_ptr<mik::UI_console_screen> console_scr = std::make_shared<mik::UI_c
 std::shared_ptr<mik::UI_auton_screen> auton_scr = std::make_shared<mik::UI_auton_screen>();
 std::shared_ptr<mik::UI_graph_screen> graph_scr = std::make_shared<mik::UI_graph_screen>();
 std::shared_ptr<mik::UI_config_screen> config_scr = std::make_shared<mik::UI_config_screen>();
+std::shared_ptr<mik::UI_motors_screen>  motors_scr = std::make_shared<mik::UI_motors_screen>();
 static std::shared_ptr<mik::UI_component> console_tgl;
 static std::shared_ptr<mik::UI_component> auton_tgl;
 static std::shared_ptr<mik::UI_component> graph_tgl;
 static std::shared_ptr<mik::UI_component> config_tgl;
+static std::shared_ptr<mik::UI_component> motors_tgl;
 
 static bool is_screen_swapping = false;
 
@@ -46,7 +48,7 @@ void UI_init() {
     main_bg_scr->add_UI_component(main_bg);
 
     // Initialize selector panel
-    selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160, 45);
+    selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160 * 2, 45);
     selector_panel_scr->add_scroll_bar(UI_crt_rec(0, 0, 40, 3, selector_scroll_bar_color, mik::UI_distance_units::pixels), mik::screen::alignment::BOTTOM);
 
     // Init config selector toggle
@@ -146,10 +148,34 @@ void UI_init() {
         UI_crt_txt("Console", 48+160+160+160, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
     console_tgl->set_callback([=](){ 
         UI_select_scr(console_scr->get_console_screen());
-    } 
-    );
+    });
 
-    selector_panel_scr->add_UI_components({console_tgl, auton_tgl, graph_tgl, config_tgl});
+    // Init motor selector toggle
+    motors_tgl = UI_crt_tgl(UI_crt_grp({
+        UI_crt_rec(480+160, 0, 160, 45, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480+160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(159+160+160+160+160, 0, 1, 35, selector_outline_color, mik::UI_distance_units::pixels), 
+        UI_crt_rec(480+160, 35, 160, 5, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Motors", 48+160+160+160+160, 23, selector_text_color, selector_bg_color, mik::UI_distance_units::pixels)}),
+        nullptr, 1
+    );
+    motors_tgl->set_states(UI_crt_grp({
+        UI_crt_rec(480+160, 0, 160, 45, selector_bg_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480+160, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480+160, 35, 160, 5, selector_outline_pressing_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Motors", 48+160+160+160+160, 23, selector_text_color, selector_bg_pressing_color, mik::UI_distance_units::pixels)}),
+        
+        UI_crt_grp({
+        UI_crt_rec(480+160, 0, 160, 45, selector_bg_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480+160, 40, 160, 5, selector_bg_color, mik::UI_distance_units::pixels),
+        UI_crt_rec(480+160, 35, 160, 5, selector_outline_pressed_color, mik::UI_distance_units::pixels),
+        UI_crt_txt("Motors", 48+160+160+160+160, 23, selector_text_color, selector_bg_pressed_color, mik::UI_distance_units::pixels)}));
+    motors_tgl->set_callback([=](){ 
+        UI_select_scr(motors_scr->get_motors_screen());
+    });
+
+
+    selector_panel_scr->add_UI_components({console_tgl, auton_tgl, graph_tgl, config_tgl, motors_tgl});
 
     // init rendering
     UI_render_queue = {main_bg_scr, selector_panel_scr};
@@ -183,6 +209,11 @@ void UI_select_scr(std::shared_ptr<mik::screen> scr) {
         tgl->press();
         UI_execute_selector_toggles(graph_tgl, selector_panel_scr, true);
         UI_swap_screens({graph_scr->get_graph_screen(), selector_panel_scr}); 
+    } else if (scr == motors_scr->get_motors_screen()) {
+        auto* tgl = static_cast<mik::toggle*>(motors_tgl.get());
+        tgl->press();
+        UI_execute_selector_toggles(motors_tgl, selector_panel_scr, true);
+        UI_swap_screens({motors_scr->get_motors_screen(), selector_panel_scr}); 
     }
 }
 

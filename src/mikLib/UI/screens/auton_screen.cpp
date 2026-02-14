@@ -518,16 +518,6 @@ void UI_auton_screen::save_auton_SD(int count) {
     } else {
         remove_duplicates_SD_file("auton.txt", id);
     }
-    
-    std::vector<std::string> output = get_SD_file_txt("auton.txt");
-    print("Saving Auto");
-    for (auto it = output.rbegin(); it != output.rend(); ++it) {
-        int r = 0, c = 0, count = 0;
-        std::stringstream ss(*it);
-        if (ss >> r >> c >> count) {}
-        print(to_string(r) + "," + to_string(c) + "," + to_string(count));
-    }
-    print("End");
 }
 
 void UI_auton_screen::set_previous_selected_auto() {
@@ -730,7 +720,7 @@ void UI_auton_screen::enable_controller_overlay() {
          {controller_btn(false, "[Qual]", "[Elim]", [this](){ UI_select_auton(autons::QUALS_ELIMS); flip_toggle(quals_elims_tgl, quals_elims); save_auton_SD(); })}}, 
 
         {{controller_btn(false, "[Off]", "[Sawp]", [this](){ UI_select_auton(autons::OFF_SAWP); flip_toggle(off_sawp_tgl, off_sawp); save_auton_SD(); } )}, 
-         {controller_btn(false, "[Off]", "[Skills]", [this](){ UI_select_auton(autons::OFF_SKILLS); flip_toggle(config_scr->macro_10_bg_tgl, off_skills); save_auton_SD(); } )}, 
+         {controller_btn(false, "[Off]", "[Skills]", [this](){ UI_select_auton(autons::OFF_SKILLS); flip_toggle(config_scr->auto_skills_tgl, off_skills); save_auton_SD(); } )}, 
          {controller_btn(true, [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); } )}}, 
 
         {{controller_btn(true, "[Desc]", "[###]", [this](){ controller_description_scr(); } )}, 
