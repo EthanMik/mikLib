@@ -2,4 +2,5 @@
 
 #include <stdint.h>
 
-extern uint8_t mikLib_logo[240*480];
+extern const uint8_t mikLib_logo[];
+extern const size_t mikLib_logo_size;

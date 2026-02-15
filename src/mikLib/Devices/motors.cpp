@@ -1,9 +1,15 @@
-#include "mikLib/drive.h"
+#include <vector>
+#include <string>
+#include <cmath>
+#include "v5.h"
+
+#include "mikLib/Devices/motors.h"
+#include "mikLib/Drive/util.h"
 
 using namespace mik;
 
 mik::motor::motor(int port, bool reversed, std::string name) :
-    vex::motor(port, ratio6_1, reversed), port_(port), gear_cartridge_(ratio6_1), reversed_(reversed), name_(std::move(name))
+    vex::motor(port, vex::ratio6_1, reversed), port_(port), gear_cartridge_(vex::ratio6_1), reversed_(reversed), name_(std::move(name))
 {};
 
 mik::motor::motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name) :
@@ -66,7 +72,7 @@ void mik::motor_group::spin(vex::directionType dir, float voltage, vex::voltageU
 
     for (mik::motor& motor : motors) {
         if (std::fabs(voltage) < 0.05f) {
-            motor.stop(coast);
+            motor.stop(vex::coast);
         } else {
             motor.spin(dir, voltage, units);
         }

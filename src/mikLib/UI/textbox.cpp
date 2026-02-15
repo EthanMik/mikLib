@@ -105,6 +105,14 @@ void textbox::set_text(std::string text) {
     needs_render_update = true;
 }
 
+void textbox::set_text_color(const std::string& color) {
+    this->text_color = color;
+}
+
+const std::string& textbox::get_text_color() {
+    return this->text_color;
+}
+
 void textbox::wrap_text() {
     std::vector<std::string> words;
     std::istringstream iss(text);

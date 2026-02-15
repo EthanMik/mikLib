@@ -72,13 +72,13 @@ Assembly assembly(
 void log_motors() {
     config_add_motors({
 		// Add all mik motor groups in here, you can log assembly motor groups
-		chassis.left_drive,
-		chassis.right_drive,
-		// assembly.lower_intake_motors
+		&chassis.left_drive,
+		&chassis.right_drive,
+		&assembly.lower_intake_motors
     },
 	{
 		// Add all mik motors in here, you can log assembly motors
-		// assembly.upper_intake_motor
+		&assembly.upper_intake_motor
     }
   );
 }
@@ -117,7 +117,7 @@ static void loading_screen(bool stop) {
 	}
 
 	Controller.Screen.setCursor(1, 1);
-	Brain.Screen.drawImageFromBuffer(mikLib_logo, 0, 0, sizeof(mikLib_logo));
+	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
 
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
@@ -173,6 +173,7 @@ void init(void) {
 
 	// Setup motors
 	log_motors();
+	motors_scr->init_motors();
 
 	// Calibrate inertial
 	calibrate_inertial();
@@ -205,5 +206,9 @@ void enable_user_control(void) {
 }
 
 bool control_disabled(void) {
+	if (Competition.isDriverControl() && user_control_disabled) {
+		auton_scr->disable_controller_overlay();
+		return false;
+	};
   	return user_control_disabled;
 }

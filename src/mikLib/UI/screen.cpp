@@ -57,6 +57,11 @@ void screen::add_scroll_bar(std::shared_ptr<drawable> scroll_bar) {
     this->scroll_bar = scroll_bar;
 }
 
+void screen::add_render_callback(std::function<void()> render_callback) {
+    this->has_render_callback = true;
+    this->render_callback = render_callback;
+}
+
 void screen::add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align) {
     int align_pos = get_aligment_pos(scroll_bar_align, scroll_bar->get_width(), scroll_bar->get_height());
     scroll_bar->set_position(align_pos, align_pos);
@@ -184,6 +189,8 @@ void screen::render(bool full_refresh) {
         render_index = 0;
         screen_needs_refresh = false;
     }
+
+    if (has_render_callback) { render_callback(); }
 
     for (std::size_t i = render_index; i < UI_components.size(); ++i) {
         auto& component = UI_components[i];

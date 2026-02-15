@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <vector>
 #include "mikLib/globals.h"
 
 /**

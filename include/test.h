@@ -124,7 +124,9 @@ extern std::vector<std::string> error_data;
 void PID_tuner();
 
 /** @brief Allows UI to interface with all of robots motors */
-void config_add_motors(std::vector<mik::motor_group> motor_groups, std::vector<mik::motor> motors);
+void config_add_motors(std::vector<mik::motor_group*> motor_groups, std::vector<mik::motor*> motors);
+
+std::vector<mik::motor*> config_get_motors();
 
 /** @brief Stops all motors connected to robot. Used when disabling user control. */
 void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);

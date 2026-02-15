@@ -2,6 +2,7 @@
 
 #include "v5.h"
 #include "v5_vcs.h"
+#include <string>
 
 typedef struct point{
     double x;

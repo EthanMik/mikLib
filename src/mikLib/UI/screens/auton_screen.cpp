@@ -776,7 +776,6 @@ void UI_auton_screen::restart_controller_overlay() {
             {
                 task::sleep(200);
                 auton_scr->disable_controller_overlay();
-                auton_scr->controller_default_scr();
                 break;
             } 
             task::sleep(50);

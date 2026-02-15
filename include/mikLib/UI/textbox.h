@@ -32,6 +32,9 @@ public:
     void set_text(std::string text);
     void wrap_text();
 
+    void set_text_color(const std::string& color);
+    const std::string& get_text_color();
+
 private:
     void draw_text();
     

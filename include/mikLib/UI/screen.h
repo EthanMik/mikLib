@@ -25,6 +25,7 @@ public:
     
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar);
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align);
+    void add_render_callback(std::function<void()>);
 
     bool needs_update();
     bool needs_full_refresh();
@@ -78,5 +79,8 @@ private:
     bool needs_render_update;
     int render_index;
     input_type input_type = input_type::TOUCHSCREEN;
+
+    bool has_render_callback = false;
+    std::function<void()> render_callback;
 };
 }

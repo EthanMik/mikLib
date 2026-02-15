@@ -1,4 +1,12 @@
-#include "mikLib/drive.h"
+#include "mikLib/Devices/distance.h"
+#include "mikLib/globals.h"
+#include "mikLib/Drive/util.h"
+#include "v5.h"
+#include "v5_vcs.h"
+#include <vector>
+#include <cmath>
+#include <string>
+#include <algorithm>
 
 using namespace mik;
 
@@ -67,7 +75,7 @@ std::string mik::distance_reset::get_wall_facing(distance_position sensor_positi
     if (index < 0) { return ""; }
     
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
-    const float distance = distance_sensors[index].objectDistance(inches);
+    const float distance = distance_sensors[index].objectDistance(vex::inches);
     const float x_offset = distance_sensors[index].x_center_offset();
     const float y_offset = distance_sensors[index].y_center_offset();
 
@@ -84,7 +92,7 @@ float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position,
     if (index < 0) { return 0; }
     
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
-    const float distance = distance_sensors[index].objectDistance(inches);
+    const float distance = distance_sensors[index].objectDistance(vex::inches);
     const float x_offset = distance_sensors[index].x_center_offset();
     const float y_offset = distance_sensors[index].y_center_offset();
 

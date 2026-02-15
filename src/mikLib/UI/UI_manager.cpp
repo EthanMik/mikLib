@@ -41,11 +41,13 @@ void UI_init() {
     create_UI_files();
     // auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, 0, 0, mik::UI_distance_units::pixels));
 
-    std::shared_ptr<mik::drawable> main_bg_img = std::make_shared<mik::image>(mikLib_logo, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mik::UI_distance_units::pixels);
-    std::shared_ptr<mik::UI_component> main_bg = std::make_shared<mik::graphic>(main_bg_img);
-    
+	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+
+    // std::shared_ptr<mik::drawable> main_bg_img = std::make_shared<mik::image>(mikLib_logo, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mik::UI_distance_units::pixels);
+    // std::shared_ptr<mik::UI_component> main_bg = std::make_shared<mik::graphic>(main_bg_img);
+
     auto main_bg_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    main_bg_scr->add_UI_component(main_bg);
+    // main_bg_scr->add_UI_component(main_bg);
 
     // Initialize selector panel
     selector_panel_scr = UI_crt_scr(0, 0, SCREEN_WIDTH + 160 * 2, 45);
@@ -255,6 +257,7 @@ void UI_render() {
         }
         temp.clear();
 
+        
         vex::this_thread::sleep_for(20);
     }
 }
