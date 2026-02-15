@@ -12,6 +12,8 @@ public:
 private:
     void UI_crt_motors_scr();
 
+    float set_voltage;
+    std::vector<std::pair<mik::toggle*, char>> volt_toggles;
     std::shared_ptr<screen> UI_motors_scr = nullptr;
 };
 }

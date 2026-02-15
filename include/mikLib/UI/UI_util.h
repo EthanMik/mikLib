@@ -46,10 +46,10 @@ std::shared_ptr<mik::UI_component> UI_crt_tgl(std::shared_ptr<mik::drawable> tog
 std::shared_ptr<mik::UI_component> UI_crt_tgl(std::shared_ptr<mik::drawable> toggle_graphic, std::function<void()> callback);
 std::shared_ptr<mik::UI_component> UI_crt_tgl(std::shared_ptr<mik::drawable> toggle_graphic);
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<mik::drawable> box);
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box);
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box);
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<mik::drawable> box, vex::fontType font = vex::fontType::mono20, int padding = 10);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box, vex::fontType font = vex::fontType::mono20, int padding = 10);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box, vex::fontType font = vex::fontType::mono20, int padding = 10);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box, vex::fontType font = vex::fontType::mono20, int padding = 10);
 
 std::shared_ptr<mik::UI_component> UI_crt_btn(std::shared_ptr<mik::drawable> button_graphic, std::function<void()> on_click);
 

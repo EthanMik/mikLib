@@ -103,12 +103,12 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
     bool is_exception = false;
 
     if ((scroll_dir == scroll_direction::VERTICAL) &&
-        (component->get_y_pos() < this->y || 
+        (component->get_y_pos() + component->get_height() < this->y ||
         component->get_y_pos() > this->y + this->h)) {
             is_exception = true;
     }
     if ((scroll_dir == scroll_direction::HORIZONTAL) &&
-        (component->get_x_pos() + component->get_width() < this->x || 
+        (component->get_x_pos() + component->get_width() < this->x ||
         component->get_x_pos() > this->x + this->w)) {
             is_exception = true;
 

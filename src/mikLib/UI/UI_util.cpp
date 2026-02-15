@@ -134,20 +134,20 @@ std::shared_ptr<mik::drawable> UI_crt_grp(std::vector<std::shared_ptr<mik::drawa
 }
 
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<mik::drawable> box) {
-    return std::make_shared<mik::textbox>(text, box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, std::shared_ptr<mik::drawable> box, vex::fontType font, int padding) {
+    return std::make_shared<mik::textbox>(text, box, font, padding);
 }
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box) {
-    return std::make_shared<mik::textbox>(text, text_alignment, box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box, vex::fontType font, int padding) {
+    return std::make_shared<mik::textbox>(text, text_alignment, box, font, padding);
 }
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box) {
-    return std::make_shared<mik::textbox>(text, text_alignment, bg_color, box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, mik::text_align text_alignment, const std::string& bg_color, std::shared_ptr<mik::drawable> box, vex::fontType font, int padding) {
+    return std::make_shared<mik::textbox>(text, text_alignment, bg_color, box, font, padding);
 }
 
-std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box) {
-    return std::make_shared<mik::textbox>(text, text_color, bg_color, text_alignment, box);
+std::shared_ptr<mik::UI_component> UI_crt_txtbox(std::string text, const std::string& text_color, const std::string& bg_color, mik::text_align text_alignment, std::shared_ptr<mik::drawable> box, vex::fontType font, int padding) {
+    return std::make_shared<mik::textbox>(text, text_color, bg_color, text_alignment, box, font, padding);
 }
 
 std::shared_ptr<mik::UI_component> UI_crt_tgl(std::shared_ptr<mik::drawable> toggle_graphic, std::function<void()> callback, int id) {

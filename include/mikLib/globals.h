@@ -205,6 +205,17 @@ namespace mik {
     inline const std::string& motors_spin_right_outline_color = UI_med_gray;
     inline const std::string& motors_spin_right_pressing_color = UI_white;
     inline const std::string& motors_spin_right_pressed_color = UI_red;
+
+    inline const std::string& motors_left_drive_btn_bg_color = "#303030";
+
+    inline const std::string& motors_port_btn_outline_color = UI_dark_gray;
+    inline const std::string& motors_port_btn_pressing_color = UI_white;
+    inline const std::string& motors_port_btn_pressed_color = UI_red;
+
+    inline const std::string& motors_volt_btn_bg_color = UI_black;
+    inline const std::string& motors_volt_btn_outline_color = UI_med_gray;
+    inline const std::string& motors_volt_btn_pressed_color = UI_white;
+    inline const std::string& motors_volt_btn_pressing_color = UI_red;
     
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
@@ -229,6 +240,8 @@ namespace mik {
     enum class input_type { CONTROLLER, TOUCHSCREEN };
     enum class text_align { LEFT, CENTER };
     enum class autons { RED_BLUE, RINGS_GOAL, QUALS_ELIMS, OFF_SAWP, OFF_SKILLS };
+
+    inline constexpr vex::fontType default_font = vex::fontType::mono20;
 
     #define UI_Graphic_ID    1
     #define UI_Background_ID 2
