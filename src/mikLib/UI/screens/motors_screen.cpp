@@ -16,12 +16,20 @@ void UI_motors_screen::UI_crt_motors_scr() {
     auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, config_bg_color, UI_distance_units::pixels));
 
     auto left_drive_lab = UI_crt_txtbox("Left Drive", UI_crt_rec(9, 55, 138, 20, "#000000"));
+    
+    // Create a motor menu
+
+    auto move_motor_left = UI_crt_btn(UI_crt_rec(23, 84, 30, 40, "#000000", "#666666", 2), [](){});
+    // move_motor_left->set_states()
+
+
+    UI_motors_scr->add_UI_components({
+        bg, left_drive_lab
+    });
 
     for (const auto& component : UI_motors_scr->get_UI_components()) {
         component->set_y_pos(component->get_y_pos() - 45);
     }
-
-    UI_motors_scr->add_UI_components({bg});
 }
 
 std::shared_ptr<screen> UI_motors_screen::get_motors_screen() {

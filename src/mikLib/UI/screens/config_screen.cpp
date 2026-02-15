@@ -107,8 +107,8 @@ void UI_config_screen::UI_crt_config_scr() {
     });
 
     // Spins each motor forwards for half a second
-    add_button(slot::MACRO, "Motor Menu", [this](){ 
-        UI_swap_screens({motors_scr->get_motors_screen()}); 
+    add_button(slot::MACRO, "Motor Menu", [](){ 
+        UI_select_scr({motors_scr->get_motors_screen()}); 
         disable_user_control(true); 
     });
 

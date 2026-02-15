@@ -26,5 +26,8 @@ public:
 
     virtual void set_text(const std::string text_label) {}
     virtual std::string get_text() {}
+
+    virtual void set_fill_color(const std::string& color) {};
+    virtual const std::string& get_fill_color() {};
 };
 }

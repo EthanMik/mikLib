@@ -25,6 +25,9 @@ public:
     void set_width(int w) override;
     void set_height(int h) override;
 
+    const std::string& get_fill_color() override;
+    void set_fill_color(const std::string& color) override;
+
     void render() override;
 
 private:
@@ -33,8 +36,8 @@ private:
     uint32_t fill_color;
     uint32_t outline_color;
     
-    const std::string fill_color_hex;
-    const std::string outline_color_hex;
+    std::string fill_color_hex;
+    std::string outline_color_hex;
 
     bool using_hex = false;
 };

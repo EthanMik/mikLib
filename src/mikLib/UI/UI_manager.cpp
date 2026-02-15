@@ -182,6 +182,8 @@ void UI_init() {
     for (const auto& scr : UI_render_queue) {
         scr->refresh();
     }
+
+    UI_select_scr(motors_scr->get_motors_screen());
 }
 
 void UI_controller_auton_selector() {
@@ -236,18 +238,19 @@ void UI_render() {
         if (!full_refresh) {
             for (const auto& screen : UI_render_queue) {
                 if (screen->needs_update()) {
-                    temp.push_back(screen);
+                    // temp.push_back(screen);
+                    // temp = UI_render_queue;
                     local_needs_render_update = true;
                 }
-                if (screen->needs_full_refresh()) {
-                    temp = UI_render_queue;
-                    break;
-                }
+                // if (screen->needs_full_refresh()) {
+                //     temp = UI_render_queue;
+                //     break;
+                // }
             }
         }
 
         while (local_needs_render_update || full_refresh) {
-            for (const auto& screen : temp) {
+            for (const auto& screen : UI_render_queue) {
                 screen->render(full_refresh);
             }
             if (Brain.Screen.render(true, true)) {  

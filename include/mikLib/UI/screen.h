@@ -59,8 +59,10 @@ private:
 
     std::shared_ptr<drawable> scroll_bar;
     scroll_direction scroll_dir = scroll_direction::NONE;
+    std::string last_fill_color;
     bool finished_scrolling;
     bool pressed = false;
+    bool actively_scrolling = false;
     int prev_touch = 0;
     const float scroll_speed = 0.1;
     int screen_pos = 0;

@@ -131,31 +131,35 @@ bool screen::needs_update() {
 
     for (std::size_t i = 0; i < UI_components.size(); ++i) {
         auto& component = UI_components[i];
+        if (!actively_scrolling && !is_clickable_exception(component)) {
+            component->is_pressing(input_type);
+        }
         if (is_render_exception(component)) {
             continue;
         }
-        if (!pressed && !is_clickable_exception(component)) {
-            component->is_pressing(input_type);
-        }
         if (component->needs_update()) {
-            if (i < render_index || render_index == 0) {
-                render_index = i;
-            }
-
+            render_index = 0;
             needs_render_update = true;
         }
     }
 
     if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
+        bool was_actively_scrolling = actively_scrolling;
         if (is_scrolling()) {
             render_index = 0;
+        }
+        if (was_actively_scrolling && !actively_scrolling) {
+            for (const auto& component : UI_components) {
+                component->is_pressing(input_type);
+            }
         }
     }
 
     component_mutex.unlock();
 
-    if (needs_render_update) {
+    if (needs_render_update || screen_needs_full_refresh) {
         needs_render_update = false;
+        screen_needs_full_refresh = false;
         return true;
     }
     return false;
@@ -212,7 +216,10 @@ bool screen::is_scrolling() {
 
     if (Brain.Screen.pressing() && !pressed && is_touch_within_screen) {
         pressed = true;
+        last_fill_color = scroll_bar->get_fill_color();
+        scroll_bar->set_fill_color("#ffffff");
         prev_touch = get_touch_pos();
+        needs_render_update = true;
     }
     if (pressed && Brain.Screen.pressing() && is_touch_within_screen) {
         int current_touch = get_touch_pos();
@@ -239,8 +246,8 @@ bool screen::is_scrolling() {
             scr_speed_limit = std::max(scr_speed_limit, 0.1f);
         } else if (direction > 0 && distance_to_lower_bound > -threshold) {
             threshold = 20;
-             scr_speed_limit = distance_to_lower_bound / threshold;
-             scr_speed_limit = std::max(scr_speed_limit, 0.1f);
+            scr_speed_limit = distance_to_lower_bound / threshold;
+            scr_speed_limit = std::max(scr_speed_limit, 0.1f);
         }
 
         int local_position = (delta_touch * scroll_speed) * scr_speed_limit + 1;
@@ -259,6 +266,7 @@ bool screen::is_scrolling() {
                 }
                 if (local_position != 0) {
                     scrolled = true;
+                    actively_scrolling = true;
                 }
             }
             component_delta_position += local_position;
@@ -266,8 +274,13 @@ bool screen::is_scrolling() {
             screen_pos += local_position;
         }
     }
-    if (!Brain.Screen.pressing()) {
+    if (!Brain.Screen.pressing() && pressed) {
         pressed = false;
+        actively_scrolling = false;
+        scroll_bar->set_fill_color(last_fill_color);
+        screen_needs_full_refresh = true;
+        needs_render_update = true;
+        scrolled = true;
     }
     return scrolled;
 }

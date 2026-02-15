@@ -67,6 +67,12 @@ void rectangle::set_y_pos(int y) { this->y = y; }
 void rectangle::set_position(int x, int y) { this->x = x; this->y = y; }
 void rectangle::set_width(int w) { this->w = w; }
 void rectangle::set_height(int h) {this->h = h; }
+void rectangle::set_fill_color(const std::string& color) { 
+    using_hex = true;
+    this->fill_color_hex = color;
+    this->outline_color_hex = color;
+}
+const std::string& rectangle::get_fill_color() { return this->fill_color_hex; }
 
 void rectangle::render() {
     Brain.Screen.setPenWidth(pen_width);
