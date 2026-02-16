@@ -480,7 +480,7 @@ void PID_tuner() {
 				test_movements_task.stop();
 				chassis.stop_drive(vex::coast);
 				auton_scr->enable_controller_overlay();
-				enable_user_control();
+				disable_user_control();
 				return 0;
 			}
 			last_b_press = now;
@@ -564,6 +564,7 @@ int run_diagnostic() {
 	return errors;
 }
 
+    // How you want your drivetrain to stop during driver
 void config_add_pid_output_SD_console() {
 	if (!Brain.SDcard.isInserted()) { return; }
 	UI_select_scr(console_scr->get_console_screen());

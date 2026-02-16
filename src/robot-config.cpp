@@ -74,11 +74,11 @@ void log_motors() {
 		// Add all mik motor groups in here, you can log assembly motor groups
 		&chassis.left_drive,
 		&chassis.right_drive,
-		&assembly.lower_intake_motors
+		// &assembly.lower_intake_motors
     },
 	{
 		// Add all mik motors in here, you can log assembly motors
-		&assembly.upper_intake_motor
+		// &assembly.upper_intake_motor
     }
   );
 }
@@ -206,7 +206,7 @@ void enable_user_control(void) {
 }
 
 bool control_disabled(void) {
-	if (Competition.isDriverControl() && user_control_disabled) {
+	if (Competition.isDriverControl() && (Competition.isFieldControl() || Competition.isCompetitionSwitch()) && user_control_disabled) {
 		auton_scr->disable_controller_overlay();
 		return false;
 	};

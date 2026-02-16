@@ -79,37 +79,37 @@ void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y) {
     auto* left_tgl = static_cast<mik::toggle*>(move_motor_left.get());
     auto* right_tgl = static_cast<mik::toggle*>(move_motor_right.get());
 
-    left_tgl->set_callback([this, mtr, right_tgl](){
+    this->motor_texts.push_back({static_cast<mik::textbox*>(motor_port_txt.get()), mtr});
+    this->motor_toggles.push_back({left_tgl, right_tgl, mtr, false, false, false});
+    int toggle_idx = this->motor_toggles.size() - 1;
+
+    left_tgl->set_callback([this, mtr, right_tgl, toggle_idx](){
         right_tgl->unpress();
         mtr->spin(vex::reverse, set_voltage, vex::volt);
-        disable_user_control(true);
-        toggles_active++;
+        motor_toggles[toggle_idx].user_pressed = true;
     });
 
-    right_tgl->set_callback([this, mtr, left_tgl](){
+    right_tgl->set_callback([this, mtr, left_tgl, toggle_idx](){
         left_tgl->unpress();
         mtr->spin(vex::fwd, set_voltage, vex::volt);
-        disable_user_control(true);
-        toggles_active++;
-        if (toggles_active == 0) { enable_user_control(); }
+        motor_toggles[toggle_idx].user_pressed = true;
     });
 
-    auto left_hidden_btn = UI_crt_btn(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color), [this, mtr, left_tgl, right_tgl](){
+    auto left_hidden_btn = UI_crt_btn(UI_crt_rec(x + 90, y, 30, 40, motors_spin_left_bg_color), [this, mtr, left_tgl, toggle_idx](){
         if (!left_tgl->get_toggle_state()) {
             mtr->stop(vex::coast);
-            toggles_active--;
+            motor_toggles[toggle_idx].user_stopped = true;
+            motor_toggles[toggle_idx].user_pressed = false;
         }
     });
 
-    auto right_hidden_btn = UI_crt_btn(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color), [this, mtr, left_tgl, right_tgl](){
+    auto right_hidden_btn = UI_crt_btn(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color), [this, mtr, right_tgl, toggle_idx](){
         if (!right_tgl->get_toggle_state()) {
             mtr->stop(vex::coast);
-            toggles_active--;
-            if (toggles_active == 0) { enable_user_control(); }
+            motor_toggles[toggle_idx].user_stopped = true;
+            motor_toggles[toggle_idx].user_pressed = false;
         }
     });
-
-    this->motor_texts.push_back({static_cast<mik::textbox*>(motor_port_txt.get()), mtr});
 
     UI_motors_scr->add_UI_components({
         left_hidden_btn, right_hidden_btn,
@@ -146,6 +146,41 @@ void UI_motors_screen::update_motors_screen() {
             item.first->set_text_color(UI_white);
         }
     }
+
+    for (auto& entry : motor_toggles) {
+        double velo = entry.mtr->velocity(vex::rpm);
+        bool left_on = entry.left_tgl->get_toggle_state();
+        bool right_on = entry.right_tgl->get_toggle_state();
+
+        if (entry.user_stopped) {
+            if (velo == 0) {
+                entry.user_stopped = false;
+                entry.was_spinning = false;
+            }
+            continue;
+        }
+
+        if (velo < 0 && !left_on) {
+            if (right_on) { entry.right_tgl->unpress(); }
+            entry.left_tgl->press();
+            entry.was_spinning = true;
+        } else if (velo > 0 && !right_on) {
+            if (left_on) { entry.left_tgl->unpress(); }
+            entry.right_tgl->press();
+            entry.was_spinning = true;
+        } else if (velo == 0 && entry.was_spinning) {
+            entry.was_spinning = false;
+            if (left_on) { entry.left_tgl->unpress(); }
+            if (right_on) { entry.right_tgl->unpress(); }
+        }
+    }
+
+    bool any_user_pressed = false;
+    for (auto& entry : motor_toggles) {
+        if (entry.user_pressed) { any_user_pressed = true; break; }
+    }
+    if (any_user_pressed) { disable_user_control(); }
+    else { enable_user_control(); }
 }
 
 std::shared_ptr<screen> UI_motors_screen::get_motors_screen() {
