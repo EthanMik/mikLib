@@ -117,6 +117,10 @@ void UI_config_screen::UI_crt_config_scr() {
         disable_user_control(); 
     });
 
+    add_button(slot::MACRO, "Get Offsets", [](){ config_measure_offsets(); });
+
+    add_button(slot::MACRO, "Get Vel/Accel", [](){ config_measure_velocity_accel(); });
+
     // Clears PID data off SD card
     add_button(slot::MACRO, "Wipe PID Data", [](){ wipe_SD_file("pid_data.txt"); });
 
@@ -136,6 +140,8 @@ void UI_config_screen::UI_crt_config_scr() {
 
     // Add odom data to console
     add_button(slot::DATA, "Odom Data", [](){ config_odom_data(); });
+
+    add_button(slot::DATA, "Reset Data", [](){ config_reset_data(); }); 
 
     // Add updated pid values from pid_tuner to console
     add_button(slot::DATA, "PID Data", [](){ config_add_pid_output_SD_console(); });
@@ -182,7 +188,8 @@ void UI_config_screen::UI_crt_config_scr() {
     add_button(slot::TEST, "Test Boomerng", [](){ test_boomerang(); });
 
     // Runs a pure pursuit test
-    add_button(slot::TEST, "Test Boomerng", [](){ test_pursuit(); });
+    add_button(slot::TEST, "Test Pursuit", [](){ test_pursuit(); });
+
 
     for (const auto& component : UI_config_scr->get_UI_components()) {
         component->set_y_pos(component->get_y_pos() - 45);

@@ -742,7 +742,7 @@ void config_measure_velocity_accel() {
     vex::task temp([](){
         std::vector<std::pair<float, float>> pos_time{};
 
-		chassis.drive_distance(80, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
+		chassis.drive_distance(72, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
 
 		Brain.Timer.reset();
 		chassis.right_drive.resetPosition();

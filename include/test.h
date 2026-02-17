@@ -181,7 +181,13 @@ void config_error_data();
 /** @brief Starts a practice driver skills run that will stop the robot after 60 seconds */
 void config_skills_driver_run();
 
+/** @brief Drives forward 72 inches and gets the robots max velocity and an estimated constant acceleration,
+ * printed to the console screen useful for simulating your robot in mikGen, https://ethanmik.github.io/mikGen/
+ */
 void config_measure_velocity_accel();
+
+/** @brief Measures the offsets of the forward and sideways tracker by turning prints output the the console screen */
+void config_measure_offsets();
 
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
 void config_test_three_wire_port(int port);

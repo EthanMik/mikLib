@@ -5,6 +5,7 @@ using namespace mik;
 
 UI_motors_screen::UI_motors_screen() {
     UI_crt_motors_scr();
+    UI_crt_reconstruct_scr();
 }
 
 void UI_motors_screen::UI_crt_motors_scr() {
@@ -14,7 +15,7 @@ void UI_motors_screen::UI_crt_motors_scr() {
     const int extra_screen_height = 39 * extra_buttons + 5;
     UI_motors_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + extra_screen_height);
     UI_motors_scr->add_scroll_bar(UI_crt_rec(0, 0, 2, 40, config_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
-    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, config_bg_color, UI_distance_units::pixels));
+    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, motors_bg_color, UI_distance_units::pixels));
     UI_motors_scr->add_UI_component(bg);
 
     // Voltage control
@@ -69,7 +70,11 @@ void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y) {
     move_motor_left->set_states(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressing_color, 2), UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressed_color, 2));
     auto left_arrow = UI_crt_txtbox("<", mik::text_align::CENTER, UI_crt_rec(x + 5, y + 5, 20, 20, motors_spin_left_bg_color), vex::fontType::mono20, 0);
 
-    auto motor_port_btn = UI_crt_btn(UI_crt_rec(x + 40, y, 40, 40, motors_left_drive_btn_bg_color, motors_port_btn_outline_color, 2), [](){});
+    auto motor_port_btn = UI_crt_btn(UI_crt_rec(x + 40, y, 40, 40, motors_left_drive_btn_bg_color, motors_port_btn_outline_color, 2), [this](){ 
+        UI_swap_screens({UI_reconstruct_scr});
+    });
+
+
     auto motor_port_txt = UI_crt_txtbox("0", "#ffffff", motors_left_drive_btn_bg_color, text_align::CENTER, UI_crt_rec(x + 42, y + 5, 36, 24, motors_left_drive_btn_bg_color), vex::fontType::mono20, 0);
 
     auto move_motor_right = UI_crt_tgl(UI_crt_rec(x + 90, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_outline_color, 2), [](){});
@@ -181,6 +186,38 @@ void UI_motors_screen::update_motors_screen() {
     }
     if (any_user_pressed) { disable_user_control(); }
     else { enable_user_control(); }
+}
+
+void UI_motors_screen::reconstruct_motor(mik::motor* mtr, int new_port, vex::gearSetting new_cart, bool new_rev) {
+    mtr->stop(vex::coast);
+
+    std::string name = mtr->name();
+
+    mtr->~motor();
+    new(mtr) mik::motor(new_port, new_rev, new_cart, name);
+}
+
+void UI_motors_screen::UI_crt_reconstruct_scr() {
+    UI_reconstruct_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, motors_bg_color, UI_distance_units::pixels));
+    UI_reconstruct_scr->add_UI_component(bg);
+
+
+    auto motor_label_component = UI_crt_txtbox("Motor X", mik::text_align::CENTER, UI_crt_rec(80, 20, 230, 25, motors_bg_color), vex::fontType::mono20, 0);
+    motor_label = static_cast<mik::textbox*>(motor_label_component.get());
+
+    auto exit_bg = UI_crt_btn(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_outline_color, 2, UI_distance_units::pixels), [this](){ UI_select_scr(UI_motors_scr); });
+        exit_bg->set_states(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressing_color, 2, UI_distance_units::pixels), UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressed_color, 2, UI_distance_units::pixels));
+    auto exit_txt = UI_crt_gfx({UI_crt_rec(4, 4, 36, 36, motors_bg_color, UI_distance_units::pixels), UI_crt_txt("X", 17, 27, motors_ports_text_color, motors_bg_color, mik::UI_distance_units::pixels)});
+    UI_reconstruct_scr->add_UI_components({exit_bg, exit_txt, motor_label_component});
+ 
+    const auto ports = 21;
+    for (size_t i = 0; i < ports; ++i) {
+        auto port_btn = UI_crt_btn(UI_crt_rec(50 + (i % 7) * 57, 65 + (i / 7) * 60, 40, 40, motors_ports_btn_bg, motors_ports_btn_current_color, 2), [](){});
+        auto port_btn_text = UI_crt_txtbox("0", text_align::CENTER, UI_crt_rec(55 + (i % 7) * 57, 70 + (i / 7) * 60, 30, 25, motors_ports_btn_bg), vex::fontType::mono20, 0);
+        UI_reconstruct_scr->add_UI_components({port_btn, port_btn_text});
+    }
+
 }
 
 std::shared_ptr<screen> UI_motors_screen::get_motors_screen() {

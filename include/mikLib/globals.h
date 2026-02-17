@@ -197,6 +197,7 @@ namespace mik {
     inline const std::string& console_scroll_bar_color = UI_med_gray;
 
     // Motors screen colors
+    inline const std::string& motors_bg_color = UI_black;
     inline const std::string& motors_spin_left_bg_color = UI_black;
     inline const std::string& motors_spin_left_outline_color = UI_med_gray;
     inline const std::string& motors_spin_left_pressing_color = UI_white;
@@ -217,6 +218,18 @@ namespace mik {
     inline const std::string& motors_volt_btn_outline_color = UI_med_gray;
     inline const std::string& motors_volt_btn_pressed_color = UI_white;
     inline const std::string& motors_volt_btn_pressing_color = UI_red;
+
+    inline const std::string& motors_ports_text_color = UI_white;
+    inline const std::string& motors_close_button_bg_color = UI_black;
+    inline const std::string& motors_close_button_outline_color = UI_med_gray;
+    inline const std::string& motors_close_button_pressing_color = UI_white;
+    inline const std::string& motors_close_button_pressed_color = UI_red;
+
+    inline const std::string& motors_ports_btn_bg = UI_black;
+    inline const std::string& motors_ports_btn_pressing_color = UI_light_gray;
+    inline const std::string& motors_ports_btn_closed_color = UI_red;
+    inline const std::string& motors_ports_btn_open_color = UI_white;
+    inline const std::string& motors_ports_btn_current_color = UI_white;
     
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
