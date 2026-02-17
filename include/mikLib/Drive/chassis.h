@@ -845,7 +845,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
 
             prev_drive_output = drive_output;
             prev_heading_output = heading_output;
-            
+
             vex::task::sleep(10);
         }
 
@@ -1521,7 +1521,7 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
                 drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
                 heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
-                drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, !close);
+                drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
                 heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
                 drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 
