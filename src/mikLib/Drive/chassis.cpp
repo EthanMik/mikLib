@@ -63,36 +63,41 @@ void Chassis::set_control_constants(float control_throttle_deadband, float contr
     this->control_turn_curve_gain = control_turn_curve_gain;
 }
 
-void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti) {
+void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
     this->turn_max_voltage = turn_max_voltage;
     this->turn_kp = turn_kp;
     this->turn_ki = turn_ki;
     this->turn_kd = turn_kd;
     this->turn_starti = turn_starti;
+    this->turn_slew = turn_slew;
 } 
 
-void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti) {
+void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_slew) {
     this->drive_max_voltage = drive_max_voltage;
     this->drive_kp = drive_kp;
     this->drive_ki = drive_ki;
     this->drive_kd = drive_kd;
     this->drive_starti = drive_starti;
+    this->drive_slew = drive_slew;
 } 
 
-void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti, float heading_slew) {
     this->heading_max_voltage = heading_max_voltage;
     this->heading_kp = heading_kp;
     this->heading_ki = heading_ki;
     this->heading_kd = heading_kd;
     this->heading_starti = heading_starti;
+    this->heading_slew = heading_slew;
+
 }
 
-void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti){
+void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_slew) {
     this->swing_max_voltage = swing_max_voltage;
     this->swing_kp = swing_kp;
     this->swing_ki = swing_ki;
     this->swing_kd = swing_kd;
     this->swing_starti = swing_starti;
+    this->swing_slew = swing_slew;
 } 
 
 void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout) {

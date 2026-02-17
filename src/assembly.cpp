@@ -5,7 +5,7 @@ using namespace mik;
 
 // The code in this file is example and can be deleted
 
-// This is example code for a push back robot with two 5.5W motors on the lower intake, /
+// This is example code for a push back robot with two 5.5W motors on the lower intake,
 // 11W motor on the top intake, a scraper, and wing
 
 // Pass in the devices we want to use, make sure this follows the same order as assembly.h

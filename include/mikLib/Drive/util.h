@@ -178,6 +178,27 @@ float left_voltage_scaling(float drive_output, float heading_output);
 float right_voltage_scaling(float drive_output, float heading_output);
 
 /**
+ * @brief Slew rate control to limit acceleration.
+ * Used for slew rate calculations to reduce wheel slippage.
+ * If slew is 0, then no slew rate control is applied.
+ * @param drive_output The forward output of the drive.
+ * @param prev_drive_output The forward output of the drive in the previous iteration, used for slew calculations.
+ * @param slew The maximum change in voltage per 10 ms.
+ * @param apply Whether or not to apply slew to the output.
+ * @return The voltage with slew applied.
+ */
+float slew_scaling(float drive_output, float prev_drive_output, float slew, bool apply = true);
+
+/**
+ * @brief Scales voltage to prevent overturning on sharp boomerang segments.
+ * @param drive_output The forward output of the drive.
+ * @param heading_output The heading output of the drive.
+ * @param max_speed The maximum speed of the drive.
+ * @return The voltage with overturn scaling applied.
+ */
+float overturn_scaling(float drive_output, float heading_output, float max_speed);
+
+/**
  * @brief Brings an output up to the minimum voltage if it's too slow.
  * Used for minimum voltage calculations for movement chaining.
  * Has no effect on 0 voltage output, because how do we know 
@@ -187,6 +208,21 @@ float right_voltage_scaling(float drive_output, float heading_output);
  * @return The voltage with the minimum applied.
  */
 float clamp_min_voltage(float drive_output, float drive_min_voltage);
+
+/**
+ * @brief Clamps the drive output to prevent the robot
+ * from drifting turn boomerang segements.
+ * @param drive_output The forward output of the drive.
+ * @param current_X The robot's current X position in inches.
+ * @param current_Y The robot's current Y position in inches.
+ * @param current_angle_deg The robot's current heading in degrees.
+ * @param desired_X The robot's desired X position in inches.
+ * @param desired_Ym The robot's desired Y position in inches.
+ * @param drift A constant to determine how aggressive drift is reduced, higher means more drift.
+ * @return The voltage with slip clamping applied.
+ */
+float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift);
+
 
 /** @return the distance between two x, y points */
 float dist(point p1, point p2);

@@ -133,11 +133,44 @@ float right_voltage_scaling(float drive_output, float heading_output) {
 }
 
 float clamp_min_voltage(float drive_output, float drive_min_voltage) {
-    if(drive_output < 0 && drive_output > -drive_min_voltage) {
+    if (drive_output < 0 && drive_output > -drive_min_voltage) {
         return -drive_min_voltage;
     }
-    if(drive_output > 0 && drive_output < drive_min_voltage) {
+    if (drive_output > 0 && drive_output < drive_min_voltage) {
         return drive_min_voltage;
+    }
+    return drive_output;
+}
+
+float slew_scaling(float drive_output, float prev_drive_output, float slew, bool apply) {
+    float change = drive_output - prev_drive_output;
+    if (slew == 0 || !apply) return drive_output;
+    if (change > slew) change = slew;
+    else if (change < -slew) change = -slew;
+    return prev_drive_output + change;
+}
+
+float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift) {
+    const float heading = to_rad(current_angle_deg);
+
+    const float side = sign(sin(heading) * (desired_X - current_X) - cos(heading) * (desired_Y - current_Y));
+
+    const float a = -tan(heading);
+    const float c = tan(heading) * current_X - current_Y;
+    const float perp_dist = std::fabs(a * desired_X + desired_Y + c) / sqrt(a * a + 1);
+    const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
+    
+    const float curvature = side * ((2 * perp_dist) / (dist * dist));
+    const float radius = 1.0 / std::fabs(curvature);
+    const float max_slip = sqrt(drift * radius * 9.8);
+    return clamp(drive_output, -max_slip, max_slip);    
+}
+
+float overturn_scaling(float drive_output, float heading_output, float max_speed) {
+    const float overturn = fabs(heading_output) + fabs(drive_output) - max_speed;
+    if (overturn > 0) {
+        if (drive_output > 0) return drive_output - overturn;
+        else return drive_output + overturn;
     }
     return drive_output;
 }
@@ -282,22 +315,22 @@ std::vector<std::string> get_SD_file_txt(const std::string& file_name) {
 
 static const char* to_ansi(mik::color clr) {
     switch (clr) {
-    case mik::color::BLACK:          return "\x1b[30m";
-    case mik::color::RED:            return "\x1b[31m";
-    case mik::color::GREEN:          return "\x1b[32m";
-    case mik::color::YELLOW:         return "\x1b[33m";
-    case mik::color::BLUE:           return "\x1b[34m";
-    case mik::color::MAGENTA:        return "\x1b[35m";
-    case mik::color::CYAN:           return "\x1b[36m";
-    case mik::color::WHITE:          return "\x1b[37m";
-    case mik::color::BRIGHT_BLACK:   return "\x1b[90m";
-    case mik::color::BRIGHT_RED:     return "\x1b[91m";
-    case mik::color::BRIGHT_GREEN:   return "\x1b[92m";
-    case mik::color::BRIGHT_YELLOW:  return "\x1b[93m";
-    case mik::color::BRIGHT_BLUE:    return "\x1b[94m";
-    case mik::color::BRIGHT_MAGENTA: return "\x1b[95m";
-    case mik::color::BRIGHT_CYAN:    return "\x1b[96m";
-    case mik::color::BRIGHT_WHITE:   return "\x1b[97m";
+        case mik::color::BLACK:          return "\x1b[30m";
+        case mik::color::RED:            return "\x1b[31m";
+        case mik::color::GREEN:          return "\x1b[32m";
+        case mik::color::YELLOW:         return "\x1b[33m";
+        case mik::color::BLUE:           return "\x1b[34m";
+        case mik::color::MAGENTA:        return "\x1b[35m";
+        case mik::color::CYAN:           return "\x1b[36m";
+        case mik::color::WHITE:          return "\x1b[37m";
+        case mik::color::BRIGHT_BLACK:   return "\x1b[90m";
+        case mik::color::BRIGHT_RED:     return "\x1b[91m";
+        case mik::color::BRIGHT_GREEN:   return "\x1b[92m";
+        case mik::color::BRIGHT_YELLOW:  return "\x1b[93m";
+        case mik::color::BRIGHT_BLUE:    return "\x1b[94m";
+        case mik::color::BRIGHT_MAGENTA: return "\x1b[95m";
+        case mik::color::BRIGHT_CYAN:    return "\x1b[96m";
+        case mik::color::BRIGHT_WHITE:   return "\x1b[97m";
     }
 }
 
