@@ -69,7 +69,7 @@ public:
     
     float boomerang_lead; // Constant scale factor that determines how far away the carrot point is. 
     float boomerang_setback; // Distance in inches from target by which the carrot is always pushed back.
-    float boomerang_drift; // Determines the amount of drift allowd, lower values will less drift.
+    float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift.
 
     float pursuit_lookahead_distance; // Radius of the look-ahead circle, in inches.
 
