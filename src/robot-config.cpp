@@ -7,8 +7,7 @@ vex::brain Brain;
 vex::controller Controller;
 vex::competition Competition;
 
-// Forces inertial sensor to recalibrate until it is within minimum threshold for 1 second
-bool force_calibrate_inertial = false;
+// mikLib v2.0 setup, if you are following along with video tutorials it is going to be slightly different
 
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
@@ -30,6 +29,7 @@ Chassis chassis(
 	
     PORT10, // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
+	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
     forward_tracker, // Replace with "motor_encoder" if no forward tracker
     2.75,   // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoders
@@ -56,49 +56,34 @@ Chassis chassis(
     })
 );
 
-// Make sure devices are passed in the same order as they are declared in assembly.h and and assembly.cpp
-Assembly assembly(
-	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "bottom_intake"),
-		mik::motor(PORT20, false, green_18_1, "middle_intake")
-	}),
-	
-	mik::motor(PORT16, false, blue_6_1, "upper_intake", log_motor), // log_motor: adds this motor to the UI
-	mik::piston(PORT_B),
-	mik::piston(PORT_A)
-);
+// Add your devices in assembly.h then create them here
+
+/* Creating a motor group in assembly */
+mik::motor_group Assembly::lower_intake_motors({
+	mik::motor(PORT13, true, green_18_1, "bottom_intake"),
+	mik::motor(PORT20, false, green_18_1, "middle_intake")
+});
+
+/* Creating upper intake motor in assembly */
+mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake", log_motor); // log_motor: adds motor to UI
+
+/* Creating pistons in assembly */
+mik::piston Assembly::scraper_piston(PORT_B);
+mik::piston Assembly::wing_piston(PORT_A);
+
+/* Creating alternative vex devices in assembly */
+// vex::rotation Assembly::rotation_sensor(PORT12);
+// vex::optical Assembly::optical_sensor(PORT13);
+// vex::limit Assembly::limit_switch(to_triport(PORT_F));
 
 
 
 
 
 
+// mikLib initialization below, you do not need to edit
 
-
-
-// After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
-// If so, it will recalibrate the inertial sensor and vibrate the controller. The lower the value the less likelihood of a failed calibration.
-static const float MINIMUM_INERTIAL_CALIBRATION_ERROR = .05;
-
-bool calibrating = false;
-
-void calibrate_inertial(void) {
-	calibrating = true;
-	chassis.inertial.calibrate();
-
-	while (chassis.inertial.isCalibrating()) {
-		vex::task::sleep(25);
-	}
-
-  	// Recalibrate inertial until it is within calibration threshold
-  	float starting_rotation = chassis.inertial.rotation();
-  	task::sleep(1000);
-	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUM_INERTIAL_CALIBRATION_ERROR) {
-		Controller.rumble("-");
-		calibrate_inertial();
-  	}
-  	calibrating = false;
-}
+Assembly assembly;
 
 static void loading_screen(bool stop) {
 	static vex::task loading_bar;
@@ -167,7 +152,7 @@ void init(void) {
 	motors_scr->init_motors();
 
 	// Calibrate inertial
-	calibrate_inertial();
+	chassis.calibrate_inertial();
 
 	// Stop loading screen
 	loading_screen(true);

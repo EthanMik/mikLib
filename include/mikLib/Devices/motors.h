@@ -2,7 +2,7 @@
 
 #include "v5.h"
 #include "v5_vcs.h"
-#include "globals.h"
+#include "mikLib/globals.h"
 
 /** 
  * @file motors.h

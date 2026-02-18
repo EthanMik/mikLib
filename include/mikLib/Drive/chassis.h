@@ -101,7 +101,7 @@ public:
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
     Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
-        float inertial_scale, mik::tracker_mode tracker_mode, float wheel_diameter, 
+        float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
         float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
         float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
         float sideways_tracker_center_distance, mik::distance_reset reset_sensors
@@ -279,6 +279,11 @@ public:
      * @param mode coast, brake, hold
      */    
     void stop_drive(vex::brakeType brake);
+
+    /** @brief Calibrates the inertial sensor, if force calibrate is true
+     * it will continue to calibrate until it is within threshold for 1 second
+     */
+    void calibrate_inertial();
 
     /** @return Field‑relative inertial heading (deg, 0‑360). */
     float get_absolute_heading();
@@ -599,6 +604,7 @@ public:
 
     mik::distance_reset reset_sensors;
 
+    bool calibrating = false;
     bool motion_running;
     float distance_traveled;
     
@@ -624,6 +630,8 @@ private:
     bool y_pos_mirrored_ = false;
 
     float inertial_scale;
+    bool force_calibrate_inertial;
+    const float minimum_calibration_error = .05;
 
     float wheel_diameter;
     float wheel_ratio;

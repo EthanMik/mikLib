@@ -28,7 +28,7 @@ void auton(void) {
 }
 
 void user_control(void) {
-    while (calibrating) { task::sleep(50); }
+    while (chassis.calibrating) { task::sleep(50); }
 
     // How you want your drivetrain to stop during driver
     chassis.set_brake_type(brakeType::coast);

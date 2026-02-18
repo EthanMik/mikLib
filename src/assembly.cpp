@@ -8,20 +8,6 @@ using namespace mik;
 // This is example code for a push back robot with two 5.5W motors on the lower intake,
 // 11W motor on the top intake, a scraper, and wing
 
-// Pass in the devices we want to use, make sure this follows the same order as assembly.h
-Assembly::Assembly(
-    mik::motor_group lower_intake_motors,
-    mik::motor upper_intake_motor, 
-    mik::piston scraper_piston,
-    mik::piston wing_piston
-) :
-    // Assign the ports to the devices
-    lower_intake_motors(lower_intake_motors),
-    upper_intake_motor(upper_intake_motor),
-    scraper_piston(scraper_piston),
-    wing_piston(wing_piston) // Make sure when using a 3 wire device that isn't mik::piston you convert the port. `to_triport(PORT_A)`.
-{};
-
 // You want to call this function once in the user control function in main.
 void Assembly::init() {
     // You can declare a task that you want to always run in user control.

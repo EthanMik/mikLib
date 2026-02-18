@@ -30,6 +30,7 @@
 #include "mikLib/UI/graphics/line.h"
 #include "mikLib/UI/graphics/group.h"
 
+#include "mikLib/UI/controller/c_button.h"
 #include "mikLib/UI/button.h"
 #include "mikLib/UI/toggle.h"
 #include "mikLib/UI/label.h"

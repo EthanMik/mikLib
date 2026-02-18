@@ -4,6 +4,8 @@
 
 namespace mik {
 
+// Look at test.cpp to see examples on how to use console screen
+
 class UI_console_screen
 {
 public:

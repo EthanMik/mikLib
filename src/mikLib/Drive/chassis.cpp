@@ -13,7 +13,7 @@ drive_to_pose_params g_drive_to_pose_params_buffer{};
 follow_path_params g_follow_path_params_buffer{};
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
-    float inertial_scale, mik::tracker_mode tracker_mode, float wheel_diameter, 
+    float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
     float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
     float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
     float sideways_tracker_center_distance, mik::distance_reset reset_sensors
@@ -33,6 +33,7 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     sideways_tracker_used(sideways_tracker_port != PORT0),
 
     inertial_scale(inertial_scale),
+    force_calibrate_inertial(force_calibrate_inertial), 
 
     wheel_diameter(wheel_diameter),
     wheel_ratio(wheel_ratio),
@@ -181,6 +182,25 @@ void Chassis::stop_drive(vex::brakeType brake) {
     left_drive.stop(brake);
     right_drive.stop(brake);
 }
+
+void Chassis::calibrate_inertial() {
+	calibrating = true;
+	inertial.calibrate();
+
+	while (inertial.isCalibrating()) {
+		vex::task::sleep(25);
+	}
+
+  	// Recalibrate inertial until it is within calibration threshold
+  	float starting_rotation = chassis.inertial.rotation();
+  	task::sleep(1000);
+	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > minimum_calibration_error) {
+		Controller.rumble("-");
+		calibrate_inertial();
+  	}
+  	calibrating = false;
+}
+
 
 float Chassis::get_absolute_heading(){ 
     return reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale); 

@@ -38,6 +38,7 @@ namespace mik {
     enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, AUTO };
     enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
     enum class log_device { LOG, NO_LOG };
+    enum class alliance_colors { RED, BLUE };
 
     inline constexpr unsigned int PORT_A = 0;
     inline constexpr unsigned int PORT_B = 1;

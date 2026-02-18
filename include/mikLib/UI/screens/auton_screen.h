@@ -8,54 +8,56 @@
 
 namespace mik {
 
-class controller_btn {
-public:
-    controller_btn(bool is_btn, std::string unpressed_state, std::string pressed_state, std::function<void()> callback);
-    controller_btn(bool really_stupid_exception_that_shouldnt_exist_but_i_dont_want_to_make_another_class, std::function<void()> callback);
-    bool push();
-    void unpush();
-    void change_state(bool is_pressed);
-    void set_cycle_state();
-    void enable_full_override(std::string lbl);
-    void disable_full_override();
-    std::string get_state_label();
-    bool get_state();
-    int get_cycle_state();
-private:
-    bool is_btn;
-    bool state = false;
-    std::string state_label;
-    std::string unpressed_state;
-    std::string pressed_state;
-    std::function<void()> callback;
-    bool exception = false;
-    int cycle_state_num;
-    bool full_override = false;
-};
 
 class UI_auton_screen {
 public:
     UI_auton_screen();
+
+    /** @returns The auton screen object */
     std::shared_ptr<screen> get_auton_screen();
 
+    /** @brief Starts selected auton, used from main.cpp, disables controller overlay, 
+     * and will calibrate if not already done do */
     void start_auton();
+
+    /** @brief Runs the auto from the UI, user control is disabled, time is displayed,
+     * and current ran auto can be stopped by pressing the B button on controller
+     */
     void start_auton_test();
+    
+    /** @brief When start auton test is ran the auto will cutoff when 15 second time limit is reached
+     * time limit is set to 60 seconds during skills
+     */
     void enable_time_limit();
+
+    /** @brief While auton test is running, coordinates of the robot will be shown */
     void enable_odom_display();
+
+    /** @brief Selects the auton used by the auton screen */
     void UI_select_auton(mik::autons auton);
+
+    /** @brief Returns the selected color in the UI */
+    mik::alliance_colors get_alliance_color();
+
+    /** @brief Enables controller auton selector, disables user control */
     void enable_controller_overlay();
+
+    /** @brief Disables controller auton selector, enables user control */
     void disable_controller_overlay();
+
+    
+    /** @brief Internal use, updates controller buttons */
     void flip_toggle_controller(std::pair<int, int> cursor_position);
+
+    /** @brief Internal use, updates controller buttons */
     void flip_toggle_controller(std::pair<int, int> cursor_position, bool state);
+
+    /** @brief Internal use, saves selected auton to SD */
     void save_auton_SD(int count = 0); 
+
     bool off_skills = false;
     bool time_limit = false;
     bool odom_display = false;
-    
-    bool auto_running = false;
-    bool end_card = false;
-    float auto_start_time = 0;
-    int auto_max_time = 15;
     int var_num = 1;
 
 private:
@@ -85,6 +87,11 @@ private:
     bool rings_goal = false;
     bool quals_elims = false;
     bool off_sawp = false;
+
+    bool auto_running = false;
+    bool end_card = false;
+    float auto_start_time = 0;
+    int auto_max_time = 15;
 
     int controller_row_min = 0;
     int controller_row_max = 3;
