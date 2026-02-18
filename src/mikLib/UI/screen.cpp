@@ -135,7 +135,7 @@ bool screen::needs_update() {
     }
 
     for (std::size_t i = 0; i < UI_components.size(); ++i) {
-        auto& component = UI_components[i];
+        auto component = UI_components[i];
         if (!actively_scrolling && !is_clickable_exception(component)) {
             component->is_pressing(input_type);
         }
@@ -332,22 +332,30 @@ void screen::remove_UI_component(std::vector<int> id) {
 }
 
 void screen::execute_removal() {
+    std::vector<size_t> indices;
+    indices.reserve(removal_id.size());
+
     for (auto id : removal_id) {
         auto it = id_to_index.find(id);
         if (it != id_to_index.end()) {
-            size_t index_to_remove = it->second;
-            size_t last_index = UI_components.size() - 1;
-
-            if (index_to_remove != last_index) {
-                std::swap(UI_components[index_to_remove], UI_components[last_index]);
-                int moved_element_id = UI_components[index_to_remove]->get_ID();
-                id_to_index[moved_element_id] = index_to_remove;
-            }
-
-            UI_components.pop_back();
+            indices.push_back(it->second);
             id_to_index.erase(it);
         }
     }
+
+    std::sort(indices.begin(), indices.end(), std::greater<size_t>());
+
+    for (size_t idx : indices) {
+        if (idx >= UI_components.size()) continue;
+        size_t last = UI_components.size() - 1;
+        if (idx != last) {
+            std::swap(UI_components[idx], UI_components[last]);
+            id_to_index[UI_components[idx]->get_ID()] = idx;
+        }
+        UI_components.pop_back();
+    }
+
+    removal_id.clear();
 }
 
 const std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {

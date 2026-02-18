@@ -228,7 +228,7 @@ namespace mik {
     inline const std::string& motors_ports_btn_bg = UI_black;
     inline const std::string& motors_ports_btn_pressing_color = UI_light_gray;
     inline const std::string& motors_ports_btn_closed_color = UI_red;
-    inline const std::string& motors_ports_btn_open_color = UI_white;
+    inline const std::string& motors_ports_btn_open_color = UI_med_gray;
     inline const std::string& motors_ports_btn_current_color = UI_white;
     
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 

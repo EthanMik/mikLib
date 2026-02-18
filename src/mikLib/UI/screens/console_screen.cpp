@@ -19,6 +19,7 @@ void UI_console_screen::UI_crt_console_scr() {
 
     this->UI_console_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
     UI_console_scr->add_scroll_bar(UI_crt_rec(0, 0, 3, 40, console_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
+    UI_console_scr->add_render_callback([this]() { update_label_colors(); });
 
     auto top_border = UI_crt_rec(3, 5, 465, 3, console_outline_color, UI_distance_units::pixels);
     auto left_border = UI_crt_rec(3, 5, 3, 180, console_outline_color, UI_distance_units::pixels);
@@ -41,7 +42,24 @@ void UI_console_screen::reset() {
     }
     UI_console_scr->remove_UI_component(remove_components);
     text_start_pos_x = 10;
-    text_start_pos_y = -18; 
+    text_start_pos_y = -18;
+}
+
+void UI_console_screen::update_label_colors() {
+    auto components = this->UI_console_scr->get_UI_components();
+    for (size_t i = 0; i + 1 < components.size(); i++) {
+        if (UI_decode_component_type(components[i]->get_ID()) != UI_Button_ID) continue;
+        if (UI_decode_component_type(components[i + 1]->get_ID()) != UI_Label_ID) continue;
+
+        auto* btn = static_cast<button*>(components[i].get());
+        auto* lbl = static_cast<label*>(components[i + 1].get());
+
+        if (btn->get_state() == button::button_state::PRESSING) {
+            lbl->set_fill_color(console_text_bg_color);
+        } else if (btn->get_state() == button::button_state::INACTIVE) {
+            lbl->set_fill_color(console_bg_color);
+        }
+    }
 }
 
 void UI_console_screen::UI_reposition_text(int position) {

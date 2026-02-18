@@ -29,6 +29,8 @@ void label::set_y_pos(int y) {
     this->y = y;
 }
 void label::set_position(int x, int y) { this->x = x; this->y = y; }
+void label::set_fill_color(const std::string& color) { this->bg_color = color; }
+void label::set_text_color(const std::string& color) { this->text_color = color; }
 
 bool label::needs_update() {
     int current_time = Brain.Timer.time(vex::timeUnits::msec);

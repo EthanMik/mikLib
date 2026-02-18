@@ -139,6 +139,7 @@ void UI_motors_screen::init_motors() {
     }
 
     UI_motors_scr->add_render_callback([this](){ update_motors_screen(); });
+    UI_reconstruct_scr->add_render_callback([this](){ update_reconstruct_screen(); });
 }
 
 void UI_motors_screen::update_motors_screen() {
@@ -214,10 +215,57 @@ void UI_motors_screen::UI_crt_reconstruct_scr() {
     const auto ports = 21;
     for (size_t i = 0; i < ports; ++i) {
         auto port_btn = UI_crt_btn(UI_crt_rec(50 + (i % 7) * 57, 65 + (i / 7) * 60, 40, 40, motors_ports_btn_bg, motors_ports_btn_current_color, 2), [](){});
-        auto port_btn_text = UI_crt_txtbox("0", text_align::CENTER, UI_crt_rec(55 + (i % 7) * 57, 70 + (i / 7) * 60, 30, 25, motors_ports_btn_bg), vex::fontType::mono20, 0);
+        auto port_btn_text = UI_crt_txtbox(to_string(i + 1), text_align::CENTER, UI_crt_rec(55 + (i % 7) * 57, 70 + (i / 7) * 60, 30, 25, motors_ports_btn_bg), vex::fontType::mono20, 0);
+        port_button_list.at(i) = {
+            static_cast<mik::button*>(port_btn.get()),
+            static_cast<mik::textbox*>(port_btn_text.get())
+        };
+
         UI_reconstruct_scr->add_UI_components({port_btn, port_btn_text});
     }
+}
 
+void UI_motors_screen::update_reconstruct_screen() {
+    // if (!selected_mtr) return;
+    selected_mtr = config_get_motors()[0];
+
+    const auto name = selected_mtr->name();
+    const auto cart = selected_mtr->gear_cartridge();
+    const auto rev = selected_mtr->reversed();
+    const auto port = selected_mtr->index();
+    
+    motor_label->set_text(name);
+
+    const size_t size = config_get_motors().size();
+    std::vector<int> ports;
+    for (auto& mtr : config_get_motors()) {
+        if (mtr->index() != selected_mtr->index()) {
+            ports.push_back(mtr->index());
+        }
+    }
+
+    size_t port_idx = 0;
+    const size_t port_amount = 21;
+    for (auto& item : port_button_list) {
+        const float btn_x = item.port_btn->get_x_pos();
+        const float btn_y = item.port_btn->get_y_pos();
+        const float btn_w = item.port_btn->get_width();
+        const float btn_h = item.port_btn->get_height();
+
+        std::string color = motors_ports_btn_open_color;
+
+        if (port_idx == selected_mtr->index()) {
+            color = motors_ports_btn_current_color;
+            print(color);
+        } else if (std::find(ports.begin(), ports.end(), port_idx) != ports.end()) {
+            color = motors_ports_btn_closed_color;
+            print(color);
+        }
+
+        item.port_btn->set_default_state(UI_crt_rec(btn_x, btn_y, btn_w, btn_h, motors_ports_btn_bg, color, 2));
+        item.port_txt->set_text_color(color);
+        port_idx++;
+    }
 }
 
 std::shared_ptr<screen> UI_motors_screen::get_motors_screen() {

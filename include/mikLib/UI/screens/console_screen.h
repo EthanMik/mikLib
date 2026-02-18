@@ -39,8 +39,10 @@ private:
     std::shared_ptr<UI_component> UI_console_scr_border_sides = nullptr;
     std::shared_ptr<UI_component> UI_console_scr_border_bottom = nullptr;
 
+    void update_label_colors();
+
     int text_start_pos_x = 10;
-    int text_start_pos_y = -18; 
+    int text_start_pos_y = -18;
 };
 
 template <typename F>
@@ -72,21 +74,22 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
 
     auto lbl = UI_crt_lbl(label_text, std::forward<data_type>(data), text_start_pos_x, delta_label_y_pos, console_text_color, console_bg_color, UI_distance_units::pixels);
 
-    int button_width = std::max(lbl->get_width(), 50);
+    int button_width = std::max(lbl->get_width(), 50) + 10;
 
     auto remove_lbl_btn = UI_crt_btn(
         UI_crt_rec(10, delta_button_y_pos, button_width, 20, console_bg_color, UI_distance_units::pixels),
         nullptr
     );
 
-    int btn_id = remove_lbl_btn->get_ID(); 
-    int lbl_id = lbl->get_ID(); 
+    int btn_id = remove_lbl_btn->get_ID();
+    int lbl_id = lbl->get_ID();
 
-    remove_lbl_btn->set_callback([this, btn_id, lbl_id, lbl](){ 
+    remove_lbl_btn->set_callback([this, btn_id, lbl_id, lbl](){
         UI_reposition_text(lbl->get_y_pos());
         this->UI_console_scr->remove_UI_component({lbl_id, btn_id});
-        UI_console_scr->refresh(); 
+        UI_console_scr->refresh();
     });
+
     remove_lbl_btn->set_states(UI_crt_rec(10, delta_button_y_pos, button_width, 20, console_text_bg_color, UI_distance_units::pixels), nullptr);
 
     this->UI_console_scr->add_UI_components({remove_lbl_btn, lbl});

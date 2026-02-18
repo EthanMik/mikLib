@@ -10,6 +10,7 @@ public:
     UI_motors_screen();
     std::shared_ptr<screen> get_motors_screen();
     void update_motors_screen();
+    void update_reconstruct_screen();
     void init_motors();
     void reconstruct_motor(mik::motor* mtr, int new_port, vex::gearSetting new_cart, bool new_rev);
 
@@ -35,11 +36,12 @@ private:
 
     // Port screen
 
+    mik::motor* selected_mtr = nullptr;
     struct port_buttons {
         mik::button* port_btn;
         mik::textbox* port_txt;
     };
-    std::vector<port_buttons> port_button_list;
+    std::array<port_buttons, 21> port_button_list;
     mik::textbox* motor_label;
     std::shared_ptr<screen> UI_reconstruct_scr = nullptr;
     

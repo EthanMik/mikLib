@@ -59,16 +59,20 @@ void button::set_position(int x, int y) {
 }
 
 void button::set_states(std::shared_ptr<drawable> pressing_state, std::shared_ptr<drawable> triggered_state) {
-    if (pressing_state) {
-        pressed_button_graphic = pressing_state;
-    }
-    if (triggered_state) {
-        triggered_button_graphic = triggered_state;
-    }
+    pressed_button_graphic = pressing_state;
+    triggered_button_graphic = triggered_state;
+}
+
+void button::set_default_state(std::shared_ptr<drawable> default_state) {
+    button_graphic = default_state;
 }
 
 void button::set_callback(std::function<void()> cb, bool call_once) {
     on_click = cb;
+}
+
+mik::button::button_state button::get_state() {
+    return state;
 }
 
 bool button::needs_update() {

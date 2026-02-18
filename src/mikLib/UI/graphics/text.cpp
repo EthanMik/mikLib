@@ -65,6 +65,8 @@ void text::set_position(int x, int y) { this->x = x; this->y = y; }
 void text::set_width(int w) { this->w = w; }
 void text::set_height(int h) { this->h = h; }
 void text::set_text(std::string text_label) { this->text_label = text_label; }
+void text::set_fill_color(const std::string& color) { this->bg_color_hex = color; }
+void text::set_text_color(const std::string& color) { this->text_color_hex = color; }
 
 void text::render() {
     if (using_hex) {
