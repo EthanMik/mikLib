@@ -494,31 +494,18 @@ void PID_tuner() {
   });
 }
 
-static std::vector<mik::motor*> motors_;
-
-void config_add_motors(std::vector<mik::motor_group*> motor_groups, std::vector<mik::motor*> motors) {
-	for (mik::motor_group* motor_group: motor_groups)  {
-		for (mik::motor& motor : motor_group->getMotors()) {
-			motors_.push_back(&motor);
-		}
-	}
-	for (mik::motor* motor : motors) {
-		motors_.push_back(motor);
-	}
-}
-
 std::vector<mik::motor*> config_get_motors() {
-	return motors_;
+	return mik::motor_registry();
 }
 
 void stop_all_motors(vex::brakeType mode) {
-	for (auto motor : motors_) {
+	for (auto motor : config_get_motors()) {
 		motor->stop(mode);
 	}
 }
 
 void set_brake_all_motors(vex::brakeType mode) {  
-	for (auto motor : motors_) {
+	for (auto motor : config_get_motors()) {
 		motor->setBrake(mode);
 	}
 }
@@ -545,7 +532,7 @@ int run_diagnostic() {
 		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
 		errors++;
 	}
-	for (auto motor : motors_) {
+	for (auto motor : config_get_motors()) {
 		if (!motor->installed()) {
 			error_data.push_back(motor->name() + " [" + motor->port() +  "] is disconnected");
 			errors++;
@@ -583,7 +570,7 @@ void config_spin_all_motors() {
 	console_scr->reset();
 	disable_user_control(true);
 	vex::task spin_mtrs([](){
-		for (auto motor : motors_) { 
+		for (auto motor : config_get_motors()) { 
 			std::string data = (motor->name() + ": " + motor->port() + ", fwd, 6 volt");
 			console_scr->add(std::string(data), [](){ return ""; });
 			motor->spin(fwd, 6, volt);
@@ -604,7 +591,7 @@ void config_motor_wattage() {
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 5, false) + " Watts    "; });
 
-		for (auto motor : motors_) {
+		for (auto motor : config_get_motors()) {
 			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->power(), 5, false) + " Watts    "; });
 		}
 		return 0;
@@ -618,7 +605,7 @@ void config_motor_temp() {
   	vex::task temp([](){
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated    "; });
-		for (auto motor : motors_) {
+		for (auto motor : config_get_motors()) {
 			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->temperature(), 0, true) + "%% overheated    "; });
 		}
 		return 0;
@@ -633,7 +620,7 @@ void config_motor_torque() {
 	vex::task temp([](){		
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 5, false) + " Nm    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 5, false) + " Nm    "; });
-		for (auto motor : motors_) {
+		for (auto motor : config_get_motors()) {
 			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->torque(), 5, false) + " Nm    "; });
 		}
 		return 0;
@@ -648,7 +635,7 @@ void config_motor_efficiency() {
 	vex::task temp([](){
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 5, false) + "%% Eff    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 5, false) + "%% Eff     "; });
-		for (auto motor : motors_) {
+		for (auto motor : config_get_motors()) {
 			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->efficiency(), 5, false) + "%% Eff    "; });
 		}
 		return 0;
@@ -663,7 +650,7 @@ void config_motor_current() {
 	vex::task temp([](){
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 5, false) + " Amps    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 5, false) + " Amps    "; });
-		for (auto motor : motors_) {
+		for (auto motor : config_get_motors()) {
 			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->current(), 5, false) + " Amps    "; });
 		}
 		return 0;

@@ -37,7 +37,8 @@ namespace mik {
     enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
     enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, AUTO };
     enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
-    
+    enum class log_device { LOG, NO_LOG };
+
     inline constexpr unsigned int PORT_A = 0;
     inline constexpr unsigned int PORT_B = 1;
     inline constexpr unsigned int PORT_C = 2;
@@ -55,6 +56,8 @@ namespace mik {
 
     inline constexpr tracker_mode forward_tracker = tracker_mode::FORWARD_TRACKER;
     inline constexpr tracker_mode motor_encoder = tracker_mode::MOTOR_ENCODER;
+
+    inline constexpr log_device log_motor = log_device::LOG;
 
     inline constexpr wall_position top_wall = wall_position::TOP_WALL;
     inline constexpr wall_position bottom_wall = wall_position::BOTTOM_WALL;

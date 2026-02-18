@@ -2,6 +2,7 @@
 
 #include "v5.h"
 #include "v5_vcs.h"
+#include "globals.h"
 
 /** 
  * @file motors.h
@@ -19,7 +20,7 @@ public:
      * @param reverse Sets the reverse flag for the new motor object.
      * @param name Sets the name for the motor
      */
-    motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name);
+    motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name, mik::log_device log = mik::log_device::NO_LOG);
 
     motor(int port, bool reversed, std::string name);
 
@@ -294,13 +295,18 @@ public:
      * @return The wrapped vex motors in a vector
      */   
     std::vector<mik::motor>& getMotors();
-    
-    
+
+
 private:
+
     float to_volt(float voltage, vex::voltageUnits velocityUnits);
     
     float set_voltage = 6; 
 
     std::vector<mik::motor> motors;
 };
+
+/** @return Reference to the global registry of all logged motors */
+std::vector<mik::motor*>& motor_registry();
+
 }

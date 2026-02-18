@@ -206,7 +206,7 @@ void UI_motors_screen::UI_crt_reconstruct_scr() {
 
     auto motor_label_component = UI_crt_txtbox("Motor X", mik::text_align::CENTER, UI_crt_rec(80, 20, 230, 25, motors_bg_color), vex::fontType::mono20, 0);
     motor_label = static_cast<mik::textbox*>(motor_label_component.get());
-
+    
     auto exit_bg = UI_crt_btn(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_outline_color, 2, UI_distance_units::pixels), [this](){ UI_select_scr(UI_motors_scr); });
         exit_bg->set_states(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressing_color, 2, UI_distance_units::pixels), UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressed_color, 2, UI_distance_units::pixels));
     auto exit_txt = UI_crt_gfx({UI_crt_rec(4, 4, 36, 36, motors_bg_color, UI_distance_units::pixels), UI_crt_txt("X", 17, 27, motors_ports_text_color, motors_bg_color, mik::UI_distance_units::pixels)});

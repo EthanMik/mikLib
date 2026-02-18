@@ -397,7 +397,7 @@ std::string to_string_float(float num, int precision, bool remove_trailing_zero)
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision) << num;
     std::string str = oss.str();
-    if (remove_trailing_zero) {
+    if (remove_trailing_zero && str.find('.') != std::string::npos) {
         str.erase(str.find_last_not_of('0') + 1);
         if (!str.empty() && str.back() == '.')
             str.pop_back();

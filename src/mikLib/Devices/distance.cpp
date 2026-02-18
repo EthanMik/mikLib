@@ -140,13 +140,13 @@ std::string mik::distance_reset::to_wall_name(mik::wall_position wall_position) 
 std::string mik::distance::to_sensor_name(distance_position sensor_pos) {
     switch (sensor_pos) {
         case distance_position::FRONT_SENSOR:
-            return "front_distance_sensor";
+            return "front";
         case distance_position::REAR_SENSOR:
-            return "rear_distance_sensor";
+            return "rear";
         case distance_position::LEFT_SENSOR:
-            return "left_distance_sensor";
+            return "left";
         case distance_position::RIGHT_SENSOR:
-            return "right_distance_sensor";
+            return "right";
     }
 }
 

@@ -90,8 +90,6 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
         UI_console_scr->refresh();
     });
 
-    remove_lbl_btn->set_states(UI_crt_rec(10, delta_button_y_pos, button_width, 20, console_text_bg_color, UI_distance_units::pixels), nullptr);
-
     this->UI_console_scr->add_UI_components({remove_lbl_btn, lbl});
 
     if (remove_lbl_btn->get_y_pos() + remove_lbl_btn->get_height() + this->UI_console_scr->get_component_delta_pos() > UI_console_scr_border_bottom->get_y_pos() + this->UI_console_scr->get_component_delta_pos()) {

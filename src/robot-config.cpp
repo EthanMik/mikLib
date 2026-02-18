@@ -13,7 +13,7 @@ bool force_calibrate_inertial = false;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, true, blue_6_1, "Left 5 PORT1"),
+        mik::motor(PORT7, true, blue_6_1, "Left 5 PORT1"),
         mik::motor(PORT17, false, blue_6_1, "Left 4 PORT17"),
         mik::motor(PORT18, true, blue_6_1, "Left 3 PORT18"),
 		mik::motor(PORT19, false, blue_6_1, "Left 2 PORT19"),
@@ -46,8 +46,8 @@ Chassis chassis(
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
-        // mik::distance(port, position, x_offset, y_offset)
-        mik::distance(PORT8,
+        mik::distance(
+			PORT8,		  // Distance sensor port
             front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
             5,            // X offset from tracking center (in). Positive = right of center, negative = left.
             3.5           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
@@ -62,26 +62,18 @@ Assembly assembly(
 		mik::motor(PORT13, true, green_18_1, "bottom_intake"),
 		mik::motor(PORT20, false, green_18_1, "middle_intake")
 	}),
-
-	mik::motor(PORT16, false, blue_6_1, "upper_intake"),
+	
+	mik::motor(PORT16, false, blue_6_1, "upper_intake", log_motor), // log_motor: adds this motor to the UI
 	mik::piston(PORT_B),
 	mik::piston(PORT_A)
 );
 
-/** Allows UI to display all motor values */
-void log_motors() {
-    config_add_motors({
-		// Add all mik motor groups in here, you can log assembly motor groups
-		&chassis.left_drive,
-		&chassis.right_drive,
-		// &assembly.lower_intake_motors
-    },
-	{
-		// Add all mik motors in here, you can log assembly motors
-		// &assembly.upper_intake_motor
-    }
-  );
-}
+
+
+
+
+
+
 
 
 // After inertial sensor calibration the program waits 1 second and checks to see if the angle has changed more than this value.
@@ -172,7 +164,6 @@ void init(void) {
 	loading_screen(false);
 
 	// Setup motors
-	log_motors();
 	motors_scr->init_motors();
 
 	// Calibrate inertial
