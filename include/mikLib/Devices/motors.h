@@ -20,9 +20,13 @@ public:
      * @param reverse Sets the reverse flag for the new motor object.
      * @param name Sets the name for the motor
      */
-    motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name, mik::log_device log = mik::log_device::NO_LOG);
+    motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name);
 
     motor(int port, bool reversed, std::string name);
+
+    motor(const motor& other);
+    motor(motor&& other) noexcept;
+    ~motor();
 
     /** @return The port in PORT# format */
     const std::string port() const;

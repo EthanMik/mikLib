@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 #include "v5.h"
 
 #include "mikLib/Devices/motors.h"
@@ -8,22 +9,43 @@
 
 using namespace mik;
 
-static std::vector<mik::motor*> motor_registry_;
-
 std::vector<mik::motor*>& mik::motor_registry() {
-    return motor_registry_;
+    static std::vector<mik::motor*> registry;
+    return registry;
 }
 
 mik::motor::motor(int port, bool reversed, std::string name) :
     vex::motor(port, vex::ratio6_1, reversed), port_(port), gear_cartridge_(vex::ratio6_1), reversed_(reversed), name_(std::move(name))
-{};
+{
+    mik::motor_registry().push_back(this);
+};
 
-mik::motor::motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name, mik::log_device log) :
+mik::motor::motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name) :
     vex::motor(port, gear_cartridge, reversed), port_(port), gear_cartridge_(gear_cartridge), reversed_(reversed), name_(std::move(name))
 {
-    if (log == mik::log_device::LOG) {
-        motor_registry_.push_back(this);
-    }
+    mik::motor_registry().push_back(this);
+};
+
+mik::motor::motor(const mik::motor& other) :
+    vex::motor(other.port_, other.gear_cartridge_, other.reversed_),
+    port_(other.port_), gear_cartridge_(other.gear_cartridge_), reversed_(other.reversed_), name_(other.name_)
+{
+    mik::motor_registry().push_back(this);
+};
+
+mik::motor::motor(mik::motor&& other) noexcept :
+    vex::motor(other.port_, other.gear_cartridge_, other.reversed_),
+    port_(other.port_), gear_cartridge_(other.gear_cartridge_), reversed_(other.reversed_), name_(std::move(other.name_))
+{
+    auto& reg = mik::motor_registry();
+    auto it = std::find(reg.begin(), reg.end(), &other);
+    if (it != reg.end()) { *it = this; }
+    else { reg.push_back(this); }
+};
+
+mik::motor::~motor() {
+    auto& reg = mik::motor_registry();
+    reg.erase(std::remove(reg.begin(), reg.end(), this), reg.end());
 };
 
 const std::string mik::motor::port() const { return "PORT" + to_string(port_ + 1); }
@@ -34,11 +56,7 @@ const std::string mik::motor::name() const { return name_; }
 
 mik::motor_group::motor_group(const std::vector<mik::motor>& motors) :
     motors(motors)
-{
-    for (mik::motor& m : this->motors) {
-        motor_registry_.push_back(&m);
-    }
-};
+{};
 
 int32_t mik::motor_group::count(void) {
     return motors.size();
