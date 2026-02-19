@@ -1,67 +1,54 @@
 #include "vex.h"
 
-void odom45::set_physical_distances(float long_offset, float lat_offset) {
-    this->lat_offset = lat_offset;
-    this->long_offset = long_offset;
+void odom45::set_physical_distances(float right_tracker_center_distance, float left_tracker_center_distance) {
+    this->right_tracker_center_distance = right_tracker_center_distance;
+    this->left_tracker_center_distance = left_tracker_center_distance;
 }
 
-void odom45::set_position(point position, float orientation_deg, float lat_position, float long_position) {
-    this->lat_position = lat_position;
-    this->long_position = long_position;
+void odom45::set_position(point position, float orientation_deg, float right_tracker_position, float left_tracker_position) {
+    this->right_tracker_position = right_tracker_position;
+    this->left_tracker_position = left_tracker_position;
     this->position = position;
     this->orientation_deg = orientation_deg;
 }
 
-void odom45::update_position(float long_position, float lat_position, float orientation_deg) {
-    // Deltas
-    double d_lat  = lat_position  - this->lat_position;
-    double d_long = long_position - this->long_position;
-    double d_head = orientation_deg - this->orientation_deg;
+void odom45::update_position(float right_tracker_position, float left_tracker_position, float orientation_deg) {
+    float right_delta = right_tracker_position - this->right_tracker_position;
+    float left_delta = left_tracker_position - this->left_tracker_position;
+    float orientation_delta = orientation_deg - this->orientation_deg;
 
-    // Update stored states
-    this->lat_position = lat_position;
-    this->long_position = long_position;
+    this->right_tracker_position = right_tracker_position;
+    this->left_tracker_position = left_tracker_position;
     this->orientation_deg = orientation_deg;
+    
+    orientation_delta = reduce_negative_180_to_180(orientation_delta);
+    float orientation_delta_rad = to_rad(orientation_delta);
 
-    // Normalize heading delta to [-180, 180]
-    d_head = reduce_negative_180_to_180(d_head);
+    if (right_delta == 0.0 && left_delta == 0.0 && orientation_delta == 0.0) return;
 
-    if (d_lat == 0.0 && d_long == 0.0 && d_head == 0.0) return;
+    const float inv_sqrt2 = 1.0 / sqrt(2.0);
 
-    // 45° wheel mixing (treat long as FR, lat as FL)
-    const double inv_sqrt2 = 1.0 / std::sqrt(2.0);
+    float forward  = (right_delta + left_delta) * inv_sqrt2;
+    float side = (right_delta - left_delta) * inv_sqrt2;
 
-    double raw_fr = d_long;
-    double raw_fl = d_lat;
+    float local_X_position;
+    float local_Y_position;
 
-    double raw_fwd  = (raw_fr + raw_fl) * inv_sqrt2;
-    double raw_side = (raw_fr - raw_fl) * inv_sqrt2;
-
-    // Arc-adjust with offsets
-    double local_off_lat, local_off_long;
-    if (std::fabs(d_head) > 1e-9) {
-        double dht_rad = d_head * (M_PI / 180.0);
-        double s = std::sin(dht_rad / 2.0);
-
-        local_off_lat  = 2.0 * s * (raw_side / dht_rad + lat_offset);
-        local_off_long = 2.0 * s * (raw_fwd  / dht_rad + long_offset);
+    if (fabs(orientation_delta) == 0) {
+        local_X_position  = side;
+        local_Y_position = forward;
     } else {
-        local_off_lat  = raw_side;
-        local_off_long = raw_fwd;
+        local_X_position = (2 * sin(orientation_delta_rad / 2)) * ((side / orientation_delta_rad) + right_tracker_center_distance); 
+        local_Y_position = (2 * sin(orientation_delta_rad / 2)) * ((forward / orientation_delta_rad) + left_tracker_center_distance);
     }
 
-    // Average angle
-    double avga_deg = reduce_negative_180_to_180(orientation_deg - 0.5 * d_head);
+    float avg_heading_deg = reduce_negative_180_to_180(orientation_deg - 0.5f * orientation_delta);
 
-    // Polar rotate (same as step)
-    double polar_r = std::sqrt(local_off_lat * local_off_lat +
-                               local_off_long * local_off_long);
+    float polar_r = sqrt(local_X_position * local_X_position + local_Y_position * local_Y_position);
+    float polar_angle = atan2(local_Y_position, local_X_position) - to_rad(avg_heading_deg);
 
-    double polar_angle = std::atan2(local_off_long, local_off_lat) - to_rad(avga_deg);
-
-    // forward -> +Y, right -> +X
-    double dX = polar_r * -std::sin(polar_angle);
-    double dY = polar_r * std::cos(polar_angle);
+    float dX = polar_r * -sin(polar_angle);
+    float dY = polar_r * cos(polar_angle);
 
     position.x += dX;
     position.y += dY;

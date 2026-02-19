@@ -5,17 +5,17 @@
 class odom45
 {
 public:
-	void set_physical_distances(float long_offset, float lat_offset);
-	void set_position(point position, float orientation_deg, float lat_position, float long_position);
-	void update_position(float long_position, float lat_position, float orientation_deg);
+	void set_physical_distances(float right_tracker_center_distance, float left_tracker_center_distance);
+	void set_position(point position, float orientation_deg, float right_tracker_position, float left_tracker_position);
+	void update_position(float right_tracker_position, float left_tracker_position, float orientation_deg);
 
 	point position;
 	float orientation_deg;
 
 private:
-	float lat_offset;
-	float long_offset;
+	float right_tracker_center_distance;
+	float left_tracker_center_distance;
 
-	float long_position;
-	float lat_position;
+	float right_tracker_position;
+	float left_tracker_position;
 };
