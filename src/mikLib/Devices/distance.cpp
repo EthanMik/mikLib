@@ -29,7 +29,6 @@ mik::distance::distance(int port, distance_position position, float x_center_off
     vex::distance(port), port_(port), position_(position), x_center_offset_(x_center_offset), y_center_offset_(y_center_offset), name_(to_sensor_name(position))
 {};
 
-const std::string mik::distance::port() const { return "PORT" + to_string(port_ + 1); }
 distance_position mik::distance::position() const { return position_; }
 float mik::distance::x_center_offset() const { return x_center_offset_; }
 float mik::distance::y_center_offset() const { return y_center_offset_; }

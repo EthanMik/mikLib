@@ -498,6 +498,7 @@ std::vector<mik::motor*> config_get_motors() {
 	return mik::motor_registry();
 }
 
+
 void stop_all_motors(vex::brakeType mode) {
 	for (auto motor : config_get_motors()) {
 		motor->stop(mode);
@@ -518,29 +519,32 @@ int run_diagnostic() {
 		errors++;
 	}
 	if (!chassis.inertial.installed()) {
-		std::string port = to_string(chassis.inertial.index() + 1);
-		error_data.push_back("Inertial [PORT" + port + "] is disconnected");
+		std::string port = port_to_string(chassis.inertial.index());
+		error_data.push_back("Inertial [" + port + "] is disconnected");
 		errors++;
 	}
 	if (!chassis.forward_tracker.installed() && chassis.tracker_mode == mik::tracker_mode::FORWARD_TRACKER) {
-		std::string port = to_string(chassis.forward_tracker.index() + 1);
-		error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
+		std::string port = port_to_string(chassis.forward_tracker.index());
+
+		error_data.push_back("Forward Tracker [" + port + "] is disconnected");
 		errors++;
 	}
 	if (!chassis.sideways_tracker.installed() && chassis.sideways_tracker_used) {
-		std::string port = to_string(chassis.sideways_tracker.index() + 1);
-		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
+		std::string port = port_to_string(chassis.sideways_tracker.index());
+		error_data.push_back("Sideways Tracker [" + port + "] is disconnected");
 		errors++;
 	}
 	for (auto motor : config_get_motors()) {
 		if (!motor->installed()) {
-			error_data.push_back(motor->name() + " [" + motor->port() +  "] is disconnected");
+			std::string port = port_to_string(motor->index());
+			error_data.push_back(motor->name() + " [" + port +  "] is disconnected");
 			errors++;
 		}   
 	}
 	for (auto& distance : chassis.reset_sensors.get_distance_sensors()) {
 		if (!distance.installed()) {
-			error_data.push_back(distance.name() + " [" + distance.port() +  "] is disconnected");
+			std::string port = port_to_string(distance.index());
+			error_data.push_back(distance.name() + " [" + port +  "] is disconnected");
 			errors++;
 		}
 	}
@@ -551,7 +555,6 @@ int run_diagnostic() {
 	return errors;
 }
 
-    // How you want your drivetrain to stop during driver
 void config_add_pid_output_SD_console() {
 	if (!Brain.SDcard.isInserted()) { return; }
 	UI_select_scr(console_scr->get_console_screen());
@@ -571,7 +574,7 @@ void config_spin_all_motors() {
 	disable_user_control(true);
 	vex::task spin_mtrs([](){
 		for (auto motor : config_get_motors()) { 
-			std::string data = (motor->name() + ": " + motor->port() + ", fwd, 6 volt");
+			std::string data = (motor->name() + ": " + port_to_string(motor->index()) + ", fwd, 6 volt");
 			console_scr->add(std::string(data), [](){ return ""; });
 			motor->spin(fwd, 6, volt);
 			vex::task::sleep(1000);
@@ -795,6 +798,7 @@ void config_measure_velocity_accel() {
         console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
         console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
 
+		
 		print("Start Data, Position (second, ft)");
 		for (const auto& p : pos_time) {
 			print(to_string_float(p.second, 3, false) + ", " + to_string_float(p.first, 3, false));
@@ -802,19 +806,21 @@ void config_measure_velocity_accel() {
 		}
 		print("End Data");
 
-		print("Start Data, Velocity (second, ft/s)");
-		for (const auto& v : velocities) {
-			print(to_string_float(v.second, 3, false) + ", " + to_string_float(v.first, 3, false));
-			task::sleep(20);
-		}
-		print("End Data");
+		// You can uncomment this if you want to see all data 
 
-		print("Start Data, Smoothed Velocity (second, ft/s)");
-		for (const auto& s : smoothed_velo) {
-			print(to_string_float(s.second, 3, false) + ", " + to_string_float(s.first, 3, false));
-			task::sleep(20);
-		}
-		print("End Data");
+		// print("Start Data, Velocity (second, ft/s)");
+		// for (const auto& v : velocities) {
+		// 	print(to_string_float(v.second, 3, false) + ", " + to_string_float(v.first, 3, false));
+		// 	task::sleep(20);
+		// }
+		// print("End Data");
+
+		// print("Start Data, Smoothed Velocity (second, ft/s)");
+		// for (const auto& s : smoothed_velo) {
+		// 	print(to_string_float(s.second, 3, false) + ", " + to_string_float(s.first, 3, false));
+		// 	task::sleep(20);
+		// }
+		// print("End Data");
 
 		print("Start Data, Acceleration Phase (second, ft/s)");
 		for (const auto& a : acceling) {
@@ -939,6 +945,12 @@ void config_skills_driver_run() {
 }
 
 void config_test_three_wire_port(int port) {
-	vex::digital_out dig_out = Brain.ThreeWirePort.Port[port];
+	vex::digital_out dig_out = to_triport(port);
+	dig_out.set(!dig_out.value());
+}
+
+void config_test_three_wire_port(int expander_port, int port) {
+	vex::triport expander(expander_port);
+	vex::digital_out dig_out = to_triport(expander, port);
 	dig_out.set(!dig_out.value());
 }

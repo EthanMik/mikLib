@@ -48,7 +48,6 @@ mik::motor::~motor() {
     reg.erase(std::remove(reg.begin(), reg.end(), this), reg.end());
 };
 
-const std::string mik::motor::port() const { return "PORT" + to_string(port_ + 1); }
 bool mik::motor::reversed() const { return reversed_; }
 vex::gearSetting mik::motor::gear_cartridge() const { return gear_cartridge_; }
 std::string& mik::motor::name() { return name_; }

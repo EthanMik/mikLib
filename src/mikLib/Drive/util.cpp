@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -390,7 +391,23 @@ void print(char c, const mik::color& clr) {
 }
 
 vex::triport::port& to_triport(int port) {
-    return Brain.ThreeWirePort.Port[port];
+    return Brain.ThreeWirePort.Port[std::abs(port) - 1];
+}
+
+vex::triport::port& to_triport(vex::triport& expander, int port) {
+    return expander.Port[std::abs(port) - 1];
+}
+
+std::string port_to_string(int port) {
+    if (port >= 0 && port <= 21) {
+        return "PORT" + to_string(port + 1);
+    }
+
+    if (port >= -8 && port <= -1) {
+        return std::string("PORT_") + char('A' + std::abs(port) - 1);
+    }
+
+    return "PORT0";
 }
 
 std::string to_string_float(float num, int precision, bool remove_trailing_zero) {

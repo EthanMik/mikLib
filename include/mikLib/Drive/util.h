@@ -309,6 +309,12 @@ void print(char c, const mik::color& clr = mik::color::WHITE);
  *  @return Triport port.
 */
 vex::triport::port& to_triport(int port);
+vex::triport::port& to_triport(vex::triport& expander, int port);
+
+/** @brief Converts a integer port ex: 0, into port or triport string.
+ *  @return Triport port.
+*/
+std::string port_to_string(int port);
 
 std::string to_string_float(float num, int precision = 5, bool remove_trailing_zero = true);
 

@@ -15,6 +15,7 @@
 #include "mikLib/Devices/motors.h"
 #include "mikLib/Devices/distance.h"
 #include "mikLib/Devices/piston.h"
+#include "mikLib/Devices/tracker.h"
 #include "mikLib/Drive/odom.h"
 #include "mikLib/Drive/PID.h"
 

@@ -27,9 +27,7 @@ public:
     motor(const motor& other);
     motor(motor&& other) noexcept;
     ~motor();
-
-    /** @return The port in PORT# format */
-    const std::string port() const;
+    
     /** @return True is motor is reversed */
     bool reversed() const;
     /** @return The gear cartidge used in mik::motor, default is 6 to 1 */

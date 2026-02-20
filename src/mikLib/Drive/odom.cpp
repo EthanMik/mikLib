@@ -13,13 +13,16 @@ void odom::set_position(point position, float orientation_deg, float forward_tra
 }
 
 void odom::update_position(float forward_tracker_position, float sideways_tracker_position, float orientation_deg){
-    float Forward_delta = forward_tracker_position - this->forward_tracker_position;
-    float Sideways_delta = sideways_tracker_position - this->sideways_tracker_position;
+    float forward_delta = forward_tracker_position - this->forward_tracker_position;
+    float sideways_delta = sideways_tracker_position - this->sideways_tracker_position;
+
     this->forward_tracker_position = forward_tracker_position;
     this->sideways_tracker_position = sideways_tracker_position;
+
     float orientation_rad = to_rad(orientation_deg);
     float prev_orientation_rad = to_rad(this->orientation_deg);
-    float orientation_delta_rad = orientation_rad-prev_orientation_rad;
+    float orientation_delta_rad = orientation_rad - prev_orientation_rad;
+
     this->orientation_deg = orientation_deg;
     
     float local_X_position;
@@ -29,11 +32,11 @@ void odom::update_position(float forward_tracker_position, float sideways_tracke
     // Document at http://thepilons.ca/wp-content/uploads/2018/10/Tracking.pdf 
 
     if (orientation_delta_rad == 0) {
-        local_X_position = Sideways_delta;
-        local_Y_position = Forward_delta;
+        local_X_position = sideways_delta;
+        local_Y_position = forward_delta;
     } else {
-        local_X_position = (2 * sin(orientation_delta_rad / 2))*((Sideways_delta / orientation_delta_rad) + sideways_tracker_center_distance); 
-        local_Y_position = (2 * sin(orientation_delta_rad / 2)) * ((Forward_delta / orientation_delta_rad) + forward_tracker_center_distance);
+        local_X_position = (2 * sin(orientation_delta_rad / 2)) * ((sideways_delta / orientation_delta_rad) + sideways_tracker_center_distance); 
+        local_Y_position = (2 * sin(orientation_delta_rad / 2)) * ((forward_delta / orientation_delta_rad) + forward_tracker_center_distance);
     }
 
     float local_polar_angle;
@@ -47,7 +50,7 @@ void odom::update_position(float forward_tracker_position, float sideways_tracke
         local_polar_length = sqrt(pow(local_X_position, 2) + pow(local_Y_position, 2)); 
     }
 
-    float global_polar_angle = local_polar_angle - prev_orientation_rad - (orientation_delta_rad/2);
+    float global_polar_angle = local_polar_angle - prev_orientation_rad - (orientation_delta_rad / 2);
 
     float X_position_delta = local_polar_length * cos(global_polar_angle); 
     float Y_position_delta = local_polar_length * sin(global_polar_angle);

@@ -188,3 +188,6 @@ void config_measure_offsets();
 
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
 void config_test_three_wire_port(int port);
+
+/** @brief Triggers a component plugged into a 3 wire port on a smart port expander */
+void config_test_three_wire_port(int expander_port, int port);

@@ -595,8 +595,9 @@ public:
      */
     void control(mik::drive_mode dm);
     
-    vex::rotation forward_tracker;
-    vex::rotation sideways_tracker;
+    mik::tracker forward_tracker;
+    mik::tracker sideways_tracker;
+
     vex::inertial inertial;
     
     mik::motor_group left_drive;

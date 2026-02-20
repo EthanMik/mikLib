@@ -39,15 +39,15 @@ namespace mik {
     enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
     enum class alliance_colors { RED, BLUE };
 
-    inline constexpr unsigned int PORT_A = 0;
-    inline constexpr unsigned int PORT_B = 1;
-    inline constexpr unsigned int PORT_C = 2;
-    inline constexpr unsigned int PORT_D = 3;
-    inline constexpr unsigned int PORT_E = 4;
-    inline constexpr unsigned int PORT_F = 5;
-    inline constexpr unsigned int PORT_G = 6;
-    inline constexpr unsigned int PORT_H = 7;
-    inline constexpr unsigned int PORT0 = -1; 
+    inline constexpr int PORT_A = -1;
+    inline constexpr int PORT_B = -2;
+    inline constexpr int PORT_C = -3;
+    inline constexpr int PORT_D = -4;
+    inline constexpr int PORT_E = -5;
+    inline constexpr int PORT_F = -6;
+    inline constexpr int PORT_G = -7;
+    inline constexpr int PORT_H = -8;
+    inline constexpr int PORT0 = INT16_MAX;
 
     inline constexpr distance_position front_sensor = distance_position::FRONT_SENSOR;
     inline constexpr distance_position rear_sensor = distance_position::REAR_SENSOR;

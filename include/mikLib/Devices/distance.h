@@ -20,9 +20,6 @@ public:
      */
     distance(int port, mik::distance_position position, float x_center_offset, float y_center_offset);
 
-    /** @return The port in PORT# format. */
-    const std::string port() const;
-
     /** @return The position of the distance sensor. */
     mik::distance_position position() const;
 
