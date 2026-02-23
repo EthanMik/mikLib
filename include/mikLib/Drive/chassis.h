@@ -741,7 +741,7 @@ struct drive_to_point_params {
 };
 
 struct drive_to_pose_params {
-    mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
+    // mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
     float lead = chassis.boomerang_lead;
     float setback = chassis.boomerang_setback;
     float drift = chassis.boomerang_drift;
