@@ -1,4 +1,4 @@
-#include "vex.h"
+#include "mikLib/drive.h"
 
 using namespace vex;
 using namespace mik;
@@ -12,29 +12,47 @@ drive_to_point_params g_drive_to_point_params_buffer{};
 drive_to_pose_params g_drive_to_pose_params_buffer{};
 follow_path_params g_follow_path_params_buffer{};
 
-Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, float inertial_scale, int forward_tracker_port, float forward_tracker_diameter, 
-    float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, float sideways_tracker_center_distance, mik::distance_reset reset_sensors):
+Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
+    float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
+    float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
+    float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
+    float sideways_tracker_center_distance, mik::distance_reset reset_sensors
+):
     
+    tracker_mode(tracker_mode),
+
     forward_tracker(forward_tracker_port),
     sideways_tracker(sideways_tracker_port),
     inertial(inertial_port),
-    
+
     left_drive(left_drive),
     right_drive(right_drive),
 
     reset_sensors(reset_sensors),
 
+    sideways_tracker_used(sideways_tracker_port != PORT0),
+
     inertial_scale(inertial_scale),
-    
+    force_calibrate_inertial(force_calibrate_inertial), 
+
+    wheel_diameter(wheel_diameter),
+    wheel_ratio(wheel_ratio),
+    wheel_center_distance(wheel_center_distance),
+
+    drive_in_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
+
     forward_tracker_diameter(forward_tracker_diameter),
     forward_tracker_center_distance(forward_tracker_center_distance),
     forward_tracker_inch_to_deg_ratio(M_PI * forward_tracker_diameter / 360.0),
-    
+
     sideways_tracker_diameter(sideways_tracker_diameter),
     sideways_tracker_center_distance(sideways_tracker_center_distance),
     sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0)
 {
-    odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
+    odom.set_physical_distances(
+        tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? wheel_center_distance : forward_tracker_center_distance, 
+        sideways_tracker_center_distance
+    );
 }
 
 void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain) {
@@ -46,36 +64,41 @@ void Chassis::set_control_constants(float control_throttle_deadband, float contr
     this->control_turn_curve_gain = control_turn_curve_gain;
 }
 
-void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti) {
+void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
     this->turn_max_voltage = turn_max_voltage;
     this->turn_kp = turn_kp;
     this->turn_ki = turn_ki;
     this->turn_kd = turn_kd;
     this->turn_starti = turn_starti;
+    this->turn_slew = turn_slew;
 } 
 
-void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti) {
+void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_slew) {
     this->drive_max_voltage = drive_max_voltage;
     this->drive_kp = drive_kp;
     this->drive_ki = drive_ki;
     this->drive_kd = drive_kd;
     this->drive_starti = drive_starti;
+    this->drive_slew = drive_slew;
 } 
 
-void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti) {
+void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti, float heading_slew) {
     this->heading_max_voltage = heading_max_voltage;
     this->heading_kp = heading_kp;
     this->heading_ki = heading_ki;
     this->heading_kd = heading_kd;
     this->heading_starti = heading_starti;
+    this->heading_slew = heading_slew;
+
 }
 
-void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti){
+void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_slew) {
     this->swing_max_voltage = swing_max_voltage;
     this->swing_kp = swing_kp;
     this->swing_ki = swing_ki;
     this->swing_kd = swing_kd;
     this->swing_starti = swing_starti;
+    this->swing_slew = swing_slew;
 } 
 
 void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout) {
@@ -128,6 +151,28 @@ void Chassis::cancel_motion() {
     if (drive_min_voltage == 0) { stop_drive(hold); }
 }
 
+void Chassis::update_drive_max_voltage(float drive_max_voltage) {
+    g_drive_distance_params_buffer.max_voltage = drive_max_voltage;
+    g_drive_to_point_params_buffer.max_voltage = drive_max_voltage;
+    g_drive_to_pose_params_buffer.max_voltage = drive_max_voltage;
+}
+
+void Chassis::update_heading_max_voltage(float heading_max_voltage) {
+    g_drive_distance_params_buffer.heading_max_voltage = heading_max_voltage;
+    g_drive_to_point_params_buffer.heading_max_voltage = heading_max_voltage;
+    g_drive_to_pose_params_buffer.heading_max_voltage = heading_max_voltage;
+}
+
+void Chassis::update_turn_max_voltage(float turn_max_voltage) {
+    g_turn_to_angle_params_buffer.max_voltage = turn_max_voltage;
+    g_turn_to_point_params_buffer.max_voltage = turn_max_voltage;
+}
+
+void Chassis::update_swing_max_voltage(float swing_max_voltage) {
+    g_swing_to_angle_params_buffer.max_voltage = swing_max_voltage;
+    g_swing_to_point_params_buffer.max_voltage = swing_max_voltage;
+}
+
 void Chassis::drive_with_voltage(float left_voltage, float right_voltage){
     left_drive.spin(vex::fwd, left_voltage, volt);
     right_drive.spin(vex::fwd, right_voltage, volt);
@@ -137,6 +182,25 @@ void Chassis::stop_drive(vex::brakeType brake) {
     left_drive.stop(brake);
     right_drive.stop(brake);
 }
+
+void Chassis::calibrate_inertial() {
+	calibrating = true;
+	inertial.calibrate();
+
+	while (inertial.isCalibrating()) {
+		vex::task::sleep(25);
+	}
+
+  	// Recalibrate inertial until it is within calibration threshold
+  	float starting_rotation = chassis.inertial.rotation();
+  	task::sleep(1000);
+	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > minimum_calibration_error) {
+		Controller.rumble("-");
+		calibrate_inertial();
+  	}
+  	calibrating = false;
+}
+
 
 float Chassis::get_absolute_heading(){ 
     return reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale); 
@@ -164,17 +228,20 @@ bool Chassis::angles_mirrored() { return angles_mirrored_; }
 bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
-float Chassis::get_ForwardTracker_position() {
+float Chassis::get_forward_tracker_position() {
+    if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
+        return right_drive.position(deg) * drive_in_to_deg_ratio;
+    }
     return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
 }
 
-float Chassis::get_SidewaysTracker_position() {
+float Chassis::get_sideways_tracker_position() {
     return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
 }
 
 void Chassis::position_track() {
     while(1) {
-        odom.update_position(get_ForwardTracker_position(), get_SidewaysTracker_position(), get_absolute_heading());
+        odom.update_position(get_forward_tracker_position(), get_sideways_tracker_position(), get_absolute_heading());
         vex::task::sleep(5);
     }
 }
@@ -197,7 +264,7 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
     X_position = mirror_x(X_position, x_pos_mirrored_);
     Y_position = mirror_y(Y_position, y_pos_mirrored_);
 
-    odom.set_position({X_position, Y_position}, orientation_deg, get_ForwardTracker_position(), get_SidewaysTracker_position());
+    odom.set_position({X_position, Y_position}, orientation_deg, get_forward_tracker_position(), get_sideways_tracker_position());
     set_heading(orientation_deg);
     odom_task = vex::task(position_track_task);
     odom_task.setPriority(0);
@@ -211,8 +278,12 @@ float Chassis::get_Y_position() {
     return odom.position.y;
 }
 
+bool Chassis::reset_axis(distance_position sensor_position, float max_reset_distance) {
+    return reset_axis(sensor_position, auto_detect_wall, max_reset_distance);
+}
+
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {
-    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_absolute_heading());
+    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_X_position(), get_Y_position(), get_absolute_heading());
 
     const bool reset_x = (wall_position == wall_position::TOP_WALL || wall_position == wall_position::BOTTOM_WALL) ? false : true; 
 
@@ -265,22 +336,22 @@ void Chassis::split_arcade_curved() {
     float turn = vex::controller(vex::primary).Axis1.value();
     throttle = std::round(curve(throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
     turn = std::round(curve(turn, control_turn_deadband, control_turn_min_output, control_turn_curve_gain));
-    chassis.left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
-    chassis.right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt); 
+    left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt); 
 }
 
 void Chassis::split_arcade() {
     float throttle = deadband(vex::controller(vex::primary).Axis3.value(), control_throttle_deadband);
     float turn = deadband(vex::controller(vex::primary).Axis1.value(), control_turn_deadband);
-    chassis.left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
-    chassis.right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
+    left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
 }
 
 void Chassis::tank() {
     float left_throttle = deadband(controller(primary).Axis3.value(), 5);
     float right_throttle = deadband(controller(primary).Axis2.value(), 5);
-    chassis.left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
-    chassis.right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
+    left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
+    right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
 
 void Chassis::tank_curved() {
@@ -288,18 +359,18 @@ void Chassis::tank_curved() {
     float right_throttle = controller(primary).Axis2.value();
     left_throttle = std::round(curve(left_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
     right_throttle = std::round(curve(right_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
-    chassis.left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
-    chassis.right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
+    left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
+    right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
 
 void Chassis::control(drive_mode dm) {
     if (control_disabled) { 
-        chassis.stop_drive(coast);
+        stop_drive(coast);
         return;
     }
     selected_drive_mode = dm;
 
-    switch (dm)
+switch (dm)
     {
     case drive_mode::SPLIT_ARCADE:
         split_arcade();

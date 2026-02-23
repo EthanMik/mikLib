@@ -1,4 +1,13 @@
-#include "vex.h"
+#include <stdio.h>
+#include <vector>
+#include <cmath>
+#include <cstdlib>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include "mikLib/Drive/util.h"
+#include "mikLib/globals.h"
+#include "robot-config.h"
 
 
 float clamp(float input, float min, float max) {
@@ -66,13 +75,13 @@ float mirror_angle(float angle, bool mirror) {
     return angle;
 }
 
-mik::direction mirror_direction(mik::direction dir, bool mirror) {
+mik::turn_direction mirror_direction(mik::turn_direction dir, bool mirror) {
     if (mirror) {
-        if (dir == mik::direction::CW) {
-            return mik::direction::CCW;
+        if (dir == mik::turn_direction::CW) {
+            return mik::turn_direction::CCW;
         }
-        if (dir == mik::direction::CCW) {
-            return mik::direction::CW;
+        if (dir == mik::turn_direction::CCW) {
+            return mik::turn_direction::CW;
         }
     }
     return dir;
@@ -92,14 +101,14 @@ float mirror_y(float y, bool mirror) {
     return y;
 }
 
-float angle_error(float error, mik::direction dir) {
+float angle_error(float error, mik::turn_direction dir) {
     switch (dir)
     {
-    case mik::direction::CW:
+    case mik::turn_direction::CW:
         return error < 0 ? error + 360 : error;
-    case mik::direction::CCW:
+    case mik::turn_direction::CCW:
         return error > 0 ? error - 360 : error;
-    case mik::direction::FASTEST:
+    case mik::turn_direction::FASTEST:
         return reduce_negative_180_to_180(error);
     }
 }
@@ -125,11 +134,43 @@ float right_voltage_scaling(float drive_output, float heading_output) {
 }
 
 float clamp_min_voltage(float drive_output, float drive_min_voltage) {
-    if(drive_output < 0 && drive_output > -drive_min_voltage) {
+    if (drive_output < 0 && drive_output > -drive_min_voltage) {
         return -drive_min_voltage;
     }
-    if(drive_output > 0 && drive_output < drive_min_voltage) {
+    if (drive_output > 0 && drive_output < drive_min_voltage) {
         return drive_min_voltage;
+    }
+    return drive_output;
+}
+
+float slew_scaling(float drive_output, float prev_drive_output, float slew, bool apply) {
+    float change = drive_output - prev_drive_output;
+    if (slew == 0 || !apply) return drive_output;
+    if (change > slew) change = slew;
+    else if (change < -slew) change = -slew;
+    return prev_drive_output + change;
+}
+
+float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift) {
+    const float heading = to_rad(current_angle_deg);
+
+    const float perp_dist = fabs(sin(heading) * (desired_Y - current_Y) - cos(heading) * (desired_X - current_X));
+    const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
+
+    const float radius = (dist * dist) / (2.0 * perp_dist);
+    const float max_slip = sqrt(drift * radius * 9.8);
+    return clamp(drive_output, -max_slip, max_slip);  
+}
+
+float overturn_scaling(float drive_output, float heading_output, float max_speed) {
+    const float overturn = fabs(heading_output) + fabs(drive_output) - max_speed;
+    if (overturn > 0) {
+        if (drive_output > 0) {
+            return drive_output - overturn;
+        }
+        else if (drive_output < 0) {
+            return drive_output + overturn;
+        }
     }
     return drive_output;
 }
@@ -242,7 +283,7 @@ void remove_duplicates_SD_file(const std::string& file_name, const std::string& 
         if (data_arr[i] == '\n') {
             data_line.assign(data_arr.begin() + i + 1, data_arr.begin() + end);
 
-            if (data_line.find(duplicate_word) != std::string::npos) {
+            if (data_line.find(duplicate_word) == 0) {
                 data_arr.erase(data_arr.begin() + i, data_arr.begin() + end);
             }
 
@@ -274,22 +315,22 @@ std::vector<std::string> get_SD_file_txt(const std::string& file_name) {
 
 static const char* to_ansi(mik::color clr) {
     switch (clr) {
-    case mik::color::BLACK:          return "\x1b[30m";
-    case mik::color::RED:            return "\x1b[31m";
-    case mik::color::GREEN:          return "\x1b[32m";
-    case mik::color::YELLOW:         return "\x1b[33m";
-    case mik::color::BLUE:           return "\x1b[34m";
-    case mik::color::MAGENTA:        return "\x1b[35m";
-    case mik::color::CYAN:           return "\x1b[36m";
-    case mik::color::WHITE:          return "\x1b[37m";
-    case mik::color::BRIGHT_BLACK:   return "\x1b[90m";
-    case mik::color::BRIGHT_RED:     return "\x1b[91m";
-    case mik::color::BRIGHT_GREEN:   return "\x1b[92m";
-    case mik::color::BRIGHT_YELLOW:  return "\x1b[93m";
-    case mik::color::BRIGHT_BLUE:    return "\x1b[94m";
-    case mik::color::BRIGHT_MAGENTA: return "\x1b[95m";
-    case mik::color::BRIGHT_CYAN:    return "\x1b[96m";
-    case mik::color::BRIGHT_WHITE:   return "\x1b[97m";
+        case mik::color::BLACK:          return "\x1b[30m";
+        case mik::color::RED:            return "\x1b[31m";
+        case mik::color::GREEN:          return "\x1b[32m";
+        case mik::color::YELLOW:         return "\x1b[33m";
+        case mik::color::BLUE:           return "\x1b[34m";
+        case mik::color::MAGENTA:        return "\x1b[35m";
+        case mik::color::CYAN:           return "\x1b[36m";
+        case mik::color::WHITE:          return "\x1b[37m";
+        case mik::color::BRIGHT_BLACK:   return "\x1b[90m";
+        case mik::color::BRIGHT_RED:     return "\x1b[91m";
+        case mik::color::BRIGHT_GREEN:   return "\x1b[92m";
+        case mik::color::BRIGHT_YELLOW:  return "\x1b[93m";
+        case mik::color::BRIGHT_BLUE:    return "\x1b[94m";
+        case mik::color::BRIGHT_MAGENTA: return "\x1b[95m";
+        case mik::color::BRIGHT_CYAN:    return "\x1b[96m";
+        case mik::color::BRIGHT_WHITE:   return "\x1b[97m";
     }
 }
 
@@ -349,14 +390,30 @@ void print(char c, const mik::color& clr) {
 }
 
 vex::triport::port& to_triport(int port) {
-    return Brain.ThreeWirePort.Port[port];
+    return Brain.ThreeWirePort.Port[std::abs(port) - 1];
+}
+
+vex::triport::port& to_triport(vex::triport& expander, int port) {
+    return expander.Port[std::abs(port) - 1];
+}
+
+std::string port_to_string(int port) {
+    if (port >= 0 && port <= 21) {
+        return "PORT" + to_string(port + 1);
+    }
+
+    if (port >= -8 && port <= -1) {
+        return std::string("PORT_") + char('A' + std::abs(port) - 1);
+    }
+
+    return "PORT0";
 }
 
 std::string to_string_float(float num, int precision, bool remove_trailing_zero) {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(precision) << num;
     std::string str = oss.str();
-    if (remove_trailing_zero) {
+    if (remove_trailing_zero && str.find('.') != std::string::npos) {
         str.erase(str.find_last_not_of('0') + 1);
         if (!str.empty() && str.back() == '.')
             str.pop_back();

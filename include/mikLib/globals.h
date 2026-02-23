@@ -1,7 +1,13 @@
 #pragma once
 
 #include "v5.h"
-#include "v5_api.h"
+#include "v5_vcs.h"
+#include <string>
+
+typedef struct point{
+    double x;
+    double y;
+};
 
 namespace mik {
 
@@ -15,43 +21,59 @@ namespace mik {
     };
 
     /** @brief Explicitly specifies rotation direction when turning or swinging. */
-    enum class direction {
+    enum class turn_direction {
         FASTEST, // Direction chosen automatically (shortest path)
         CW,      // Clockwise rotation
         CCW      // Counter‑clockwise rotation
     };
 
+    enum class drive_direction {
+        FASTEST,  // Direction chosen automatically (shortest path)
+        FWD,      // Drives to point in forward direction
+        REV       // Drives it point in reverse direction
+    };
+
     enum auto_variation : int { ONE = 1, TWO = 2, THREE = 3, FOUR = 4 };
     enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
-    enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL };
-    
-    inline constexpr unsigned int PORT_A = 0;
-    inline constexpr unsigned int PORT_B = 1;
-    inline constexpr unsigned int PORT_C = 2;
-    inline constexpr unsigned int PORT_D = 3;
-    inline constexpr unsigned int PORT_E = 4;
-    inline constexpr unsigned int PORT_F = 5;
-    inline constexpr unsigned int PORT_G = 6;
-    inline constexpr unsigned int PORT_H = 7;
+    enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, AUTO };
+    enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
+    enum class alliance_colors { RED, BLUE };
+
+    inline constexpr int PORT_A = -1;
+    inline constexpr int PORT_B = -2;
+    inline constexpr int PORT_C = -3;
+    inline constexpr int PORT_D = -4;
+    inline constexpr int PORT_E = -5;
+    inline constexpr int PORT_F = -6;
+    inline constexpr int PORT_G = -7;
+    inline constexpr int PORT_H = -8;
+    inline constexpr int PORT0 = INT16_MAX;
 
     inline constexpr distance_position front_sensor = distance_position::FRONT_SENSOR;
     inline constexpr distance_position rear_sensor = distance_position::REAR_SENSOR;
     inline constexpr distance_position left_sensor = distance_position::LEFT_SENSOR;
     inline constexpr distance_position right_sensor = distance_position::RIGHT_SENSOR;
 
+    inline constexpr tracker_mode forward_tracker = tracker_mode::FORWARD_TRACKER;
+    inline constexpr tracker_mode motor_encoder = tracker_mode::MOTOR_ENCODER;
+
     inline constexpr wall_position top_wall = wall_position::TOP_WALL;
     inline constexpr wall_position bottom_wall = wall_position::BOTTOM_WALL;
     inline constexpr wall_position left_wall = wall_position::LEFT_WALL;
     inline constexpr wall_position right_wall = wall_position::RIGHT_WALL;
+    inline constexpr wall_position auto_detect_wall = wall_position::AUTO;
 
     inline constexpr vex::gearSetting blue_6_1  = vex::gearSetting::ratio6_1;
     inline constexpr vex::gearSetting green_18_1 = vex::gearSetting::ratio18_1;
     inline constexpr vex::gearSetting red_36_1   = vex::gearSetting::ratio36_1;
 
-    inline constexpr direction clockwise         = direction::CW;
-    inline constexpr direction counter_clockwise = direction::CCW;
-    inline constexpr direction cw                = direction::CW;
-    inline constexpr direction ccw               = direction::CCW;
+    inline constexpr turn_direction clockwise         = turn_direction::CW;
+    inline constexpr turn_direction counter_clockwise = turn_direction::CCW;
+    inline constexpr turn_direction cw                = turn_direction::CW;
+    inline constexpr turn_direction ccw               = turn_direction::CCW;
+
+    inline constexpr drive_direction forwards     = drive_direction::FWD;
+    inline constexpr drive_direction reversed     = drive_direction::REV;
 
     inline constexpr auto_variation one   = auto_variation::ONE;
     inline constexpr auto_variation two   = auto_variation::TWO;
@@ -116,7 +138,7 @@ namespace mik {
     inline const std::string pnematic_E_btn_bg_color = "#303030";
     inline const std::string pnematic_F_btn_bg_color = "#595959";
     inline const std::string pnematic_G_btn_bg_color = "#858585";
-    inline const std::string pnematic_H_btn_bg_color = "#858585";
+    inline const std::string pnematic_H_btn_bg_color = "#cccccc";
 
     // Auton screen colors
     inline const std::string& auton_bg_color = UI_black;
@@ -174,6 +196,41 @@ namespace mik {
     inline const std::string& console_text_bg_color = UI_med_gray;
     inline const std::string& console_outline_color = UI_med_gray;
     inline const std::string& console_scroll_bar_color = UI_med_gray;
+
+    // Motors screen colors
+    inline const std::string& motors_bg_color = UI_black;
+    inline const std::string& motors_spin_left_bg_color = UI_black;
+    inline const std::string& motors_spin_left_outline_color = UI_med_gray;
+    inline const std::string& motors_spin_left_pressing_color = UI_white;
+    inline const std::string& motors_spin_left_pressed_color = UI_red;
+
+    inline const std::string& motors_spin_right_bg_color = UI_black;
+    inline const std::string& motors_spin_right_outline_color = UI_med_gray;
+    inline const std::string& motors_spin_right_pressing_color = UI_white;
+    inline const std::string& motors_spin_right_pressed_color = UI_red;
+
+    inline const std::string& motors_left_drive_btn_bg_color = "#303030";
+
+    inline const std::string& motors_port_btn_outline_color = UI_dark_gray;
+    inline const std::string& motors_port_btn_pressing_color = UI_white;
+    inline const std::string& motors_port_btn_pressed_color = UI_red;
+
+    inline const std::string& motors_volt_btn_bg_color = UI_black;
+    inline const std::string& motors_volt_btn_outline_color = UI_med_gray;
+    inline const std::string& motors_volt_btn_pressed_color = UI_white;
+    inline const std::string& motors_volt_btn_pressing_color = UI_red;
+
+    inline const std::string& motors_ports_text_color = UI_white;
+    inline const std::string& motors_close_button_bg_color = UI_black;
+    inline const std::string& motors_close_button_outline_color = UI_med_gray;
+    inline const std::string& motors_close_button_pressing_color = UI_white;
+    inline const std::string& motors_close_button_pressed_color = UI_red;
+
+    inline const std::string& motors_ports_btn_bg = UI_black;
+    inline const std::string& motors_ports_btn_pressing_color = UI_light_gray;
+    inline const std::string& motors_ports_btn_closed_color = UI_red;
+    inline const std::string& motors_ports_btn_open_color = UI_med_gray;
+    inline const std::string& motors_ports_btn_current_color = UI_white;
     
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
@@ -198,6 +255,8 @@ namespace mik {
     enum class input_type { CONTROLLER, TOUCHSCREEN };
     enum class text_align { LEFT, CENTER };
     enum class autons { RED_BLUE, RINGS_GOAL, QUALS_ELIMS, OFF_SAWP, OFF_SKILLS };
+
+    inline constexpr vex::fontType default_font = vex::fontType::mono20;
 
     #define UI_Graphic_ID    1
     #define UI_Background_ID 2

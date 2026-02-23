@@ -1,6 +1,7 @@
 #pragma once
 
-#include "vex.h"
+#include <memory>
+#include "mikLib/ui.h"
 
 void UI_init();
 void UI_controller_auton_selector();
@@ -10,6 +11,7 @@ extern std::shared_ptr<mik::UI_auton_screen> auton_scr;
 extern std::shared_ptr<mik::UI_console_screen> console_scr;
 extern std::shared_ptr<mik::UI_graph_screen> graph_scr;
 extern std::shared_ptr<mik::UI_config_screen> config_scr;
+extern std::shared_ptr<mik::UI_motors_screen> motors_scr;
 
 extern std::vector<std::shared_ptr<mik::screen>> UI_render_queue;
 

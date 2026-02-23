@@ -1,16 +1,17 @@
 #pragma once
 
-#include "vex.h"
+#include <memory>
+#include "mikLib/ui.h"
 
 namespace mik {
 
 class textbox : public UI_component
 {
 public:
-    textbox(std::string text, std::shared_ptr<drawable> box);
-    textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box);
-    textbox(std::string text, text_align text_alignment, const std::string& bg_color, std::shared_ptr<drawable> box);
-    textbox(std::string text, const std::string& text_color, const std::string& bg_color, text_align text_alignment, std::shared_ptr<drawable> box);
+    textbox(std::string text, std::shared_ptr<drawable> box, vex::fontType font, int padding = 10);
+    textbox(std::string text, text_align text_alignment, std::shared_ptr<drawable> box, vex::fontType font, int padding = 10);
+    textbox(std::string text, text_align text_alignment, const std::string& bg_color, std::shared_ptr<drawable> box, vex::fontType font, int padding = 10);
+    textbox(std::string text, const std::string& text_color, const std::string& bg_color, text_align text_alignment, std::shared_ptr<drawable> box, vex::fontType font, int padding = 10);
 
     int get_x_pos() override;
     int get_y_pos() override;
@@ -31,6 +32,9 @@ public:
     void set_text(std::string text);
     void wrap_text();
 
+    void set_text_color(const std::string& color);
+    const std::string& get_text_color();
+
 private:
     void draw_text();
     
@@ -43,6 +47,8 @@ private:
     std::string text_color;
     std::string bg_color;
     text_align alignment;
+    vex::fontType font;
+    int padding;
     std::vector<std::string> wrapped_text;
 };
 }

@@ -1,4 +1,4 @@
-#include "vex.h"
+#include "mikLib/ui.h"
 
 using namespace mik;
 
@@ -57,6 +57,11 @@ void screen::add_scroll_bar(std::shared_ptr<drawable> scroll_bar) {
     this->scroll_bar = scroll_bar;
 }
 
+void screen::add_render_callback(std::function<void()> render_callback) {
+    this->has_render_callback = true;
+    this->render_callback = render_callback;
+}
+
 void screen::add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align) {
     int align_pos = get_aligment_pos(scroll_bar_align, scroll_bar->get_width(), scroll_bar->get_height());
     scroll_bar->set_position(align_pos, align_pos);
@@ -103,15 +108,22 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
     bool is_exception = false;
 
     if ((scroll_dir == scroll_direction::VERTICAL) &&
-        (component->get_y_pos() < this->y || 
+        (component->get_y_pos() < this->y ||
         component->get_y_pos() > this->y + this->h)) {
             is_exception = true;
     }
     if ((scroll_dir == scroll_direction::HORIZONTAL) &&
-        (component->get_x_pos() + component->get_width() < this->x || 
+        (component->get_x_pos() + component->get_width() < this->x ||
         component->get_x_pos() > this->x + this->w)) {
             is_exception = true;
 
+    }
+    if (scroll_dir == scroll_direction::NONE &&
+        (component->get_x_pos() + component->get_width() < this->x ||
+        component->get_x_pos() > this->x + this->w ||
+        component->get_y_pos() + component->get_height() < this->y ||
+        component->get_y_pos() > SCREEN_HEIGHT)) {
+            is_exception = true;
     }
     if (component->get_ID() < 0) {
         is_exception = true;
@@ -121,6 +133,8 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
 }
 
 bool screen::needs_update() {
+    component_mutex.lock();
+
     if (removal_scheduled) {
         execute_removal();
         removal_scheduled = false;
@@ -128,30 +142,39 @@ bool screen::needs_update() {
     }
 
     for (std::size_t i = 0; i < UI_components.size(); ++i) {
-        auto& component = UI_components[i];
+        auto component = UI_components[i];
+        if (!actively_scrolling && !is_clickable_exception(component)) {
+            component->is_pressing(input_type);
+        }
         if (is_render_exception(component)) {
             continue;
         }
-        if (!pressed && !is_clickable_exception(component)) {
-            component->is_pressing(input_type);
-        }
         if (component->needs_update()) {
-            if (i < render_index || render_index == 0) {
+            render_index = 0;
+            if (lazy_render) {
                 render_index = i;
             }
-
             needs_render_update = true;
         }
     }
 
     if (scroll_dir == scroll_direction::VERTICAL || scroll_dir == scroll_direction::HORIZONTAL) {
+        bool was_actively_scrolling = actively_scrolling;
         if (is_scrolling()) {
             render_index = 0;
         }
+        if (was_actively_scrolling && !actively_scrolling) {
+            for (const auto& component : UI_components) {
+                component->is_pressing(input_type);
+            }
+        }
     }
 
-    if (needs_render_update) {
+    component_mutex.unlock();
+
+    if (needs_render_update || screen_needs_full_refresh) {
         needs_render_update = false;
+        screen_needs_full_refresh = false;
         return true;
     }
     return false;
@@ -170,10 +193,14 @@ void screen::refresh() {
 }
 
 void screen::render(bool full_refresh) {
+    component_mutex.lock();
+
     if (full_refresh || screen_needs_refresh) {
         render_index = 0;
         screen_needs_refresh = false;
     }
+
+    if (has_render_callback) { render_callback(); }
 
     for (std::size_t i = render_index; i < UI_components.size(); ++i) {
         auto& component = UI_components[i];
@@ -189,6 +216,8 @@ void screen::render(bool full_refresh) {
         }
     }
     render_index = 0;
+
+    component_mutex.unlock();
 }
 
 bool screen::is_scrolling() {
@@ -204,7 +233,10 @@ bool screen::is_scrolling() {
 
     if (Brain.Screen.pressing() && !pressed && is_touch_within_screen) {
         pressed = true;
+        last_fill_color = scroll_bar->get_fill_color();
+        scroll_bar->set_fill_color("#ffffff");
         prev_touch = get_touch_pos();
+        needs_render_update = true;
     }
     if (pressed && Brain.Screen.pressing() && is_touch_within_screen) {
         int current_touch = get_touch_pos();
@@ -231,8 +263,8 @@ bool screen::is_scrolling() {
             scr_speed_limit = std::max(scr_speed_limit, 0.1f);
         } else if (direction > 0 && distance_to_lower_bound > -threshold) {
             threshold = 20;
-             scr_speed_limit = distance_to_lower_bound / threshold;
-             scr_speed_limit = std::max(scr_speed_limit, 0.1f);
+            scr_speed_limit = distance_to_lower_bound / threshold;
+            scr_speed_limit = std::max(scr_speed_limit, 0.1f);
         }
 
         int local_position = (delta_touch * scroll_speed) * scr_speed_limit + 1;
@@ -251,6 +283,7 @@ bool screen::is_scrolling() {
                 }
                 if (local_position != 0) {
                     scrolled = true;
+                    actively_scrolling = true;
                 }
             }
             component_delta_position += local_position;
@@ -258,8 +291,13 @@ bool screen::is_scrolling() {
             screen_pos += local_position;
         }
     }
-    if (!Brain.Screen.pressing()) {
+    if (!Brain.Screen.pressing() && pressed) {
         pressed = false;
+        actively_scrolling = false;
+        scroll_bar->set_fill_color(last_fill_color);
+        screen_needs_full_refresh = true;
+        needs_render_update = true;
+        scrolled = true;
     }
     return scrolled;
 }
@@ -277,44 +315,64 @@ int screen::get_touch_pos() {
 
 void screen::add_UI_component(std::shared_ptr<UI_component> component) {
     component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
+    component_mutex.lock();
     UI_components.push_back(component);
     id_to_index[component->get_ID()] = UI_components.size() - 1;
+    component_mutex.unlock();
 }
 
 void screen::add_UI_components(std::vector<std::shared_ptr<UI_component>> components) {
     for (const auto& component : components) {
         component->set_position(component->get_x_pos() + x, component->get_y_pos() + y);
+    }
+    component_mutex.lock();
+    for (const auto& component : components) {
         UI_components.push_back(component);
         id_to_index[component->get_ID()] = UI_components.size() - 1;
     }
+    component_mutex.unlock();
 }
 
 void screen::remove_UI_component(std::vector<int> id) {
+    component_mutex.lock();
     removal_id.swap(id);
-    removal_scheduled = true;
+    execute_removal();
+    screen_needs_full_refresh = true;
+    component_mutex.unlock();
 }
 
 void screen::execute_removal() {
+    std::vector<size_t> indices;
+    indices.reserve(removal_id.size());
+
     for (auto id : removal_id) {
         auto it = id_to_index.find(id);
         if (it != id_to_index.end()) {
-            size_t index_to_remove = it->second;
-            size_t last_index = UI_components.size() - 1;
-
-            if (index_to_remove != last_index) {
-                std::swap(UI_components[index_to_remove], UI_components[last_index]);
-                int moved_element_id = UI_components[index_to_remove]->get_ID();
-                id_to_index[moved_element_id] = index_to_remove;
-            }
-
-            UI_components.pop_back();
+            indices.push_back(it->second);
             id_to_index.erase(it);
         }
     }
+
+    std::sort(indices.begin(), indices.end(), std::greater<size_t>());
+
+    for (size_t idx : indices) {
+        if (idx >= UI_components.size()) continue;
+        size_t last = UI_components.size() - 1;
+        if (idx != last) {
+            std::swap(UI_components[idx], UI_components[last]);
+            id_to_index[UI_components[idx]->get_ID()] = idx;
+        }
+        UI_components.pop_back();
+    }
+
+    removal_id.clear();
 }
 
 const std::vector<std::shared_ptr<UI_component>> screen::get_UI_components() {
-    return UI_components;
+    component_mutex.lock();
+    auto copy = UI_components;
+    component_mutex.unlock();
+    return copy;
 }
 
 int screen::get_aligment_pos(alignment alignment, int scroll_bar_w, int scroll_bar_h) {

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "vex.h"
+#include "v5.h"
+#include "v5_vcs.h"
+#include "mikLib/globals.h"
 
 /** 
  * @file motors.h
@@ -22,8 +24,10 @@ public:
 
     motor(int port, bool reversed, std::string name);
 
-    /** @return The port in PORT# format */
-    const std::string port() const;
+    motor(const motor& other);
+    motor(motor&& other) noexcept;
+    ~motor();
+    
     /** @return True is motor is reversed */
     bool reversed() const;
     /** @return The gear cartidge used in mik::motor, default is 6 to 1 */
@@ -293,13 +297,18 @@ public:
      * @return The wrapped vex motors in a vector
      */   
     std::vector<mik::motor>& getMotors();
-    
-    
+
+
 private:
+
     float to_volt(float voltage, vex::voltageUnits velocityUnits);
     
     float set_voltage = 6; 
 
     std::vector<mik::motor> motors;
 };
+
+/** @return Reference to the global registry of all logged motors */
+std::vector<mik::motor*>& motor_registry();
+
 }

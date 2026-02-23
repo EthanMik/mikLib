@@ -1,6 +1,8 @@
 #pragma once
 
-#include "vex.h"
+#include <memory>
+#include <unordered_map>
+#include "mikLib/ui.h"
 
 namespace mik {
     
@@ -23,6 +25,7 @@ public:
     
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar);
     void add_scroll_bar(std::shared_ptr<drawable> scroll_bar, alignment scroll_bar_align);
+    void add_render_callback(std::function<void()>);
 
     bool needs_update();
     bool needs_full_refresh();
@@ -34,6 +37,8 @@ public:
     void remove_UI_component(std::vector<int> id);
     void set_UI_components(std::vector<std::shared_ptr<UI_component>> components);
     const std::vector<std::shared_ptr<UI_component>> get_UI_components();
+
+    bool lazy_render = false;
 
 private:
     enum class scroll_direction { NONE, HORIZONTAL, VERTICAL };
@@ -57,8 +62,10 @@ private:
 
     std::shared_ptr<drawable> scroll_bar;
     scroll_direction scroll_dir = scroll_direction::NONE;
+    std::string last_fill_color;
     bool finished_scrolling;
     bool pressed = false;
+    bool actively_scrolling = false;
     int prev_touch = 0;
     const float scroll_speed = 0.1;
     int screen_pos = 0;
@@ -67,11 +74,15 @@ private:
     std::unordered_map<int, size_t> id_to_index;
     bool removal_scheduled = false;
     std::vector<int> removal_id;
+    vex::mutex component_mutex;
 
     bool screen_needs_refresh;
     bool screen_needs_full_refresh;
     bool needs_render_update;
     int render_index;
     input_type input_type = input_type::TOUCHSCREEN;
+
+    bool has_render_callback = false;
+    std::function<void()> render_callback;
 };
 }

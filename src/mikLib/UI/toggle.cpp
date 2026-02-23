@@ -1,4 +1,4 @@
-#include "vex.h"
+#include "mikLib/ui.h"
 
 using namespace mik;
 
@@ -179,12 +179,12 @@ void toggle::is_pressing_touch() {
 
             is_toggled = !is_toggled;
             execute();
-    } else if (!is_touch_within_toggle) {
+    } else {
         if (is_toggled) {
             state = toggle_state::TOGGLED;
         } else {
             state = toggle_state::INACTIVE;
-        } 
+        }
     }
 }
 

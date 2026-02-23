@@ -3,29 +3,51 @@
 using namespace vex;
 using namespace mik;
 
-void default_constants(void) {
+void default_constants() {
+    // Each controller constant in the form of throttle, turn (deadband, min_output, curve_gain).
     chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019);
 
-    // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI).
-    chassis.set_turn_constants(12, .437, .0215, 3.686, 15);
-    chassis.set_drive_constants(10, 1.5, 0, 10, 0);
-    chassis.set_heading_constants(6, .4, 0, 1, 0);
-    chassis.set_swing_constants(12, .437, .0295, 3.486, 15);
+    // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI, slew).
+    chassis.set_turn_constants(12, .4, .03, 3, 15, 0);
+    chassis.set_drive_constants(10, 1.5, 0, 10, 0, 0);
+    chassis.set_heading_constants(6, .4, 0, 3, 0, 0);
+    chassis.set_swing_constants(12, .4, .01, 2, 15, 0);
 
     // Each exit condition set is in the form of (settle_error, settle_time, timeout).
-    chassis.set_turn_exit_conditions(1.5, 75, 2000);
-    chassis.set_drive_exit_conditions(1, 75, 3000);
-    chassis.set_swing_exit_conditions(1.25, 75, 3000);
+    chassis.set_turn_exit_conditions(1, 200, 3000);
+    chassis.set_drive_exit_conditions(1.5, 200, 5000);
+    chassis.set_swing_exit_conditions(1, 200, 3000);
 }
 
-void odom_constants(void) {
+// Odometry constants perform better with these drive constants, 
+// make sure to call odom_constants() at the start of auto if you are using odometry!
+void odom_constants() {
     default_constants();
     chassis.heading_max_voltage = 10;
     chassis.drive_max_voltage = 8;
     chassis.drive_settle_error = 3;
     chassis.boomerang_lead = .5;
-    chassis.boomerang_setback = 2;    
+    chassis.boomerang_setback = 2;  
+    chassis.boomerang_drift = 2;  // Change to 8 if you are not running all omni wheels
 }
+
+// When using motor encoders, it's best to 
+// have a high drive slew to prevent wheel slip.
+void no_tracker_constants() {
+    default_constants();
+    chassis.drive_slew = 2;
+}
+
+// Motion chaining constants are used to chain multiple movements together with minimal pause in between,
+// make sure to add a chassis.stop_drive(hold) at the end of you auton if you are using min speed.
+void motion_chaining_constants() {
+    odom_constants();
+    chassis.drive_settle_error = 6;
+    chassis.drive_min_voltage = 3;
+    chassis.drive_settle_time = 0;
+}
+
+// Example auton template, you can delete this
 
 std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
     /* The first variation will be this auto */
@@ -35,8 +57,10 @@ std::string template_auto(bool calibrate, auto_variation var, bool get_name) {
     You may want this if you want a different movements in the same starting configuration */
     if (var == two) { return template_auto_other_variation(calibrate, get_name); }
 
-    if (get_name) { /* Give a desciption of your auto */ return "template auto 1 (3 objs)"; }
+    if (get_name) { /* Give a description of your auto */ return "template auto 1 (3 objs)"; }
     if (calibrate) {
+        odom_constants(); // Make sure to call odom constants at the start of auto if you are using it!
+
         /* Initialize robots starting position "https://path.jerryio.com/" and/or add extra movements to line up robots 
         starting position **IF MOVING DURING CALIBRATION DO BEFORE FIELD CONTROLLER PLUG IN** */
         chassis.set_coordinates(55, 23.5, 90);
@@ -72,6 +96,7 @@ std::string template_auto_other_variation(bool calibrate, bool get_name) {
     return "";
 }
 
+// Do not delete the autons below
 
 std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name) {
     if (get_name) { return "blue left winpoint"; }

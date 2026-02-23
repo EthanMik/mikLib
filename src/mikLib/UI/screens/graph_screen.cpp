@@ -1,4 +1,4 @@
-#include "vex.h"
+#include "mikLib/ui.h"
 
 using namespace mik;
 
@@ -12,6 +12,7 @@ std::shared_ptr<screen> UI_graph_screen::get_graph_screen() {
 
 void UI_graph_screen::UI_crt_graph_scr() {
     UI_graph_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
+    UI_graph_scr->lazy_render = true;
     auto bg = UI_crt_bg(UI_crt_rec(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT - 45, graph_bg_color, UI_distance_units::pixels));
     
     auto legend_box = UI_crt_gfx(UI_crt_rec(3.72, .56, 1.19, 1.88, graph_legend_bg_color, graph_legend_outline_color, 2, UI_distance_units::inches));
@@ -21,17 +22,18 @@ void UI_graph_screen::UI_crt_graph_scr() {
         UI_crt_ln(0.05, 1.59, 3.6, 1.59, graph_chart_outline_color, UI_distance_units::inches),
         UI_crt_ln(0.05, 2.04, 3.6, 2.04, graph_chart_outline_color, UI_distance_units::inches)
     });
+    
 
     auto graph_name = UI_crt_gfx(UI_crt_txt("PID Output", 140, 62, graph_text_color, graph_bg_color, UI_distance_units::pixels));
     
-    auto reset_btn = UI_crt_btn(UI_crt_grp({UI_crt_rec(366, 205, 98, 20, graph_reset_btn_bg_color, graph_reset_btn_outline_color, 2, UI_distance_units::pixels), UI_crt_txt("Reset", 392, 221, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)}), 
+    auto reset_btn = UI_crt_btn(UI_crt_grp({UI_crt_rec(366, 200, 98, 25, graph_reset_btn_bg_color, graph_reset_btn_outline_color, 2, UI_distance_units::pixels), UI_crt_txt("Reset", 392, 221-3, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)}), 
         [this](){ reset_graph(); });
     reset_btn->set_states(
-        UI_crt_grp({UI_crt_rec(366, 205, 98, 20, graph_reset_btn_bg_color, graph_reset_btn_pressing_color, 2, UI_distance_units::pixels), 
-        UI_crt_txt("Reset", 392, 221, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)}), 
+        UI_crt_grp({UI_crt_rec(366, 200, 98, 25, graph_reset_btn_bg_color, graph_reset_btn_pressing_color, 2, UI_distance_units::pixels), 
+        UI_crt_txt("Reset", 392, 221-3, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)}), 
         
-        UI_crt_grp({UI_crt_rec(366, 205, 98, 20, graph_reset_btn_bg_color, graph_reset_btn_pressed_color, 2, UI_distance_units::pixels), 
-        UI_crt_txt("Reset", 392, 221, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)})
+        UI_crt_grp({UI_crt_rec(366, 200, 98, 25, graph_reset_btn_bg_color, graph_reset_btn_pressed_color, 2, UI_distance_units::pixels), 
+        UI_crt_txt("Reset", 392, 221-3, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)})
     );
     
     auto _y_axis = UI_crt_gfx(UI_crt_img("", 0, 0, 0, 0, UI_distance_units::pixels));
@@ -106,26 +108,49 @@ void UI_graph_screen::graph() {
         float x = graph_scr->x_min_bound;
 
         std::vector<std::pair<int,int>> prev_pts;
+        std::vector<float> prev_y_vals;
         prev_pts.reserve(graph_scr->plots.size());
+        prev_y_vals.reserve(graph_scr->plots.size());
 
         for (auto& f : graph_scr->plots) {
-            auto [px, py] = graph_scr->transform_plot(x, f(x));
+            float y_val = f(x);
+            auto [px, py] = graph_scr->transform_plot(x, y_val);
             prev_pts.emplace_back(px, py);
+            prev_y_vals.push_back(y_val);
         }
+
+        const int graph_top_px = graph_scr->graph_top;
+        const int graph_bot_px = graph_scr->graph_top + graph_scr->graph_height;
 
         while (x < graph_scr->x_max_bound) {
             while (Brain.Screen.pressing()) { vex::this_thread::sleep_for(100); }
             for (size_t i = 0; i < graph_scr->plots.size(); ++i) {
                 graph_scr->undefined = false;
-                auto [x_px, y_px] = graph_scr->transform_plot(x, graph_scr->plots[i](x));
-                
+                float y_val = graph_scr->plots[i](x);
+                auto [x_px, y_px] = graph_scr->transform_plot(x, y_val);
+
                 if (!graph_scr->undefined) {
                     uint32_t clr = (i < graph_scr->labels.size()) ? graph_scr->labels[i].second : 0x00FF3C00;
-                    graph_scr->graph_lines->add_graphic(UI_crt_ln(prev_pts[i].first, prev_pts[i].second, x_px, y_px, clr, UI_distance_units::pixels));
+                    float dy = y_val - prev_y_vals[i];
+
+                    if (dy < -180.0f) {
+                        float frac = (360 - prev_y_vals[i]) / (y_val + 360 - prev_y_vals[i]);
+                        int cross_x = prev_pts[i].first + (int)((x_px - prev_pts[i].first) * frac);
+                        graph_scr->graph_lines->add_graphic(UI_crt_ln(prev_pts[i].first, prev_pts[i].second, cross_x, graph_top_px, clr, UI_distance_units::pixels));
+                        graph_scr->graph_lines->add_graphic(UI_crt_ln(cross_x, graph_bot_px, x_px, y_px, clr, UI_distance_units::pixels));
+                    } else if (dy > 180) {
+                        float frac = prev_y_vals[i] / (prev_y_vals[i] + 360 - y_val);
+                        int cross_x = prev_pts[i].first + (int)((x_px - prev_pts[i].first) * frac);
+                        graph_scr->graph_lines->add_graphic(UI_crt_ln(prev_pts[i].first, prev_pts[i].second, cross_x, graph_bot_px, clr, UI_distance_units::pixels));
+                        graph_scr->graph_lines->add_graphic(UI_crt_ln(cross_x, graph_top_px, x_px, y_px, clr, UI_distance_units::pixels));
+                    } else {
+                        graph_scr->graph_lines->add_graphic(UI_crt_ln(prev_pts[i].first, prev_pts[i].second, x_px, y_px, clr, UI_distance_units::pixels));
+                    }
 
                     if (graph_scr->graph_lines->get_size() >= graph_scr->graphic_buffer)
                     graph_scr->graph_lines->remove_first_graphic();
                 }
+                prev_y_vals[i] = y_val;
                 prev_pts[i] = {x_px, y_px};
             }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vex.h"
+#include "mikLib/ui.h"
 
 namespace mik {
 
@@ -23,6 +23,9 @@ public:
     void set_x_pos(int x) override;
     void set_y_pos(int y) override;
     void set_position(int x, int y) override;
+
+    void set_text_color(const std::string& color);
+    void set_fill_color(const std::string& color);
 
     bool needs_update() override;
     void render() override;

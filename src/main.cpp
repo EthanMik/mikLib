@@ -7,7 +7,11 @@ task UI;
 
 static int run_UI() {
     UI_init();
-    UI_controller_auton_selector();
+
+    // Running the auton selector on the controller disables user control,
+    // press X on the controller to close auton selector and enable user control
+    UI_controller_auton_selector(); 
+
     UI_render();
     return 0;
 }
@@ -24,17 +28,17 @@ void auton(void) {
 }
 
 void user_control(void) {
-    while (calibrating) { task::sleep(50); }
+    while (chassis.calibrating) { task::sleep(50); }
 
     // How you want your drivetrain to stop during driver
     chassis.set_brake_type(brakeType::coast);
-    
+
     assembly.init();
 
     while (true) {
         if (!control_disabled()) {
             // Add your user control code here
-            chassis.control(drive_mode::SPLIT_ARCADE_CURVED);
+            chassis.control(drive_mode::SPLIT_ARCADE);
             assembly.control();
         }
         task::sleep(5);

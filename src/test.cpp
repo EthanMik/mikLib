@@ -30,7 +30,7 @@ void test_turn() {
 	chassis.turn_to_angle(90);
 	chassis.turn_to_angle(225);
 	chassis.turn_to_angle(180, { .turn_direction = ccw });
-	chassis.turn_to_angle(0, { .turn_direction = cw });
+	chassis.turn_to_angle(359, { .turn_direction = cw });
 }
 
 void test_swing() {
@@ -95,10 +95,10 @@ void test_boomerang() {
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
-	chassis.drive_to_pose(24, 0, 0, {.lead = .2});
+	chassis.drive_to_pose(24, 0, 90, {.lead = .2});
 	chassis.drive_to_pose(0, 24, 315);
 	chassis.drive_to_pose(0, 0, 0);
-	}
+}
 
 std::vector<point> path = {
 	{  0.000,   0.000 },
@@ -174,9 +174,10 @@ void config_tune_drive() {
 		{"drive_stl_err: ", chassis.drive_settle_error}, 
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
+		{"drive_slew ", chassis.drive_slew}
 	};
 
-	std::function<float(double)> actual_plot = [](double x){ return chassis.get_ForwardTracker_position(); };
+	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
 
 	std::function<float(double)> set_point_plot = [](double x){ 
 		if (chassis.desired_distance != prev_desired_distance) {
@@ -224,7 +225,8 @@ void config_tune_heading() {
 		{"heading_ki: ", chassis.heading_ki}, 
 		{"heading_kd: ", chassis.heading_kd}, 
 		{"heading_starti: ", chassis.heading_starti}, 
-		{"max_volt: ", chassis.heading_max_voltage}
+		{"max_volt: ", chassis.heading_max_voltage},
+		{"heading_slew ", chassis.heading_slew}
 	};
 
 	int y_min = -30;
@@ -273,7 +275,8 @@ void config_tune_turn() {
 		{"turn_max_volt: ", chassis.turn_max_voltage}, 
 		{"turn_stl_err: ", chassis.turn_settle_error}, 
 		{"turn_stl_tm: ", chassis.turn_settle_time}, 
-		{"turn_tmout: ", chassis.turn_timeout}
+		{"turn_tmout: ", chassis.turn_timeout},
+		{"Turn_slew: ", chassis.turn_slew}
 	};
 
   int y_min = -10;
@@ -313,11 +316,12 @@ void config_tune_swing() {
 		{"swing_max_volt: ", chassis.turn_max_voltage}, 
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
-		{"swing_tmout: ", chassis.swing_timeout}
+		{"swing_tmout: ", chassis.swing_timeout},
+		{"swing_slew: ", chassis.swing_slew}
 	};
 
-	int y_min = 0;
-	int y_max = 360;
+	int y_min = -20;
+	int y_max = 370;
 	int time_spent_graphing_ms = 5000; 
 
 	graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
@@ -445,24 +449,24 @@ void PID_tuner() {
 			data.modifer_scale = 1;
 		}
 		if (btnRight_new_press(Controller.ButtonRight.pressing())) {
-			data.modifier = 1 / data.modifer_scale;
-			data.needs_update = true;
+			data.modifer_scale *= 10;
+			if (data.modifer_scale > 1000) {
+				data.modifer_scale = 1000;
+			}
 		}
 		if (btnLeft_new_press(Controller.ButtonLeft.pressing())) {
-			data.modifier = -1 / data.modifer_scale;
-			data.needs_update = true;
-		}
-		if (btnY_new_press(Controller.ButtonY.pressing())) {
 			data.modifer_scale /= 10;
 			if (data.modifer_scale < (1 / data.var_upper_size)) {
 				data.modifer_scale = (1 / data.var_upper_size);
 			}
 		}
+		if (btnY_new_press(Controller.ButtonY.pressing())) {
+			data.modifier = -1 / data.modifer_scale;
+			data.needs_update = true;
+		}
 		if (btnA_new_press(Controller.ButtonA.pressing())) {
-			data.modifer_scale *= 10;
-			if (data.modifer_scale > 1000) {
-				data.modifer_scale = 1000;
-			}
+			data.modifier = 1 / data.modifer_scale;
+			data.needs_update = true;
 		}
 		if (btnX_new_press(Controller.ButtonX.pressing())) {
 			user_control_task.suspend();
@@ -472,6 +476,18 @@ void PID_tuner() {
 			});
 		}
 		if (btnB_new_press(Controller.ButtonB.pressing())) {
+			static uint32_t last_b_press = 0;
+			uint32_t now = vex::timer::system();
+			if (now - last_b_press < 200) {
+				pid_tuner_task.stop();
+				user_control_task.stop();
+				test_movements_task.stop();
+				chassis.stop_drive(vex::coast);
+				auton_scr->enable_controller_overlay();
+				disable_user_control();
+				return 0;
+			}
+			last_b_press = now;
 			user_control_task.resume();
 			test_movements_task.stop();
 			chassis.stop_drive(vex::coast);
@@ -482,28 +498,20 @@ void PID_tuner() {
   });
 }
 
-static std::vector<mik::motor> motors_;
-
-void config_add_motors(std::vector<mik::motor_group> motor_groups, std::vector<mik::motor> motors) {
-	for (auto& motor_group: motor_groups)  {
-		for (auto& motor : motor_group.getMotors()) {
-			motors_.push_back(motor);
-		}
-	}
-	for (auto& motor : motors) {
-		motors_.push_back(motor);
-	}
+std::vector<mik::motor*> config_get_motors() {
+	return mik::motor_registry();
 }
 
+
 void stop_all_motors(vex::brakeType mode) {
-	for (auto& motor : motors_) {
-		motor.stop(mode);
+	for (auto motor : config_get_motors()) {
+		motor->stop(mode);
 	}
 }
 
 void set_brake_all_motors(vex::brakeType mode) {  
-	for (auto& motor : motors_) {
-		motor.setBrake(mode);
+	for (auto motor : config_get_motors()) {
+		motor->setBrake(mode);
 	}
 }
 
@@ -515,29 +523,32 @@ int run_diagnostic() {
 		errors++;
 	}
 	if (!chassis.inertial.installed()) {
-		std::string port = to_string(chassis.inertial.index() + 1);
-		error_data.push_back("Inertial [PORT" + port + "] is disconnected");
+		std::string port = port_to_string(chassis.inertial.index());
+		error_data.push_back("Inertial [" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.forward_tracker.installed()) {
-		std::string port = to_string(chassis.forward_tracker.index() + 1);
-		error_data.push_back("Forward Tracker [PORT" + port + "] is disconnected");
+	if (!chassis.forward_tracker.installed() && chassis.tracker_mode == mik::tracker_mode::FORWARD_TRACKER) {
+		std::string port = port_to_string(chassis.forward_tracker.index());
+
+		error_data.push_back("Forward Tracker [" + port + "] is disconnected");
 		errors++;
 	}
-	if (!chassis.sideways_tracker.installed()) {
-		std::string port = to_string(chassis.sideways_tracker.index() + 1);
-		error_data.push_back("Sideways Tracker [PORT" + port + "] is disconnected");
+	if (!chassis.sideways_tracker.installed() && chassis.sideways_tracker_used) {
+		std::string port = port_to_string(chassis.sideways_tracker.index());
+		error_data.push_back("Sideways Tracker [" + port + "] is disconnected");
 		errors++;
 	}
-	for (auto& motor : motors_) {
-		if (!motor.installed()) {
-			error_data.push_back(motor.name() + " [" + motor.port() +  "] is disconnected");
+	for (auto motor : config_get_motors()) {
+		if (!motor->installed()) {
+			std::string port = port_to_string(motor->index());
+			error_data.push_back(motor->name() + " [" + port +  "] is disconnected");
 			errors++;
 		}   
 	}
 	for (auto& distance : chassis.reset_sensors.get_distance_sensors()) {
 		if (!distance.installed()) {
-			error_data.push_back(distance.name() + " [" + distance.port() +  "] is disconnected");
+			std::string port = port_to_string(distance.index());
+			error_data.push_back(distance.name() + " [" + port +  "] is disconnected");
 			errors++;
 		}
 	}
@@ -553,8 +564,6 @@ void config_add_pid_output_SD_console() {
 	UI_select_scr(console_scr->get_console_screen());
 	console_scr->reset();
 	vex::task e([](){
-		task::sleep(500);
-
 		std::vector<std::string> data_arr = get_SD_file_txt("pid_data.txt");
 		for (const auto& line : data_arr) {
 			console_scr->add(line, false);
@@ -568,14 +577,12 @@ void config_spin_all_motors() {
 	console_scr->reset();
 	disable_user_control(true);
 	vex::task spin_mtrs([](){
-		task::sleep(500);
-
-		for (mik::motor& motor : motors_) { 
-			std::string data = (motor.name() + ": " + motor.port() + ", fwd, 6 volt");
+		for (auto motor : config_get_motors()) { 
+			std::string data = (motor->name() + ": " + port_to_string(motor->index()) + ", fwd, 6 volt");
 			console_scr->add(std::string(data), [](){ return ""; });
-			motor.spin(fwd, 6, volt);
+			motor->spin(fwd, 6, volt);
 			vex::task::sleep(1000);
-			motor.stop();
+			motor->stop();
 			vex::task::sleep(1000);
 		}
 		enable_user_control();
@@ -588,12 +595,11 @@ void config_motor_wattage() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task watt([](){
-		task::sleep(500);
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 5, false) + " Watts    "; });
 
-		for (auto& motor : motors_) {
-			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.power(), 5, false) + " Watts    "; });
+		for (auto motor : config_get_motors()) {
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->power(), 5, false) + " Watts    "; });
 		}
 		return 0;
 	});
@@ -604,12 +610,10 @@ void config_motor_temp() {
 	UI_select_scr(console_scr->get_console_screen()); 
   
   	vex::task temp([](){
-		task::sleep(500);
-		
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTemperature(), 0, true) + "%% overheated    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTemperature(), 0, true) + "%% overheated    "; });
-		for (auto& motor : motors_) {
-			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.temperature(), 0, true) + "%% overheated    "; });
+		for (auto motor : config_get_motors()) {
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->temperature(), 0, true) + "%% overheated    "; });
 		}
 		return 0;
   });
@@ -620,13 +624,11 @@ void config_motor_torque() {
 	console_scr->reset();
 	UI_select_scr(console_scr->get_console_screen()); 
 	
-	vex::task temp([](){
-		task::sleep(500);
-		
+	vex::task temp([](){		
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 5, false) + " Nm    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 5, false) + " Nm    "; });
-		for (auto& motor : motors_) {
-			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.torque(), 5, false) + " Nm    "; });
+		for (auto motor : config_get_motors()) {
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->torque(), 5, false) + " Nm    "; });
 		}
 		return 0;
 	});
@@ -638,12 +640,10 @@ void config_motor_efficiency() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 5, false) + "%% Eff    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 5, false) + "%% Eff     "; });
-		for (auto& motor : motors_) {
-			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.efficiency(), 5, false) + "%% Eff    "; });
+		for (auto motor : config_get_motors()) {
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->efficiency(), 5, false) + "%% Eff    "; });
 		}
 		return 0;
 	});
@@ -655,30 +655,64 @@ void config_motor_current() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		task::sleep(500);
-
 		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 5, false) + " Amps    "; });
 		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 5, false) + " Amps    "; });
-		for (auto& motor : motors_) {
-			console_scr->add(motor.name() + ": ", [&motor]() { return to_string_float(motor.current(), 5, false) + " Amps    "; });
+		for (auto motor : config_get_motors()) {
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->current(), 5, false) + " Amps    "; });
 		}
 		return 0;
 	});
 }
 
 void config_odom_data() {
-	if (!chassis.position_tracking) {
-		chassis.set_coordinates(0, 0, 0);
-	}
-
-	console_scr->add("X: ", [](){ return chassis.get_X_position(); });
-	console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
-	console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
-	console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-	console_scr->add("Forward_Tracker: ", [](){ return chassis.get_ForwardTracker_position(); });
-	console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_SidewaysTracker_position(); });
-
+	console_scr->reset();
 	UI_select_scr(console_scr->get_console_screen()); 
+
+	vex::task temp([](){
+		if (!chassis.position_tracking) {
+			chassis.set_coordinates(0, 0, 0);
+		}
+	
+		console_scr->add("X: ", [](){ return chassis.get_X_position(); });
+		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
+		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
+		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
+		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+
+		return 0;
+	});
+
+}
+
+void config_reset_data() {
+	console_scr->reset();
+	UI_select_scr(console_scr->get_console_screen()); 
+
+	vex::task temp([](){
+		if (!chassis.position_tracking) {
+			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
+			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
+			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
+			return 0;
+		}
+
+		console_scr->add("Odom X: ", [](){ return chassis.get_X_position(); });
+		console_scr->add("Odom Y: ", [](){ return chassis.get_Y_position(); });
+		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+
+		for (auto& sensor : chassis.reset_sensors.get_distance_sensors()) {
+			auto sensor_pos = sensor.position();
+
+			console_scr->add(sensor.name() + ": ", [sensor_pos, &sensor](){
+				auto wall = chassis.reset_sensors.get_wall_facing(sensor_pos, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading());
+				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
+				return wall + " " + axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(sensor_pos, auto_detect_wall, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading()), 3, false) + " D: " + to_string_float(sensor.objectDistance(distanceUnits::in), 3, false);
+			});
+		}
+
+		return 0;
+	});	
 }
 
 void config_error_data() {
@@ -686,38 +720,198 @@ void config_error_data() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task add_errors([](){
-	task::sleep(500);
-	for (const auto& error : error_data) {
-		console_scr->add(error);  
-	}
-	return 0;
+		for (const auto& error : error_data) {
+			console_scr->add(error);  
+		}
+		return 0;
 	});
+}
+
+void config_measure_velocity_accel() {
+    console_scr->reset();
+    UI_select_scr(console_scr->get_console_screen());
+
+	disable_user_control();
+
+    vex::task temp([](){
+        std::vector<std::pair<float, float>> pos_time{};
+
+		chassis.drive_distance(72, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
+
+		Brain.Timer.reset();
+		chassis.right_drive.resetPosition();
+		chassis.forward_tracker.resetPosition();
+
+        while (Brain.Timer.time(msec) < 1500) {
+            float pos = chassis.get_forward_tracker_position() / 12.0f;
+			float t = Brain.Timer.time(msec) / 1000.0f;
+            pos_time.push_back({pos, t});
+            task::sleep(10);
+        }
+		chassis.cancel_motion();
+		task::sleep(100);
+		chassis.set_brake_type(coast);
+		chassis.stop_drive(vex::brakeType::coast);
+
+        std::vector<std::pair<float, float>> velocities;
+		for (size_t i = 1; i < pos_time.size(); ++i) {
+			float v = ((pos_time[i].first - pos_time[i - 1].first) / (pos_time[i].second - pos_time[i - 1].second));
+			velocities.push_back({v, pos_time[i].second});
+		}
+
+		std::vector<std::pair<float, float>> smoothed_velo;
+        for (size_t i = 2; i < velocities.size() - 2; ++i) {
+			float avg_v = (velocities[i - 2].first + velocities[i - 1].first +
+			velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
+			smoothed_velo.push_back({avg_v, velocities[i].second});
+        }
+
+		std::vector<std::pair<float, float>> acceling;
+		float max_vel = -1.0;
+		size_t max_index = 0;
+
+		for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+			if (smoothed_velo[i].first > max_vel) {
+				max_vel = smoothed_velo[i].first;
+				max_index = i;
+			}
+		}
+
+		for (size_t i = 0; i <= max_index; ++i) {
+            float v = smoothed_velo[i].first;
+            
+            if (v > max_vel * 0.10 && v < max_vel * 0.90) {
+                acceling.push_back(smoothed_velo[i]);
+            }
+        }
+
+		float sum_a = 0;
+		float sum_t = 0;
+		
+		float start_time = acceling[0].second;
+
+        for (size_t i = 0; i < acceling.size(); ++i) {
+            float v = acceling[i].first;
+            float t = acceling[i].second - start_time;
+            
+            sum_a += v * t;
+            sum_t += t * t;
+        }
+		float constant_accel = sum_a / sum_t; 
+
+        console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
+        console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
+
+		
+		print("Start Data, Position (second, ft)");
+		for (const auto& p : pos_time) {
+			print(to_string_float(p.second, 3, false) + ", " + to_string_float(p.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		// You can uncomment this if you want to see all data 
+
+		// print("Start Data, Velocity (second, ft/s)");
+		// for (const auto& v : velocities) {
+		// 	print(to_string_float(v.second, 3, false) + ", " + to_string_float(v.first, 3, false));
+		// 	task::sleep(20);
+		// }
+		// print("End Data");
+
+		// print("Start Data, Smoothed Velocity (second, ft/s)");
+		// for (const auto& s : smoothed_velo) {
+		// 	print(to_string_float(s.second, 3, false) + ", " + to_string_float(s.first, 3, false));
+		// 	task::sleep(20);
+		// }
+		// print("End Data");
+
+		print("Start Data, Acceleration Phase (second, ft/s)");
+		for (const auto& a : acceling) {
+			print(to_string_float(a.second, 3, false) + ", " + to_string_float(a.first, 3, false));
+			task::sleep(20);
+		}
+		print("End Data");
+
+		enable_user_control();
+        return 0;
+    });
+}
+
+void config_measure_offsets() {
+    console_scr->reset();
+    UI_select_scr(console_scr->get_console_screen());
+
+    vex::task temp([](){
+		int iterations = 10;
+	
+		float f_offset = 0.0, s_offset = 0.0;
+	
+		chassis.forward_tracker.resetPosition();
+		chassis.sideways_tracker.resetPosition();
+		chassis.right_drive.resetPosition();
+		no_tracker_constants();
+	
+		for (int i = 0; i < iterations; i++) {
+			chassis.set_heading(0);
+			chassis.forward_tracker.resetPosition();
+			chassis.sideways_tracker.resetPosition();
+			chassis.right_drive.resetPosition();
+	
+			float start_heading = chassis.inertial.rotation();
+			float target = i % 2 == 0 ? 90 : 270;
+	
+			chassis.turn_to_angle(target, { .max_voltage = 6 });
+			task::sleep(250);
+	
+			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
+	
+	
+			float f_delta = chassis.get_forward_tracker_position();
+			float s_delta = chassis.get_sideways_tracker_position();
+	
+			f_offset += f_delta / t_delta;
+			s_offset += s_delta / t_delta;
+		}
+	
+		f_offset /= iterations;
+		s_offset /= iterations;
+
+		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
+		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
+
+		chassis.set_brake_type(vex::brakeType::coast);
+		chassis.stop_drive(vex::brakeType::coast);
+
+		return 0;
+	});
+
 }
 
 void config_skills_driver_run() {
 	auton_scr->disable_controller_overlay();
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("SKILLS DRIVER RUN               ");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             3                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             2                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("             1                 ");
-	Controller.rumble(".");
-	task::sleep(1000);
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("            GO                 ");
-	Controller.rumble("-");
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("                               ");
-
 	vex::task timer([](){
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("SKILLS DRIVER RUN               ");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             3                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             2                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("             1                 ");
+		Controller.rumble(".");
+		task::sleep(1000);
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("            GO                 ");
+		Controller.rumble("-");
+		Controller.Screen.setCursor(1, 1);
+		Controller.Screen.print("                               ");
+
 		float start_time = Brain.Timer.time(vex::timeUnits::sec);
 		float current_time = start_time;
 		float max_time = 60;
@@ -758,6 +952,12 @@ void config_skills_driver_run() {
 }
 
 void config_test_three_wire_port(int port) {
-	vex::digital_out dig_out = Brain.ThreeWirePort.Port[port];
+	vex::digital_out dig_out = to_triport(port);
+	dig_out.set(!dig_out.value());
+}
+
+void config_test_three_wire_port(int expander_port, int port) {
+	vex::triport expander(expander_port);
+	vex::digital_out dig_out = to_triport(expander, port);
 	dig_out.set(!dig_out.value());
 }

@@ -1,16 +1,53 @@
-#include "vex.h"
+#include <vector>
+#include <string>
+#include <cmath>
+#include <algorithm>
+#include "v5.h"
+
+#include "mikLib/Devices/motors.h"
+#include "mikLib/Drive/util.h"
 
 using namespace mik;
 
+std::vector<mik::motor*>& mik::motor_registry() {
+    static std::vector<mik::motor*> registry;
+    return registry;
+}
+
 mik::motor::motor(int port, bool reversed, std::string name) :
-    vex::motor(port, ratio6_1, reversed), port_(port), gear_cartridge_(ratio6_1), reversed_(reversed), name_(std::move(name))
-{};
+    vex::motor(port, vex::ratio6_1, reversed), port_(port), gear_cartridge_(vex::ratio6_1), reversed_(reversed), name_(std::move(name))
+{
+    mik::motor_registry().push_back(this);
+};
 
 mik::motor::motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name) :
     vex::motor(port, gear_cartridge, reversed), port_(port), gear_cartridge_(gear_cartridge), reversed_(reversed), name_(std::move(name))
-{};
+{
+    mik::motor_registry().push_back(this);
+};
 
-const std::string mik::motor::port() const { return "PORT" + to_string(port_ + 1); }
+mik::motor::motor(const mik::motor& other) :
+    vex::motor(other.port_, other.gear_cartridge_, other.reversed_),
+    port_(other.port_), gear_cartridge_(other.gear_cartridge_), reversed_(other.reversed_), name_(other.name_)
+{
+    mik::motor_registry().push_back(this);
+};
+
+mik::motor::motor(mik::motor&& other) noexcept :
+    vex::motor(other.port_, other.gear_cartridge_, other.reversed_),
+    port_(other.port_), gear_cartridge_(other.gear_cartridge_), reversed_(other.reversed_), name_(std::move(other.name_))
+{
+    auto& reg = mik::motor_registry();
+    auto it = std::find(reg.begin(), reg.end(), &other);
+    if (it != reg.end()) { *it = this; }
+    else { reg.push_back(this); }
+};
+
+mik::motor::~motor() {
+    auto& reg = mik::motor_registry();
+    reg.erase(std::remove(reg.begin(), reg.end(), this), reg.end());
+};
+
 bool mik::motor::reversed() const { return reversed_; }
 vex::gearSetting mik::motor::gear_cartridge() const { return gear_cartridge_; }
 std::string& mik::motor::name() { return name_; }
@@ -62,8 +99,14 @@ void mik::motor_group::spin(vex::directionType dir) {
 }
 
 void mik::motor_group::spin(vex::directionType dir, float voltage, vex::voltageUnits units) {
+    // TEMP FIX NEEDS TO BE TEST
+
     for (mik::motor& motor : motors) {
-        motor.spin(dir, voltage, units);
+        if (std::fabs(voltage) < 0.05f) {
+            motor.stop(vex::coast);
+        } else {
+            motor.spin(dir, voltage, units);
+        }
     }
 }
 

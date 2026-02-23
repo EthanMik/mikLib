@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vex.h"
+#include "mikLib/ui.h"
 
 namespace mik {
 
@@ -27,6 +27,9 @@ public:
     void set_width(int w) override;
     void set_height(int h) override;
     void set_text(std::string text_label) override;
+    
+    void set_text_color(const std::string& color);
+    void set_fill_color(const std::string& color);
 
     void render() override;
 
@@ -39,8 +42,8 @@ private:
     int h;
     uint32_t text_color;
     uint32_t bg_color;
-    const std::string text_color_hex;
-    const std::string bg_color_hex;
+    std::string text_color_hex;
+    std::string bg_color_hex;
     UI_distance_units units;
 };
 }

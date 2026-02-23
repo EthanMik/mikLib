@@ -7,102 +7,91 @@ vex::brain Brain;
 vex::controller Controller;
 vex::competition Competition;
 
-bool calibrating = false;
-
-// Allows recalibration of the inertial using MINIMUN_INERTIAL_CALIBRATION_ERROR
-bool force_calibrate_inertial = true;
-
-// After inertial sensor calibration the program waits 1 second and checks 
-// to see if the angle has changed more than this value. If so, it will recalibrate 
-// the inertial sensor and vibrate the controller. The lower the value the less likelihood
-// of a failed calibration.
-static const float MINIMUN_INERTIAL_CALIBRATION_ERROR = .05;
+// mikLib v2.0 setup, if you are following along with video tutorials it is going to be slightly different
 
 Chassis chassis(
-    // Drivetrain motors
+    // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-		mik::motor(PORT4, false, blue_6_1, "left_front_motor"), 
-		mik::motor(PORT8, true, blue_6_1, "left_middle_motor"), 
-		mik::motor(PORT6, true, blue_6_1, "left_back_motor")
+        mik::motor(PORT11, true, blue_6_1, "left front motor"),
+        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
+        mik::motor(PORT13, true, blue_6_1, "left back motor"),
     }),
+    // Right drivetrain motors
     mik::motor_group({
-		mik::motor(PORT5, false, blue_6_1, "right_front_motor"), 
-		mik::motor(PORT9, true, blue_6_1, "right_middle_motor"), 
-		mik::motor(PORT10, false, blue_6_1, "right_back_motor")
+        mik::motor(PORT2, false, blue_6_1, "right front motor"),
+        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
+        mik::motor(PORT6, false, blue_6_1, "right back motor"),
     }),
+	
+    PORT3,  // Inertial sensor port
+    360,    // Inertial scale (reading after a full 360° turn)
+	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
+	
+    forward_tracker, // Replace with "motor_encoder" if no forward tracker
+    2.75,            // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoder
+    1.33,            // Drivetrain gear ratio (ex: a 36 driving a 48 is 1.33). Only needed with motor encoder
+	6,               // Drivetrain center distance (in), (half drivetrain track width). Only needed with motor encoder. Can be found automatically with "Get Offsets" on "Config" tab
 
-    PORT18, // Inertia sensor port
-    360,    // Inertial scale, value that reads after turning robot a full 360
+    PORT4,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    0,      // Forward tracker center distance (in). Positive = right of center, negative = left. Can be found automatically with "Get Offsets" on "Config" tab
 
-    PORT19, // Forward Tracker Port
-    -2,     // Forward Tracker wheel diameter in inches (negative flips direction)
-    0,      // Forward Tracker center distance in inches (a positive distance corresponds to a tracker on the right side of the robot, negative is left)
+    PORT14,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
+    -2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
+    0.3,     // Sideways tracker center distance (in). Positive = behind center, negative = in front. Can be found automatically with "Get Offsets" on "Config" tab
 
-    PORT15,  // Sideways tracker port
-    2,       // Sideways tracker wheel diameter in inches (negative flips direction)
-    0.3,     // Sideways tracker center distance in inches (positive distance is behind the center of the robot, negative is in front)
-
+    // Distance sensors mounted on a face of the robot
     mik::distance_reset({
-		// A distance sensor that is mounted on the front of the robot and is offset by 5 inches to the right and 3.5 inches forward from the tracking center 
-		mik::distance(PORT17, rear_sensor, 5, 3.5)
+        mik::distance(
+			PORT8,		  // Distance sensor port
+            front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
+            5,            // X offset from tracking center (in). Positive = right of center, negative = left.
+            3.5           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+        ),
+        mik::distance(PORT8, left_sensor, -2, -4)
     })
 );
 
-Assembly assembly(
-	mik::motor_group({
-		mik::motor(PORT13, true, green_18_1, "left_lift_motor"),
-		mik::motor(PORT20, false, green_18_1, "right_lift_motor")
-	}),
+// Add your devices in assembly.h then create them here
 
-	mik::motor(PORT16, false, blue_6_1, "intake_motor"),
-	vex::rotation(PORT11),
-	mik::piston(PORT_A)
-);
+/* Creating a motor group in assembly */
+mik::motor_group Assembly::lower_intake_motors({
+	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
+	mik::motor(PORT2, false, green_18_1, "middle_intake")
+});
 
-/** Allows UI to display all motor values */
-void log_motors() {
-    config_add_motors({
-		// Add all mik motor groups in here
-		chassis.left_drive, 
-		chassis.right_drive, 
-		assembly.lift_arm_motors
-    }, 
-	{
-		// Add all mik motors in here
-		assembly.intake_motor
-    }
-  );
-}
+/* Creating upper intake motor in assembly */
+mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
 
-void calibrate_inertial(void) {
-	calibrating = true;
-	chassis.inertial.calibrate();
-  
-	while (chassis.inertial.isCalibrating()) {
-		vex::task::sleep(25);
-	}
-  
-  	// Recalibrate inertial until it is within calibration threshold
-  	float starting_rotation = chassis.inertial.rotation();
-  	task::sleep(1000);
-	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > MINIMUN_INERTIAL_CALIBRATION_ERROR) { 
-		Controller.rumble("-");
-		calibrate_inertial();
-  	}
-  	calibrating = false;
-}
+/* Creating pistons in assembly */
+mik::piston Assembly::scraper_piston(PORT_B);
+mik::piston Assembly::wing_piston(PORT_A);
+
+/* Creating alternative vex devices in assembly */
+vex::rotation Assembly::rotation_sensor(PORT6);
+vex::optical Assembly::optical_sensor(PORT13);
+vex::limit Assembly::limit_switch(to_triport(PORT_F));
+
+
+
+
+
+
+// mikLib initialization below, you do not need to edit
+
+Assembly assembly;
 
 static void loading_screen(bool stop) {
 	static vex::task loading_bar;
-	
+
 	if (stop) {
 		loading_bar.stop();
 		return;
 	}
 
 	Controller.Screen.setCursor(1, 1);
-	Brain.Screen.drawImageFromBuffer(mikLib_logo, 0, 0, sizeof(mikLib_logo));
-	
+	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
 		Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
@@ -128,7 +117,7 @@ static void loading_screen(bool stop) {
 }
 
 static void handle_disconnected_devices() {
-	int errors = run_diagnostic(); 
+	int errors = run_diagnostic();
 	if (errors > 0) {
 		Controller.rumble(".");
 		Controller.Screen.setCursor(1, 1);
@@ -156,10 +145,10 @@ void init(void) {
 	loading_screen(false);
 
 	// Setup motors
-	log_motors();
+	motors_scr->init_motors();
 
 	// Calibrate inertial
-	calibrate_inertial();
+	chassis.calibrate_inertial();
 
 	// Stop loading screen
 	loading_screen(true);
@@ -189,5 +178,9 @@ void enable_user_control(void) {
 }
 
 bool control_disabled(void) {
+	if (Competition.isDriverControl() && (Competition.isFieldControl() || Competition.isCompetitionSwitch()) && user_control_disabled) {
+		auton_scr->disable_controller_overlay();
+		return false;
+	};
   	return user_control_disabled;
 }

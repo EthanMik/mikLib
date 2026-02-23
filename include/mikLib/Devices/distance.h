@@ -1,6 +1,10 @@
 #pragma once
 
-#include "vex.h"
+#include "v5.h"
+#include "v5_vcs.h"
+#include "mikLib/globals.h"
+#include <string>
+#include <vector>
   
 namespace mik {
 
@@ -15,9 +19,6 @@ public:
      * @param y_center_offset The vertical offset from the tracking center, forward is +, backwards is -
      */
     distance(int port, mik::distance_position position, float x_center_offset, float y_center_offset);
-
-    /** @return The port in PORT# format. */
-    const std::string port() const;
 
     /** @return The position of the distance sensor. */
     mik::distance_position position() const;
@@ -67,15 +68,22 @@ public:
      * 
      * @return A new x or y coordinate based on the wall desired sensor is faced at.
      */
-    float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float angle);
+    float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float x, float y, float angle);
+
+    std::string get_wall_facing(mik::distance_position sensor_pos, float x, float y, float angle);
     
     /** @returns vector containing all mik::distance sensors. */
     std::vector<mik::distance>& get_distance_sensors();
     
 private:
     float to_sensor_offset_constant(mik::distance_position sensor_pos);
+    std::string to_wall_name(mik::wall_position wall_position);
     float to_wall_pos_constant(mik::wall_position wall_pos);
     float to_wall_angle_constant(mik::wall_position wall_pos);
+
+    mik::wall_position auto_detect_wall(const float distance, const float sensor_offset,
+        const float x_offset, const float y_offset, float x, float y, float angle
+    );
 
     std::vector<mik::distance> distance_sensors;
 };

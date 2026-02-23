@@ -1,89 +1,8 @@
-#include "vex.h"
+#include "mikLib/ui.h"
+#include "mikLib/drive.h"
 
 using namespace mik;
 using namespace vex;
-
-// Beware of garbage code below
-
-controller_btn::controller_btn(bool is_btn, std::string unpressed_state, std::string pressed_state, std::function<void()> callback) :
-    is_btn(is_btn), unpressed_state(unpressed_state), pressed_state(pressed_state), callback(callback)
-{
-    state_label = unpressed_state;
-};
-
-controller_btn::controller_btn(bool really_stupid_exception_that_shouldnt_exist_but_i_dont_want_to_make_another_class, std::function<void()> callback) :
-    callback(callback), exception(really_stupid_exception_that_shouldnt_exist_but_i_dont_want_to_make_another_class)
-{
-    cycle_state_num = auton_scr->var_num;
-    state_label = "[" + to_string(cycle_state_num) + "]";
-};
-
-std::string controller_btn::get_state_label() { return state_label; }
-bool controller_btn::get_state() { 
-    if (exception) {
-        return exception;
-    }
-    return state;
-}
-void controller_btn::unpush() { state = true; push(); }
-void controller_btn::enable_full_override(std::string lbl) { state_label = lbl; full_override = true; }
-void controller_btn::change_state(bool is_pressed) {
-    if (is_pressed) {
-        state = true;
-        state_label = pressed_state;
-    } else {
-        state = false;
-        state_label = unpressed_state;
-    }
-}
-void controller_btn::disable_full_override() { 
-    full_override = false;
-    if (state) {
-        state_label = pressed_state;
-    } else {
-        state_label = unpressed_state;
-    } 
-}
-
-bool controller_btn::push() {
-    if (full_override) {
-        return false;
-    }
-    if (exception) {
-        callback();
-        cycle_state_num = auton_scr->var_num;
-        state_label = "[" + to_string(cycle_state_num) + "]";
-        return false;
-    }
-
-    state = !state;
-    if (state) {
-        state_label = pressed_state;
-    } else {
-        state_label = unpressed_state;
-    }
-    if (is_btn && state) {
-        state_label = unpressed_state;
-        state = false;
-        callback();
-        return state;
-    }
-    callback();
-
-    return state;
-}
-
-void controller_btn::set_cycle_state() {
-    if (exception) {
-        cycle_state_num = auton_scr->var_num;
-        state_label = "[" + to_string(cycle_state_num) + "]";
-    }
-}
-
-int controller_btn::get_cycle_state() {
-    return cycle_state_num;
-}
-
 
 UI_auton_screen::UI_auton_screen() {
     UI_crt_auton_scr();
@@ -94,6 +13,12 @@ std::shared_ptr<screen> UI_auton_screen::get_auton_screen() {
 }
 
 void UI_auton_screen::start_auton() {
+    Brain.Screen.clearScreen();
+    Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+    Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
+    Brain.Screen.setPenColor(mik::loading_text_color.c_str());
+    Brain.Screen.printAt(160, 220, "Competition Mode");
+    Brain.Screen.render();
     disable_controller_overlay();
     time_limit = false;
     if (!robot_is_calibrated) {
@@ -297,7 +222,7 @@ void UI_auton_screen::UI_crt_auton_scr() {
         }));
         show_alignment_btn->set_callback([this](){ queue_autons(true, false); });
 
-    auto heading_btn = UI_crt_btn(UI_crt_rec(268, 50, 170, 76, auton_data_bg_color, auton_data_outline_color, 2, UI_distance_units::pixels), [](){ calibrate_inertial(); });
+    auto heading_btn = UI_crt_btn(UI_crt_rec(268, 50, 170, 76, auton_data_bg_color, auton_data_outline_color, 2, UI_distance_units::pixels), [](){ chassis.calibrate_inertial(); });
         heading_btn->set_states(UI_crt_rec(268, 50, 170, 76, auton_data_bg_color, auton_data_pressed_color, 2, UI_distance_units::pixels), UI_crt_rec(268, 50, 170, 76, auton_data_bg_color, auton_data_pressed_color, 2, UI_distance_units::pixels));
 
     auto label_label = UI_crt_gfx({UI_crt_txt("A:", 278, 75, auton_text_color, auton_data_bg_color, UI_distance_units::pixels), UI_crt_txt("X:", 278, 95, auton_text_color, auton_data_bg_color, UI_distance_units::pixels), UI_crt_txt("Y:", 278, 115, auton_text_color, auton_data_bg_color, UI_distance_units::pixels)});
@@ -337,28 +262,27 @@ void UI_auton_screen::update_var_display() {
 void UI_auton_screen::UI_select_auton(autons auton) {
     robot_is_calibrated = false;
 
-    switch (auton)
-    {
-    case autons::RED_BLUE:
-        auto_max_time = 15;
-        red_blue = !red_blue;
-        break;
+    switch (auton) {
+        case autons::RED_BLUE:
+            auto_max_time = 15;
+            red_blue = !red_blue;
+            break;
         case autons::RINGS_GOAL:
-        auto_max_time = 15;
-        rings_goal = !rings_goal;
-        break;
+            auto_max_time = 15;
+            rings_goal = !rings_goal;
+            break;
         case autons::QUALS_ELIMS:
-        auto_max_time = 15;
-        quals_elims = !quals_elims;
-        break;    
+            auto_max_time = 15;
+            quals_elims = !quals_elims;
+            break;    
         case autons::OFF_SAWP:
-        auto_max_time = 15;
-        off_sawp = !off_sawp;
-        break;
+            auto_max_time = 15;
+            off_sawp = !off_sawp;
+            break;
         case autons::OFF_SKILLS:
-        auto_max_time = 60;
-        off_skills = !off_skills;
-        break;
+            auto_max_time = 60;
+            off_skills = !off_skills;
+            break;
     }
 
     if (off_sawp && quals_elims) {
@@ -384,6 +308,11 @@ void UI_auton_screen::UI_select_auton(autons auton) {
     }
 
     set_description();
+}
+
+mik::alliance_colors UI_auton_screen::get_alliance_color() {
+    if (this->red_blue) return mik::alliance_colors::RED;
+    return mik::alliance_colors::BLUE;
 }
 
 bool UI_auton_screen::set_description() {
@@ -502,7 +431,7 @@ void UI_auton_screen::prev_var() {
 }
 
 void UI_auton_screen::save_auton_SD(int count) {
-    if (!Brain.SDcard.isInserted()) { return; }
+    if (!Brain.SDcard.isInserted() || restoring_from_sd) { return; }
     int r = auton_scr->cursor_position.first;
     int c = auton_scr->cursor_position.second;
     std::string id = to_string(r) + " " + to_string(c);
@@ -512,6 +441,7 @@ void UI_auton_screen::save_auton_SD(int count) {
         write_to_SD_file("auton.txt", id_full);
         return;
     }
+    remove_duplicates_SD_file("auton.txt", id);
     if (auton_scr->control_panel[r][c].get_state()) {
         write_to_SD_file("auton.txt", id_full);
     } else {
@@ -520,20 +450,39 @@ void UI_auton_screen::save_auton_SD(int count) {
 }
 
 void UI_auton_screen::set_previous_selected_auto() {
+    red_blue = false;
+    rings_goal = false;
+    quals_elims = false;
+    off_sawp = false;
+    off_skills = false;
+    time_limit = false;
+    odom_display = false;
+    var_num = 1;
+    var = auto_variation::ONE;
+
+    flip_toggle(red_blue_tgl, false);
+    flip_toggle(rings_goal_tgl, false);
+    flip_toggle(quals_elims_tgl, false);
+    flip_toggle(off_sawp_tgl, false);
+
     std::vector<std::string> output = get_SD_file_txt("auton.txt");
 
+    restoring_from_sd = true;
     for (auto it = output.rbegin(); it != output.rend(); ++it) {
         int r = 0, c = 0, count = 0;
         std::stringstream ss(*it);
-        if (ss >> r >> c >> count) {}
+        if (!(ss >> r >> c)) continue;
+        ss >> count;
 
         if (count > 0) {
             var_num = count;
+            var = int_to_auto_variation(var_num);
             auton_scr->control_panel[r][c].set_cycle_state();
         } else {
             auton_scr->control_panel[r][c].push();
         }
     }
+    restoring_from_sd = false;
     update_var_display();
 }
 
@@ -700,15 +649,15 @@ void UI_auton_screen::enable_controller_overlay() {
          {controller_btn(false, "[Qual]", "[Elim]", [this](){ UI_select_auton(autons::QUALS_ELIMS); flip_toggle(quals_elims_tgl, quals_elims); save_auton_SD(); })}}, 
 
         {{controller_btn(false, "[Off]", "[Sawp]", [this](){ UI_select_auton(autons::OFF_SAWP); flip_toggle(off_sawp_tgl, off_sawp); save_auton_SD(); } )}, 
-         {controller_btn(false, "[Off]", "[Skills]", [this](){ UI_select_auton(autons::OFF_SKILLS); flip_toggle(config_scr->macro_10_bg_tgl, off_skills); save_auton_SD(); } )}, 
+         {controller_btn(false, "[Off]", "[Skills]", [this](){ UI_select_auton(autons::OFF_SKILLS); flip_toggle(config_scr->auto_skills_tgl, off_skills); save_auton_SD(); } )}, 
          {controller_btn(true, [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); } )}}, 
 
         {{controller_btn(true, "[Desc]", "[###]", [this](){ controller_description_scr(); } )}, 
          {controller_btn(true, "[Calib]", "[###]", [this](){ controller_calibrate_scr(); queue_autons(true, false); } )},
          {controller_btn(true, "[Run]", "[##]", [](){ auton_scr->start_auton_test(); })}},
 
-        {{controller_btn(false, "[Off]", "[Cap]", [this](){ enable_time_limit(); flip_toggle(config_scr->macro_4_bg_tgl, time_limit); save_auton_SD(); } )}, 
-         {controller_btn(true, "[RCal]", "[...]", [](){ calibrate_inertial(); } )}, 
+        {{controller_btn(false, "[Off]", "[Cap]", [this](){ enable_time_limit(); flip_toggle(config_scr->time_cap_auto_tgl, time_limit); save_auton_SD(); } )}, 
+         {controller_btn(true, "[RCal]", "[...]", [](){ chassis.calibrate_inertial(); } )}, 
          {controller_btn(false, "[Off]", "[Odom]", [this](){ enable_odom_display(); save_auton_SD(); } )}}
     };
     
@@ -756,7 +705,6 @@ void UI_auton_screen::restart_controller_overlay() {
             {
                 task::sleep(200);
                 auton_scr->disable_controller_overlay();
-                auton_scr->controller_default_scr();
                 break;
             } 
             task::sleep(50);
