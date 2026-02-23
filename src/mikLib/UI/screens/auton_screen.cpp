@@ -13,6 +13,12 @@ std::shared_ptr<screen> UI_auton_screen::get_auton_screen() {
 }
 
 void UI_auton_screen::start_auton() {
+    Brain.Screen.clearScreen();
+    Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+    Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
+    Brain.Screen.setPenColor(mik::loading_text_color.c_str());
+    Brain.Screen.printAt(160, 220, "Competition Mode");
+    Brain.Screen.render();
     disable_controller_overlay();
     time_limit = false;
     if (!robot_is_calibrated) {

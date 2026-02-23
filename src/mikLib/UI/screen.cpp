@@ -108,7 +108,7 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
     bool is_exception = false;
 
     if ((scroll_dir == scroll_direction::VERTICAL) &&
-        (component->get_y_pos() + component->get_height() < this->y ||
+        (component->get_y_pos() < this->y ||
         component->get_y_pos() > this->y + this->h)) {
             is_exception = true;
     }
@@ -117,6 +117,13 @@ bool screen::is_clickable_exception(const std::shared_ptr<UI_component>& compone
         component->get_x_pos() > this->x + this->w)) {
             is_exception = true;
 
+    }
+    if (scroll_dir == scroll_direction::NONE &&
+        (component->get_x_pos() + component->get_width() < this->x ||
+        component->get_x_pos() > this->x + this->w ||
+        component->get_y_pos() + component->get_height() < this->y ||
+        component->get_y_pos() > SCREEN_HEIGHT)) {
+            is_exception = true;
     }
     if (component->get_ID() < 0) {
         is_exception = true;
@@ -144,6 +151,9 @@ bool screen::needs_update() {
         }
         if (component->needs_update()) {
             render_index = 0;
+            if (lazy_render) {
+                render_index = i;
+            }
             needs_render_update = true;
         }
     }

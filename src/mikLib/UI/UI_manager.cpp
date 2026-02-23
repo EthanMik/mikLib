@@ -185,7 +185,7 @@ void UI_init() {
         scr->refresh();
     }
 
-    UI_select_scr(motors_scr->get_motors_screen());
+    // UI_select_scr(motors_scr->get_motors_screen());
 }
 
 void UI_controller_auton_selector() {

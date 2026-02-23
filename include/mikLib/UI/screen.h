@@ -38,6 +38,8 @@ public:
     void set_UI_components(std::vector<std::shared_ptr<UI_component>> components);
     const std::vector<std::shared_ptr<UI_component>> get_UI_components();
 
+    bool lazy_render = false;
+
 private:
     enum class scroll_direction { NONE, HORIZONTAL, VERTICAL };
     

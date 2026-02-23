@@ -12,37 +12,33 @@ vex::competition Competition;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT7, true, blue_6_1, "Left 5 PORT1"),
-        mik::motor(PORT17, false, blue_6_1, "Left 4 PORT17"),
-        mik::motor(PORT18, true, blue_6_1, "Left 3 PORT18"),
-		mik::motor(PORT19, false, blue_6_1, "Left 2 PORT19"),
-		mik::motor(PORT20, true, blue_6_1, "Left 1 PORT 20"),
+        mik::motor(PORT11, true, blue_6_1, "left front motor"),
+        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
+        mik::motor(PORT13, true, blue_6_1, "left back motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT11, false, blue_6_1, "Right 5 PORT11"),
-        mik::motor(PORT12, true, blue_6_1, "Right 4 PORT12"),
-        mik::motor(PORT13, false, blue_6_1, "Right 3 PORT13"),
-		mik::motor(PORT14, true, blue_6_1, "Right 2 PORT14"),
-		mik::motor(PORT15, false, blue_6_1, "Right 1 PORT15")
+        mik::motor(PORT2, false, blue_6_1, "right front motor"),
+        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
+        mik::motor(PORT6, false, blue_6_1, "right back motor"),
     }),
 	
-    PORT10, // Inertial sensor port
+    PORT3,  // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-    motor_encoder, // Replace with "motor_encoder" if no forward tracker
-    2.75,   // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoders
-    0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75). Only needed with motor encoders
-	6,      // Drivetrain center distance (in), Half the track width (center-to-center distance between left and right wheels). Only needed with motor encoders
+    forward_tracker, // Replace with "motor_encoder" if no forward tracker
+    2.75,            // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoder
+    1.33,            // Drivetrain gear ratio (ex: a 36 driving a 48 is 1.33). Only needed with motor encoder
+	6,               // Drivetrain center distance (in), (half drivetrain track width). Only needed with motor encoder. Can be found automatically with "Get Offsets" on "Config" tab
 
-    PORT3, // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
-    -2,     // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
-    0,      // Forward tracker center distance (in). Positive = right of center, negative = left
+    PORT4,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    0,      // Forward tracker center distance (in). Positive = right of center, negative = left. Can be found automatically with "Get Offsets" on "Config" tab
 
-    PORT4, // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
-    0.3,    // Sideways tracker center distance (in). Positive = behind center, negative = in front
+    PORT14,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
+    -2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
+    0.3,     // Sideways tracker center distance (in). Positive = behind center, negative = in front. Can be found automatically with "Get Offsets" on "Config" tab
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
@@ -72,7 +68,7 @@ mik::piston Assembly::scraper_piston(PORT_B);
 mik::piston Assembly::wing_piston(PORT_A);
 
 /* Creating alternative vex devices in assembly */
-vex::rotation Assembly::rotation_sensor(PORT12);
+vex::rotation Assembly::rotation_sensor(PORT6);
 vex::optical Assembly::optical_sensor(PORT13);
 vex::limit Assembly::limit_switch(to_triport(PORT_F));
 

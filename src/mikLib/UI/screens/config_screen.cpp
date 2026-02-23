@@ -75,7 +75,7 @@ std::shared_ptr<UI_component> UI_config_screen::add_button(slot slot, std::strin
 
 
 void UI_config_screen::UI_crt_config_scr() {
-    const int extra_buttons = 2; // Expands the screen to scroll
+    const int extra_buttons = 3; // Expands the screen to scroll
     const int extra_screen_height = 39 * extra_buttons + 5;
     UI_config_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + extra_screen_height);
     UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 2, 40, config_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
@@ -107,8 +107,9 @@ void UI_config_screen::UI_crt_config_scr() {
     });
 
     // Spins each motor forwards for half a second
-    add_button(slot::MACRO, "Motor Menu", [](){ 
-        UI_select_scr({motors_scr->get_motors_screen()}); 
+    add_button(slot::MACRO, "Spin All Mtrs", [](){ 
+        // UI_select_scr({motors_scr->get_motors_screen()});
+        config_spin_all_motors(); 
     });
 
     // Opens pnematic menu
@@ -118,8 +119,6 @@ void UI_config_screen::UI_crt_config_scr() {
     });
 
     add_button(slot::MACRO, "Get Offsets", [](){ config_measure_offsets(); });
-
-    add_button(slot::MACRO, "Get Vel/Accel", [](){ config_measure_velocity_accel(); });
 
     // Clears PID data off SD card
     add_button(slot::MACRO, "Wipe PID Data", [](){ wipe_SD_file("pid_data.txt"); });
@@ -190,6 +189,7 @@ void UI_config_screen::UI_crt_config_scr() {
     // Runs a pure pursuit test
     add_button(slot::TEST, "Test Pursuit", [](){ test_pursuit(); });
 
+    add_button(slot::TEST, "Test Vel/Accel", [](){ config_measure_velocity_accel(); });
 
     for (const auto& component : UI_config_scr->get_UI_components()) {
         component->set_y_pos(component->get_y_pos() - 45);

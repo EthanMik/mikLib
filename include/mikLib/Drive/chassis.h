@@ -85,7 +85,7 @@ public:
     float stop_apply_turn_slew = 20; // The angle away from the target to stop applying turn slew, in degrees.
     float stop_apply_swing_slew = 20; // The angle away from the target to stop applying swing slew, in degrees.
 
-    mik::tracker_mode tracker_mode; // Type of tracker to use on the drivetrain
+    mik::tracker_mode tracker_mode; // Type of tracking mode to use for odometry.
 
     /**
      * @param left_drive  Motor group on the robot's left side.
@@ -1285,41 +1285,40 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         float prev_drive_output = 0;
         float prev_heading_output = 0;
 
-        while(!chassis.pid.is_settled()){
+        while (!chassis.pid.is_settled()){
             line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
             if (line_settled && !prev_line_settled) { break; }
             prev_line_settled = line_settled;
 
             float desired_heading = to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position()));
             int drive_sign = 1;
-
             if (p.drive_direction == mik::drive_direction::REV) {
                 desired_heading = reduce_negative_180_to_180(desired_heading + 180);
                 drive_sign = -1;
             }
 
             drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
             prev_drive_error = drive_error;
 
             float heading_error = reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading());
+
             float drive_output = chassis.pid.compute(drive_error);
-    
             float heading_scale_factor = cos(to_rad(heading_error));
             if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
-            
             drive_output *= heading_scale_factor * drive_sign;
-            heading_error = reduce_negative_90_to_90(heading_error);
+
+            if (p.drive_direction == mik::drive_direction::FASTEST) heading_error = reduce_negative_90_to_90(heading_error);
+
             float heading_output = chassis.pid_2.compute(heading_error);
-            
+
             if (drive_error < p.settle_error) { 
                 heading_output = 0;
             }
-    
+
             drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
-            
+
             drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
             heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
 
@@ -1372,28 +1371,28 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         bool prev_center_line_side = center_line_side;
 
         float target_distance = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-        float carrot_X = x_pos- sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
+        float carrot_X = x_pos - sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
         float carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
         float drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
         float prev_drive_error = drive_error;
 
         float prev_drive_output = 0;
 
-        while(!chassis.pid.is_settled()){
+        while (!chassis.pid.is_settled()){
             line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
             if (line_settled && !prev_line_settled) { break; }
             prev_line_settled = line_settled;
-    
+
             center_line_side = is_line_settled(x_pos, y_pos, angle + 90, chassis.get_X_position(), chassis.get_Y_position());
             if (center_line_side != prev_center_line_side) {
                 crossed_center_line = true;
             }
-    
+
             target_distance = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-    
+
             carrot_X = x_pos - sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
             carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
-    
+
             drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
 
             float heading_error = reduce_negative_180_to_180(to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading());
@@ -1402,35 +1401,35 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
             prev_drive_error = drive_error;
 
-    
             if (drive_error < p.settle_error || crossed_center_line || drive_error < p.setback) { 
                 heading_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading()); 
                 drive_error = target_distance;
             }
 
-            if (p.drive_direction == mik::drive_direction::REV) {
-                heading_error = reduce_negative_180_to_180(heading_error + 180);
-                drive_sign = -1;
-            }
+            // if (p.drive_direction == mik::drive_direction::REV) {
+            //     heading_error = reduce_negative_180_to_180(heading_error + 180);
+            //     drive_sign = -1;
+            // }
             
             float drive_output = chassis.pid.compute(drive_error);
-    
+
             float heading_scale_factor = cos(to_rad(heading_error));
-            if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
+            // if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
 
             drive_output *= heading_scale_factor * drive_sign;
 
-            if (p.drive_direction == mik::drive_direction::FASTEST) heading_error = reduce_negative_90_to_90(heading_error);
+            /* if (p.drive_direction == mik::drive_direction::FASTEST) */ 
+            heading_error = reduce_negative_90_to_90(heading_error);
             float heading_output = chassis.pid_2.compute(heading_error);
-    
+
             drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
             
             drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
             drive_output = clamp_max_slip(drive_output, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading(), carrot_X, carrot_Y, p.drift);
-            drive_output = overturn_scaling(drive_output, heading_output, p.max_voltage);
+            drive_output = overturn_scaling(drive_output, heading_output, p.max_voltage * fabs(heading_scale_factor));
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);        
-    
+
             chassis.drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
 
             prev_drive_output = drive_output;

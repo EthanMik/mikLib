@@ -30,7 +30,7 @@ void test_turn() {
 	chassis.turn_to_angle(90);
 	chassis.turn_to_angle(225);
 	chassis.turn_to_angle(180, { .turn_direction = ccw });
-	chassis.turn_to_angle(0, { .turn_direction = cw });
+	chassis.turn_to_angle(359, { .turn_direction = cw });
 }
 
 void test_swing() {
@@ -95,7 +95,7 @@ void test_boomerang() {
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
-	chassis.drive_to_pose(24, 0, 0, {.lead = .2});
+	chassis.drive_to_pose(24, 0, 90, {.lead = .2});
 	chassis.drive_to_pose(0, 24, 315);
 	chassis.drive_to_pose(0, 0, 0);
 }
@@ -174,6 +174,7 @@ void config_tune_drive() {
 		{"drive_stl_err: ", chassis.drive_settle_error}, 
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
+		{"drive_slew ", chassis.drive_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
@@ -224,7 +225,8 @@ void config_tune_heading() {
 		{"heading_ki: ", chassis.heading_ki}, 
 		{"heading_kd: ", chassis.heading_kd}, 
 		{"heading_starti: ", chassis.heading_starti}, 
-		{"max_volt: ", chassis.heading_max_voltage}
+		{"max_volt: ", chassis.heading_max_voltage},
+		{"heading_slew ", chassis.heading_slew}
 	};
 
 	int y_min = -30;
@@ -273,7 +275,8 @@ void config_tune_turn() {
 		{"turn_max_volt: ", chassis.turn_max_voltage}, 
 		{"turn_stl_err: ", chassis.turn_settle_error}, 
 		{"turn_stl_tm: ", chassis.turn_settle_time}, 
-		{"turn_tmout: ", chassis.turn_timeout}
+		{"turn_tmout: ", chassis.turn_timeout},
+		{"Turn_slew: ", chassis.turn_slew}
 	};
 
   int y_min = -10;
@@ -313,11 +316,12 @@ void config_tune_swing() {
 		{"swing_max_volt: ", chassis.turn_max_voltage}, 
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
-		{"swing_tmout: ", chassis.swing_timeout}
+		{"swing_tmout: ", chassis.swing_timeout},
+		{"swing_slew: ", chassis.swing_slew}
 	};
 
-	int y_min = 0;
-	int y_max = 360;
+	int y_min = -20;
+	int y_max = 370;
 	int time_spent_graphing_ms = 5000; 
 
 	graph_scr->set_plot_bounds(y_min, y_max, 0, time_spent_graphing_ms, 1, 1);
@@ -745,9 +749,9 @@ void config_measure_velocity_accel() {
             task::sleep(10);
         }
 		chassis.cancel_motion();
-        chassis.stop_drive(hold);
 		task::sleep(100);
 		chassis.set_brake_type(coast);
+		chassis.stop_drive(vex::brakeType::coast);
 
         std::vector<std::pair<float, float>> velocities;
 		for (size_t i = 1; i < pos_time.size(); ++i) {
@@ -845,11 +849,14 @@ void config_measure_offsets() {
 	
 		chassis.forward_tracker.resetPosition();
 		chassis.sideways_tracker.resetPosition();
+		chassis.right_drive.resetPosition();
+		no_tracker_constants();
 	
 		for (int i = 0; i < iterations; i++) {
 			chassis.set_heading(0);
 			chassis.forward_tracker.resetPosition();
 			chassis.sideways_tracker.resetPosition();
+			chassis.right_drive.resetPosition();
 	
 			float start_heading = chassis.inertial.rotation();
 			float target = i % 2 == 0 ? 90 : 270;
@@ -870,15 +877,15 @@ void config_measure_offsets() {
 		f_offset /= iterations;
 		s_offset /= iterations;
 
-		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(f_offset, 3, false) + " in"; });
-		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(s_offset, 3, false) + " in"; });
+		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
+		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 
-		console_scr->add("", [](){ return ""; });
-		console_scr->add("Offsets are a positive value, make sure to change their", [](){ return ""; });
-		console_scr->add("sign depending on where your trackers are located", [](){ return ""; });
-		
+		chassis.set_brake_type(vex::brakeType::coast);
+		chassis.stop_drive(vex::brakeType::coast);
+
 		return 0;
 	});
+
 }
 
 void config_skills_driver_run() {

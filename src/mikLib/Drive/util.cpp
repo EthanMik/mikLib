@@ -154,24 +154,23 @@ float slew_scaling(float drive_output, float prev_drive_output, float slew, bool
 float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift) {
     const float heading = to_rad(current_angle_deg);
 
-    const float side = sign(sin(heading) * (desired_X - current_X) - cos(heading) * (desired_Y - current_Y));
-
-    const float a = -tan(heading);
-    const float c = tan(heading) * current_X - current_Y;
-    const float perp_dist = std::fabs(a * desired_X + desired_Y + c) / sqrt(a * a + 1);
+    const float perp_dist = fabs(sin(heading) * (desired_Y - current_Y) - cos(heading) * (desired_X - current_X));
     const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
-    
-    const float curvature = side * ((2 * perp_dist) / (dist * dist));
-    const float radius = 1.0 / std::fabs(curvature);
+
+    const float radius = (dist * dist) / (2.0 * perp_dist);
     const float max_slip = sqrt(drift * radius * 9.8);
-    return clamp(drive_output, -max_slip, max_slip);    
+    return clamp(drive_output, -max_slip, max_slip);  
 }
 
 float overturn_scaling(float drive_output, float heading_output, float max_speed) {
     const float overturn = fabs(heading_output) + fabs(drive_output) - max_speed;
     if (overturn > 0) {
-        if (drive_output > 0) return drive_output - overturn;
-        else return drive_output + overturn;
+        if (drive_output > 0) {
+            return drive_output - overturn;
+        }
+        else if (drive_output < 0) {
+            return drive_output + overturn;
+        }
     }
     return drive_output;
 }

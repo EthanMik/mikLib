@@ -10,7 +10,7 @@ void default_constants() {
     // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI, slew).
     chassis.set_turn_constants(12, .4, .03, 3, 15, 0);
     chassis.set_drive_constants(10, 1.5, 0, 10, 0, 0);
-    chassis.set_heading_constants(6, .4, 0, 1, 0, 0);
+    chassis.set_heading_constants(6, .4, 0, 3, 0, 0);
     chassis.set_swing_constants(12, .4, .01, 2, 15, 0);
 
     // Each exit condition set is in the form of (settle_error, settle_time, timeout).
@@ -28,7 +28,7 @@ void odom_constants() {
     chassis.drive_settle_error = 3;
     chassis.boomerang_lead = .5;
     chassis.boomerang_setback = 2;  
-    chassis.boomerang_drift = 2;  
+    chassis.boomerang_drift = 2;  // Change to 8 if you are not running all omni wheels
 }
 
 // When using motor encoders, it's best to 
