@@ -4,5 +4,4 @@
 #include "mikLib/ui.h"
 
 #include "assembly.h"
-#include "autons.h"
 #include "test.h"
