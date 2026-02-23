@@ -1,6 +1,6 @@
 {
   "title": "mikLib",
-  "description": "mikLib-v1.2.3                 Press X to hide auton selector",
+  "description": "mikLib-v2.0             Press X to hide auton selector",
   "icon": "USER911x.bmp",
   "version": "22.03.0110",
   "sdk": "20220215_18_00_00",
@@ -14,6 +14,8 @@
     { "name": "include/test.h", "type": "File", "specialType": "" },
 
     { "name": "include/mikLib/globals.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/drive.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/ui.h", "type": "File", "specialType": "" },
 
     { "name": "include/mikLib/Drive/util.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/Drive/odom.h", "type": "File", "specialType": "" },
@@ -23,6 +25,7 @@
     { "name": "include/mikLib/Devices/motors.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/Devices/distance.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/Devices/piston.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/Devices/tracker.h", "type": "File", "specialType": "" },
 
     { "name": "include/mikLib/UI/UI_component.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/UI_util.h", "type": "File", "specialType": "" },
@@ -35,10 +38,13 @@
     { "name": "include/mikLib/UI/textbox.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/screen.h", "type": "File", "specialType": "" },
 
+    { "name": "include/mikLib/UI/controller/c_button.h", "type": "File", "specialType": "" },
+
     { "name": "include/mikLib/UI/screens/console_screen.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/screens/auton_screen.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/screens/config_screen.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/screens/graph_screen.h", "type": "File", "specialType": "" },
+    { "name": "include/mikLib/UI/screens/motors_screen.h", "type": "File", "specialType": "" },
 
     { "name": "include/mikLib/UI/graphics/drawable.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/UI/graphics/image.h", "type": "File", "specialType": "" },
@@ -54,6 +60,45 @@
     { "name": "src/main.cpp", "type": "File", "specialType": "" },
     { "name": "src/robot-config.cpp", "type": "File", "specialType": "device_config" },
     { "name": "src/autons.cpp", "type": "File", "specialType": "" },
+    { "name": "src/assembly.cpp", "type": "File", "specialType": "" },
+    { "name": "src/test.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/Devices/distance.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Devices/motors.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Devices/piston.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Devices/tracker.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/Drive/chassis.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Drive/odom.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Drive/PID.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/Drive/util.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/UI/background.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/button.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphic.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/label.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/screen.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/textbox.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/toggle.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/UI_manager.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/UI_util.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/UI/controller/c_button.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/UI/graphics/circle.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/group.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/image.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/line.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/logo.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/pixel.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/rectangle.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/graphics/text.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/mikLib/UI/screens/auton_screen.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/screens/config_screen.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/screens/console_screen.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/screens/graph_screen.cpp", "type": "File", "specialType": "" },
+    { "name": "src/mikLib/UI/screens/motors_screen.cpp", "type": "File", "specialType": "" },
 
     { "name": "vex/mkenv.mk", "type": "File", "specialType": "" },
     { "name": "vex/mkrules.mk", "type": "File", "specialType": "" },
@@ -63,9 +108,17 @@
     { "name": "include/mikLib/Drive", "type": "Directory" },
     { "name": "include/mikLib/Devices", "type": "Directory" },
     { "name": "include/mikLib/UI", "type": "Directory" },
+    { "name": "include/mikLib/UI/controller", "type": "Directory" },
     { "name": "include/mikLib/UI/screens", "type": "Directory" },
     { "name": "include/mikLib/UI/graphics", "type": "Directory" },
     { "name": "src", "type": "Directory" },
+    { "name": "src/mikLib", "type": "Directory" },
+    { "name": "src/mikLib/Devices", "type": "Directory" },
+    { "name": "src/mikLib/Drive", "type": "Directory" },
+    { "name": "src/mikLib/UI", "type": "Directory" },
+    { "name": "src/mikLib/UI/controller", "type": "Directory" },
+    { "name": "src/mikLib/UI/graphics", "type": "Directory" },
+    { "name": "src/mikLib/UI/screens", "type": "Directory" },
     { "name": "vex", "type": "Directory" }
   ],
   "device": {
