@@ -55,6 +55,7 @@ public:
     float turn_timeout; // Time before quitting and move on in milliseconds.
 
     float swing_min_voltage = 0; // Minimum voltage for swinging out of 12.
+    float swing_opposite_voltage = 0; // Voltage on the opposite swung drivetrain side out of 12.
     float swing_max_voltage; // Max voltage out of 12.
 
     float swing_kp; // Proportional constant.
@@ -719,6 +720,7 @@ struct swing_to_angle_params {
     mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
+    float opposite_voltage = chassis.swing_opposite_voltage;
     float settle_error = chassis.swing_settle_error;
     float settle_time = chassis.swing_settle_time;
     float timeout = chassis.swing_timeout;
@@ -778,6 +780,7 @@ struct swing_to_point_params {
     float angle_offset = 0;
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
+    float opposite_voltage = chassis.swing_opposite_voltage;
     float settle_error = chassis.swing_settle_error;
     float settle_time = chassis.swing_settle_time;
     float timeout = chassis.swing_timeout;
@@ -972,11 +975,16 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_turn_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.left_drive.spin(fwd, output, volt);
-            chassis.right_drive.stop(hold);
+
+            if (p.opposite_voltage != 0) {
+                chassis.right_drive.spin(fwd, p.opposite_voltage * (output / p.max_voltage), volt);
+            } else {
+                chassis.right_drive.stop(hold);
+            }
 
             prev_output = output;
     
@@ -1036,7 +1044,12 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.right_drive.spin(reverse, output, volt);
-            chassis.left_drive.stop(hold);
+
+            if (p.opposite_voltage != 0) {
+                chassis.left_drive.spin(reverse, p.opposite_voltage * (output / p.max_voltage), volt);
+            } else {
+                chassis.left_drive.stop(hold);
+            }
 
             prev_output = output;
     
