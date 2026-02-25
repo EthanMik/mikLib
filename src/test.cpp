@@ -122,7 +122,6 @@ std::vector<point> path = {
 	{ 23.393,  19.643 },
 	{ 23.536,  21.637 },
 	{ 23.554,  23.664 },
-	{ 23.554,  23.664 },
 	{ 24.554,  24.664 },
 };
 
@@ -313,7 +312,7 @@ void config_tune_swing() {
 		{"swing_ki: ", chassis.swing_ki }, 
 		{"swing_kd: ", chassis.swing_kd}, 
 		{"swing_starti: ", chassis.swing_starti}, 
-		{"swing_max_volt: ", chassis.turn_max_voltage}, 
+		{"swing_max_volt: ", chassis.swing_max_voltage}, 
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
 		{"swing_tmout: ", chassis.swing_timeout},
@@ -691,7 +690,7 @@ void config_reset_data() {
 
 	vex::task temp([](){
 		if (!chassis.position_tracking) {
-			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
+			console_scr->add("The robot does not know where it is, place", [](){ return ""; });	
 			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
 			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
 			return 0;
@@ -841,11 +840,14 @@ void config_measure_velocity_accel() {
 void config_measure_offsets() {
     console_scr->reset();
     UI_select_scr(console_scr->get_console_screen());
-
+	
     vex::task temp([](){
+		const auto saved_mode = chassis.tracker_mode; 
+		chassis.tracker_mode = mik::tracker_mode::FORWARD_TRACKER;
+
 		int iterations = 10;
 	
-		float f_offset = 0.0, s_offset = 0.0;
+		float f_offset = 0.0, s_offset = 0.0, d_offset = 0.0;
 	
 		chassis.forward_tracker.resetPosition();
 		chassis.sideways_tracker.resetPosition();
@@ -869,19 +871,25 @@ void config_measure_offsets() {
 	
 			float f_delta = chassis.get_forward_tracker_position();
 			float s_delta = chassis.get_sideways_tracker_position();
+			float d_delta = chassis.get_motor_encoder_position();
 	
 			f_offset += f_delta / t_delta;
 			s_offset += s_delta / t_delta;
+			d_delta += d_delta / t_delta;
 		}
 	
 		f_offset /= iterations;
 		s_offset /= iterations;
+		d_offset /= iterations;
 
-		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
-		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
+		console_scr->add("Drivetrain Center Distance: ", [d_offset](){ return to_string_float(-d_offset, 3, false) + " in"; });
+		console_scr->add("Forward Tracker Center Distance: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
+		console_scr->add("Sideways Tracker Center Distance: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 
 		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.stop_drive(vex::brakeType::coast);
+
+		chassis.tracker_mode = saved_mode;
 
 		return 0;
 	});
@@ -926,6 +934,7 @@ void config_skills_driver_run() {
 			{
 			case 30:
 				Controller.rumble((".-"));
+				break;
 			case 15:
 				Controller.rumble(("."));
 				break;

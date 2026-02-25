@@ -30,7 +30,7 @@ public:
     float drive_starti; // Minimum distance in inches for integral to begin
     float drive_slew;  // Limits drive acceleration in volt per 10 ms.
 
-    float drive_settle_error; // Error to be considered settled in degrees.
+    float drive_settle_error; // Error to be considered settled in inches.
     float drive_settle_time; // Time to be considered settled in milliseconds.
     float drive_timeout; // Time before quitting and move on in milliseconds.
 
@@ -256,13 +256,13 @@ public:
 
     /** 
      * @brief Changes the turn max voltage that is currently being used for a drive motion
-     * @param turn_max_voltage voltage of the heading, 0-12.
+     * @param turn_max_voltage voltage of turning, 0-12.
     */
     void update_turn_max_voltage(float turn_max_voltage);
 
     /** 
      * @brief Changes the swing max voltage that is currently being used for a drive motion
-     * @param swing_max_voltage voltage of the heading, 0-12.
+     * @param swing_max_voltage voltage of swinging, 0-12.
     */
     void update_swing_max_voltage(float swing_max_voltage);
 
@@ -388,7 +388,9 @@ public:
      * @param wait Yields program until motion has finished, true by default.
      */
     void right_swing_to_angle(float angle, const swing_to_angle_params& p);
-
+    
+    /** @return Position of the right drivetrain in inches */ 
+    float get_motor_encoder_position();
     /** @return Position of the forward tracker in inches */ 
     float get_forward_tracker_position();
     /** @return Position of the sideways tracker in inches */ 
@@ -608,6 +610,7 @@ public:
     bool calibrating = false;
     bool motion_running;
     float distance_traveled;
+    float active_min_voltage = 0;
     
     bool position_tracking;
     bool control_disabled;
@@ -760,7 +763,7 @@ struct drive_to_pose_params {
 struct turn_to_point_params {
     mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float angle_offset = 0;
-    float min_voltage = chassis.drive_min_voltage;
+    float min_voltage = chassis.turn_min_voltage;
     float max_voltage = chassis.turn_max_voltage;
     float settle_error = chassis.turn_settle_error;
     float settle_time = chassis.turn_settle_time;
@@ -814,8 +817,9 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
 
     pid = PID(distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
     pid_2 = PID(reduce_negative_180_to_180(p.heading - get_absolute_heading()), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-    
+
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -846,7 +850,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
             drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.slew);
+            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 
@@ -873,8 +877,9 @@ inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = 
     g_turn_to_angle_params_buffer = p;
 
     pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
-    
+
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -933,6 +938,7 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
     pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -952,13 +958,13 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
                 error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
             }
-            
+
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
             chassis.distance_traveled += std::abs(error - prev_error);
 
@@ -968,7 +974,7 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
             output = clamp(output, -p.max_voltage, p.max_voltage);
             output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_turn_slew);
             output = clamp_min_voltage(output, p.min_voltage);
-    
+
             chassis.left_drive.spin(fwd, output, volt);
             chassis.right_drive.stop(hold);
 
@@ -992,6 +998,7 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
     pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1011,13 +1018,13 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
                 error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
             }
-            
+
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
             chassis.distance_traveled += std::abs(error - prev_error);
 
@@ -1027,7 +1034,7 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
             output = clamp(output, -p.max_voltage, p.max_voltage);
             output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
             output = clamp_min_voltage(output, p.min_voltage);
-    
+
             chassis.right_drive.spin(reverse, output, volt);
             chassis.left_drive.stop(hold);
 
@@ -1060,6 +1067,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1096,7 +1104,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_turn_slew);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.drive_with_voltage(output, -output);
@@ -1129,6 +1137,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1200,6 +1209,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1269,6 +1279,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
     pid_2 = PID(desired_heading - get_absolute_heading(), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1354,8 +1365,9 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
     float target_distance = hypot(X_position - get_X_position(), Y_position - get_Y_position());
     pid = PID(target_distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
     pid_2 = PID(to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position())) - get_absolute_heading(), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-    
+
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
     drive_task = vex::task([](){
@@ -1463,6 +1475,7 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
     pid_2 = PID(0, p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
 
     motion_running = true;
+    active_min_voltage = p.min_voltage;
     distance_traveled = 0;
 
 	// Add current position to the start of the path so that intersections can be found initially, even if the robot is off the path.
@@ -1476,7 +1489,6 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
         follow_path_params& p = g_follow_path_params_buffer;
         float prev_drive_output = 0;
         float prev_heading_output = 0;
-        float close = false;
 
         point target_intersection = chassis.odom.position; // The point on the path that we should target with PID.
 
@@ -1523,7 +1535,6 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
                 
                 if (drive_error < p.settle_error) { 
                     heading_output = 0;
-                    close = true;
                 }
   
                 drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);

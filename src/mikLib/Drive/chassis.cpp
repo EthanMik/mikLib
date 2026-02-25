@@ -148,7 +148,7 @@ bool Chassis::is_in_motion() {
 void Chassis::cancel_motion() {
     drive_task.stop();
     motion_running = false;
-    if (drive_min_voltage == 0) { stop_drive(hold); }
+    if (active_min_voltage == 0) { stop_drive(hold); }
 }
 
 void Chassis::update_drive_max_voltage(float drive_max_voltage) {
@@ -228,6 +228,10 @@ bool Chassis::angles_mirrored() { return angles_mirrored_; }
 bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
+float Chassis::get_motor_encoder_position() {
+    return right_drive.position(deg) * drive_in_to_deg_ratio;
+}
+
 float Chassis::get_forward_tracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
         return right_drive.position(deg) * drive_in_to_deg_ratio;
@@ -256,6 +260,7 @@ void Chassis::set_heading(float orientation_deg){
 }
 
 void Chassis::set_coordinates(float X_position, float Y_position, float orientation_deg) {
+    if (position_tracking) { odom_task.stop(); }
     position_tracking = true;
     forward_tracker.resetPosition();
     sideways_tracker.resetPosition();
@@ -348,8 +353,8 @@ void Chassis::split_arcade() {
 }
 
 void Chassis::tank() {
-    float left_throttle = deadband(controller(primary).Axis3.value(), 5);
-    float right_throttle = deadband(controller(primary).Axis2.value(), 5);
+    float left_throttle = deadband(controller(primary).Axis3.value(), control_throttle_deadband);
+    float right_throttle = deadband(controller(primary).Axis2.value(), control_throttle_deadband);
     left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
     right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
