@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/EthanMik/mikLib/mikLib-v2.0/src/logo.svg" alt="mikLib" width="300">
+<img src="https://raw.githubusercontent.com/EthanMik/mikLib/mikLib-v2.0/src/logo.svg" alt="mikLib" width="350" style="margin: -50px 0; display: block;">
 
-[<img src="https://img.shields.io/github/downloads/EthanMik/mikLib/total?style=for-the-badge&color=red">](https://github.com/EthanMik/mikLib/releases)
+[<img src="https://img.shields.io/github/downloads/EthanMik/mikLib/total?style=for-the-badge&color=cc0000">](https://github.com/EthanMik/mikLib/releases)
 
 An easy to use odometry VEXcode template with UI support.
 
