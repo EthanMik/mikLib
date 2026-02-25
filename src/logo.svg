@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="220" height="70">
-  <text y="54" font-family="Roboto, sans-serif" font-weight="400">
-    <tspan font-size="48" fill="#888888">mik</tspan><tspan font-size="61" fill="#ffffff">Lib</tspan>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="60">
+  <text y="44" font-family="monospace">
+    <tspan font-size="28" fill="#888888">mik</tspan><tspan font-size="35" fill="#ffffff">Lib</tspan>
   </text>
 </svg>
