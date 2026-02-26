@@ -313,6 +313,7 @@ void config_tune_swing() {
 		{"swing_kd: ", chassis.swing_kd}, 
 		{"swing_starti: ", chassis.swing_starti}, 
 		{"swing_max_volt: ", chassis.swing_max_voltage}, 
+		{"swing_opp_volt: ", chassis.swing_opposite_voltage}, 
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
 		{"swing_tmout: ", chassis.swing_timeout},
