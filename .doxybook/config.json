@@ -1,0 +1,13 @@
+{
+  "baseUrl": "/api/",
+  "linkSuffix": "",
+  "indexInFolders": false,
+  "mainPageName": "index",
+  "mainPageInRoot": false,
+  "folderClassesName": "classes",
+  "folderFilesName": "files",
+  "folderGroupsName": "modules",
+  "folderNamespacesName": "namespaces",
+  "filesFilter": ["*.h"],
+  "sort": true
+}

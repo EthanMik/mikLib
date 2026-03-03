@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+
+/**
+ * mikLIb color scheme
+ *
+ * UI_white:      #ffffff  - Text and secondary primary outline
+ * UI_light_gray: #999999  - Secondary outline
+ * UI_med_gray:   #666666  - Primary outline
+ * UI_dark_gray:  #434343  - Secondary background
+ * UI_black:      #000000  - Primary background
+ * UI_red:        #ff0000  - Tertiary outline / accent
+ */
+
+:root {
+  --ifm-font-family-base: 'Inter', sans-serif;
+  --ifm-heading-font-family: 'Inter', sans-serif;
+
+  /* Red accent */
+  --ifm-color-primary: #e03e3e;
+  --ifm-color-primary-dark: #cc3838;
+  --ifm-color-primary-darker: #c03535;
+  --ifm-color-primary-darkest: #9e2b2b;
+  --ifm-color-primary-light: #e55656;
+  --ifm-color-primary-lighter: #e86060;
+  --ifm-color-primary-lightest: #ee7f7f;
+
+  /* Backgrounds — layered so each surface is distinguishable */
+  --ifm-background-color: #111111;
+  --ifm-background-surface-color: #1e1e1e;
+
+  /* Text */
+  --ifm-font-color-base: #d4d4d4;
+  --ifm-font-color-secondary: #888888;
+  --ifm-heading-color: #f0f0f0;
+  --ifm-link-color: #e03e3e;
+  --ifm-link-hover-color: #ee7f7f;
+
+  /* Borders — subtle, not distracting */
+  --ifm-color-emphasis-300: #333333;
+  --ifm-color-emphasis-200: #2a2a2a;
+  --ifm-hr-background-color: #2a2a2a;
+  --ifm-toc-border-color: #2a2a2a;
+  --ifm-table-border-color: #2a2a2a;
+
+  /* Navbar */
+  --ifm-navbar-background-color: #0d0d0d;
+  --ifm-navbar-link-color: #d4d4d4;
+  --ifm-navbar-link-hover-color: #e03e3e;
+
+  /* Footer */
+  --ifm-footer-background-color: #0d0d0d;
+  --ifm-footer-color: #888888;
+  --ifm-footer-link-color: #d4d4d4;
+  --ifm-footer-link-hover-color: #e03e3e;
+  --ifm-footer-title-color: #ffffff;
+
+  /* Code */
+  --ifm-code-font-size: 95%;
+  --ifm-code-background: #1e1e1e;
+  --ifm-pre-background: #1e1e1e;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.07);
+
+  /* Cards */
+  --ifm-card-background-color: #1a1a1a;
+
+  /* Sidebar */
+  --doc-sidebar-width: 300px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #e03e3e;
+  --ifm-color-primary-dark: #cc3838;
+  --ifm-color-primary-darker: #c03535;
+  --ifm-color-primary-darkest: #9e2b2b;
+  --ifm-color-primary-light: #e55656;
+  --ifm-color-primary-lighter: #e86060;
+  --ifm-color-primary-lightest: #ee7f7f;
+
+  --ifm-background-color: #111111;
+  --ifm-background-surface-color: #1e1e1e;
+  --ifm-font-color-base: #d4d4d4;
+  --ifm-font-color-secondary: #888888;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.07);
+}
+
+/* ─── Navbar ─────────────────────────────────────────────── */
+
+.navbar__title {
+  font-size: 0;
+}
+
+.navbar__title::before {
+  content: 'mik';
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1rem;
+  color: #888888;
+  transition: color 0.2s;
+}
+
+.navbar__title::after {
+  content: 'Lib';
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  transition: color 0.2s;
+}
+
+.navbar__brand:hover .navbar__title::before,
+.navbar__brand:hover .navbar__title::after {
+  color: #e03e3e;
+}
+
+.navbar {
+  border-bottom: 1px solid #2a2a2a;
+  box-shadow: none;
+}
+
+/* ─── Footer ─────────────────────────────────────────────── */
+
+.footer {
+  border-top: 1px solid #2a2a2a;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────── */
+
+.menu {
+  background-color: #161616;
+}
+
+.menu__link {
+  color: #888888;
+  border-radius: 4px;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  color: #f0f0f0;
+  background-color: #252525;
+  border-left: 2px solid #e03e3e;
+}
+
+.menu__link:hover {
+  color: #d4d4d4;
+  background-color: #1e1e1e;
+}
+
+/* ─── Table of contents ──────────────────────────────────── */
+
+.table-of-contents__link {
+  color: #888888;
+}
+
+.table-of-contents__link:hover {
+  color: #d4d4d4;
+}
+
+.table-of-contents__link--active {
+  color: #e03e3e;
+  font-weight: 600;
+}
+
+/* ─── Pagination ─────────────────────────────────────────── */
+
+.pagination-nav__link {
+  border-color: #2a2a2a;
+  background-color: #161616;
+  transition: border-color 0.2s;
+}
+
+.pagination-nav__link:hover {
+  border-color: #e03e3e;
+}
+
+/* ─── Breadcrumbs ────────────────────────────────────────── */
+
+.breadcrumbs__link {
+  color: #888888;
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+  color: #d4d4d4;
+  background-color: #1e1e1e;
+}
+
+/* ─── Doc cards ──────────────────────────────────────────── */
+
+.card {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  border-color: #e03e3e;
+  box-shadow: 0 0 12px rgba(224, 62, 62, 0.15);
+}
+
+/* ─── Tables ─────────────────────────────────────────────── */
+
+table {
+  border-collapse: collapse;
+}
+
+table th {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+
+table tr:nth-child(even) {
+  background-color: #161616;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* ─── Prism syntax highlighting (VSCode Dark+ style) ─────── */
+
+.prism-code .token.class-name {
+  color: #4ec9b0 !important;
+}
+
+.prism-code .token.function {
+  color: #9cdcfe !important;
+}
+
+.prism-code .token.paren-brace,
+.prism-code .token.paren-after-brace {
+  color: #da70d6 !important;
+}
+
+.prism-code .token.brace {
+  color: #179fff !important;
+}
+
+.prism-code .token.bracket {
+  color: #ffd700 !important;
+}
+
+.prism-code .token.punctuation {
+  color: #d4d4d4 !important;
+}
+
+.prism-code .token.keyword {
+  color: #569cd6 !important;
+}
+
+.prism-code .token.boolean {
+  color: #569cd6 !important;
+}
+
+.prism-code .token.number {
+  color: #b5cea8 !important;
+}
+
+.prism-code .token.string {
+  color: #ce9178 !important;
+}
+
+.prism-code .token.comment {
+  color: #6a9955 !important;
+}
+
+.prism-code .token.operator {
+  color: #d4d4d4 !important;
+}
+
+/* ─── Admonitions ────────────────────────────────────────── */
+
+.admonition h5 {
+  font-size: 0.7rem;
+}
