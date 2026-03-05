@@ -1,0 +1,38 @@
+# Doxyfile for mikLib
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "mikLib"
+PROJECT_BRIEF          = "An easy to use odometry VEXcode template with UI support"
+OUTPUT_DIRECTORY       = .
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+INPUT                  = include src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.cpp
+EXCLUDE_PATTERNS       = */vex/* \
+                         */build/* \
+                         */website/* \
+                         */UI/graphics/* \
+                         */UI/controller/* \
+                         */UI/components/* 
+
+#---------------------------------------------------------------------------
+# Extraction
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+#---------------------------------------------------------------------------
+# Output — XML only (doxybook2 will convert to Markdown for Docusaurus)
+#---------------------------------------------------------------------------
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+XML_PROGRAMLISTING     = NO
