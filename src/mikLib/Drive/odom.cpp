@@ -31,7 +31,7 @@ void odom::update_position(float forward_tracker_position, float sideways_tracke
     // All of the following lines are pretty well documented in 5225A's Into to Position Tracking 
     // Document at http://thepilons.ca/wp-content/uploads/2018/10/Tracking.pdf 
 
-    if (orientation_delta_rad == 0) {
+    if (fabs(orientation_delta_rad) < 1e-7) {
         local_X_position = sideways_delta;
         local_Y_position = forward_delta;
     } else {
@@ -42,7 +42,7 @@ void odom::update_position(float forward_tracker_position, float sideways_tracke
     float local_polar_angle;
     float local_polar_length;
 
-    if (local_X_position == 0 && local_Y_position == 0){
+    if (fabs(local_X_position) < 1e-7 && fabs(local_Y_position) < 1e-7){
         local_polar_angle = 0;
         local_polar_length = 0;
     } else {
