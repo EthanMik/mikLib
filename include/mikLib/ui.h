@@ -44,7 +44,7 @@
 #include "mikLib/UI/graph_screen.h"
 #include "mikLib/UI/motors_screen.h"
 
-#include "mikLib/UI/components/UI_manager.h"
+#include "mikLib/UI/UI_manager.h"
 
 #include "robot-config.h"
 #include "autons.h"
