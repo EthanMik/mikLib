@@ -33,7 +33,7 @@ Chassis chassis(
 	6,               // Drivetrain center distance (in), (half drivetrain track width). Only needed with motor encoder. Can be found automatically with "Get Offsets" on "Config" tab
 
     PORT4,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y. 2" omnis are 2", not 2.125"
     0,      // Forward tracker center distance (in). Positive = right of center, negative = left. Can be found automatically with "Get Offsets" on "Config" tab
 
     PORT14,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
