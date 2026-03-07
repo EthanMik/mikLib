@@ -40,6 +40,7 @@ void user_control(void) {
             // Add your user control code here
             chassis.control(drive_mode::SPLIT_ARCADE);
             assembly.control();
+            print(assembly.barrel_motor.position(deg));
         }
         task::sleep(5);
     }

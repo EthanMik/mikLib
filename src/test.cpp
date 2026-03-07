@@ -8,7 +8,7 @@ void relative_mode_constants() {
 }
 
 void odom_mode_constants() {
-	odom_constants();
+
 }
 
 void test_drive() {
@@ -79,7 +79,6 @@ void test_odom_swing() {
 }
 
 void test_odom_full() {
-	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_point(0, 24);
@@ -91,7 +90,6 @@ void test_odom_full() {
 }
 
 void test_boomerang() {
-	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
@@ -126,7 +124,6 @@ std::vector<point> path = {
 };
 
 void test_pursuit() {
-	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
@@ -173,7 +170,13 @@ void config_tune_drive() {
 		{"drive_stl_err: ", chassis.drive_settle_error}, 
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
-		{"drive_slew ", chassis.drive_slew}
+		{"drive_slew ", chassis.drive_slew},
+		{"heading_kp: ", chassis.heading_kp}, 
+		{"heading_ki: ", chassis.heading_ki}, 
+		{"heading_kd: ", chassis.heading_kd}, 
+		{"heading_starti: ", chassis.heading_starti}, 
+		{"max_volt: ", chassis.heading_max_voltage},
+		{"heading_slew ", chassis.heading_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
@@ -853,7 +856,6 @@ void config_measure_offsets() {
 		chassis.forward_tracker.resetPosition();
 		chassis.sideways_tracker.resetPosition();
 		chassis.right_drive.resetPosition();
-		no_tracker_constants();
 	
 		for (int i = 0; i < iterations; i++) {
 			chassis.set_heading(0);
@@ -874,9 +876,9 @@ void config_measure_offsets() {
 			float s_delta = chassis.get_sideways_tracker_position();
 			float d_delta = chassis.get_motor_encoder_position();
 	
-			f_offset += f_delta / t_delta;
-			s_offset += s_delta / t_delta;
-			d_delta += d_delta / t_delta;
+			f_offset += f_delta * sqrt(2) / t_delta;
+			s_offset += s_delta  * sqrt(2) / t_delta;
+			d_delta += d_delta * sqrt(2) / t_delta;
 		}
 	
 		f_offset /= iterations;
@@ -887,6 +889,7 @@ void config_measure_offsets() {
 		console_scr->add("Forward Tracker Center Distance: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
 		console_scr->add("Sideways Tracker Center Distance: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 
+		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.stop_drive(vex::brakeType::coast);
 

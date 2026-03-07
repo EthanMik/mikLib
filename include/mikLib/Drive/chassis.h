@@ -653,7 +653,7 @@ private:
 
     PID pid; // Primary PID controller.
     PID pid_2; // Secondary PID controller (heading).
-    odom odom;
+    odom45 odom;
 
     vex::task odom_task;
     vex::task drive_task;

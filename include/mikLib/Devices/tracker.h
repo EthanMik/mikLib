@@ -57,7 +57,7 @@ public:
     float position(vex::rotationUnits units);
 
     // For VEXU
-    bool is_rev_encoder = false;
+    bool is_rev_encoder = true;
 
 private:
     bool is_three_wire;

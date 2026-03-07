@@ -12,15 +12,15 @@ using namespace vex;
 class Assembly {
 public:
 /* Create your devices here */
-    static mik::motor_group lower_intake_motors;
-    static mik::motor upper_intake_motor;
-    static mik::piston scraper_piston;
-    static mik::piston wing_piston;
+    static mik::motor_group back_intake_motors;
+    static mik::motor transfer_motor;
+    static mik::motor front_intake_motor;
+    static mik::motor barrel_motor;
 
 /* Examples of other vex devices you may need */
-    static vex::rotation rotation_sensor;
-    static vex::optical optical_sensor;
-    static vex::limit limit_switch;
+    static mik::piston barrel_lift_piston;
+    static mik::piston back_intake_piston;
+    static mik::piston rake_piston;
 
     void init();
     void control();
