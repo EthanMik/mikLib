@@ -30,17 +30,16 @@ void auton(void) {
 void user_control(void) {
     while (chassis.calibrating) { task::sleep(50); }
 
+    enable_user_control();
+
     // How you want your drivetrain to stop during driver
     chassis.set_brake_type(brakeType::coast);
-
-    assembly.init();
 
     while (true) {
         if (!control_disabled()) {
             // Add your user control code here
             chassis.control(drive_mode::SPLIT_ARCADE);
             assembly.control();
-            print(assembly.barrel_motor.position(deg));
         }
         task::sleep(5);
     }

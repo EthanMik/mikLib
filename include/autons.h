@@ -17,3 +17,4 @@ std::string red_right_winpoint(bool calibrate, mik::auto_variation var, bool get
 std::string red_right_sawp(bool calibrate, mik::auto_variation var, bool get_name );
 std::string red_right_elim(bool calibrate, mik::auto_variation var, bool get_name );
 std::string skills(bool calibrate, mik::auto_variation var, bool get_name );
+void skills_2();

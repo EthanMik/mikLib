@@ -13,6 +13,8 @@ void matchload(float volts = 12);
 
 void intake(float volts = 12);
 
+void intake_rear(float volts = 12);
+void stop_intake_rear();
 
 void lift_barrel();
 void drop_barrel();
@@ -20,5 +22,6 @@ void drop_barrel();
 void stop_matchload();
 
 void stop_intake();
+void outtake_rear(float volts = 12);
 
 void score(float volts = 12);

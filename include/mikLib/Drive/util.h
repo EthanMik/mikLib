@@ -89,45 +89,30 @@ float reduce_negative_90_to_90(float angle);
 float reduce_0_to_360(float angle);
 
 /**
- * @brief Conditionally mirror an angle (degrees) across the 0°/360° axis.
- *
- *
- * @param angle Angle in degrees.
- * @param mirror Whether to apply mirroring.
- * @return Mirrored (or original) angle in degrees.
+ * @brief Mirrors a pose and turn direction for use on the opposite side of the field.
+ * Negating x uses 360 - angle, negating y uses 180 - angle.
+ * Turn direction is flipped when exactly one axis is mirrored.
+ * @param x X coordinate in inches.
+ * @param y Y coordinate in inches.
+ * @param angle Heading in degrees.
+ * @param turn_direction The preferred turn direction.
+ * @param mirror_x Whether to negate X.
+ * @param mirror_y Whether to negate Y.
  */
-float mirror_angle(float angle, bool mirror);
+void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
+void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y);
+void mirror(float& x, float& y, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
+void mirror(float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
 
 /**
- * @brief Conditionally mirror a rotation direction (swap CW ↔ CCW).
- *
- * If `mirror` is true, direction::CW becomes direction::CCW and vice versa.
- * direction::FASTEST is returned unchanged. When `mirror` is false, `dir` is
- * returned as-is.
- *
- * @param dir    Input rotation direction (CW, CCW, or FASTEST).
- * @param mirror Whether to apply mirroring.
- * @return Mirrored (or original) direction value.
+ * @brief Mirrors coordinates only (no angle or turn direction).
+ * Negating x and/or y.
+ * @param x X coordinate in inches.
+ * @param y Y coordinate in inches.
+ * @param mirror_x Whether to negate X.
+ * @param mirror_y Whether to negate Y.
  */
-mik::turn_direction mirror_direction(mik::turn_direction dir, bool mirror);
-
-/**
- * @brief Conditionally mirror an X coordinate (negate when mirrored).
- *
- * @param x X coordinate value.
- * @param mirror Whether to apply mirroring.
- * @return Mirrored (negated) X coordinate if mirrored; otherwise the original.
- */
-float mirror_x(float x, bool mirror);
-
-/**
- * @brief Conditionally mirror a Y coordinate (negate when mirrored).
- *
- * @param y Y coordinate value.
- * @param mirror Whether to apply mirroring.
- * @return Mirrored (negated) Y coordinate if mirrored; otherwise the original.
- */
-float mirror_y(float y, bool mirror);
+void mirror(float& x, float& y, bool mirror_x, bool mirror_y);
 
 /**
  * @brief Normalize an angular error according to a direction preference.

@@ -32,7 +32,20 @@ void matchload(float volts) {
     assembly.back_intake_motors.spin(fwd, volts, volt);        
 }
 
+void intake_rear(float volts) {
+    assembly.transfer_motor.spin(fwd, volts, volt);
+    assembly.front_intake_motor.spin(fwd, volts, volt);
+    assembly.back_intake_motors.spin(fwd, volts, volt);
+}
+
+void stop_intake_rear() {
+    assembly.back_intake_motors.stop();
+    assembly.transfer_motor.stop();
+    assembly.front_intake_motor.stop();  
+}
+
 void stop_matchload() {
+    assembly.back_intake_piston.close();
     assembly.back_intake_motors.stop();
     assembly.transfer_motor.stop();
     assembly.front_intake_motor.stop();
@@ -49,9 +62,18 @@ void intake(float volts) {
     assembly.transfer_motor.spin(fwd, volts, volt);
 }
 
+void outtake_rear(float volts) {
+    assembly.back_intake_piston.open();
+
+    assembly.transfer_motor.spin(reverse, volts, volt);
+    assembly.front_intake_motor.spin(reverse, volts, volt);
+    assembly.back_intake_motors.spin(reverse, volts, volt);   
+}
+
 void lift_barrel() {
     vex::task lift_barrel([](){
-        assembly.barrel_motor.spinFor(fwd, 500, deg, 600, velocityUnits::rpm, true);
+        override_barrel = true;
+        assembly.barrel_motor.spinFor(fwd, 300, deg, 600, velocityUnits::rpm, true);
         assembly.barrel_lift_piston.open();
 
         return 0;
@@ -63,6 +85,7 @@ void drop_barrel() {
 }
 
 void score(float volts) {
+    override_barrel = false;
     barrel_max_voltage = volts;
     barrel_target += BARREL_ROTATION / 2.0f;
 }

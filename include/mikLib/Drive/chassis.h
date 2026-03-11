@@ -289,28 +289,20 @@ public:
     /** @return Field‑relative inertial heading (deg, 0‑360). */
     float get_absolute_heading();
     
-    /** @brief Mirror all subsequent turn angles, affecting turn_to_angle(), drive_to_pose(), and set_coordinates(). 
-     * Useful on opposite field sides. Also changes turn directions to their inverse, cw->ccw, ccw->cw. 
-    */
-    void mirror_all_auton_angles();
-    
     /** @brief Mirror all subsequent x-coordinates, affecting drive_to_point(), turn_to_point(), drive_to_pose(), and set_coordinates().
      * Useful on opposite field sides. 
     */
     void mirror_all_auton_x_pos();
-
-    /** @brief Disables mirroring for x_pos, y_pos and angles.
-    */
-    void disable_mirroring();
     
     /** @brief Mirror all subsequent y-coordinates, affecting drive_to_point(), turn_to_point(), drive_to_pose(), and set_coordinates().
      * Useful on opposite field sides. 
     */
     void mirror_all_auton_y_pos();
-    
-    /** @return True if angles have been mirrored */
-    bool angles_mirrored();
 
+    /** @brief Disables mirroring for x_pos, y_pos and angles.
+    */
+    void disable_mirroring();
+    
     /** @return True if x coordinates have been mirrored */
     bool x_pos_mirrored();
     
@@ -332,7 +324,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void turn_to_angle(float angle, const turn_to_angle_params& p);
+    void turn_to_angle(float angle, turn_to_angle_params p);
 
     /**
      * @brief Drives the robot a given distance with a given heading.
@@ -371,7 +363,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void left_swing_to_angle(float angle, const swing_to_angle_params& p);
+    void left_swing_to_angle(float angle, swing_to_angle_params p);
 
     /**
      * Turns to a given angle with the right side of the drivetrain.
@@ -388,7 +380,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void right_swing_to_angle(float angle, const swing_to_angle_params& p);
+    void right_swing_to_angle(float angle, swing_to_angle_params p);
     
     /** @return Position of the right drivetrain in inches */ 
     float get_motor_encoder_position();
@@ -462,7 +454,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void turn_to_point(float X_position, float Y_position, const turn_to_point_params& p);
+    void turn_to_point(float X_position, float Y_position, turn_to_point_params p);
     
     /**
      * @brief Turns to a specified point on the field with the left side of the drivetrain.
@@ -483,7 +475,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void left_swing_to_point(float X_position, float Y_position, const swing_to_point_params& p);
+    void left_swing_to_point(float X_position, float Y_position, swing_to_point_params p);
 
     /**
      * @brief Turns to a specified point on the field with the right side of the drivetrain.
@@ -504,7 +496,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void right_swing_to_point(float X_position, float Y_position, const swing_to_point_params& p);
+    void right_swing_to_point(float X_position, float Y_position, swing_to_point_params p);
 
     /**
      * @brief Drives to a specified point on the field.
@@ -630,7 +622,6 @@ public:
     std::vector<point> desired_path{};
 
 private:
-    bool angles_mirrored_ = false;
     bool x_pos_mirrored_ = false;
     bool y_pos_mirrored_ = false;
 
@@ -875,11 +866,12 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
     }
 }
 
-inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = turn_to_angle_params{}) {
-    desired_angle = mirror_angle(angle, angles_mirrored_);
+inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to_angle_params{}) {
+    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    desired_angle = angle;
     g_turn_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -891,7 +883,7 @@ inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = 
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
-        float error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -902,11 +894,11 @@ inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = 
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
             }
             
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
@@ -934,11 +926,12 @@ inline void Chassis::turn_to_angle(float angle, const turn_to_angle_params& p = 
     if (p.wait) { this->wait(); }
 }
 
-inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_params& p = swing_to_angle_params{}) {
-    desired_angle = mirror_angle(angle, angles_mirrored_);
+inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{}) {
+    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    desired_angle = angle;
     g_swing_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -950,7 +943,7 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
-        float error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -965,7 +958,7 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
             }
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
@@ -999,11 +992,12 @@ inline void Chassis::left_swing_to_angle(float angle, const swing_to_angle_param
     if (p.wait) { this->wait(); }    
 }
 
-inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_params& p = swing_to_angle_params{}) {
-    desired_angle = mirror_angle(angle, angles_mirrored_);
+inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{}) {
+    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    desired_angle = angle;
     g_swing_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_)), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1015,7 +1009,7 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
-        float error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1030,7 +1024,7 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading(), mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
             }
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
@@ -1064,9 +1058,8 @@ inline void Chassis::right_swing_to_angle(float angle, const swing_to_angle_para
     if (p.wait) { this->wait(); }    
 }
 
-inline void Chassis::turn_to_point(float X_position, float Y_position, const turn_to_point_params& p = turn_to_point_params{}) {
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
+inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_params p = turn_to_point_params{}) {
+    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
     desired_Y_position = Y_position;
@@ -1076,7 +1069,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
     float start_angle = to_deg(atan2((X_position - get_X_position()), (Y_position - get_Y_position())));
     desired_angle = start_angle;
 
-    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
@@ -1092,7 +1085,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1103,11 +1096,11 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
             }
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
@@ -1134,9 +1127,8 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, const tur
     if (p.wait) { this->wait(); }
 }
 
-inline void Chassis::left_swing_to_point(float X_position, float Y_position, const swing_to_point_params& p = swing_to_point_params{}) {
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
+inline void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{}) {
+    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
     desired_Y_position = Y_position;
@@ -1146,7 +1138,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
     float start_angle = to_deg(atan2((X_position - get_X_position()), (Y_position - get_Y_position())));
     desired_angle = start_angle;
 
-    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
@@ -1162,7 +1154,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1173,11 +1165,11 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
             }
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
@@ -1206,9 +1198,8 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, con
     if (p.wait) { this->wait(); }  
 }
 
-inline void Chassis::right_swing_to_point(float X_position, float Y_position, const swing_to_point_params& p = swing_to_point_params{}) {
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
+inline void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{}) {
+    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
     desired_Y_position = Y_position;
@@ -1218,7 +1209,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
     float start_angle = to_deg(atan2((X_position - get_X_position()), (Y_position - get_Y_position())));
     desired_angle = start_angle;
 
-    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+    float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
     pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
 
     motion_running = true;
@@ -1230,11 +1221,11 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
         const float y_pos = chassis.desired_Y_position;
         const float angle_offset = chassis.desired_angle_offset;
         swing_to_point_params& p = g_swing_to_point_params_buffer;
-        
+
         bool crossed = false;
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1245,11 +1236,11 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
                 crossed = true;
             }
             prev_raw_error = raw_error;
-            
+
             if (crossed) {
                 error = raw_error;
             } else {
-                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, mirror_direction(p.turn_direction, chassis.angles_mirrored_));
+                error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
             }
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
@@ -1280,8 +1271,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, co
 }
 
 inline void Chassis::drive_to_point(float X_position, float Y_position, const drive_to_point_params& p = drive_to_point_params{}) {
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
+    mirror(X_position, Y_position, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
     desired_Y_position = Y_position;
@@ -1365,9 +1355,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
 }
 
 inline void Chassis::drive_to_pose(float X_position, float Y_position, float angle, const drive_to_pose_params& p = drive_to_pose_params{}) {
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
-    angle = mirror_angle(angle, angles_mirrored_);
+    mirror(X_position, Y_position, angle, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
     desired_Y_position = Y_position;

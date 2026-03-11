@@ -19,6 +19,11 @@ void Assembly::init() {
 
 // You want to put this function inside the user control loop in main.
 void Assembly::control() {
+    static bool initialized = false;
+    if (!initialized) {
+        init();
+        initialized = true;
+    }
     lower_intake_control();
     upper_intake_control();
     wing_piston_control();
@@ -62,7 +67,9 @@ void Assembly::upper_intake_control() {
 
 // Extends piston when button R1 is pressed, releases otherwise 
 void Assembly::wing_piston_control() {
-
+    if (btnY_new_press(Controller.ButtonY.pressing())) {
+        lift_barrel();
+    }
 }
 
 // Extends or retracts piston when button A is pressed, 
@@ -70,5 +77,8 @@ void Assembly::wing_piston_control() {
 void Assembly::scraper_piston_control() {
     if (btnX_new_press(Controller.ButtonX.pressing())) {
         score();
+    }
+    if (btnRight_new_press(Controller.ButtonRight.pressing())) {
+        rake_piston.toggle();
     }
 }

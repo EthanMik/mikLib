@@ -71,9 +71,11 @@ public:
     float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float x, float y, float angle);
 
     std::string get_wall_facing(mik::distance_position sensor_pos, float x, float y, float angle);
-    
+
     /** @returns vector containing all mik::distance sensors. */
     std::vector<mik::distance>& get_distance_sensors();
+
+    mik::distance get_distance_sensor(mik::distance_position sensor_pos);
     
 private:
     float to_sensor_offset_constant(mik::distance_position sensor_pos);

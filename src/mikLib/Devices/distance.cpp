@@ -71,8 +71,11 @@ std::string mik::distance_reset::get_wall_facing(distance_position sensor_positi
             index = i;
         }
     }
-    if (index < 0) { return ""; }
-    
+    if (index < 0) {
+        print("Sensor does not exist", mik::red);
+        return "";
+    }
+
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
     const float distance = distance_sensors[index].objectDistance(vex::inches);
     const float x_offset = distance_sensors[index].x_center_offset();
@@ -88,7 +91,10 @@ float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position,
             index = i;
         }
     }
-    if (index < 0) { return 0; }
+    if (index < 0) {
+        print("Sensor does not exist", mik::red);
+        return 0;
+    }
     
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
     const float distance = distance_sensors[index].objectDistance(vex::inches);
@@ -121,31 +127,40 @@ std::vector<mik::distance>& mik::distance_reset::get_distance_sensors() {
     return distance_sensors;
 }
 
+mik::distance mik::distance_reset::get_distance_sensor(mik::distance_position sensor_pos) {
+    for (auto& sensor : distance_sensors) {
+        if (sensor.position() == sensor_pos) {
+            return sensor;
+        }
+    }
+    return mik::distance(PORT0, sensor_pos, 0, 0);
+}   
+
 std::string mik::distance_reset::to_wall_name(mik::wall_position wall_position) {
     switch (wall_position) {
         case wall_position::TOP_WALL:
-            return "top_wall";
+            return "Top Wall";
         case wall_position::LEFT_WALL:
-            return "left_wall";
+            return "Left Wall";
         case wall_position::RIGHT_WALL:
-            return "right_wall";
+            return "Right Wall";
         case wall_position::BOTTOM_WALL:
-            return "bottom_wall";
+            return "Bottom Wall";
         case wall_position::AUTO:
-            return "auto";
+            return "Auto";
     }
 }
 
 std::string mik::distance::to_sensor_name(distance_position sensor_pos) {
     switch (sensor_pos) {
         case distance_position::FRONT_SENSOR:
-            return "front";
+            return "Front";
         case distance_position::REAR_SENSOR:
-            return "rear";
+            return "Rear";
         case distance_position::LEFT_SENSOR:
-            return "left";
+            return "Left";
         case distance_position::RIGHT_SENSOR:
-            return "right";
+            return "Right";
     }
 }
 

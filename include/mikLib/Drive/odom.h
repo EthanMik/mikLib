@@ -50,10 +50,11 @@ public:
 
 	point position;
 	float orientation_deg; 
-
-private:
+	
 	float forward_tracker_center_distance;
 	float sideways_tracker_center_distance;
+	
+private:
 	float forward_tracker_position;
 	float sideways_tracker_position;
 };

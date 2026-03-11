@@ -191,10 +191,15 @@ void Chassis::calibrate_inertial() {
 		vex::task::sleep(25);
 	}
 
+    if (!force_calibrate_inertial) {
+        calibrating = false;
+        return;
+    }
+
   	// Recalibrate inertial until it is within calibration threshold
   	float starting_rotation = chassis.inertial.rotation();
   	task::sleep(1000);
-	if (force_calibrate_inertial && std::abs(chassis.inertial.rotation() - starting_rotation) > minimum_calibration_error) {
+	if (std::abs(chassis.inertial.rotation() - starting_rotation) > minimum_calibration_error) {
 		Controller.rumble("-");
 		calibrate_inertial();
   	}
@@ -206,10 +211,6 @@ float Chassis::get_absolute_heading(){
     return reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale); 
 }
 
-void Chassis::mirror_all_auton_angles() {
-    angles_mirrored_ = true;
-}
-
 void Chassis::mirror_all_auton_x_pos() {
     x_pos_mirrored_ = true;
 }
@@ -219,12 +220,10 @@ void Chassis::mirror_all_auton_y_pos() {
 }
 
 void Chassis::disable_mirroring() {
-    angles_mirrored_ = false;
     x_pos_mirrored_ = false;
     y_pos_mirrored_ = false;
 }
 
-bool Chassis::angles_mirrored() { return angles_mirrored_; }
 bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
@@ -265,9 +264,7 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
     forward_tracker.resetPosition();
     sideways_tracker.resetPosition();
 
-    orientation_deg = mirror_angle(orientation_deg, angles_mirrored_);
-    X_position = mirror_x(X_position, x_pos_mirrored_);
-    Y_position = mirror_y(Y_position, y_pos_mirrored_);
+    mirror(X_position, Y_position, orientation_deg, x_pos_mirrored_, y_pos_mirrored_);
 
     odom.set_position({X_position, Y_position}, orientation_deg, get_forward_tracker_position(), get_sideways_tracker_position());
     set_heading(orientation_deg);
@@ -288,33 +285,38 @@ bool Chassis::reset_axis(distance_position sensor_position, float max_reset_dist
 }
 
 bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_position, float max_reset_distance) {
-    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, get_X_position(), get_Y_position(), get_absolute_heading());
-
-    const bool reset_x = (wall_position == wall_position::TOP_WALL || wall_position == wall_position::BOTTOM_WALL) ? false : true; 
-
     const float odom_x = get_X_position();
     const float odom_y = get_Y_position();
 
-    // add more data
+    auto wall = reset_sensors.get_wall_facing(sensor_position, odom_x, odom_y, get_absolute_heading());
+
+    const float new_pos = reset_sensors.get_reset_axis_pos(sensor_position, wall_position, odom_x, odom_y, get_absolute_heading());
+
+    bool reset_x;
+    if (wall_position == wall_position::AUTO) {
+        reset_x = (wall != "top_wall" && wall != "bottom_wall");
+    } else {
+        reset_x = (wall_position != wall_position::TOP_WALL && wall_position != wall_position::BOTTOM_WALL);
+    }
 
     if (reset_x && std::abs(new_pos - odom_x) < max_reset_distance) {
         chassis.set_coordinates(new_pos, odom_y, get_absolute_heading());
-        print("Reset Odom X Position Sucessfully", mik::green);
+        print("Reset Odom X Position on " + wall + " Sucessfully", mik::green);
         print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(new_pos) + ", " + to_string(odom_y) + ")", mik::bright_green);
         return true;
     }
     if (!reset_x && std::abs(new_pos - odom_y) < max_reset_distance) {
         chassis.set_coordinates(odom_x, new_pos, get_absolute_heading());
-        print("Reset Odom Y Position Sucessfully", mik::green);
+        print("Reset Odom Y Position on " + wall + " Sucessfully", mik::green);
         print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(odom_x) + ", " + to_string(new_pos) + ")", mik::bright_green);
         return true;
     } 
     
     if (reset_x) {
-        print("Reset Odom X Position Failed", mik::red);
+        print("Reset Odom X Position on" + wall + " Failed", mik::red);
         print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(new_pos) + ", " + to_string(odom_y) + ")", mik::bright_red);
     } else {
-        print("Reset Odom Y Position Failed", mik::red);
+        print("Reset Odom Y Position on " + wall + " Failed", mik::red);
         print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(odom_x) + ", " + to_string(new_pos) + ")", mik::bright_red);
     }
 

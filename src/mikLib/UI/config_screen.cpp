@@ -75,7 +75,7 @@ std::shared_ptr<UI_component> UI_config_screen::add_button(slot slot, std::strin
 
 
 void UI_config_screen::UI_crt_config_scr() {
-    const int extra_buttons = 3; // Expands the screen to scroll
+    const int extra_buttons = 4; // Expands the screen to scroll
     const int extra_screen_height = 39 * extra_buttons + 5;
     UI_config_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + extra_screen_height);
     UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 2, 40, config_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
@@ -118,7 +118,10 @@ void UI_config_screen::UI_crt_config_scr() {
         disable_user_control(); 
     });
 
-    add_button(slot::MACRO, "Get Offsets", [](){ config_measure_offsets(); });
+    add_button(slot::MACRO, "Odom Offsets", [](){ config_measure_odometry_offsets(); });
+
+    add_button(slot::MACRO, "Reset Offsets", [](){ config_measure_distance_reset_offsets(); });
+
 
     // Clears PID data off SD card
     add_button(slot::MACRO, "Wipe PID Data", [](){ wipe_SD_file("pid_data.txt"); });

@@ -841,7 +841,89 @@ void config_measure_velocity_accel() {
     });
 }
 
-void config_measure_offsets() {
+void config_measure_distance_reset_offsets() {
+	console_scr->reset();
+	UI_select_scr(console_scr->get_console_screen());
+
+	vex::task temp([](){
+		struct sensor_data {
+			mik::distance sensor;
+			float x_offset;
+			float y_offset;
+		};
+
+		std::vector<sensor_data> sensor_order{
+			{ chassis.reset_sensors.get_distance_sensor(front_sensor), 0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(left_sensor),  0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(rear_sensor),  0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(right_sensor), 0, 0 },
+		};
+
+		const float iterations = 10.0;
+		const float bracket = 15.0;
+		const float cardinals[] = { 0.0, 90.0, 180.0, 270.0 };
+		const float facing_offsets[] = { 0.0, 270.0, 180.0, 90.0 };
+
+		chassis.set_coordinates(47.125, 47.125, 0);
+
+		for (size_t i = 0; i < sensor_order.size(); ++i) {
+			float cardinal = cardinals[i];
+			float angle1, angle2, robot_y1, robot_y2;
+			float dist1 = 0, dist2 = 0;
+
+			chassis.turn_to_angle(cardinal - bracket, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			task::sleep(250);
+			angle1 = chassis.get_absolute_heading();
+			robot_y1 = chassis.get_Y_position();
+			for (int j = 0; j < iterations; ++j) {
+				dist1 += sensor_order[i].sensor.objectDistance(inches);
+				task::sleep(50);
+			}
+			dist1 /= iterations;
+
+			chassis.turn_to_angle(cardinal + bracket, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			task::sleep(250);
+			angle2 = chassis.get_absolute_heading();
+			robot_y2 = chassis.get_Y_position();
+			for (int j = 0; j < iterations; ++j) {
+				dist2 += sensor_order[i].sensor.objectDistance(inches);
+				task::sleep(50);
+			}
+			dist2 /= iterations;
+
+			if (dist1 > 100 || dist1 < 1 || dist2 > 100 || dist2 < 1) {
+				sensor_order[i].x_offset = -9999;
+				sensor_order[i].y_offset = -9999;
+				continue;
+			}
+
+			float eq1 = 70.25f - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
+			float eq2 = 70.25f - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
+			float det = sin(to_rad(angle2 - angle1));
+			if (fabs(det) < 0.01f) continue;
+
+			sensor_order[i].x_offset = (eq1 * cos(to_rad(angle2)) - eq2 * cos(to_rad(angle1))) / det;
+			sensor_order[i].y_offset = (eq1 * sin(to_rad(angle2)) - eq2 * sin(to_rad(angle1))) / det;
+		}
+
+		for (auto& data : sensor_order) {
+			if (fabs(data.x_offset) > 999 || fabs(data.y_offset) > 999) {
+				console_scr->add(data.sensor.name() + " Sensor is unplugged or missing", [](){ return ""; });
+				continue;
+			}
+			console_scr->add(data.sensor.name() + " Sensor Offsets, ", [x = data.x_offset, y = data.y_offset](){
+				return "X: " + to_string_float(x, 3, false) + " Y: " + to_string_float(y, 3, false);
+			});
+		}
+
+		chassis.set_brake_type(vex::brakeType::coast);
+		chassis.stop_drive(vex::brakeType::coast);
+
+		return 0;
+	});
+}
+
+void config_measure_odometry_offsets() {
     console_scr->reset();
     UI_select_scr(console_scr->get_console_screen());
 	
@@ -866,7 +948,7 @@ void config_measure_offsets() {
 			float start_heading = chassis.inertial.rotation();
 			float target = i % 2 == 0 ? 90 : 270;
 	
-			chassis.turn_to_angle(target, { .max_voltage = 6 });
+			chassis.turn_to_angle(target, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
 			task::sleep(250);
 	
 			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
@@ -876,9 +958,9 @@ void config_measure_offsets() {
 			float s_delta = chassis.get_sideways_tracker_position();
 			float d_delta = chassis.get_motor_encoder_position();
 	
-			f_offset += f_delta * sqrt(2) / t_delta;
-			s_offset += s_delta  * sqrt(2) / t_delta;
-			d_delta += d_delta * sqrt(2) / t_delta;
+			f_offset += (f_delta - s_delta) / (sqrt(2) * t_delta);
+			s_offset += (f_delta + s_delta) / (sqrt(2) * t_delta);
+			d_offset += d_delta / t_delta;
 		}
 	
 		f_offset /= iterations;
@@ -889,7 +971,6 @@ void config_measure_offsets() {
 		console_scr->add("Forward Tracker Center Distance: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
 		console_scr->add("Sideways Tracker Center Distance: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 
-		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.stop_drive(vex::brakeType::coast);
 

@@ -68,48 +68,53 @@ float reduce_0_to_360(float angle) {
     return angle;
 }
 
-float mirror_angle(float angle, bool mirror) { 
-    if (mirror) {
-        return reduce_0_to_360(360 - angle);
+void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y) {
+    if (!mirror_x && !mirror_y) return;
+
+    if (mirror_x) {
+        x = -x;
+        angle = reduce_0_to_360(360 - angle);
     }
-    return angle;
+
+    if (mirror_y) {
+        y = -y;
+        angle = reduce_0_to_360(180 - angle);
+    }
+
+    if (mirror_x ^ mirror_y) {
+        turn_direction = turn_direction == mik::turn_direction::CW ? mik::turn_direction::CCW : mik::turn_direction::CW;
+    }
 }
 
-mik::turn_direction mirror_direction(mik::turn_direction dir, bool mirror) {
-    if (mirror) {
-        if (dir == mik::turn_direction::CW) {
-            return mik::turn_direction::CCW;
-        }
-        if (dir == mik::turn_direction::CCW) {
-            return mik::turn_direction::CW;
-        }
-    }
-    return dir;
+void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y) {
+    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mirror(x, y, angle, unused, mirror_x, mirror_y);
 }
 
-float mirror_x(float x, bool mirror) {
-    if (mirror) {
-        return -x;
-    }
-    return x;
+void mirror(float& x, float& y, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y) {
+    float dummy_angle = 0;
+    mirror(x, y, dummy_angle, turn_direction, mirror_x, mirror_y);
 }
 
-float mirror_y(float y, bool mirror) {
-    if (mirror) {
-        return -y;
-    }
-    return y;
+void mirror(float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y) {
+    float dummy_x = 0, dummy_y = 0;
+    mirror(dummy_x, dummy_y, angle, turn_direction, mirror_x, mirror_y);
+}
+
+void mirror(float& x, float& y, bool mirror_x, bool mirror_y) {
+    float dummy_angle = 0;
+    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mirror(x, y, dummy_angle, unused, mirror_x, mirror_y);
 }
 
 float angle_error(float error, mik::turn_direction dir) {
-    switch (dir)
-    {
-    case mik::turn_direction::CW:
-        return error < 0 ? error + 360 : error;
-    case mik::turn_direction::CCW:
-        return error > 0 ? error - 360 : error;
-    case mik::turn_direction::FASTEST:
-        return reduce_negative_180_to_180(error);
+    switch (dir) {
+        case mik::turn_direction::CW:
+            return error < 0 ? error + 360 : error;
+        case mik::turn_direction::CCW:
+            return error > 0 ? error - 360 : error;
+        case mik::turn_direction::FASTEST:
+            return reduce_negative_180_to_180(error);
     }
 }
 
