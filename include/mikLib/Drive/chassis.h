@@ -88,6 +88,9 @@ public:
 
     mik::tracker_mode tracker_mode; // Type of tracking mode to use for odometry.
 
+    // How the robot will stop after a motion is finished. min speed > 0 will skip this step. Default will set voltage to 0.
+    vex::brakeType stop_behavior = vex::brakeType::undefined; 
+
     /**
      * @param left_drive  Motor group on the robot's left side.
      * @param right_drive Motor group on the robot's right side.
@@ -857,7 +860,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -919,7 +922,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
         }
     
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -985,7 +988,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1051,7 +1054,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1120,7 +1123,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1191,7 +1194,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1263,7 +1266,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1346,7 +1349,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1451,7 +1454,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });
@@ -1555,7 +1558,7 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(hold); }
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
         return 0;
     });

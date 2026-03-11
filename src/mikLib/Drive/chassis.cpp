@@ -148,7 +148,7 @@ bool Chassis::is_in_motion() {
 void Chassis::cancel_motion() {
     drive_task.stop();
     motion_running = false;
-    if (active_min_voltage == 0) { stop_drive(hold); }
+    if (active_min_voltage == 0) { stop_drive(chassis.stop_behavior); }
 }
 
 void Chassis::update_drive_max_voltage(float drive_max_voltage) {
@@ -179,8 +179,13 @@ void Chassis::drive_with_voltage(float left_voltage, float right_voltage){
 }
 
 void Chassis::stop_drive(vex::brakeType brake) {
-    left_drive.stop(brake);
-    right_drive.stop(brake);
+    if (brake == vex::brakeType::undefined) {
+        left_drive.spin(fwd, 0, volt);
+        right_drive.spin(fwd, 0, volt);
+    } else {
+        left_drive.stop(brake);
+        right_drive.stop(brake);
+    }
 }
 
 void Chassis::calibrate_inertial() {
@@ -374,7 +379,7 @@ void Chassis::tank_curved() {
 
 void Chassis::control(drive_mode dm) {
     if (control_disabled) { 
-        stop_drive(coast);
+        stop_drive(chassis.stop_behavior);
         return;
     }
     selected_drive_mode = dm;
