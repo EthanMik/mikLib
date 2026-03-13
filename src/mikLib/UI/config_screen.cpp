@@ -75,7 +75,7 @@ std::shared_ptr<UI_component> UI_config_screen::add_button(slot slot, std::strin
 
 
 void UI_config_screen::UI_crt_config_scr() {
-    const int extra_buttons = 4; // Expands the screen to scroll
+    const int extra_buttons = 3; // Expands the screen to scroll
     const int extra_screen_height = 39 * extra_buttons + 5;
     UI_config_scr = UI_crt_scr(0, 45, SCREEN_WIDTH, SCREEN_HEIGHT + extra_screen_height);
     UI_config_scr->add_scroll_bar(UI_crt_rec(0, 0, 2, 40, config_scroll_bar_color, UI_distance_units::pixels), screen::alignment::RIGHT);
@@ -107,9 +107,9 @@ void UI_config_screen::UI_crt_config_scr() {
     });
 
     // Spins each motor forwards for half a second
-    add_button(slot::MACRO, "Spin All Mtrs", [](){ 
-        // UI_select_scr({motors_scr->get_motors_screen()});
-        config_spin_all_motors(); 
+    add_button(slot::MACRO, "Motor Menu", [](){ 
+        UI_select_scr({motors_scr->get_motors_screen()});
+        disable_user_control();
     });
 
     // Opens pnematic menu
@@ -124,10 +124,10 @@ void UI_config_screen::UI_crt_config_scr() {
 
 
     // Clears PID data off SD card
-    add_button(slot::MACRO, "Wipe PID Data", [](){ wipe_SD_file("pid_data.txt"); });
-
-    // Wipes selected auto off the SD card
-    add_button(slot::MACRO, "Wipe Sel Auto", [](){ wipe_SD_file("auton.txt"); });
+    add_button(slot::MACRO, "Wipe SD", [](){ 
+        wipe_SD_file("auton.txt");
+        wipe_SD_file("pid_data.txt");
+    });
 
 // DATA SLOTS
 

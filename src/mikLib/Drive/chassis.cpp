@@ -14,7 +14,7 @@ follow_path_params g_follow_path_params_buffer{};
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
     float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
-    float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
+    float drivetrain_rpm, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter,
     float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
     float sideways_tracker_center_distance, mik::distance_reset reset_sensors
 ):
@@ -36,10 +36,10 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     force_calibrate_inertial(force_calibrate_inertial), 
 
     wheel_diameter(wheel_diameter),
-    wheel_ratio(wheel_ratio),
+    drivetrain_rpm(drivetrain_rpm),
     wheel_center_distance(wheel_center_distance),
 
-    drive_in_to_deg_ratio(wheel_ratio / 360.0 * M_PI * wheel_diameter),
+    drive_in_to_deg_ratio(0),
 
     forward_tracker_diameter(forward_tracker_diameter),
     forward_tracker_center_distance(forward_tracker_center_distance),
@@ -49,6 +49,14 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     sideways_tracker_center_distance(sideways_tracker_center_distance),
     sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0)
 {
+    float motor_rpm;
+    switch (right_drive.getMotors()[0].gear_cartridge()) {
+        case vex::gearSetting::ratio6_1:  motor_rpm = 600; break;
+        case vex::gearSetting::ratio18_1: motor_rpm = 200; break;
+        case vex::gearSetting::ratio36_1: motor_rpm = 100; break;
+    }
+    drive_in_to_deg_ratio = (drivetrain_rpm / motor_rpm) / 360.0 * M_PI * fabs(wheel_diameter);
+
     odom.set_physical_distances(
         tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? wheel_center_distance : forward_tracker_center_distance, 
         sideways_tracker_center_distance
@@ -140,6 +148,12 @@ void Chassis::wait_until(float units) {
         task::sleep(10);
     }
 }
+
+void Chassis::wait_until(float units, vex::percentUnits percent_units) {
+    while (percent_traveled < units && motion_running) {
+        task::sleep(10);
+    }
+} 
 
 bool Chassis::is_in_motion() {
     return motion_running;
@@ -268,6 +282,7 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
     position_tracking = true;
     forward_tracker.resetPosition();
     sideways_tracker.resetPosition();
+    right_drive.resetPosition();
 
     mirror(X_position, Y_position, orientation_deg, x_pos_mirrored_, y_pos_mirrored_);
 

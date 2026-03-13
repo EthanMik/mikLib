@@ -169,6 +169,10 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
         // chassis.set_coordinates(0, 0, 0);
         chassis.set_coordinates(47.125, 47.125, 0);
 
+        chassis.wait_until(100, percent);
+        assembly.barrel_motor.spin(fwd, 0, volt);
+        chassis.wait();
+
         return "";
     }
 

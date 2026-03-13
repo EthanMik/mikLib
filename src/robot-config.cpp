@@ -31,7 +31,7 @@ Chassis chassis(
 	
     forward_tracker, // Replace with "motor_encoder" if no forward tracker
     2.5,            // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoder
-    0.9375,            // Drivetrain gear ratio (ex: a 36 driving a 48 is 0.75). Only needed with motor encoder
+    562.5,             // Drivetrain RPM (wheel RPM). Only needed with motor encoder
 	6,               // Drivetrain center distance (in), (half drivetrain track width). Only needed with motor encoder. Can be found automatically with "Get Offsets" on "Config" tab
 
     PORT_E,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
@@ -171,6 +171,7 @@ void disable_user_control(bool stop_all_motors_) {
 	if (stop_all_motors_) {
 		stop_all_motors(vex::brakeType::hold);
 		set_brake_all_motors(vex::brakeType::coast);
+		stop_all_motors(vex::brakeType::coast);
 	}
 }
 

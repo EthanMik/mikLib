@@ -106,7 +106,7 @@ public:
      */
     Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
         float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
-        float wheel_ratio, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter, 
+        float drivetrain_rpm, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter,
         float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
         float sideways_tracker_center_distance, mik::distance_reset reset_sensors
     );
@@ -232,6 +232,13 @@ public:
      * @param units units of motion (inches or degrees).
     */
     void wait_until(float units);
+
+    /** 
+     * @brief Yield to the scheduler until the current motion the robots in has traveled specifed units. 
+     * @param units units of motion.
+     * @param percent Uses a 0-100, with 0 being start and 100 being end of motion.
+    */
+    void wait_until(float units, vex::percentUnits percent_units);
 
     /** @return True if the robot is in motion. */
     bool is_in_motion();
@@ -606,6 +613,7 @@ public:
     bool calibrating = false;
     bool motion_running;
     float distance_traveled;
+    float percent_traveled; // Percent of the current motion traveled, 0-100.
     float active_min_voltage = 0;
     
     bool position_tracking;
@@ -633,7 +641,7 @@ private:
     const float minimum_calibration_error = .05;
 
     float wheel_diameter;
-    float wheel_ratio;
+    float drivetrain_rpm;
     float wheel_center_distance;
     float drive_in_to_deg_ratio;
 
@@ -818,12 +826,14 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float distance = chassis.desired_distance;
         const float heading = chassis.desired_heading;
         drive_distance_params& p = g_drive_distance_params_buffer;
 
+        const float total_distance = fabs(distance);
         float drive_start_position = chassis.get_forward_tracker_position();
         float current_position = drive_start_position;
 
@@ -837,6 +847,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
     
             drive_error = distance + drive_start_position - current_position;
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
             prev_drive_error = drive_error;
 
             float heading_error = reduce_negative_180_to_180(heading - chassis.get_absolute_heading());
@@ -879,6 +890,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
@@ -887,6 +899,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
         float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -906,6 +919,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
             
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -918,9 +932,9 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
 
             prev_output = output;
 
-            vex::task::sleep(10); 
+            vex::task::sleep(10);
         }
-    
+
         chassis.motion_running = false;
         if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
 
@@ -939,6 +953,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
@@ -947,6 +962,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
         float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -966,6 +982,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -1005,6 +1022,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float angle = chassis.desired_angle;
@@ -1013,6 +1031,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading());
         float error = angle_error(angle - chassis.get_absolute_heading(), p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1032,6 +1051,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -1078,6 +1098,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1089,6 +1110,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
         float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1108,6 +1130,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -1147,6 +1170,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1158,6 +1182,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
         float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1177,6 +1202,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -1218,6 +1244,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1229,6 +1256,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
         float angle = to_deg(atan2((x_pos - chassis.get_X_position()), (y_pos - chassis.get_Y_position())));
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
         float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
+        const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
         float prev_output = 0;
@@ -1248,6 +1276,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
 
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) { break; }
             chassis.distance_traveled += std::abs(error - prev_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
@@ -1287,6 +1316,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1297,6 +1327,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         bool line_settled = false;
         bool prev_line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
         float drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
+        const float total_distance = drive_error;
 
         float prev_drive_error = drive_error;
         float prev_drive_output = 0;
@@ -1316,6 +1347,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
 
             drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
             prev_drive_error = drive_error;
 
             float heading_error = reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading());
@@ -1373,6 +1405,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
     drive_task = vex::task([](){
         const float x_pos = chassis.desired_X_position;
@@ -1387,6 +1420,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         bool prev_center_line_side = center_line_side;
 
         float target_distance = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
+        const float total_distance = target_distance;
         float carrot_X = x_pos - sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
         float carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
         float drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
@@ -1415,6 +1449,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
             int drive_sign = 1;
 
             chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
+            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
             prev_drive_error = drive_error;
 
             if (drive_error < p.settle_error || crossed_center_line || drive_error < p.setback) { 
@@ -1481,18 +1516,24 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    percent_traveled = 0;
 
 	// Add current position to the start of the path so that intersections can be found initially, even if the robot is off the path.
     path.insert(path.begin(), odom.position);
 
     desired_path = path;
     g_follow_path_params_buffer = p;
-    
+
     drive_task = vex::task([](){
         std::vector<point> path = chassis.desired_path;
         follow_path_params& p = g_follow_path_params_buffer;
         float prev_drive_output = 0;
         float prev_heading_output = 0;
+
+        float total_distance = 0;
+        for (int i = 0; i < (int)(path.size() - 1); i++) {
+            total_distance += dist(path[i], path[i+1]);
+        }
 
         point target_intersection = chassis.odom.position; // The point on the path that we should target with PID.
 
@@ -1524,6 +1565,7 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
 
                 point current_position = chassis.odom.position;
                 chassis.distance_traveled += dist(current_position, prev_position);
+                chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
                 prev_position = current_position;
   
                 // Move towards the target intersection with PID

@@ -8,7 +8,7 @@ void relative_mode_constants() {
 }
 
 void odom_mode_constants() {
-
+	
 }
 
 void test_drive() {
@@ -92,10 +92,11 @@ void test_odom_full() {
 void test_boomerang() {
 	chassis.set_coordinates(0, 0, 0);
 
-	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
-	chassis.drive_to_pose(24, 0, 90, {.lead = .2});
-	chassis.drive_to_pose(0, 24, 315);
-	chassis.drive_to_pose(0, 0, 0);
+    chassis.drive_to_pose(24, 24, 90);
+    chassis.drive_to_pose(24, 0, 90);
+    chassis.drive_to_pose(0, 24, 270);
+    chassis.drive_to_pose(0, 0, 180);
+    chassis.turn_to_angle(0);
 }
 
 std::vector<point> path = {
@@ -680,8 +681,9 @@ void config_odom_data() {
 		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
 		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
 		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
-		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+		console_scr->add("Forward Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
+		console_scr->add("Sideways Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+		console_scr->add("Motor Encoder: ", [](){ return chassis.get_motor_encoder_position(); });
 
 		return 0;
 	});
