@@ -974,8 +974,8 @@ void config_measure_odometry_offsets() {
 			float s_delta = chassis.get_sideways_tracker_position();
 			float d_delta = chassis.get_motor_encoder_position();
 	
-			f_offset += (f_delta - s_delta) / (sqrt(2) * t_delta);
-			s_offset += (f_delta + s_delta) / (sqrt(2) * t_delta);
+			f_offset += f_delta / t_delta;
+			s_offset += s_delta / t_delta;
 			d_offset += d_delta / t_delta;
 		}
 	
