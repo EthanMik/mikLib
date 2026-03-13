@@ -725,7 +725,7 @@ void config_reset_data() {
 
 			console_scr->add(sensor.name() + ": ", [sensor_pos, &sensor](){
 				auto wall = chassis.reset_sensors.get_wall_facing(sensor_pos, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading());
-				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
+				std::string axis = (wall == "Bottom Wall" || wall == "Top Wall") ? "Y" : "X";
 				return wall + " " + axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(sensor_pos, auto_detect_wall, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading()), 3, false) + " D: " + to_string_float(sensor.objectDistance(distanceUnits::in), 3, false);
 			});
 		}

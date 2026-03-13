@@ -17,7 +17,6 @@
 #include "mikLib/Devices/piston.h"
 #include "mikLib/Devices/tracker.h"
 #include "mikLib/Drive/odom.h"
-#include "mikLib/Drive/odom45.h"
 #include "mikLib/Drive/PID.h"
 
 using namespace vex;

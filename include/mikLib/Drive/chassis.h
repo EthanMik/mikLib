@@ -442,8 +442,8 @@ public:
      * 
      * @return True if the desired axis was reset successfully.
      */
-    bool reset_axis(mik::distance_position sensor_pos, float max_reset_distance);
-    bool reset_axis(mik::distance_position sensor_pos, mik::wall_position wall_pos, float max_reset_distance);
+    bool reset_axis(mik::distance_position sensor_pos, float max_reset_distance, int reset_attempts = 1);
+    bool reset_axis(mik::distance_position sensor_pos, mik::wall_position wall_pos, float max_reset_distance, int reset_attempts = 1);
 
     /**
      * @brief Turns to a specified point on the field.
