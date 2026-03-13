@@ -3,15 +3,13 @@
 using namespace vex;
 using namespace mik;
 
-void relative_mode_constants() {
+void test_constants() {
   	default_constants();
 }
 
-void odom_mode_constants() {
-	
-}
-
 void test_drive() {
+	test_constants();
+
 	chassis.drive_distance(6);
 	chassis.drive_distance(12);
 	chassis.drive_distance(18);
@@ -19,12 +17,16 @@ void test_drive() {
 }
 
 void test_heading() {
+	test_constants();
+
 	chassis.drive_distance(10, { .heading = 15 });
 	chassis.drive_distance(20, { .heading = 45 });
 	chassis.drive_distance(-30, { .heading = 0 });
 }
 
 void test_turn() {
+	test_constants();
+
 	chassis.turn_to_angle(5);
 	chassis.turn_to_angle(30);
 	chassis.turn_to_angle(90);
@@ -34,12 +36,15 @@ void test_turn() {
 }
 
 void test_swing() {
+	test_constants();
+
 	chassis.left_swing_to_angle(110);
 	chassis.right_swing_to_angle(0);
 }
 
 void test_full() {
-	default_constants();
+	test_constants();
+
 	chassis.set_heading(0);
 
 	chassis.drive_distance(24);
@@ -51,6 +56,8 @@ void test_full() {
 }
 
 void test_odom_drive() {
+	test_constants();
+
 	chassis.drive_to_point(0, 6);
 	chassis.drive_to_point(0, 18);
 	chassis.drive_to_point(0, 36);
@@ -58,6 +65,8 @@ void test_odom_drive() {
 }
 
 void test_odom_heading() {
+	test_constants();
+
 	chassis.drive_to_point(5, 18);
 	chassis.drive_to_point(20, 35);
 	chassis.drive_to_point(0, 0);
@@ -65,6 +74,8 @@ void test_odom_heading() {
 }
 
 void test_odom_turn() {
+	test_constants();
+
 	chassis.turn_to_point(0.437,  5);
 	chassis.turn_to_point(2.887,  5);
 	chassis.turn_to_point(5, 0);
@@ -74,11 +85,14 @@ void test_odom_turn() {
 }
 
 void test_odom_swing() {
+	test_constants();
+	
 	chassis.left_swing_to_point(24, 12);
 	chassis.right_swing_to_point(12, 24);
 }
 
 void test_odom_full() {
+	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_point(0, 24);
@@ -90,6 +104,7 @@ void test_odom_full() {
 }
 
 void test_boomerang() {
+	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
     chassis.drive_to_pose(24, 24, 90);
@@ -125,6 +140,7 @@ std::vector<point> path = {
 };
 
 void test_pursuit() {
+	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
@@ -149,11 +165,6 @@ static bool testing_odom = false;
 
 bool config_swap_test_mode() {
 	testing_odom = !testing_odom;
-	if (testing_odom) {
-		odom_mode_constants();
-	} else {
-		relative_mode_constants();
-	}
 	return testing_odom;
 }
 
@@ -172,12 +183,15 @@ void config_tune_drive() {
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
 		{"drive_slew ", chassis.drive_slew},
-		{"heading_kp: ", chassis.heading_kp}, 
-		{"heading_ki: ", chassis.heading_ki}, 
-		{"heading_kd: ", chassis.heading_kd}, 
-		{"heading_starti: ", chassis.heading_starti}, 
-		{"max_volt: ", chassis.heading_max_voltage},
-		{"heading_slew ", chassis.heading_slew}
+
+		// You can add more parameters to tune
+
+		// {"heading_kp: ", chassis.heading_kp}, 
+		// {"heading_ki: ", chassis.heading_ki}, 
+		// {"heading_kd: ", chassis.heading_kd}, 
+		// {"heading_starti: ", chassis.heading_starti}, 
+		// {"max_volt: ", chassis.heading_max_voltage},
+		// {"heading_slew ", chassis.heading_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };

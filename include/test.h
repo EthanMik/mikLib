@@ -2,11 +2,8 @@
 
 #include "vex.h"
 
-/** @brief Constants used while tuning relative motions */
-void relative_mode_constants();
-
-/** @brief Constants used while tuning odom motions */
-void odom_mode_constants();
+/** @brief Constants used while tuning motions */
+void test_constants();
 
 /** @brief Robot should drive and end in starting position. */
 void test_drive();

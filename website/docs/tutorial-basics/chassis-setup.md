@@ -119,14 +119,8 @@ sideways tracking wheel being perpendicular
 
 ### Forward Tracker
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 The forward tracker measures the lateral distance of the robot. You can use
 either a dedicated forward tracking wheel or your drivetrain motor encoders.
-
-<Tabs>
-  <TabItem value="motor-encoder" label="Motor Encoders" default>
 
 If you don't have a dedicated forward tracking wheel, you can use the built-in
 motor encoders from your drivetrain.
