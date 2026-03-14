@@ -83,7 +83,7 @@ public:
     float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
     float control_desaturate_bias; // Desaturation bias for split_arcade_curved (0 = prioritize turn, 1 = prioritize throttle).
 
-    float drive_large_settle_error = 7; // The distance away from the target to stop applying drive slew and set heading output to 0, in inches.
+    float drive_large_settle_error = 6; // The distance away from the target to stop applying drive slew and lock heading output, in inches.
     float turn_large_settle_error = 15; // The angle away from the target to stop applying turn slew, in degrees.
     float swing_large_settle_error = 15; // The angle away from the target to stop applying swing slew, in degrees.
 
