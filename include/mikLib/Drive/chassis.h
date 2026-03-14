@@ -81,6 +81,7 @@ public:
     float control_turn_deadband; // Deadband percent for the turn axis.
     float control_turn_min_output; // Minimum turn output percent after deadband.
     float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
+    float control_desaturate_bias; // Desaturation bias for split_arcade_curved (0 = prioritize turn, 1 = prioritize throttle).
 
     float stop_apply_drive_slew = 7.5; // The distance away from the target to stop applying drive slew, in inches.
     float stop_apply_turn_slew = 20; // The angle away from the target to stop applying turn slew, in degrees.
@@ -96,7 +97,7 @@ public:
      * @param right_drive Motor group on the robot's right side.
      * @param inertial_port Inertial sensor port (1-21).
      * @param inertial_scale Scale factor applied to raw gyro angles to correct drift.
-     * @param forward_tracker_port Forward tracker rotation sensor port (1-21).
+     * @param forward_tracker_port Forward tracker rotation sensor port (1-21). Use PORT0 to use motor encoders instead.
      * @param forward_tracker_diameter Forward tracking‑wheel diameter (in inches).
      * @param forward_tracker_center_distance Distance from the chassis centre to the forward tracker (in).
      * @param sideways_tracker_port Sideways tracker rotation sensor port (1-21).
@@ -104,11 +105,11 @@ public:
      * @param sideways_tracker_center_distance Distance from the chassis centre to the sideways tracker (in).
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
-    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
-        float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
-        float drivetrain_rpm, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter,
-        float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
-        float sideways_tracker_center_distance, mik::distance_reset reset_sensors
+    Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
+        double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
+        double drivetrain_rpm, double wheel_center_distance, int forward_tracker_port, double forward_tracker_diameter,
+        double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
+        double sideways_tracker_center_distance, mik::distance_reset reset_sensors
     );
 
     /**
@@ -121,8 +122,9 @@ public:
      * @param control_turn_deadband  Deadband percent for the turn axis.
      * @param control_turn_min_output Minimum turn output percent after deadband.
      * @param control_turn_curve_gain Expo gain for turn axis.
+     * @param control_desaturate_bias Desaturation bias when throttle+turn exceeds 100 (0 = prioritize turn, 1 = prioritize throttle, default 0.5).
      */
-    void set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain);
+    void set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain, float control_desaturate_bias);
 
     /**
      * @brief Resets default turn constants.

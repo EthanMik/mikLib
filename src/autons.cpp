@@ -4,8 +4,8 @@ using namespace vex;
 using namespace mik;
 
 void default_constants() {
-    // Each controller constant in the form of throttle, turn (deadband, min_output, curve_gain).
-    chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019);
+    // Each controller constant in the form of throttle, turn (deadband, min_output, curve_gain), desaturate_bias.
+    chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019, 0.5);
 
     // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI, slew).
     chassis.set_drive_constants(10, 1.5, 0, 10, 0, 2);

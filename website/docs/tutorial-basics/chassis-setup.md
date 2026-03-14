@@ -44,10 +44,11 @@ mik::motor_group({
 ```
 
 When applying a positive voltage, all the drivetrain motors need to spin 
-forward, to find which motors are reversed you can run the program, press
+forward. To find which motors are reversed you can run the program, press
 the **Config** tab at the top left, then press
-**Spin Motors** at the bottom left. You should see each motor spin individually. Set reversed to 
-**true** if motor does not spin forward.
+**Motor Menu** at the bottom left. You should then see a screen with all the 
+motors ports laid out. Press the right arrow next to the motor to spin it forward.
+If the motor does not spin forward then set the value to **true**.
 
 // attach image
 
@@ -119,8 +120,9 @@ sideways tracking wheel being perpendicular
 
 ### Forward Tracker
 
-The forward tracker measures the lateral distance of the robot. You can use
-either a dedicated forward tracking wheel or your drivetrain motor encoders.
+The forward tracker measures the lateral distance of the robot.
+
+// insert image of forward tracker
 
 If you don't have a dedicated forward tracking wheel, you can use the built-in
 motor encoders from your drivetrain.
@@ -130,47 +132,60 @@ motor_encoder, // Use "motor_encoder" if no forward tracker
 ```
 
 To be able to use inches as distance measurement you need to plug in your drivetrain
-wheel diameter in inches and gear ratio. If you have a 36 tooth gear attached to the motor with a 48
-tooth gear attached to the wheel use 36/48 -> 0.75.
+wheel diameter in inches and drivetrain rpm. If you have a 36 tooth gear attached to the motor with a 48
+tooth gear attached to the wheel use 36/48 -> 0.75 and multiply that by 
+the cartidge rpm.
+
+- Blue Cartridge = 600 rpm.
+- Green Cartridge = 200 rpm.
+- Red Cartridge = 100 rpm.
+
+
 
 ```cpp
 2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
-0.75,   // Drivetrain gear ratio (e.g. 36T:48T = 0.75).
+450,    // Drivetrain RPM. (600 * 0.75 = 450).
 ```
 
 :::important
 Run the program click on **Odom Data** on the **Config Tab**.
 Take out a tape measure and move the robot 24 forward inches next to it. 
-**If `Y: position` is not positive use a negative wheel diameter. If it is not reading 24
-double check your wheel diameter is accurate.** 
+**If `Y: position` is not positive, use a negative wheel diameter. If it is not reading 24 double check your wheel diameter is accurate.** 
 :::
 
-If you are using motor encoders for odometry you need an offset from the center of rotation. To get
-this value you need to measure from the center of the wheel of the right and left drivetrain then divide
-it by two. 
-
-// Attach image here
+Center distance will be skipped until later on, use 0 for now.
 
 ```cpp
-6,      // Drivetrain center distance (in), Half the track width
+0,   // Drivetrain center distance (in), (half drivetrain track width).
 ```
 
-
-  </TabItem>
-  <TabItem value="tracking-wheel" label="Forward Tracking Wheel">
-
-If you have a dedicated forward tracking wheel, plug in the port and wheel
-diameter.
+This next section is for dedicated odometry trackers.
+If you are using a dedictated forward tracker make sure you plug in `forward_tracker` 
+into the setup
 
 ```cpp
-// Forward tracker on port 'A' with a 2.75" wheel
-mik::tracker(PORT_A, 2.75, "forward_tracker"),
+forward_tracker, // Replace with "motor_encoder" if no forward tracker
 ```
 
+Plug in the port for the forward tracker, you can use `PORT0` if you are 
+not using one. You can also use `PORT_A` if you are using a three wire encoder.
 
+```cpp
+PORT8,  // Forward tracker port.
+```
 
-  </TabItem>
-</Tabs>
+Plug in the wheel diameter for the tracker used. For 2" omni wheels use 2.
+Refer to the important tab above to make sure wheel diameter is correct.
+
+```cpp
+2, // Forward tracker wheel diameter (in). Negative flips direction.
+```
+
+Center distance will be skipped until later on, use 0 for now.
+
+```cpp
+0, // Forward tracker center distance (in). Positive = right of center, negative = left.
+```
 
 ### Sideways Tracker
 
@@ -182,11 +197,14 @@ recommended for drivetrain's using only omni wheels.
 :::
 
 Plug in the port for the sideways tracker, you can use `PORT0` if you are 
-not using one
+not using one. You can also use `PORT_A` if you are using a three wire encoder.
 
 ```cpp
 PORT0, // Sideways tracker port.
 ```
+
+Plug in the wheel diameter for the tracker used. For 2" omni wheels use 2.
+Refer to the important tab above to make sure wheel diameter is correct.
 
 ## Finished Chassis Setup
 

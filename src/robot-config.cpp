@@ -27,16 +27,15 @@ Chassis chassis(
     360,    // Inertial scale (reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-    forward_tracker, // Replace with "motor_encoder" if no forward tracker
-    2.75,            // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoder
-    450,             // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450). Only needed with motor encoder
-	6,               // Drivetrain center distance (in), (half drivetrain track width).
+    2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
+    450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
+	6,      // Drivetrain center distance (in), (half drivetrain track width).
 
-    PORT8,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
     0.5,    // Forward tracker center distance (in). Positive = right of center, negative = left.
 
-    PORT9,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
+    PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
     -1,     // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 

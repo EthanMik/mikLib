@@ -12,14 +12,14 @@ drive_to_point_params g_drive_to_point_params_buffer{};
 drive_to_pose_params g_drive_to_pose_params_buffer{};
 follow_path_params g_follow_path_params_buffer{};
 
-Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port, 
-    float inertial_scale, bool force_calibrate_inertial, mik::tracker_mode tracker_mode, float wheel_diameter, 
-    float drivetrain_rpm, float wheel_center_distance, int forward_tracker_port, float forward_tracker_diameter,
-    float forward_tracker_center_distance, int sideways_tracker_port, float sideways_tracker_diameter, 
-    float sideways_tracker_center_distance, mik::distance_reset reset_sensors
+Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
+    double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
+    double drivetrain_rpm, double wheel_center_distance, int forward_tracker_port, double forward_tracker_diameter,
+    double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
+    double sideways_tracker_center_distance, mik::distance_reset reset_sensors
 ):
-    
-    tracker_mode(tracker_mode),
+
+    tracker_mode(forward_tracker_port != PORT0 ? mik::tracker_mode::FORWARD_TRACKER : mik::tracker_mode::MOTOR_ENCODER),
 
     forward_tracker(forward_tracker_port),
     sideways_tracker(sideways_tracker_port),
@@ -63,13 +63,14 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     );
 }
 
-void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain) {
+void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain, float control_desaturate_bias) {
     this->control_throttle_deadband = control_throttle_deadband;
     this->control_throttle_min_output = control_throttle_min_output;
     this->control_throttle_curve_gain = control_throttle_curve_gain;
     this->control_turn_deadband = control_turn_deadband;
     this->control_turn_min_output = control_turn_min_output;
     this->control_turn_curve_gain = control_turn_curve_gain;
+    this->control_desaturate_bias = control_desaturate_bias;
 }
 
 void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
@@ -135,6 +136,7 @@ void Chassis::set_tracking_offsets(float forward_tracker_center_distance, float 
 void Chassis::set_brake_type(vex::brakeType brake) {
     left_drive.setStopping(brake);
     right_drive.setStopping(brake);
+    chassis.stop_behavior = brake;
 }
 
 void Chassis::wait() {
@@ -258,6 +260,7 @@ float Chassis::get_forward_tracker_position() {
 }
 
 float Chassis::get_sideways_tracker_position() {
+    if (!sideways_tracker_used) return 0;
     return sideways_tracker.position(vex::deg) * sideways_tracker_inch_to_deg_ratio;
 }
 
@@ -365,8 +368,14 @@ void Chassis::split_arcade_curved() {
     float turn = vex::controller(vex::primary).Axis1.value();
     throttle = std::round(curve(throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
     turn = std::round(curve(turn, control_turn_deadband, control_turn_min_output, control_turn_curve_gain));
+    if (std::fabs(throttle) + std::fabs(turn) > 100) {
+        float raw_turn = turn;
+        float raw_throttle = throttle;
+        throttle *= (1 - control_desaturate_bias * std::fabs(raw_turn / 100.0f));
+        turn *= (1 - (1 - control_desaturate_bias) * std::fabs(raw_throttle / 100.0f));
+    }
     left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
-    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt); 
+    right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
 }
 
 void Chassis::split_arcade() {
@@ -399,19 +408,18 @@ void Chassis::control(drive_mode dm) {
     }
     selected_drive_mode = dm;
 
-switch (dm)
-    {
-    case drive_mode::SPLIT_ARCADE:
-        split_arcade();
-        return;
-    case drive_mode::SPLIT_ARCADE_CURVED:
-        split_arcade_curved();
-        return;
-    case drive_mode::TANK:
-        tank();
-        return;
-    case drive_mode::TANK_CURVED:
-        tank_curved();
-        return;
+    switch (dm) {
+        case drive_mode::SPLIT_ARCADE:
+            split_arcade();
+            return;
+        case drive_mode::SPLIT_ARCADE_CURVED:
+            split_arcade_curved();
+            return;
+        case drive_mode::TANK:
+            tank();
+            return;
+        case drive_mode::TANK_CURVED:
+            tank_curved();
+            return;
     }
 }
