@@ -23,7 +23,6 @@ private:
         mik::toggle* left_tgl;
         mik::toggle* right_tgl;
         mik::motor* mtr;
-        bool was_spinning = false;
         bool user_stopped = false;
         bool user_pressed = false;
     };

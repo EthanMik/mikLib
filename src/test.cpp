@@ -8,8 +8,6 @@ void test_constants() {
 }
 
 void test_drive() {
-	test_constants();
-
 	chassis.drive_distance(6);
 	chassis.drive_distance(12);
 	chassis.drive_distance(18);
@@ -17,16 +15,12 @@ void test_drive() {
 }
 
 void test_heading() {
-	test_constants();
-
 	chassis.drive_distance(10, { .heading = 15 });
 	chassis.drive_distance(20, { .heading = 45 });
 	chassis.drive_distance(-30, { .heading = 0 });
 }
 
 void test_turn() {
-	test_constants();
-
 	chassis.turn_to_angle(5);
 	chassis.turn_to_angle(30);
 	chassis.turn_to_angle(90);
@@ -36,15 +30,11 @@ void test_turn() {
 }
 
 void test_swing() {
-	test_constants();
-
 	chassis.left_swing_to_angle(110);
 	chassis.right_swing_to_angle(0);
 }
 
 void test_full() {
-	test_constants();
-
 	chassis.set_heading(0);
 
 	chassis.drive_distance(24);
@@ -56,8 +46,6 @@ void test_full() {
 }
 
 void test_odom_drive() {
-	test_constants();
-
 	chassis.drive_to_point(0, 6);
 	chassis.drive_to_point(0, 18);
 	chassis.drive_to_point(0, 36);
@@ -65,8 +53,6 @@ void test_odom_drive() {
 }
 
 void test_odom_heading() {
-	test_constants();
-
 	chassis.drive_to_point(5, 18);
 	chassis.drive_to_point(20, 35);
 	chassis.drive_to_point(0, 0);
@@ -74,8 +60,6 @@ void test_odom_heading() {
 }
 
 void test_odom_turn() {
-	test_constants();
-
 	chassis.turn_to_point(0.437,  5);
 	chassis.turn_to_point(2.887,  5);
 	chassis.turn_to_point(5, 0);
@@ -84,15 +68,12 @@ void test_odom_turn() {
 	chassis.turn_to_point(0,  5, {.turn_direction = cw});
 }
 
-void test_odom_swing() {
-	test_constants();
-	
+void test_odom_swing() {	
 	chassis.left_swing_to_point(24, 12);
 	chassis.right_swing_to_point(12, 24);
 }
 
 void test_odom_full() {
-	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_point(0, 24);
@@ -104,7 +85,6 @@ void test_odom_full() {
 }
 
 void test_boomerang() {
-	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
     chassis.drive_to_pose(24, 24, 90);
@@ -165,6 +145,7 @@ static bool testing_odom = false;
 
 bool config_swap_test_mode() {
 	testing_odom = !testing_odom;
+	test_constants();
 	return testing_odom;
 }
 

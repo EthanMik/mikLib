@@ -317,7 +317,7 @@ bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_p
 
     bool reset_x;
     if (wall_position == wall_position::AUTO) {
-        reset_x = (wall != "top_wall" && wall != "bottom_wall");
+        reset_x = (wall != "Top Wall" && wall != "Bottom Wall");
     } else {
         reset_x = (wall_position != wall_position::TOP_WALL && wall_position != wall_position::BOTTOM_WALL);
     }
@@ -336,7 +336,7 @@ bool Chassis::reset_axis(distance_position sensor_position, wall_position wall_p
     } 
     
     if (reset_x) {
-        print("Reset Odom X Position on" + wall + " Failed", mik::red);
+        print("Reset Odom X Position on " + wall + " Failed", mik::red);
         print("Old: (" + to_string(odom_x) + ", " + to_string(odom_y) + ")" + " -> " + " New: (" + to_string(new_pos) + ", " + to_string(odom_y) + ")", mik::bright_red);
     } else {
         print("Reset Odom Y Position on " + wall + " Failed", mik::red);

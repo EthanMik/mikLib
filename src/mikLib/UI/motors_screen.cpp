@@ -82,7 +82,11 @@ void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y, const std::
     auto* right_tgl = static_cast<mik::toggle*>(move_motor_right.get());
 
     this->motor_texts.push_back({static_cast<mik::textbox*>(motor_port_txt.get()), mtr});
-    this->motor_toggles.push_back({left_tgl, right_tgl, mtr, false, false, false});
+    motor_toggle_entry entry;
+    entry.left_tgl = left_tgl;
+    entry.right_tgl = right_tgl;
+    entry.mtr = mtr;
+    this->motor_toggles.push_back(entry);
     int toggle_idx = this->motor_toggles.size() - 1;
 
     left_tgl->set_callback([this, mtr, right_tgl, toggle_idx](){
@@ -150,30 +154,10 @@ void UI_motors_screen::update_motors_screen() {
     }
 
     for (auto& entry : motor_toggles) {
-        double velo = entry.mtr->velocity(vex::rpm);
-        bool left_on = entry.left_tgl->get_toggle_state();
-        bool right_on = entry.right_tgl->get_toggle_state();
-
         if (entry.user_stopped) {
-            if (velo == 0) {
+            if (entry.mtr->velocity(vex::rpm) == 0) {
                 entry.user_stopped = false;
-                entry.was_spinning = false;
             }
-            continue;
-        }
-
-        if (velo < 0 && !left_on) {
-            if (right_on) { entry.right_tgl->unpress(); }
-            entry.left_tgl->press();
-            entry.was_spinning = true;
-        } else if (velo > 0 && !right_on) {
-            if (left_on) { entry.left_tgl->unpress(); }
-            entry.right_tgl->press();
-            entry.was_spinning = true;
-        } else if (velo == 0 && entry.was_spinning) {
-            entry.was_spinning = false;
-            if (left_on) { entry.left_tgl->unpress(); }
-            if (right_on) { entry.right_tgl->unpress(); }
         }
     }
 

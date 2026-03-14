@@ -83,9 +83,9 @@ public:
     float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
     float control_desaturate_bias; // Desaturation bias for split_arcade_curved (0 = prioritize turn, 1 = prioritize throttle).
 
-    float stop_apply_drive_slew = 7.5; // The distance away from the target to stop applying drive slew, in inches.
-    float stop_apply_turn_slew = 20; // The angle away from the target to stop applying turn slew, in degrees.
-    float stop_apply_swing_slew = 20; // The angle away from the target to stop applying swing slew, in degrees.
+    float drive_large_settle_error = 7; // The distance away from the target to stop applying drive slew and set heading output to 0, in inches.
+    float turn_large_settle_error = 15; // The angle away from the target to stop applying turn slew, in degrees.
+    float swing_large_settle_error = 15; // The angle away from the target to stop applying swing slew, in degrees.
 
     mik::tracker_mode tracker_mode; // Type of tracking mode to use for odometry.
 
@@ -859,7 +859,7 @@ inline void Chassis::drive_distance(float distance, const drive_distance_params&
             drive_output = clamp(drive_output, -p.max_voltage, p.max_voltage);
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
             heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
@@ -927,7 +927,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_turn_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.turn_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.drive_with_voltage(output, -output);
@@ -990,7 +990,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.swing_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.left_drive.spin(fwd, output, volt);
@@ -1059,7 +1059,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.swing_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.right_drive.spin(reverse, output, volt);
@@ -1138,7 +1138,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_turn_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.turn_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.drive_with_voltage(output, -output);
@@ -1210,7 +1210,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.swing_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.left_drive.spin(fwd, output, volt);
@@ -1285,7 +1285,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
 
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.stop_apply_swing_slew);
+            output = slew_scaling(output, prev_output, p.slew, fabs(error) > chassis.swing_large_settle_error);
             output = clamp_min_voltage(output, p.min_voltage);
 
             chassis.right_drive.spin(reverse, output, volt);
@@ -1334,6 +1334,8 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         float prev_drive_error = drive_error;
         float prev_drive_output = 0;
         float prev_heading_output = 0;
+        float locked_heading = heading;
+        bool heading_locked = false;
 
         while (!chassis.pid.is_settled()){
             line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
@@ -1359,18 +1361,22 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
             if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
             drive_output *= heading_scale_factor * drive_sign;
 
+            if (drive_error < chassis.drive_large_settle_error) {
+                if (!heading_locked) {
+                    locked_heading = desired_heading;
+                    heading_locked = true;
+                }
+                heading_error = reduce_negative_180_to_180(locked_heading - chassis.get_absolute_heading());
+            }
+
             if (p.drive_direction == mik::drive_direction::FASTEST) heading_error = reduce_negative_90_to_90(heading_error);
 
             float heading_output = chassis.pid_2.compute(heading_error);
 
-            if (drive_error < p.settle_error) { 
-                heading_output = 0;
-            }
-
             drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
             heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
@@ -1454,7 +1460,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
             chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
             prev_drive_error = drive_error;
 
-            if (drive_error < p.settle_error || crossed_center_line || drive_error < p.setback) { 
+            if (drive_error < 7.5 || crossed_center_line || drive_error < p.setback) { 
                 heading_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading()); 
                 drive_error = target_distance;
             }
@@ -1478,7 +1484,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
             drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
             
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
             drive_output = clamp_max_slip(drive_output, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading(), carrot_X, carrot_Y, p.drift);
             drive_output = overturn_scaling(drive_output, heading_output, p.max_voltage * fabs(heading_scale_factor));
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);        
@@ -1581,14 +1587,14 @@ inline void Chassis::follow_path(std::vector<point> path, const follow_path_para
                 heading_error = reduce_negative_90_to_90(heading_error);
                 float heading_output = chassis.pid_2.compute(heading_error);
                 
-                if (drive_error < p.settle_error) { 
+                if (drive_error < chassis.drive_large_settle_error){ 
                     heading_output = 0;
                 }
   
                 drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
                 heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
-                drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.stop_apply_drive_slew);
+                drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
                 heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
                 drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 

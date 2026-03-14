@@ -8,14 +8,14 @@ void default_constants() {
     chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019, 0.5);
 
     // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI, slew).
-    chassis.set_drive_constants(10, 1.5, 0, 10, 0, 2);
-    chassis.set_heading_constants(10, .2, 0, 1, 0, 0);
+    chassis.set_drive_constants(8, 1.5, 0, 10, 0, 2);
+    chassis.set_heading_constants(10, .4, 0, 1, 0, 0);
     chassis.set_turn_constants(12, .4, .03, 3, 15, 0);
     chassis.set_swing_constants(12, .4, .01, 2, 15, 0);
 
     // Each exit condition set is in the form of (settle_error, settle_time, timeout).
     chassis.set_turn_exit_conditions(1, 200, 3000);
-    chassis.set_drive_exit_conditions(3, 200, 5000);
+    chassis.set_drive_exit_conditions(1.5, 200, 5000);
     chassis.set_swing_exit_conditions(1, 200, 3000);
 
     chassis.boomerang_lead = .5;
@@ -37,7 +37,7 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
 
         return "";
     }
-
+    
     // Place start of autonoumous here
 
     return "";
@@ -230,6 +230,7 @@ std::string skills(bool calibrate, auto_variation var, bool get_name) {
         return "";
     }
 
+    chassis.turn_to_angle(180);
     // Place start of autonoumous here
 
     return "";
