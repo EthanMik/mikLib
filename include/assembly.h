@@ -21,7 +21,7 @@ public:
     static vex::rotation rotation_sensor;
     static vex::optical optical_sensor;
     static vex::limit limit_switch;
-
+    
     void init();
     void control();
 

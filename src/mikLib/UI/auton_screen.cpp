@@ -4,6 +4,34 @@
 using namespace mik;
 using namespace vex;
 
+void UI_auton_screen::queue_autons(bool calibrating, bool set_description) {    
+    if (!calibrating && !set_description && (time_limit || odom_display)) {
+        start_time_limit();
+    }
+
+    if (calibrating) {
+        robot_is_calibrated = true;
+    }
+
+    if (off_skills) { output = skills(calibrating, var, set_description); return; }
+
+    if (!red_blue && !rings_goal && !quals_elims && !off_sawp) { output = blue_left_winpoint(calibrating, var, set_description); return; }
+    if (!red_blue && !rings_goal && !quals_elims &&  off_sawp) { output = blue_left_sawp(calibrating, var, set_description); return; }
+    if (!red_blue && !rings_goal &&  quals_elims && !off_sawp) { output = blue_left_elim(calibrating, var, set_description); return; }
+
+    if (!red_blue &&  rings_goal && !quals_elims && !off_sawp) { output = blue_right_winpoint(calibrating, var, set_description); return; }
+    if (!red_blue &&  rings_goal && !quals_elims &&  off_sawp) { output = blue_right_sawp(calibrating, var, set_description); return; }
+    if (!red_blue &&  rings_goal &&  quals_elims && !off_sawp) { output = blue_right_elim(calibrating, var, set_description); return; }
+
+    if ( red_blue && !rings_goal && !quals_elims && !off_sawp) { output = red_left_winpoint(calibrating, var, set_description); return; }
+    if ( red_blue && !rings_goal && !quals_elims &&  off_sawp) { output = red_left_sawp(calibrating, var, set_description); return; }
+    if ( red_blue && !rings_goal &&  quals_elims && !off_sawp) { output = red_left_elim(calibrating, var, set_description); return; }
+
+    if ( red_blue &&  rings_goal && !quals_elims && !off_sawp) { output = red_right_winpoint(calibrating, var, set_description); return; }
+    if ( red_blue &&  rings_goal && !quals_elims &&  off_sawp) { output = red_right_sawp(calibrating, var, set_description); return; }
+    if ( red_blue &&  rings_goal &&  quals_elims && !off_sawp) { output = red_right_elim(calibrating, var, set_description); return; }
+}
+
 UI_auton_screen::UI_auton_screen() {
     UI_crt_auton_scr();
 }
@@ -331,34 +359,6 @@ void UI_auton_screen::set_description(std::string text) {
     description_output = text;
 }
 
-void UI_auton_screen::queue_autons(bool calibrating, bool set_description) {    
-    if (!calibrating && !set_description && (time_limit || odom_display)) {
-        start_time_limit();
-    }
-
-    if (calibrating) {
-        robot_is_calibrated = true;
-    }
-
-    if (off_skills) { output = skills(calibrating, var, set_description); return; }
-
-    if (!red_blue && !rings_goal && !quals_elims && !off_sawp) { output = blue_left_winpoint(calibrating, var, set_description); return; }
-    if (!red_blue && !rings_goal && !quals_elims &&  off_sawp) { output = blue_left_sawp(calibrating, var, set_description); return; }
-    if (!red_blue && !rings_goal &&  quals_elims && !off_sawp) { output = blue_left_elim(calibrating, var, set_description); return; }
-
-    if (!red_blue &&  rings_goal && !quals_elims && !off_sawp) { output = blue_right_winpoint(calibrating, var, set_description); return; }
-    if (!red_blue &&  rings_goal && !quals_elims &&  off_sawp) { output = blue_right_sawp(calibrating, var, set_description); return; }
-    if (!red_blue &&  rings_goal &&  quals_elims && !off_sawp) { output = blue_right_elim(calibrating, var, set_description); return; }
-
-    if ( red_blue && !rings_goal && !quals_elims && !off_sawp) { output = red_left_winpoint(calibrating, var, set_description); return; }
-    if ( red_blue && !rings_goal && !quals_elims &&  off_sawp) { output = red_left_sawp(calibrating, var, set_description); return; }
-    if ( red_blue && !rings_goal &&  quals_elims && !off_sawp) { output = red_left_elim(calibrating, var, set_description); return; }
-
-    if ( red_blue &&  rings_goal && !quals_elims && !off_sawp) { output = red_right_winpoint(calibrating, var, set_description); return; }
-    if ( red_blue &&  rings_goal && !quals_elims &&  off_sawp) { output = red_right_sawp(calibrating, var, set_description); return; }
-    if ( red_blue &&  rings_goal &&  quals_elims && !off_sawp) { output = red_right_elim(calibrating, var, set_description); return; }
-}
-
 void UI_auton_screen::start_time_limit() {
     controller_scr_overlay.stop();
     Controller.Screen.clearScreen();
@@ -642,7 +642,7 @@ void UI_auton_screen::disable_controller_overlay() {
 }
 
 void UI_auton_screen::enable_controller_overlay() {
-    disable_user_control();
+    disable_user_control(true);
     control_panel = {
         {{controller_btn(false, "[Blue]", "[Red]", [this](){ UI_select_auton(autons::RED_BLUE); flip_toggle(red_blue_tgl, red_blue); save_auton_SD(); } )},
          {controller_btn(false, "[Left]", "[Right]", [this](){ UI_select_auton(autons::RINGS_GOAL); flip_toggle(rings_goal_tgl, rings_goal); save_auton_SD(); })},

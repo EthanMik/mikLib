@@ -39,6 +39,7 @@ namespace mik {
     enum class tracker_mode { MOTOR_ENCODER, FORWARD_TRACKER };
     enum class alliance_colors { RED, BLUE };
 
+
     inline constexpr int PORT_A = -1;
     inline constexpr int PORT_B = -2;
     inline constexpr int PORT_C = -3;
@@ -209,7 +210,9 @@ namespace mik {
     inline const std::string& motors_spin_right_pressing_color = UI_white;
     inline const std::string& motors_spin_right_pressed_color = UI_red;
 
-    inline const std::string& motors_left_drive_btn_bg_color = "#303030";
+    inline const std::string motors_left_drive_btn_bg_color = "#303030";
+    inline const std::string motors_right_drive_btn_bg_color = "#595959";
+    inline const std::string motors_assembly_btn_bg_color = "#858585";
 
     inline const std::string& motors_port_btn_outline_color = UI_dark_gray;
     inline const std::string& motors_port_btn_pressing_color = UI_white;

@@ -2,11 +2,8 @@
 
 #include "vex.h"
 
-/** @brief Constants used while tuning relative motions */
-void relative_mode_constants();
-
-/** @brief Constants used while tuning odom motions */
-void odom_mode_constants();
+/** @brief Constants used while tuning motions */
+void test_constants();
 
 /** @brief Robot should drive and end in starting position. */
 void test_drive();
@@ -184,7 +181,9 @@ void config_skills_driver_run();
 void config_measure_velocity_accel();
 
 /** @brief Measures the offsets of the forward and sideways tracker by turning prints output the the console screen */
-void config_measure_offsets();
+void config_measure_odometry_offsets();
+
+void config_measure_distance_reset_offsets();
 
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
 void config_test_three_wire_port(int port);

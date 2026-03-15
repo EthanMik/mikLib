@@ -3,12 +3,8 @@
 using namespace vex;
 using namespace mik;
 
-void relative_mode_constants() {
+void test_constants() {
   	default_constants();
-}
-
-void odom_mode_constants() {
-	odom_constants();
 }
 
 void test_drive() {
@@ -39,7 +35,6 @@ void test_swing() {
 }
 
 void test_full() {
-	default_constants();
 	chassis.set_heading(0);
 
 	chassis.drive_distance(24);
@@ -73,13 +68,12 @@ void test_odom_turn() {
 	chassis.turn_to_point(0,  5, {.turn_direction = cw});
 }
 
-void test_odom_swing() {
+void test_odom_swing() {	
 	chassis.left_swing_to_point(24, 12);
 	chassis.right_swing_to_point(12, 24);
 }
 
 void test_odom_full() {
-	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.drive_to_point(0, 24);
@@ -91,13 +85,13 @@ void test_odom_full() {
 }
 
 void test_boomerang() {
-	odom_constants();
 	chassis.set_coordinates(0, 0, 0);
 
-	chassis.drive_to_pose(24, 24, 90, {.lead = .4});
-	chassis.drive_to_pose(24, 0, 90, {.lead = .2});
-	chassis.drive_to_pose(0, 24, 315);
-	chassis.drive_to_pose(0, 0, 0);
+    chassis.drive_to_pose(24, 24, 90);
+    chassis.drive_to_pose(24, 0, 90);
+    chassis.drive_to_pose(0, 24, 270);
+    chassis.drive_to_pose(0, 0, 180);
+    chassis.turn_to_angle(0);
 }
 
 std::vector<point> path = {
@@ -122,12 +116,11 @@ std::vector<point> path = {
 	{ 23.393,  19.643 },
 	{ 23.536,  21.637 },
 	{ 23.554,  23.664 },
-	{ 23.554,  23.664 },
 	{ 24.554,  24.664 },
 };
 
 void test_pursuit() {
-	odom_constants();
+	test_constants();
 	chassis.set_coordinates(0, 0, 0);
 
 	chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
@@ -152,11 +145,7 @@ static bool testing_odom = false;
 
 bool config_swap_test_mode() {
 	testing_odom = !testing_odom;
-	if (testing_odom) {
-		odom_mode_constants();
-	} else {
-		relative_mode_constants();
-	}
+	test_constants();
 	return testing_odom;
 }
 
@@ -174,7 +163,16 @@ void config_tune_drive() {
 		{"drive_stl_err: ", chassis.drive_settle_error}, 
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
-		{"drive_slew ", chassis.drive_slew}
+		{"drive_slew ", chassis.drive_slew},
+
+		// You can add more parameters to tune
+
+		// {"heading_kp: ", chassis.heading_kp}, 
+		// {"heading_ki: ", chassis.heading_ki}, 
+		// {"heading_kd: ", chassis.heading_kd}, 
+		// {"heading_starti: ", chassis.heading_starti}, 
+		// {"max_volt: ", chassis.heading_max_voltage},
+		// {"heading_slew ", chassis.heading_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
@@ -313,7 +311,8 @@ void config_tune_swing() {
 		{"swing_ki: ", chassis.swing_ki }, 
 		{"swing_kd: ", chassis.swing_kd}, 
 		{"swing_starti: ", chassis.swing_starti}, 
-		{"swing_max_volt: ", chassis.turn_max_voltage}, 
+		{"swing_max_volt: ", chassis.swing_max_voltage}, 
+		{"swing_opp_volt: ", chassis.swing_opposite_voltage}, 
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
 		{"swing_tmout: ", chassis.swing_timeout},
@@ -677,8 +676,9 @@ void config_odom_data() {
 		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
 		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
 		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-		console_scr->add("Forward_Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
-		console_scr->add("Sideways_Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+		console_scr->add("Forward Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
+		console_scr->add("Sideways Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+		console_scr->add("Motor Encoder: ", [](){ return chassis.get_motor_encoder_position(); });
 
 		return 0;
 	});
@@ -691,7 +691,7 @@ void config_reset_data() {
 
 	vex::task temp([](){
 		if (!chassis.position_tracking) {
-			console_scr->add("The robot does know where it is, place", [](){ return ""; });	
+			console_scr->add("The robot does not know where it is, place", [](){ return ""; });	
 			console_scr->add("`chassis.set_coordinates(x, y, heading);`", [](){ return ""; });	
 			console_scr->add("during pre_auton() or calibrate an auton", [](){ return ""; });	
 			return 0;
@@ -706,7 +706,7 @@ void config_reset_data() {
 
 			console_scr->add(sensor.name() + ": ", [sensor_pos, &sensor](){
 				auto wall = chassis.reset_sensors.get_wall_facing(sensor_pos, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading());
-				std::string axis = (wall == "bottom_wall" || wall == "top_wall") ? "Y" : "X";
+				std::string axis = (wall == "Bottom Wall" || wall == "Top Wall") ? "Y" : "X";
 				return wall + " " + axis + ": " + to_string_float(chassis.reset_sensors.get_reset_axis_pos(sensor_pos, auto_detect_wall, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading()), 3, false) + " D: " + to_string_float(sensor.objectDistance(distanceUnits::in), 3, false);
 			});
 		}
@@ -838,19 +838,103 @@ void config_measure_velocity_accel() {
     });
 }
 
-void config_measure_offsets() {
+void config_measure_distance_reset_offsets() {
+	console_scr->reset();
+	UI_select_scr(console_scr->get_console_screen());
+
+	vex::task temp([](){
+		struct sensor_data {
+			mik::distance sensor;
+			float x_offset;
+			float y_offset;
+		};
+
+		std::vector<sensor_data> sensor_order{
+			{ chassis.reset_sensors.get_distance_sensor(front_sensor), 0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(left_sensor),  0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(rear_sensor),  0, 0 },
+			{ chassis.reset_sensors.get_distance_sensor(right_sensor), 0, 0 },
+		};
+
+		const float iterations = 10.0;
+		const float bracket = 15.0;
+		const float cardinals[] = { 0.0, 90.0, 180.0, 270.0 };
+		const float facing_offsets[] = { 0.0, 270.0, 180.0, 90.0 };
+
+		chassis.set_coordinates(47.125, 47.125, 0);
+
+		for (size_t i = 0; i < sensor_order.size(); ++i) {
+			float cardinal = cardinals[i];
+			float angle1, angle2, robot_y1, robot_y2;
+			float dist1 = 0, dist2 = 0;
+
+			chassis.turn_to_angle(cardinal - bracket, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			task::sleep(250);
+			angle1 = chassis.get_absolute_heading();
+			robot_y1 = chassis.get_Y_position();
+			for (int j = 0; j < iterations; ++j) {
+				dist1 += sensor_order[i].sensor.objectDistance(inches);
+				task::sleep(50);
+			}
+			dist1 /= iterations;
+
+			chassis.turn_to_angle(cardinal + bracket, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			task::sleep(250);
+			angle2 = chassis.get_absolute_heading();
+			robot_y2 = chassis.get_Y_position();
+			for (int j = 0; j < iterations; ++j) {
+				dist2 += sensor_order[i].sensor.objectDistance(inches);
+				task::sleep(50);
+			}
+			dist2 /= iterations;
+
+			if (dist1 > 100 || dist1 < 1 || dist2 > 100 || dist2 < 1) {
+				sensor_order[i].x_offset = -9999;
+				sensor_order[i].y_offset = -9999;
+				continue;
+			}
+
+			float eq1 = 70.25f - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
+			float eq2 = 70.25f - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
+			float det = sin(to_rad(angle2 - angle1));
+			if (fabs(det) < 0.01f) continue;
+
+			sensor_order[i].x_offset = (eq1 * cos(to_rad(angle2)) - eq2 * cos(to_rad(angle1))) / det;
+			sensor_order[i].y_offset = (eq1 * sin(to_rad(angle2)) - eq2 * sin(to_rad(angle1))) / det;
+		}
+
+		for (auto& data : sensor_order) {
+			if (fabs(data.x_offset) > 999 || fabs(data.y_offset) > 999) {
+				console_scr->add(data.sensor.name() + " Sensor is unplugged or missing", [](){ return ""; });
+				continue;
+			}
+			console_scr->add(data.sensor.name() + " Sensor Offsets, ", [x = data.x_offset, y = data.y_offset](){
+				return "X: " + to_string_float(x, 3, false) + " Y: " + to_string_float(y, 3, false);
+			});
+		}
+
+		chassis.set_brake_type(vex::brakeType::coast);
+		chassis.stop_drive(vex::brakeType::coast);
+
+		return 0;
+	});
+}
+
+void config_measure_odometry_offsets() {
     console_scr->reset();
     UI_select_scr(console_scr->get_console_screen());
-
+	
     vex::task temp([](){
+		const auto saved_mode = chassis.tracker_mode; 
+		chassis.tracker_mode = mik::tracker_mode::FORWARD_TRACKER;
+
 		int iterations = 10;
 	
-		float f_offset = 0.0, s_offset = 0.0;
+		float f_offset = 0.0, s_offset = 0.0, d_offset = 0.0;
 	
 		chassis.forward_tracker.resetPosition();
 		chassis.sideways_tracker.resetPosition();
 		chassis.right_drive.resetPosition();
-		no_tracker_constants();
 	
 		for (int i = 0; i < iterations; i++) {
 			chassis.set_heading(0);
@@ -861,7 +945,7 @@ void config_measure_offsets() {
 			float start_heading = chassis.inertial.rotation();
 			float target = i % 2 == 0 ? 90 : 270;
 	
-			chassis.turn_to_angle(target, { .max_voltage = 6 });
+			chassis.turn_to_angle(target, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
 			task::sleep(250);
 	
 			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
@@ -869,19 +953,25 @@ void config_measure_offsets() {
 	
 			float f_delta = chassis.get_forward_tracker_position();
 			float s_delta = chassis.get_sideways_tracker_position();
+			float d_delta = chassis.get_motor_encoder_position();
 	
 			f_offset += f_delta / t_delta;
 			s_offset += s_delta / t_delta;
+			d_offset += d_delta / t_delta;
 		}
 	
 		f_offset /= iterations;
 		s_offset /= iterations;
+		d_offset /= iterations;
 
-		console_scr->add("Forward Tracker Offset: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
-		console_scr->add("Sideways Tracker Offset: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
+		console_scr->add("Drivetrain Center Distance: ", [d_offset](){ return to_string_float(-d_offset, 3, false) + " in"; });
+		console_scr->add("Forward Tracker Center Distance: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
+		console_scr->add("Sideways Tracker Center Distance: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 
 		chassis.set_brake_type(vex::brakeType::coast);
 		chassis.stop_drive(vex::brakeType::coast);
+
+		chassis.tracker_mode = saved_mode;
 
 		return 0;
 	});
@@ -926,6 +1016,7 @@ void config_skills_driver_run() {
 			{
 			case 30:
 				Controller.rumble((".-"));
+				break;
 			case 15:
 				Controller.rumble(("."));
 				break;

@@ -51,9 +51,9 @@ mik::wall_position mik::distance_reset::auto_detect_wall(
     const float sensor_x = x + x_offset * cos(to_rad(angle)) + y_offset * sin(to_rad(angle));
     const float sensor_y = y - x_offset * sin(to_rad(angle)) + y_offset * cos(to_rad(angle));
 
-    const float t_right  = dx > 0 ? (WALL_RIGHT_X  - sensor_x) / dx : INFINITY;
-    const float t_left   = dx < 0 ? (WALL_LEFT_X   - sensor_x) / dx : INFINITY;
-    const float t_top    = dy > 0 ? (WALL_TOP_Y    - sensor_y) / dy : INFINITY;
+    const float t_right = dx > 0 ? (WALL_RIGHT_X - sensor_x) / dx : INFINITY;
+    const float t_left = dx < 0 ? (WALL_LEFT_X - sensor_x) / dx : INFINITY;
+    const float t_top = dy > 0 ? (WALL_TOP_Y - sensor_y) / dy : INFINITY;
     const float t_bottom = dy < 0 ? (WALL_BOTTOM_Y - sensor_y) / dy : INFINITY;
 
     const float tMin = std::min({t_right, t_left, t_top, t_bottom});
@@ -71,14 +71,33 @@ std::string mik::distance_reset::get_wall_facing(distance_position sensor_positi
             index = i;
         }
     }
-    if (index < 0) { return ""; }
-    
+    if (index < 0) {
+        print("Sensor does not exist", mik::red);
+        return "";
+    }
+
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
     const float distance = distance_sensors[index].objectDistance(vex::inches);
     const float x_offset = distance_sensors[index].x_center_offset();
     const float y_offset = distance_sensors[index].y_center_offset();
 
     return to_wall_name(auto_detect_wall(distance, sensor_offset, x_offset, y_offset, x, y, angle));
+}
+
+float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position, wall_position wall_position, float x, float y, float angle, int attempts) {
+    std::vector<float> readings;
+    readings.reserve(attempts);
+    for (int i = 0; i < attempts; ++i) {
+        readings.push_back(get_reset_axis_pos(sensor_position, wall_position, x, y, angle));
+        if (i < attempts - 1) { vex::task::sleep(20); }
+    }
+
+    std::sort(readings.begin(), readings.end());
+    const int n = readings.size();
+    if (n % 2 == 1) {
+        return readings[n / 2];
+    }
+    return (readings[n / 2 - 1] + readings[n / 2]) / 2.0f;
 }
 
 float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position, wall_position wall_position, float x, float y, float angle) {
@@ -88,7 +107,10 @@ float mik::distance_reset::get_reset_axis_pos(distance_position sensor_position,
             index = i;
         }
     }
-    if (index < 0) { return 0; }
+    if (index < 0) {
+        print("Sensor does not exist", mik::red);
+        return 0;
+    }
     
     const float sensor_offset = to_sensor_offset_constant(sensor_position);
     const float distance = distance_sensors[index].objectDistance(vex::inches);
@@ -121,31 +143,40 @@ std::vector<mik::distance>& mik::distance_reset::get_distance_sensors() {
     return distance_sensors;
 }
 
+mik::distance mik::distance_reset::get_distance_sensor(mik::distance_position sensor_pos) {
+    for (auto& sensor : distance_sensors) {
+        if (sensor.position() == sensor_pos) {
+            return sensor;
+        }
+    }
+    return mik::distance(PORT0, sensor_pos, 0, 0);
+}   
+
 std::string mik::distance_reset::to_wall_name(mik::wall_position wall_position) {
     switch (wall_position) {
         case wall_position::TOP_WALL:
-            return "top_wall";
+            return "Top Wall";
         case wall_position::LEFT_WALL:
-            return "left_wall";
+            return "Left Wall";
         case wall_position::RIGHT_WALL:
-            return "right_wall";
+            return "Right Wall";
         case wall_position::BOTTOM_WALL:
-            return "bottom_wall";
+            return "Bottom Wall";
         case wall_position::AUTO:
-            return "auto";
+            return "Auto";
     }
 }
 
 std::string mik::distance::to_sensor_name(distance_position sensor_pos) {
     switch (sensor_pos) {
         case distance_position::FRONT_SENSOR:
-            return "front";
+            return "Front";
         case distance_position::REAR_SENSOR:
-            return "rear";
+            return "Rear";
         case distance_position::LEFT_SENSOR:
-            return "left";
+            return "Left";
         case distance_position::RIGHT_SENSOR:
-            return "right";
+            return "Right";
     }
 }
 

@@ -5,7 +5,6 @@ using namespace mik;
 
 UI_motors_screen::UI_motors_screen() {
     UI_crt_motors_scr();
-    UI_crt_reconstruct_scr();
 }
 
 void UI_motors_screen::UI_crt_motors_scr() {
@@ -65,17 +64,15 @@ void UI_motors_screen::UI_crt_motors_scr() {
     }
 }
 
-void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y) {
+void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y, const std::string& bg_color) {
     auto move_motor_left = UI_crt_tgl(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_outline_color, 2), [](){});
     move_motor_left->set_states(UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressing_color, 2), UI_crt_rec(x, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressed_color, 2));
     auto left_arrow = UI_crt_txtbox("<", mik::text_align::CENTER, UI_crt_rec(x + 5, y + 5, 20, 20, motors_spin_left_bg_color), vex::fontType::mono20, 0);
 
-    auto motor_port_btn = UI_crt_btn(UI_crt_rec(x + 40, y, 40, 40, motors_left_drive_btn_bg_color, motors_port_btn_outline_color, 2), [this](){ 
-        UI_swap_screens({UI_reconstruct_scr});
-    });
+    auto motor_port_btn = UI_crt_btn(UI_crt_rec(x + 40, y, 40, 40, bg_color, motors_port_btn_outline_color, 2), [](){});
 
 
-    auto motor_port_txt = UI_crt_txtbox("0", "#ffffff", motors_left_drive_btn_bg_color, text_align::CENTER, UI_crt_rec(x + 42, y + 5, 36, 24, motors_left_drive_btn_bg_color), vex::fontType::mono20, 0);
+    auto motor_port_txt = UI_crt_txtbox("0", "#ffffff", bg_color, text_align::CENTER, UI_crt_rec(x + 42, y + 5, 36, 24, bg_color), vex::fontType::mono20, 0);
 
     auto move_motor_right = UI_crt_tgl(UI_crt_rec(x + 90, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_outline_color, 2), [](){});
     move_motor_right->set_states(UI_crt_rec(x + 90, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressing_color, 2), UI_crt_rec(x + 90, y, 30, 40, motors_spin_left_bg_color, motors_spin_left_pressed_color, 2));
@@ -85,7 +82,11 @@ void UI_motors_screen::crt_motor_btns(mik::motor* mtr, int x, int y) {
     auto* right_tgl = static_cast<mik::toggle*>(move_motor_right.get());
 
     this->motor_texts.push_back({static_cast<mik::textbox*>(motor_port_txt.get()), mtr});
-    this->motor_toggles.push_back({left_tgl, right_tgl, mtr, false, false, false});
+    motor_toggle_entry entry;
+    entry.left_tgl = left_tgl;
+    entry.right_tgl = right_tgl;
+    entry.mtr = mtr;
+    this->motor_toggles.push_back(entry);
     int toggle_idx = this->motor_toggles.size() - 1;
 
     left_tgl->set_callback([this, mtr, right_tgl, toggle_idx](){
@@ -129,17 +130,16 @@ void UI_motors_screen::init_motors() {
     int idx = 0;
 
     for (; idx < chassis.left_drive.getMotors().size(); ++idx) {
-        crt_motor_btns(motors[idx], 10, 35 + (int)(idx * 50));
+        crt_motor_btns(motors[idx], 10, 35 + (int)(idx * 50), motors_left_drive_btn_bg_color);
     }
     for (int i = 0; idx < chassis.right_drive.getMotors().size() + chassis.left_drive.getMotors().size(); ++idx, ++i) {
-        crt_motor_btns(motors[idx], 10+140, 35 + (int)(i * 50));
+        crt_motor_btns(motors[idx], 10+140, 35 + (int)(i * 50), motors_right_drive_btn_bg_color);
     }
     for (int i = 0; idx < motors.size(); ++idx, ++i) {
-        crt_motor_btns(motors[idx], 10+140*2, 35 + (int)(i * 50));
+        crt_motor_btns(motors[idx], 10+140*2, 35 + (int)(i * 50), motors_assembly_btn_bg_color);
     }
 
     UI_motors_scr->add_render_callback([this](){ update_motors_screen(); });
-    UI_reconstruct_scr->add_render_callback([this](){ update_reconstruct_screen(); });
 }
 
 void UI_motors_screen::update_motors_screen() {
@@ -154,30 +154,10 @@ void UI_motors_screen::update_motors_screen() {
     }
 
     for (auto& entry : motor_toggles) {
-        double velo = entry.mtr->velocity(vex::rpm);
-        bool left_on = entry.left_tgl->get_toggle_state();
-        bool right_on = entry.right_tgl->get_toggle_state();
-
         if (entry.user_stopped) {
-            if (velo == 0) {
+            if (entry.mtr->velocity(vex::rpm) == 0) {
                 entry.user_stopped = false;
-                entry.was_spinning = false;
             }
-            continue;
-        }
-
-        if (velo < 0 && !left_on) {
-            if (right_on) { entry.right_tgl->unpress(); }
-            entry.left_tgl->press();
-            entry.was_spinning = true;
-        } else if (velo > 0 && !right_on) {
-            if (left_on) { entry.left_tgl->unpress(); }
-            entry.right_tgl->press();
-            entry.was_spinning = true;
-        } else if (velo == 0 && entry.was_spinning) {
-            entry.was_spinning = false;
-            if (left_on) { entry.left_tgl->unpress(); }
-            if (right_on) { entry.right_tgl->unpress(); }
         }
     }
 
@@ -189,84 +169,6 @@ void UI_motors_screen::update_motors_screen() {
     else { enable_user_control(); }
 }
 
-void UI_motors_screen::reconstruct_motor(mik::motor* mtr, int new_port, vex::gearSetting new_cart, bool new_rev) {
-    mtr->stop(vex::coast);
-
-    std::string name = mtr->name();
-
-    mtr->~motor();
-    new(mtr) mik::motor(new_port, new_rev, new_cart, name);
-}
-
-void UI_motors_screen::UI_crt_reconstruct_scr() {
-    UI_reconstruct_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    auto bg = UI_crt_bg(UI_crt_rec(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, motors_bg_color, UI_distance_units::pixels));
-    UI_reconstruct_scr->add_UI_component(bg);
-
-
-    auto motor_label_component = UI_crt_txtbox("Motor X", mik::text_align::CENTER, UI_crt_rec(80, 20, 230, 25, motors_bg_color), vex::fontType::mono20, 0);
-    motor_label = static_cast<mik::textbox*>(motor_label_component.get());
-    
-    auto exit_bg = UI_crt_btn(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_outline_color, 2, UI_distance_units::pixels), [this](){ UI_select_scr(UI_motors_scr); });
-        exit_bg->set_states(UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressing_color, 2, UI_distance_units::pixels), UI_crt_rec(2, 2, 40, 40, motors_bg_color, motors_close_button_pressed_color, 2, UI_distance_units::pixels));
-    auto exit_txt = UI_crt_gfx({UI_crt_rec(4, 4, 36, 36, motors_bg_color, UI_distance_units::pixels), UI_crt_txt("X", 17, 27, motors_ports_text_color, motors_bg_color, mik::UI_distance_units::pixels)});
-    UI_reconstruct_scr->add_UI_components({exit_bg, exit_txt, motor_label_component});
- 
-    const auto ports = 21;
-    for (size_t i = 0; i < ports; ++i) {
-        auto port_btn = UI_crt_btn(UI_crt_rec(50 + (i % 7) * 57, 65 + (i / 7) * 60, 40, 40, motors_ports_btn_bg, motors_ports_btn_current_color, 2), [](){});
-        auto port_btn_text = UI_crt_txtbox(to_string(i + 1), text_align::CENTER, UI_crt_rec(55 + (i % 7) * 57, 70 + (i / 7) * 60, 30, 25, motors_ports_btn_bg), vex::fontType::mono20, 0);
-        port_button_list.at(i) = {
-            static_cast<mik::button*>(port_btn.get()),
-            static_cast<mik::textbox*>(port_btn_text.get())
-        };
-
-        UI_reconstruct_scr->add_UI_components({port_btn, port_btn_text});
-    }
-}
-
-void UI_motors_screen::update_reconstruct_screen() {
-    // if (!selected_mtr) return;
-    selected_mtr = config_get_motors()[0];
-
-    const auto name = selected_mtr->name();
-    const auto cart = selected_mtr->gear_cartridge();
-    const auto rev = selected_mtr->reversed();
-    const auto port = selected_mtr->index();
-    
-    motor_label->set_text(name);
-
-    const size_t size = config_get_motors().size();
-    std::vector<int> ports;
-    for (auto& mtr : config_get_motors()) {
-        if (mtr->index() != selected_mtr->index()) {
-            ports.push_back(mtr->index());
-        }
-    }
-
-    size_t port_idx = 0;
-    const size_t port_amount = 21;
-    for (auto& item : port_button_list) {
-        const float btn_x = item.port_btn->get_x_pos();
-        const float btn_y = item.port_btn->get_y_pos();
-        const float btn_w = item.port_btn->get_width();
-        const float btn_h = item.port_btn->get_height();
-
-        std::string color = motors_ports_btn_open_color;
-
-        if (port_idx == selected_mtr->index()) {
-            color = motors_ports_btn_current_color;
-            print(color);
-        } else if (std::find(ports.begin(), ports.end(), port_idx) != ports.end()) {
-            color = motors_ports_btn_closed_color;
-            print(color);
-        }
-
-        item.port_btn->set_default_state(UI_crt_rec(btn_x, btn_y, btn_w, btn_h, motors_ports_btn_bg, color, 2));
-        item.port_txt->set_text_color(color);
-        port_idx++;
-    }
-}
 
 std::shared_ptr<screen> UI_motors_screen::get_motors_screen() {
     return UI_motors_scr;

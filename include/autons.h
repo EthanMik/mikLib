@@ -3,12 +3,6 @@
 #include "mikLib/globals.h"
 
 void default_constants(void);
-void odom_constants(void);
-void no_tracker_constants(void);
-void motion_chaining_constants(void);
-
-std::string template_auto(bool calibrate , mik::auto_variation var, bool get_name );
-std::string template_auto_other_variation(bool calibrate, bool get_name);
 
 std::string blue_left_winpoint(bool calibrate, mik::auto_variation var, bool get_name );
 std::string blue_left_sawp(bool calibrate, mik::auto_variation var, bool get_name );

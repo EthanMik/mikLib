@@ -12,43 +12,43 @@ vex::competition Competition;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT11, true, blue_6_1, "left front motor"),
-        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
-        mik::motor(PORT13, true, blue_6_1, "left back motor"),
+        mik::motor(PORT1, false, blue_6_1, "left front motor"),
+        mik::motor(PORT2, false, blue_6_1, "left middle motor"),
+        mik::motor(PORT3, false, blue_6_1, "left back motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT2, false, blue_6_1, "right front motor"),
-        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
-        mik::motor(PORT6, false, blue_6_1, "right back motor"),
+        mik::motor(PORT4, true, blue_6_1, "right front motor"),
+        mik::motor(PORT4, true, blue_6_1, "right middle motor"),
+        mik::motor(PORT6, true, blue_6_1, "right back motor"),
     }),
 	
-    PORT3,  // Inertial sensor port
+    PORT7,  // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-    forward_tracker, // Replace with "motor_encoder" if no forward tracker
-    2.75,            // Drivetrain wheel diameter (in). Negative flips direction. Only needed with motor encoder
-    1.33,            // Drivetrain gear ratio (ex: a 36 driving a 48 is 1.33). Only needed with motor encoder
-	6,               // Drivetrain center distance (in), (half drivetrain track width). Only needed with motor encoder. Can be found automatically with "Get Offsets" on "Config" tab
+    2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
+    450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
+	6,      // Drivetrain center distance (in), (half drivetrain track width).
 
-    PORT4,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
-    0,      // Forward tracker center distance (in). Positive = right of center, negative = left. Can be found automatically with "Get Offsets" on "Config" tab
+    0.5,    // Forward tracker center distance (in). Positive = right of center, negative = left.
 
-    PORT14,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
-    -2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
-    0.3,     // Sideways tracker center distance (in). Positive = behind center, negative = in front. Can be found automatically with "Get Offsets" on "Config" tab
+    PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
+    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
+    -1,     // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
         mik::distance(
-			PORT8,		  // Distance sensor port
-            front_sensor, // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
-            5,            // X offset from tracking center (in). Positive = right of center, negative = left.
-            3.5           // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+			PORT10,		   // Distance sensor port
+            front_sensor,  // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
+            3,             // X offset from tracking center (in). Positive = right of center, negative = left. 
+            -4             // Y offset from tracking center (in). Positive = in front of center, negative = behind.
         ),
-        mik::distance(PORT8, left_sensor, -2, -4)
+        mik::distance(PORT11, right_sensor, 4, -5),
+
     })
 );
 
@@ -71,9 +71,6 @@ mik::piston Assembly::wing_piston(PORT_A);
 vex::rotation Assembly::rotation_sensor(PORT6);
 vex::optical Assembly::optical_sensor(PORT13);
 vex::limit Assembly::limit_switch(to_triport(PORT_F));
-
-
-
 
 
 
@@ -141,6 +138,9 @@ static void reset_screens() {
 }
 
 void init(void) {
+	// Disable user control during initialization to prevent inputs
+	disable_user_control(false);
+
 	// Start loading screen
 	loading_screen(false);
 
@@ -158,9 +158,6 @@ void init(void) {
 
 	// Init brain and controller screen
 	reset_screens();
-
-	// Make sure user control is enabled
-	enable_user_control();
 }
 
 static bool user_control_disabled = false;
@@ -170,6 +167,7 @@ void disable_user_control(bool stop_all_motors_) {
 	if (stop_all_motors_) {
 		stop_all_motors(vex::brakeType::hold);
 		set_brake_all_motors(vex::brakeType::coast);
+		stop_all_motors(vex::brakeType::coast);
 	}
 }
 
