@@ -15,15 +15,15 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://ethanmik.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/mikLib/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'EthanMik', // Usually your GitHub org/user name.
+  projectName: 'mikLib', // Usually your repo name.
 
   onBrokenLinks: 'warn',
 
@@ -40,6 +40,16 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: {
+        name: 'google-site-verification',
+        content: '8NV5Qg9JxlfuFPPPZLmdVi1t9QOsM8U5t3mNl-bpS_o',
+      },
+    },
+  ],
 
   presets: [
     [
@@ -101,7 +111,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/EthanMik/mikLib',
             },
             {
               label: 'Youtube',
