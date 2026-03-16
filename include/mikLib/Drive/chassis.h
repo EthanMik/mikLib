@@ -30,6 +30,7 @@ public:
     float drive_starti; // Minimum distance in inches for integral to begin
     float drive_slew;  // Limits drive acceleration in volt per 10 ms.
 
+    float drive_exit_error = 0; // Error to exit drive motion in inches.
     float drive_settle_error; // Error to be considered settled in inches.
     float drive_settle_time; // Time to be considered settled in milliseconds.
     float drive_timeout; // Time before quitting and move on in milliseconds.
@@ -50,6 +51,7 @@ public:
     float turn_starti; // Minimum angle in degrees for integral to begin.
     float turn_slew; // Limits turning acceleration in volt per 10 ms.
 
+    float turn_exit_error = 0; // Error to exit turn motion in inches.
     float turn_settle_error; // Error to be considered settled in degrees.
     float turn_settle_time; // Time to be considered settled in milliseconds.
     float turn_timeout; // Time before quitting and move on in milliseconds.
@@ -63,7 +65,8 @@ public:
     float swing_kd; // Derivative constant.
     float swing_starti; // Minimum distance in degrees for integral to begin
     float swing_slew; // Limits swinging acceleration in volt per 10 ms.
-    
+
+    float swing_exit_error; // Error to exit swing motion in inches.
     float swing_settle_error; // Error to be considered settled in degrees.
     float swing_settle_time; // Time to be considered settled in milliseconds.
     float swing_timeout; // Time before quitting and move on in milliseconds.
@@ -358,7 +361,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_distance(float distance, const drive_distance_params& p);
+    void drive_distance(float distance, drive_distance_params p);
 
     /**
      * Turns to a given angle with the left side of the drivetrain.
@@ -530,7 +533,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_to_point(float X_position, float Y_position, const drive_to_point_params& p);
+    void drive_to_point(float X_position, float Y_position, drive_to_point_params p);
     
     /**
      * @brief Drives to a specified point and orientation on the field.
@@ -559,7 +562,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_to_pose(float X_position, float Y_position, float angle, const drive_to_pose_params& p);
+    void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p);
 
     /** @brief Drives the robot along defined waypoints.
      * Waypoints can be obtained from https://path.jerryio.com/.
@@ -583,7 +586,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void follow_path(std::vector<point> path, const follow_path_params& p);
+    void follow_path(std::vector<point> path, follow_path_params p);
     
     /** @brief disables joystick control of the drivetrain */
     void disable_control();
@@ -698,6 +701,7 @@ struct drive_distance_params {
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.drive_max_voltage;
     float heading_max_voltage = chassis.heading_max_voltage;
+    float exit_error = chassis.drive_exit_error;
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
@@ -712,6 +716,7 @@ struct turn_to_angle_params {
     mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
     float min_voltage = chassis.turn_min_voltage;
     float max_voltage = chassis.turn_max_voltage;
+    float exit_error = chassis.turn_exit_error;
     float settle_error = chassis.turn_settle_error;
     float settle_time = chassis.turn_settle_time;
     float timeout = chassis.turn_timeout;
@@ -725,6 +730,7 @@ struct swing_to_angle_params {
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
     float opposite_voltage = chassis.swing_opposite_voltage;
+    float exit_error = chassis.swing_exit_error;
     float settle_error = chassis.swing_settle_error;
     float settle_time = chassis.swing_settle_time;
     float timeout = chassis.swing_timeout;
@@ -738,6 +744,7 @@ struct drive_to_point_params {
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.drive_max_voltage;
     float heading_max_voltage = chassis.heading_max_voltage;
+    float exit_error = chassis.drive_exit_error;
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
@@ -757,6 +764,7 @@ struct drive_to_pose_params {
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.drive_max_voltage;
     float heading_max_voltage = chassis.heading_max_voltage;
+    float exit_error = chassis.drive_exit_error;
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
@@ -771,6 +779,7 @@ struct turn_to_point_params {
     float angle_offset = 0;
     float min_voltage = chassis.turn_min_voltage;
     float max_voltage = chassis.turn_max_voltage;
+    float exit_error = chassis.turn_exit_error;
     float settle_error = chassis.turn_settle_error;
     float settle_time = chassis.turn_settle_time;
     float timeout = chassis.turn_timeout;
@@ -785,6 +794,7 @@ struct swing_to_point_params {
     float min_voltage = chassis.swing_min_voltage;
     float max_voltage = chassis.swing_max_voltage;
     float opposite_voltage = chassis.swing_opposite_voltage;
+    float exit_error = chassis.swing_exit_error;
     float settle_error = chassis.swing_settle_error;
     float settle_time = chassis.swing_settle_time;
     float timeout = chassis.swing_timeout;
@@ -798,6 +808,7 @@ struct follow_path_params {
     float min_voltage = chassis.drive_min_voltage;
     float max_voltage = chassis.drive_max_voltage;
     float heading_max_voltage = chassis.heading_max_voltage;
+    float exit_error = chassis.drive_exit_error;
     float settle_error = chassis.drive_settle_error;
     float settle_time = chassis.drive_settle_time;
     float timeout = chassis.drive_timeout;
@@ -817,12 +828,12 @@ extern drive_to_point_params g_drive_to_point_params_buffer;
 extern drive_to_pose_params g_drive_to_pose_params_buffer;
 extern follow_path_params g_follow_path_params_buffer;
 
-inline void Chassis::drive_distance(float distance, const drive_distance_params& p = drive_distance_params{}) {
+inline void Chassis::drive_distance(float distance, drive_distance_params p = drive_distance_params{}) {
     desired_distance = distance;
     desired_heading = p.heading;
     g_drive_distance_params_buffer = p;
 
-    pid = PID(distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
     pid_2 = PID(reduce_negative_180_to_180(p.heading - get_absolute_heading()), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
 
     motion_running = true;
@@ -887,7 +898,7 @@ inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to
     desired_angle = angle;
     g_turn_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -950,7 +961,7 @@ inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = 
     desired_angle = angle;
     g_swing_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1019,7 +1030,7 @@ inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p =
     desired_angle = angle;
     g_swing_to_angle_params_buffer = p;
 
-    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(angle_error(angle - chassis.get_absolute_heading(), p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1095,7 +1106,7 @@ inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_p
     desired_angle = start_angle;
 
     float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
-    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1167,7 +1178,7 @@ inline void Chassis::left_swing_to_point(float X_position, float Y_position, swi
     desired_angle = start_angle;
 
     float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
-    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1241,7 +1252,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
     desired_angle = start_angle;
 
     float start_error = angle_error(start_angle - chassis.get_absolute_heading() + p.angle_offset, p.turn_direction);
-    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.timeout);
+    pid = PID(start_error, p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -1304,7 +1315,7 @@ inline void Chassis::right_swing_to_point(float X_position, float Y_position, sw
     if (p.wait) { this->wait(); }  
 }
 
-inline void Chassis::drive_to_point(float X_position, float Y_position, const drive_to_point_params& p = drive_to_point_params{}) {
+inline void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_params p = drive_to_point_params{}) {
     mirror(X_position, Y_position, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
@@ -1326,8 +1337,11 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         const float heading = chassis.desired_heading;
         drive_to_point_params& p = g_drive_to_point_params_buffer;
 
+        const float exit_x = x_pos - sin(to_rad(heading)) * p.exit_error;
+        const float exit_y = y_pos - cos(to_rad(heading)) * p.exit_error;
+
         bool line_settled = false;
-        bool prev_line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
+        bool prev_line_settled = is_line_settled(exit_x, exit_y, heading, chassis.get_X_position(), chassis.get_Y_position());
         float drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
         const float total_distance = drive_error;
 
@@ -1338,8 +1352,8 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
         bool heading_locked = false;
 
         while (!chassis.pid.is_settled()){
-            line_settled = is_line_settled(x_pos, y_pos, heading, chassis.get_X_position(), chassis.get_Y_position());
-            if (line_settled && !prev_line_settled) { break; }
+            line_settled = is_line_settled(exit_x, exit_y, heading, chassis.get_X_position(), chassis.get_Y_position());
+            if (line_settled && !prev_line_settled && p.min_voltage > 0) { break; }
             prev_line_settled = line_settled;
 
             float desired_heading = to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position()));
@@ -1397,7 +1411,7 @@ inline void Chassis::drive_to_point(float X_position, float Y_position, const dr
     if (p.wait) { this->wait(); }
 }
 
-inline void Chassis::drive_to_pose(float X_position, float Y_position, float angle, const drive_to_pose_params& p = drive_to_pose_params{}) {
+inline void Chassis::drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{}) {
     mirror(X_position, Y_position, angle, x_pos_mirrored_, y_pos_mirrored_);
 
     desired_X_position = X_position;
@@ -1421,8 +1435,11 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         const float angle = chassis.desired_angle;
         drive_to_pose_params& p = g_drive_to_pose_params_buffer;
 
-        bool line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
-        bool prev_line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
+        const float exit_x = x_pos - sin(to_rad(angle)) * p.exit_error;
+        const float exit_y = y_pos - cos(to_rad(angle)) * p.exit_error;
+
+        bool line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
+        bool prev_line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
         bool crossed_center_line = false;
         bool center_line_side = is_line_settled(x_pos, y_pos, angle + 90, chassis.get_X_position(), chassis.get_Y_position());
         bool prev_center_line_side = center_line_side;
@@ -1437,8 +1454,8 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         float prev_drive_output = 0;
 
         while (!chassis.pid.is_settled()){
-            line_settled = is_line_settled(x_pos, y_pos, angle, chassis.get_X_position(), chassis.get_Y_position());
-            if (line_settled && !prev_line_settled) { break; }
+            line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
+            if (line_settled && !prev_line_settled && p.min_voltage > 0) { break; }
             prev_line_settled = line_settled;
 
             center_line_side = is_line_settled(x_pos, y_pos, angle + 90, chassis.get_X_position(), chassis.get_Y_position());
@@ -1505,7 +1522,7 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
     if (p.wait) { this->wait(); }
 }
 
-inline void Chassis::follow_path(std::vector<point> path, const follow_path_params& p) {
+inline void Chassis::follow_path(std::vector<point> path, follow_path_params p) {
     if (x_pos_mirrored_) {
         for (auto& point : path) {
             point.x = -point.x;

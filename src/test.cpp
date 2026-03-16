@@ -164,6 +164,8 @@ void config_tune_drive() {
 		{"drive_stl_tm: ", chassis.drive_settle_time}, 
 		{"drive_tmout: ", chassis.drive_timeout}, 
 		{"drive_slew ", chassis.drive_slew},
+		{"drive_ext_err: ", chassis.drive_exit_error}
+		
 
 		// You can add more parameters to tune
 
@@ -224,7 +226,7 @@ void config_tune_heading() {
 		{"heading_kd: ", chassis.heading_kd}, 
 		{"heading_starti: ", chassis.heading_starti}, 
 		{"max_volt: ", chassis.heading_max_voltage},
-		{"heading_slew ", chassis.heading_slew}
+		{"heading_slew: ", chassis.heading_slew}
 	};
 
 	int y_min = -30;
@@ -274,7 +276,8 @@ void config_tune_turn() {
 		{"turn_stl_err: ", chassis.turn_settle_error}, 
 		{"turn_stl_tm: ", chassis.turn_settle_time}, 
 		{"turn_tmout: ", chassis.turn_timeout},
-		{"Turn_slew: ", chassis.turn_slew}
+		{"Turn_slew: ", chassis.turn_slew},
+		{"Turn_exit_err: ", chassis.turn_exit_error}
 	};
 
   int y_min = -10;
@@ -316,7 +319,8 @@ void config_tune_swing() {
 		{"swing_stl_err: ", chassis.swing_settle_error}, 
 		{"swing_stl_tm: ", chassis.swing_settle_time}, 
 		{"swing_tmout: ", chassis.swing_timeout},
-		{"swing_slew: ", chassis.swing_slew}
+		{"swing_slew: ", chassis.swing_slew},
+		{"swing_ext_err: ", chassis.swing_exit_error}
 	};
 
 	int y_min = -20;
