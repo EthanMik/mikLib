@@ -1,8 +1,5 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 void test_constants() {
   	default_constants();
 }

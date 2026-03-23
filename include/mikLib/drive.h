@@ -20,5 +20,6 @@
 #include "mikLib/Drive/PID.h"
 
 using namespace vex;
+using namespace mik;
 
 #include "mikLib/Drive/chassis.h"

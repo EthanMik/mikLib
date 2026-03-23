@@ -1,8 +1,5 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 task UI;
 
 static int run_UI() {

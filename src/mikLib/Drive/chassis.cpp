@@ -249,12 +249,12 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_motor_encoder_position() {
-    return right_drive.position(deg) * drive_in_to_deg_ratio;
+    return right_drive.averagePosition(deg) * drive_in_to_deg_ratio;
 }
 
 float Chassis::get_forward_tracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
-        return right_drive.position(deg) * drive_in_to_deg_ratio;
+        return get_motor_encoder_position();
     }
     return forward_tracker.position(vex::deg) * forward_tracker_inch_to_deg_ratio;
 }

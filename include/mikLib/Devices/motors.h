@@ -188,6 +188,13 @@ public:
      */
     float position(vex::rotationUnits units);
     
+    /**
+     * @brief Gets the average position of the group's encoders.
+     * @returns Returns a float that represents the current position of the motors in the units defined in the parameter.
+     * @param units The measurement unit for the position.
+     */
+    float averagePosition(vex::rotationUnits units);
+
     /** 
      * @brief Gets the current voltage of the first motor in the group.
      * @return Returns a float that represents the current voltage of the motor in the units defined in the parameter.

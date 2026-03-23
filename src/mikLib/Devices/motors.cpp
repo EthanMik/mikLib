@@ -254,6 +254,15 @@ float mik::motor_group::position(vex::rotationUnits units) {
     return motors[0].position(units);
 }
 
+float mik::motor_group::averagePosition(vex::rotationUnits units) {
+    if (motors.empty()) return 0;
+    float position = 0;
+    for (auto& motor : motors) {
+        position += motor.position(units);
+    }
+    return position / motors.size();
+}
+
 float mik::motor_group::voltage(vex::voltageUnits units) {
     if (motors.empty()) { return 0; }
     return motors[0].voltage(units);
