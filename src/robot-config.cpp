@@ -9,24 +9,24 @@ vex::competition Competition;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, false, blue_6_1, "left front motor"),
-        mik::motor(PORT2, false, blue_6_1, "left middle motor"),
-        mik::motor(PORT3, false, blue_6_1, "left back motor"),
+        mik::motor(PORT11, true, blue_6_1, "left front motor"),
+        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
+        mik::motor(PORT13, true, blue_6_1, "left back motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT4, true, blue_6_1, "right front motor"),
-        mik::motor(PORT4, true, blue_6_1, "right middle motor"),
-        mik::motor(PORT6, true, blue_6_1, "right back motor"),
+        mik::motor(PORT2, false, blue_6_1, "right front motor"),
+        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
+        mik::motor(PORT6, false, blue_6_1, "right back motor"),
     }),
 	
     PORT7,  // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-    2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
-    450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
-	6,      // Drivetrain center distance (in), (half drivetrain track width).
+    3,   // Drivetrain wheel diameter (in). Negative flips direction.
+    342,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
+	0,      // Drivetrain center distance (in), (half drivetrain track width).
 
     PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y

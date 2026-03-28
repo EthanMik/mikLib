@@ -249,7 +249,9 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_motor_encoder_position() {
-    return right_drive.averagePosition(deg) * drive_in_to_deg_ratio;
+    float right_drive_value = right_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
+    float left_drive_value = left_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
+    return (right_drive_value + left_drive_value) / 2.0;
 }
 
 float Chassis::get_forward_tracker_position() {
