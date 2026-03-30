@@ -73,12 +73,30 @@ void test_odom_swing() {
 void test_odom_full() {
 	chassis.set_coordinates(0, 0, 0);
 
+	Brain.resetTimer();
 	chassis.drive_to_point(0, 24);
+	print(Brain.Timer.time(msec) / 1000);
+
+	Brain.resetTimer();
 	chassis.turn_to_point(24, 0, { .angle_offset = 180 });
+	print(Brain.Timer.time(msec) / 1000);
+
+	Brain.resetTimer();
 	chassis.drive_to_point(24, 0);
+	print(Brain.Timer.time(msec) / 1000);
+
+	Brain.resetTimer();
 	chassis.right_swing_to_point(0, 0);
+	print(Brain.Timer.time(msec) / 1000);
+
+	Brain.resetTimer();
 	chassis.drive_to_point(0, 0);
+	print(Brain.Timer.time(msec) / 1000);
+
+	Brain.resetTimer();
 	chassis.turn_to_angle(0);
+	print(Brain.Timer.time(msec) / 1000);
+	
 }
 
 void test_boomerang() {
@@ -712,11 +730,12 @@ void config_measure_velocity_accel() {
 		std::vector<std::pair<float, float>> angle_time{};
 
 		// Spin in place at full voltage for 1.5 seconds
-		chassis.drive_with_voltage(12, -12);
-
+		
 		Brain.Timer.reset();
 		chassis.inertial.resetRotation();
-
+		
+		chassis.drive_with_voltage(12, -12);
+		
 		while (Brain.Timer.time(msec) < 1500) {
 			float angle = chassis.inertial.rotation(degrees);
 			float t = Brain.Timer.time(sec); 
@@ -731,7 +750,9 @@ void config_measure_velocity_accel() {
 		// Drive full speed for 1.5 seconds
 		chassis.drive_distance(72, {.max_voltage = 12, .heading_max_voltage = 12, .timeout = 1500, .wait = false});
 
+		Brain.resetTimer();
 		chassis.right_drive.resetPosition();
+		chassis.left_drive.resetPosition();
 		chassis.forward_tracker.resetPosition();
 
         while (chassis.motion_running) {
@@ -751,14 +772,21 @@ void config_measure_velocity_accel() {
 			return velocities;
 		};
 
-		auto smooth_velocity = [](const std::vector<std::pair<float, float>>& velocity){
-			std::vector<std::pair<float, float>> smoothed_velo;
-			for (size_t i = 2; i < velocity.size() - 2; ++i) {
-				float avg_v = (velocity[i - 2].first + velocity[i - 1].first +
-				velocity[i].first + velocity[i + 1].first + velocity[i + 2].first) / 5.0;
-				smoothed_velo.push_back({avg_v, velocity[i].second});
-			}	
-			return smoothed_velo;
+		// 5-point centered median filter — eliminates encoder-tick spikes with only ~20ms lag
+		auto smooth_velocity_median = [](const std::vector<std::pair<float, float>>& velocity){
+			std::vector<std::pair<float, float>> smoothed;
+			const int half = 2;
+			for (size_t i = 0; i < velocity.size(); ++i) {
+				int start = std::max(0, (int)i - half);
+				int end   = std::min((int)velocity.size() - 1, (int)i + half);
+				std::vector<float> vals;
+				for (int j = start; j <= end; ++j) {
+					vals.push_back(velocity[j].first);
+				}
+				std::nth_element(vals.begin(), vals.begin() + vals.size() / 2, vals.end());
+				smoothed.push_back({vals[vals.size() / 2], velocity[i].second});
+			}
+			return smoothed;
 		};
 
 		auto max_velo_idx = [](float& max_velocity, size_t& index, const std::vector<std::pair<float, float>>& smoothed_velo){
@@ -773,28 +801,31 @@ void config_measure_velocity_accel() {
 			}		
 		};
 
-		auto time_constant = [](const std::vector<std::pair<float, float>>& smoothed_velo, float max_vel, size_t max_index){
-			float sum_t2  = 0.0;
-			float sum_ty  = 0.0;
-			float t0 = smoothed_velo[0].second;
-
-			for (size_t i = 0; i <= max_index; ++i) {
-				float v = smoothed_velo[i].first;
-				float t = smoothed_velo[i].second - t0;
-				if (v <= 0.0 || v >= max_vel * 0.95) continue;
-				float y = std::log(1.0 - v / max_vel);
-				sum_t2 += t * t;
-				sum_ty += t * y;
+		// Time constant = time from first motion to reaching 63.2% of max velocity
+		auto time_constant = [](const std::vector<std::pair<float, float>>& smoothed_velo, float max_vel){
+			float t_start = -1.0f;
+			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+				if (smoothed_velo[i].first > 0.0f) {
+					t_start = smoothed_velo[i].second;
+					break;
+				}
 			}
+			if (t_start < 0.0f) return -1.0f;
 
-			return (sum_ty != 0.0) ? -sum_t2 / sum_ty : -1.0;
+			const float threshold = max_vel * 0.632f;
+			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+				if (smoothed_velo[i].second >= t_start && smoothed_velo[i].first >= threshold) {
+					return smoothed_velo[i].second - t_start;
+				}
+			}
+			return -1.0f;
 		};
 
 		auto turn_velocities = position_to_velocity(angle_time);
 		auto drive_velocities = position_to_velocity(pos_time);
 
-		auto smoothed_turn_velo = smooth_velocity(turn_velocities);
-		auto smoothed_drive_velo = smooth_velocity(drive_velocities);
+		auto smoothed_turn_velo = smooth_velocity_median(turn_velocities);
+		auto smoothed_drive_velo = smooth_velocity_median(drive_velocities);
 
 		float max_drive_vel, max_turn_vel = -1.0;
 		size_t max_drive_index, max_turn_index = 0;
@@ -802,8 +833,8 @@ void config_measure_velocity_accel() {
 		max_velo_idx(max_drive_vel, max_drive_index, smoothed_drive_velo);
 		max_velo_idx(max_turn_vel, max_turn_index, smoothed_turn_velo);
 
-		float drive_time_constant = time_constant(smoothed_drive_velo, max_drive_vel, max_drive_index); 
-		float turn_time_constant = time_constant(smoothed_turn_velo, max_turn_vel, max_turn_index); 
+		float drive_time_constant = time_constant(smoothed_drive_velo, max_drive_vel);
+		float turn_time_constant = time_constant(smoothed_turn_velo, max_turn_vel);
 
         console_scr->add("Max Drive Velocity: ", [max_drive_vel](){ return to_string_float(max_drive_vel, 3, false) + " ft/s"; });
         console_scr->add("Drive Time Constant: ", [drive_time_constant](){ return to_string_float(drive_time_constant, 4, false) + " s"; });

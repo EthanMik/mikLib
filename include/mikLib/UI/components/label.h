@@ -50,15 +50,14 @@ private:
 }
 
 template<typename T>
-mik::label::label(const std::string& label, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units): 
+mik::label::label(const std::string& label, T& data, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units):
     label_text(label),
-    data_func([&data]() {
-        std::ostringstream oss;
-        if (std::is_floating_point<T>::value) {
-            oss << std::fixed << std::setprecision(5);
+    data_func([&data]() -> std::string {
+        if constexpr (std::is_floating_point<T>::value) {
+            return ::to_string_float(static_cast<float>(data), 5, false);
+        } else {
+            return ::to_string(data);
         }
-        oss << data;
-        return oss.str();
     }),
     text_color(text_color),
     bg_color(bg_color),
@@ -74,16 +73,15 @@ mik::label::label(const std::string& label, T& data, float x, float y, const std
 
 
 template<typename F>
-mik::label::label(const std::string& label, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units): 
+mik::label::label(const std::string& label, F&& data_func, float x, float y, const std::string& text_color, const std::string& bg_color, UI_distance_units units):
     label_text(label),
-    data_func([data_func = std::forward<F>(data_func)]() {
-        std::ostringstream oss;
+    data_func([data_func = std::forward<F>(data_func)]() -> std::string {
         auto value = data_func();
-        if (std::is_floating_point<decltype(value)>::value) {
-            oss << std::fixed << std::setprecision(5);
+        if constexpr (std::is_floating_point<decltype(value)>::value) {
+            return ::to_string_float(static_cast<float>(value), 5, false);
+        } else {
+            return ::to_string(value);
         }
-        oss << value;
-        return oss.str();
     }),
     text_color(text_color),
     bg_color(bg_color),

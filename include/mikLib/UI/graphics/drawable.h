@@ -25,9 +25,9 @@ public:
     virtual void set_height(int h) = 0;
 
     virtual void set_text(const std::string text_label) {}
-    virtual std::string get_text() {}
+    virtual std::string get_text() { return {}; }
 
     virtual void set_fill_color(const std::string& color) {};
-    virtual const std::string& get_fill_color() {};
+    virtual const std::string& get_fill_color() { static const std::string empty; return empty; };
 };
 }

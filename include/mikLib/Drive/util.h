@@ -1,6 +1,7 @@
 #pragma once
 
-#include <sstream>
+#include <cstdio>
+#include <string>
 #include <vector>
 #include "mikLib/globals.h"
 
@@ -319,9 +320,9 @@ auto to_string(const T& value) -> typename std::enable_if<
     !std::is_same<T, std::nullptr_t>::value,
     std::string>::type
 {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%g", static_cast<double>(value));
+    return std::string(buf);
 }
 
 template<int ID>

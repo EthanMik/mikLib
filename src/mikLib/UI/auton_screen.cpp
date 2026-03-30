@@ -1,5 +1,7 @@
 #include "mikLib/ui.h"
 #include "mikLib/drive.h"
+#include <cstdio>
+#include <cctype>
 
 using namespace mik;
 using namespace vex;
@@ -470,9 +472,7 @@ void UI_auton_screen::set_previous_selected_auto() {
     restoring_from_sd = true;
     for (auto it = output.rbegin(); it != output.rend(); ++it) {
         int r = 0, c = 0, count = 0;
-        std::stringstream ss(*it);
-        if (!(ss >> r >> c)) continue;
-        ss >> count;
+        if (sscanf(it->c_str(), "%d %d %d", &r, &c, &count) < 2) continue;
 
         if (count > 0) {
             var_num = count;
@@ -532,11 +532,12 @@ void UI_auton_screen::controller_description_scr() {
     controller_scr_overlay = vex::task([](){
         std::vector<std::string> wrapped_text;
         std::vector<std::string> words;
-        std::istringstream iss(auton_scr->description_output);
-        std::string word;
-
-        while (iss >> word)
-            words.push_back(word);
+        const auto& desc = auton_scr->description_output;
+        for (size_t i = 0, n = desc.size(), j; i < n; i = j) {
+            while (i < n && std::isspace((unsigned char)desc[i])) ++i;
+            for (j = i; j < n && !std::isspace((unsigned char)desc[j]); ++j);
+            if (i < j) words.push_back(desc.substr(i, j - i));
+        }
         
         std::string line;
         for (int i = 0; i < words.size(); ++i) {

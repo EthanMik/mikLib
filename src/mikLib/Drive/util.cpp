@@ -3,8 +3,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <string>
-#include <sstream>
-#include <iomanip>
 #include "mikLib/Drive/util.h"
 #include "mikLib/globals.h"
 #include "robot-config.h"
@@ -415,9 +413,9 @@ std::string port_to_string(int port) {
 }
 
 std::string to_string_float(float num, int precision, bool remove_trailing_zero) {
-    std::ostringstream oss;
-    oss << std::fixed << std::setprecision(precision) << num;
-    std::string str = oss.str();
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%.*f", precision, num);
+    std::string str(buf);
     if (remove_trailing_zero && str.find('.') != std::string::npos) {
         str.erase(str.find_last_not_of('0') + 1);
         if (!str.empty() && str.back() == '.')

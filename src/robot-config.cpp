@@ -27,9 +27,9 @@ Chassis chassis(
     3.05,   // Drivetrain wheel diameter (in). Negative flips direction.
     355.55,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
 
-    PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
-    0.5,    // Forward tracker center distance (in). Positive = right of center, negative = left.
+    PORT4,  // Forward tracker porksmootht. PORT0 if unused. Accepts "PORT_A"
+    -2.5,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    0,    // Forward tracker center distance (in). Positive = right of center, negative = left.
 
     PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
