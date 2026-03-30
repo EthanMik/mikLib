@@ -20,13 +20,12 @@ Chassis chassis(
         mik::motor(PORT6, false, blue_6_1, "right back motor"),
     }),
 	
-    PORT7,  // Inertial sensor port
+    PORT3,  // Inertial sensor port
     360,    // Inertial scale (reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-    3,   // Drivetrain wheel diameter (in). Negative flips direction.
-    342,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
-	0,      // Drivetrain center distance (in), (half drivetrain track width).
+    3.05,   // Drivetrain wheel diameter (in). Negative flips direction.
+    355.55,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
 
     PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y

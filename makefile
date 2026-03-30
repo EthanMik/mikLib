@@ -3,12 +3,11 @@
 # show compiler output
 VERBOSE = 0
 
+# parallel compilation
+MAKEFLAGS += -j$(shell nproc)
+
 # include toolchain options
 include vex/mkenv.mk
-
-# enable debug metadata
-CFLAGS += -g
-CXX_FLAGS += -g
 
 # location of the project source cpp and c files
 SRC_C  = $(wildcard src/*.cpp)
@@ -28,6 +27,9 @@ OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(basename $(SRC_C))) )
 
 # location of include files that c and cpp files depend on
 SRC_H  = $(wildcard include/*.h)
+SRC_H += $(wildcard include/**/*.h)
+SRC_H += $(wildcard include/**/**/*.h)
+SRC_H += $(wildcard include/**/**/**/*.h)
 
 # additional dependancies
 SRC_A  = makefile

@@ -11,7 +11,6 @@ struct drive_to_point_params;
 struct drive_to_pose_params;
 struct turn_to_point_params;
 struct swing_to_point_params;
-struct follow_path_params;
 struct drive_constants;
 struct heading_constants;
 struct turn_constants;
@@ -75,8 +74,6 @@ public:
     float boomerang_setback; // Distance in inches from target by which the carrot is always pushed back.
     float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift.
 
-    float pursuit_lookahead_distance; // Radius of the look-ahead circle, in inches.
-
     float control_throttle_deadband; // Deadband percent for the throttle axis.
     float control_throttle_min_output; // Minimum throttle output percent after deadband.
     float control_throttle_curve_gain; // Expo gain for throttle axis (1 linear, 1.06 very curvy).
@@ -110,7 +107,7 @@ public:
      */
     Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
         double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
-        double drivetrain_rpm, double wheel_center_distance, int forward_tracker_port, double forward_tracker_diameter,
+        double drivetrain_rpm, int forward_tracker_port, double forward_tracker_diameter,
         double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
         double sideways_tracker_center_distance, mik::distance_reset reset_sensors
     );
@@ -397,8 +394,16 @@ public:
      */
     void right_swing_to_angle(float angle, swing_to_angle_params p);
     
-    /** @return Position of the right drivetrain in inches */ 
+    /** @return Position of the left and right drivetrain encoders averaged in inches */ 
     float get_motor_encoder_position();
+    /** 
+     * @param index Index of motor to get position of, default, -1, is average position
+     * @return Position of the right side of the drivetrain in inches */ 
+    float get_right_drive_position(int index = -1);
+    /** 
+     * @param index Index of motor to get position of, default, -1, is average position
+     * @return Position of the right side of the drivetrain in inches */ 
+    float get_left_drive_position(int index = -1);
     /** @return Position of the forward tracker in inches */ 
     float get_forward_tracker_position();
     /** @return Position of the sideways tracker in inches */ 
@@ -564,30 +569,6 @@ public:
      */
     void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p);
 
-    /** @brief Drives the robot along defined waypoints.
-     * Waypoints can be obtained from https://path.jerryio.com/.
-     * 
-     * Algorithm is from Taolib and is very similar to a pure pursuit controler.
-     * It continously finds the best intersection between a look-ahead circle
-     * (whose radius is `lookahead_distance`) and the current path segment,
-     * then goes to that point with pair of PIDs, one regulating
-     * forward motion and the other correcting heading. The larger the lookahead
-     * the faster but less accurate the robot will follow the path.
-     * 
-     * @param path The vector of points that the robot will follow.
-     * @param lookahead_distance Radius of the look-ahead circle, in inches.
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for getting to heading out of 12.
-     * @param settle_error Error to be considered settled in inches.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
-     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
-     */
-    void follow_path(std::vector<point> path, follow_path_params p);
-    
     /** @brief disables joystick control of the drivetrain */
     void disable_control();
     /** @brief enables joystick control of the drivetrain */
@@ -647,7 +628,6 @@ private:
 
     float wheel_diameter;
     float drivetrain_rpm;
-    float wheel_center_distance;
     float drive_in_to_deg_ratio;
 
     float forward_tracker_diameter;
@@ -803,22 +783,6 @@ struct swing_to_point_params {
     swing_constants k = swing_constants{};
 };
 
-struct follow_path_params {
-    float lookahead_distance = chassis.pursuit_lookahead_distance;
-    float min_voltage = chassis.drive_min_voltage;
-    float max_voltage = chassis.drive_max_voltage;
-    float heading_max_voltage = chassis.heading_max_voltage;
-    float exit_error = chassis.drive_exit_error;
-    float settle_error = chassis.drive_settle_error;
-    float settle_time = chassis.drive_settle_time;
-    float timeout = chassis.drive_timeout;
-    float slew = chassis.drive_slew;
-    float heading_slew = chassis.heading_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
-};
-
 extern drive_distance_params g_drive_distance_params_buffer;
 extern turn_to_angle_params g_turn_to_angle_params_buffer;
 extern swing_to_angle_params g_swing_to_angle_params_buffer;
@@ -826,7 +790,6 @@ extern turn_to_point_params g_turn_to_point_params_buffer;
 extern swing_to_point_params g_swing_to_point_params_buffer;
 extern drive_to_point_params g_drive_to_point_params_buffer;
 extern drive_to_pose_params g_drive_to_pose_params_buffer;
-extern follow_path_params g_follow_path_params_buffer;
 
 inline void Chassis::drive_distance(float distance, drive_distance_params p = drive_distance_params{}) {
     desired_distance = distance;
@@ -1519,116 +1482,5 @@ inline void Chassis::drive_to_pose(float X_position, float Y_position, float ang
         return 0;
     });
 
-    if (p.wait) { this->wait(); }
-}
-
-inline void Chassis::follow_path(std::vector<point> path, follow_path_params p) {
-    if (x_pos_mirrored_) {
-        for (auto& point : path) {
-            point.x = -point.x;
-        }
-    }
-
-    if (y_pos_mirrored_) {
-        for (auto& point : path) {
-            point.y = -point.y;
-        }
-    }
-
-    pid = PID(0, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
-    pid_2 = PID(0, p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-
-    motion_running = true;
-    active_min_voltage = p.min_voltage;
-    distance_traveled = 0;
-    percent_traveled = 0;
-
-	// Add current position to the start of the path so that intersections can be found initially, even if the robot is off the path.
-    path.insert(path.begin(), odom.position);
-
-    desired_path = path;
-    g_follow_path_params_buffer = p;
-
-    drive_task = vex::task([](){
-        std::vector<point> path = chassis.desired_path;
-        follow_path_params& p = g_follow_path_params_buffer;
-        float prev_drive_output = 0;
-        float prev_heading_output = 0;
-
-        float total_distance = 0;
-        for (int i = 0; i < (int)(path.size() - 1); i++) {
-            total_distance += dist(path[i], path[i+1]);
-        }
-
-        point target_intersection = chassis.odom.position; // The point on the path that we should target with PID.
-
-        point prev_position = chassis.odom.position;
-
-        // Loop through all waypoints in the provided path.
-        for (int i = 0; i < (path.size() - 1); i++) {
-            point start = path[i]; // The current waypoint
-            point end = path[i+1]; // The next waypoint
-  
-            while (dist(chassis.odom.position, end) > p.lookahead_distance) {
-                // Find the point(s) of intersection between a circle centered around our global position with the radius of our
-                // lookahead distance and a line segment formed between our starting/ending points.
-                // This can be 0-2 points depending on whether there are tangent, secant, or no intersections.
-                std::vector<point> intersections = line_circle_intersections(chassis.odom.position, p.lookahead_distance, start, end);
-  
-                // Choose the best intersection to go to, ensuring that we don't go backwards along the path.
-                if (intersections.size() == 2) {
-                    // There are two intersections between our lookahead circle and the path. Find the one closest to the end of the line segment.
-                    if (dist(intersections[0], end) < dist(intersections[1], end)) {
-                        target_intersection = intersections[0];
-                    } else {
-                        target_intersection = intersections[1];
-                    }
-                } else if (intersections.size() == 1) {
-                    // There is one intersection. Go to that intersection.
-                    target_intersection = intersections[0];
-                }
-
-                point current_position = chassis.odom.position;
-                chassis.distance_traveled += dist(current_position, prev_position);
-                chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
-                prev_position = current_position;
-  
-                // Move towards the target intersection with PID
-                float drive_error = dist(chassis.odom.position, target_intersection);
-
-                float heading_error = reduce_negative_180_to_180(to_deg(atan2(target_intersection.x - chassis.odom.position.x, target_intersection.y - chassis.odom.position.y)) - chassis.get_absolute_heading());
-                float drive_output = chassis.pid.compute(drive_error);
-  
-                float heading_scale_factor = cos(to_rad(heading_error));
-                drive_output *= heading_scale_factor;
-                heading_error = reduce_negative_90_to_90(heading_error);
-                float heading_output = chassis.pid_2.compute(heading_error);
-                
-                if (drive_error < chassis.drive_large_settle_error){ 
-                    heading_output = 0;
-                }
-  
-                drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
-                heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
-
-                drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
-                heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
-                drive_output = clamp_min_voltage(drive_output, p.min_voltage);
-
-                chassis.drive_with_voltage(drive_output + heading_output, drive_output - heading_output);
-
-                prev_drive_output = drive_output;
-                prev_heading_output = heading_output;
-
-                task::sleep(10);
-            }
-        }
-
-        chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
-
-        return 0;
-    });
-  
     if (p.wait) { this->wait(); }
 }

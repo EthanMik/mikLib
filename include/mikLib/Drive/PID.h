@@ -93,9 +93,9 @@ public:
     float ki = 0;
     float kd = 0;
     float starti = 0;
-    float exit_error = 0;
     float settle_error = 0;
     float settle_time = 0;
+    float exit_error = 0;
     float timeout = 0;
     float accumulated_error = 0;
     float previous_error = 0;

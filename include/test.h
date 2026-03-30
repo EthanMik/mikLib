@@ -33,11 +33,6 @@ void test_odom_full();
 /** @brief Robot should drive in curves and end in starting position. */
 void test_boomerang();
 
-/** @brief Robot should drive in an S shape forwards and backwards and end in starting position.
- * Play around with settle error and lookahead distance if robot is driving sporadic.
- */
-void test_pursuit();
-
 /**
  * @brief Enables a PID tuner suite.
  * `test_drive()` can be run on controller and Actual and Setpoint values will be graphed on brain.

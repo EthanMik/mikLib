@@ -10,11 +10,10 @@ turn_to_point_params g_turn_to_point_params_buffer{};
 swing_to_point_params g_swing_to_point_params_buffer{};
 drive_to_point_params g_drive_to_point_params_buffer{};
 drive_to_pose_params g_drive_to_pose_params_buffer{};
-follow_path_params g_follow_path_params_buffer{};
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
     double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
-    double drivetrain_rpm, double wheel_center_distance, int forward_tracker_port, double forward_tracker_diameter,
+    double drivetrain_rpm, int forward_tracker_port, double forward_tracker_diameter,
     double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
     double sideways_tracker_center_distance, mik::distance_reset reset_sensors
 ):
@@ -37,7 +36,6 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
 
     wheel_diameter(wheel_diameter),
     drivetrain_rpm(drivetrain_rpm),
-    wheel_center_distance(wheel_center_distance),
 
     drive_in_to_deg_ratio(0),
 
@@ -58,7 +56,7 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     drive_in_to_deg_ratio = (drivetrain_rpm / motor_rpm) / 360.0 * M_PI * fabs(wheel_diameter);
 
     odom.set_physical_distances(
-        tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? wheel_center_distance : forward_tracker_center_distance, 
+        tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? 0 : forward_tracker_center_distance, 
         sideways_tracker_center_distance
     );
 }
@@ -249,10 +247,22 @@ bool Chassis::x_pos_mirrored() { return x_pos_mirrored_; }
 bool Chassis::y_pos_mirrored() { return y_pos_mirrored_; }
 
 float Chassis::get_motor_encoder_position() {
-    float right_drive_value = right_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
-    float left_drive_value = left_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
-    return (right_drive_value + left_drive_value) / 2.0;
+    return (get_left_drive_position() + get_right_drive_position()) / 2.0;
 }
+
+float Chassis::get_left_drive_position(int index) {
+    if (index == -1) {
+        return left_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
+    }
+    return left_drive.getMotors()[index].position(deg) * drive_in_to_deg_ratio; 
+}
+
+float Chassis::get_right_drive_position(int index) {
+    if (index == -1) {
+        return right_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
+    }
+    return right_drive.getMotors()[index].position(deg) * drive_in_to_deg_ratio; 
+} 
 
 float Chassis::get_forward_tracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {
@@ -288,6 +298,7 @@ void Chassis::set_coordinates(float X_position, float Y_position, float orientat
     forward_tracker.resetPosition();
     sideways_tracker.resetPosition();
     right_drive.resetPosition();
+    left_drive.resetPosition();
 
     mirror(X_position, Y_position, orientation_deg, x_pos_mirrored_, y_pos_mirrored_);
 
