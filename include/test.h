@@ -117,12 +117,6 @@ void PID_tuner();
 
 std::vector<mik::motor*> config_get_motors();
 
-/** @brief Stops all motors connected to robot. Used when disabling user control. */
-void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);
-
-/** @brief Changes braketype to all motors connected to robot. Used when disabling user control. */
-void set_brake_all_motors(vex::brakeType mode);
-
 /** @brief Logs errors during robot calibration, checks inertial, SD, and drivetrain motors
  * It is recommended to add other motors and devices to this function
  */

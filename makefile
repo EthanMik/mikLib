@@ -1,5 +1,9 @@
 # VEXcode makefile 2019_03_26_01
 
+# Set to 1 to reduce upload speeds but disable Brain UI completely. 
+# Controller auton selector will be unaffected 
+FAST_COMPILE = 1
+
 # show compiler output
 VERBOSE = 0
 
@@ -22,6 +26,18 @@ SRC_C += $(wildcard src/*/*/*/*/*.cpp)
 SRC_C += $(wildcard src/*/*/*/*/*.c)
 SRC_C += $(wildcard src/*/*/*/*/*/*.cpp)
 SRC_C += $(wildcard src/*/*/*/*/*/*.c)
+
+ifeq ($(FAST_COMPILE), 1)
+DEFINES += -DFAST_COMPILE
+SRC_C := $(filter-out src/test.cpp, $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/components/*.cpp), $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/graphics/*.cpp), $(SRC_C))
+SRC_C += src/mikLib/UI/graphics/logo.cpp
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/config_screen.cpp), $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/console_screen.cpp), $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/graph_screen.cpp), $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/motors_screen.cpp), $(SRC_C))
+endif
 
 OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(basename $(SRC_C))) )
 

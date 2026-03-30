@@ -5,8 +5,9 @@ using namespace mik;
 std::vector<std::shared_ptr<mik::screen>> UI_render_queue = {};
 static std::vector<std::shared_ptr<mik::screen>> UI_render_buffer;
 
-std::shared_ptr<mik::UI_console_screen> console_scr = std::make_shared<mik::UI_console_screen>();
 std::shared_ptr<mik::UI_auton_screen> auton_scr = std::make_shared<mik::UI_auton_screen>();
+#ifndef FAST_COMPILE
+std::shared_ptr<mik::UI_console_screen> console_scr = std::make_shared<mik::UI_console_screen>();
 std::shared_ptr<mik::UI_graph_screen> graph_scr = std::make_shared<mik::UI_graph_screen>();
 std::shared_ptr<mik::UI_config_screen> config_scr = std::make_shared<mik::UI_config_screen>();
 std::shared_ptr<mik::UI_motors_screen>  motors_scr = std::make_shared<mik::UI_motors_screen>();
@@ -20,6 +21,7 @@ static bool is_screen_swapping = false;
 
 static bool local_needs_render_update = false;
 static bool full_refresh = false;
+#endif
 static std::vector<std::shared_ptr<mik::screen>> temp;
 
 static std::shared_ptr<mik::screen> selector_panel_scr;
@@ -39,6 +41,7 @@ static void create_UI_files() {
 
 void UI_init() {
     create_UI_files();
+#ifndef FAST_COMPILE
     // auto main_bg = UI_crt_gfx(UI_crt_img("background_main.png", 0, 0, 0, 0, mik::UI_distance_units::pixels));
 
 	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
@@ -184,8 +187,7 @@ void UI_init() {
     for (const auto& scr : UI_render_queue) {
         scr->refresh();
     }
-
-    // UI_select_scr(motors_scr->get_motors_screen());
+#endif
 }
 
 void UI_controller_auton_selector() {
@@ -193,6 +195,7 @@ void UI_controller_auton_selector() {
 }
 
 void UI_select_scr(std::shared_ptr<mik::screen> scr) {
+#ifndef FAST_COMPILE
     if (scr == console_scr->get_console_screen()) {
         auto* tgl = static_cast<mik::toggle*>(console_tgl.get());
         tgl->press();
@@ -219,14 +222,18 @@ void UI_select_scr(std::shared_ptr<mik::screen> scr) {
         UI_execute_selector_toggles(motors_tgl, selector_panel_scr, true);
         UI_swap_screens({motors_scr->get_motors_screen(), selector_panel_scr}); 
     }
+#endif
 }
 
 void UI_swap_screens(const std::vector<std::shared_ptr<mik::screen>>& scr) {
+#ifndef FAST_COMPILE
     UI_render_buffer = scr;
     is_screen_swapping = true;
+#endif
 }
 
 void UI_render() {
+#ifndef FAST_COMPILE
     while(1) {
         if (is_screen_swapping) {
             full_refresh = true;
@@ -260,9 +267,11 @@ void UI_render() {
         
         vex::this_thread::sleep_for(20);
     }
+#endif
 }
 
 void UI_execute_selector_toggles(std::shared_ptr<mik::UI_component> tgl, std::shared_ptr<mik::screen> scr, bool lock_toggles) {
+#ifndef FAST_COMPILE
     int tgl_id = UI_decode_toggle_group(tgl->get_ID());
     int tgl_unique_id = tgl->get_ID();
 
@@ -283,4 +292,5 @@ void UI_execute_selector_toggles(std::shared_ptr<mik::UI_component> tgl, std::sh
             toggle_component->unpress();
         }
     }
+#endif
 }

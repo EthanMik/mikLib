@@ -110,6 +110,7 @@ static void loading_screen(bool stop) {
 }
 
 static void handle_disconnected_devices() {
+#ifndef FAST_COMPILE
 	int errors = run_diagnostic();
 	if (errors > 0) {
 		Controller.rumble(".");
@@ -119,6 +120,7 @@ static void handle_disconnected_devices() {
 		Controller.Screen.print("[Config]->[Error Data]");
 		task::sleep(500);
 	}
+#endif
 }
 
 static void reset_screens() {
@@ -141,7 +143,9 @@ void init(void) {
 	loading_screen(false);
 
 	// Setup motors
+#ifndef FAST_COMPILE
 	motors_scr->init_motors();
+#endif
 
 	// Calibrate inertial
 	chassis.calibrate_inertial();
@@ -178,3 +182,16 @@ bool control_disabled(void) {
 	};
   	return user_control_disabled;
 }
+
+void stop_all_motors(vex::brakeType mode) {
+	for (auto motor : mik::motor_registry()) {
+		motor->stop(mode);
+	}
+}
+
+void set_brake_all_motors(vex::brakeType mode) {  
+	for (auto motor : mik::motor_registry()) {
+		motor->setBrake(mode);
+	}
+}
+

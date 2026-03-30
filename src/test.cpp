@@ -483,19 +483,6 @@ std::vector<mik::motor*> config_get_motors() {
 	return mik::motor_registry();
 }
 
-
-void stop_all_motors(vex::brakeType mode) {
-	for (auto motor : config_get_motors()) {
-		motor->stop(mode);
-	}
-}
-
-void set_brake_all_motors(vex::brakeType mode) {  
-	for (auto motor : config_get_motors()) {
-		motor->setBrake(mode);
-	}
-}
-
 int run_diagnostic() {
 	error_data.clear();
 	int errors = 0;

@@ -28,3 +28,9 @@ void enable_user_control(void);
  * competition switch or field controller override this function
  */
 bool control_disabled(void);
+
+/** @brief Stops all motors connected to robot. Used when disabling user control. */
+void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);
+
+/** @brief Changes braketype to all motors connected to robot. Used when disabling user control. */
+void set_brake_all_motors(vex::brakeType mode);
