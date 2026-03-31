@@ -717,38 +717,42 @@ void config_measure_velocity_accel() {
 		std::vector<std::pair<float, float>> angle_time{};
 
 		// Spin in place at full voltage for 1.5 seconds
-		
 		Brain.Timer.reset();
 		chassis.inertial.resetRotation();
 		
 		chassis.drive_with_voltage(12, -12);
 		
 		while (Brain.Timer.time(msec) < 1500) {
-			float angle = chassis.inertial.rotation(degrees);
-			float t = Brain.Timer.time(sec); 
+
+			// float gyro_dps = std::fabs(chassis.inertial.gyroRate(zaxis, dps));
+			float angle = chassis.inertial.rotation();
+			float t = Brain.Timer.time(msec) / 1000.0;
+
 			angle_time.push_back({angle, t});
-			task::sleep(10);
+			task::sleep(20); 
 		}
 		chassis.turn_to_angle(0);
+		task::sleep(500);
 		chassis.stop_drive(coast);
 
         std::vector<std::pair<float, float>> pos_time{};
 
 		// Drive full speed for 1.5 seconds
-		chassis.drive_distance(72, {.max_voltage = 12, .heading_max_voltage = 12, .timeout = 1500, .wait = false});
+		chassis.drive_with_voltage(12, 12);
 
 		Brain.resetTimer();
 		chassis.right_drive.resetPosition();
 		chassis.left_drive.resetPosition();
 		chassis.forward_tracker.resetPosition();
 
-        while (chassis.motion_running) {
+        while (Brain.Timer.time(msec) < 1500) {
             float pos = chassis.get_forward_tracker_position() / 12.0;
-			float t = Brain.Timer.time(sec);
+			float t = Brain.Timer.time(msec) / 1000.0;
             pos_time.push_back({pos, t});
-            task::sleep(10);
+            task::sleep(20);
         }
-		chassis.stop_drive(coast);
+		chassis.stop_drive(hold);
+		chassis.set_brake_type(coast);
 
 		auto position_to_velocity = [](const std::vector<std::pair<float, float>>& unit_time){
 			std::vector<std::pair<float, float>> velocities;
@@ -790,9 +794,10 @@ void config_measure_velocity_accel() {
 
 		// Time constant = time from first motion to reaching 63.2% of max velocity
 		auto time_constant = [](const std::vector<std::pair<float, float>>& smoothed_velo, float max_vel){
+			// Use 2% of max as noise floor so sensor drift doesn't set t_start early
 			float t_start = -1.0f;
 			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
-				if (smoothed_velo[i].first > 0.0f) {
+				if (smoothed_velo[i].first > max_vel * 0.02f) {
 					t_start = smoothed_velo[i].second;
 					break;
 				}
@@ -808,7 +813,7 @@ void config_measure_velocity_accel() {
 			return -1.0f;
 		};
 
-		auto turn_velocities = position_to_velocity(angle_time);
+		auto turn_velocities = position_to_velocity(angle_time); // gyroRate already stored as velocity
 		auto drive_velocities = position_to_velocity(pos_time);
 
 		auto smoothed_turn_velo = smooth_velocity_median(turn_velocities);

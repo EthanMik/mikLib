@@ -1,8 +1,8 @@
 # VEXcode makefile 2019_03_26_01
 
 # Set to 1 to reduce upload speeds but disable Brain UI completely. 
-# Controller auton selector will be unaffected 
-FAST_COMPILE = 1
+# Controller auton selector will be unaffected. 0 by default.
+FAST_COMPILE = 0
 
 # show compiler output
 VERBOSE = 0

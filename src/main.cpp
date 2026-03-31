@@ -2,6 +2,8 @@
 
 task UI;
 
+// If you want to disable Brain UI, and reduce upload times
+// Go into `makefile` and set `FAST_COMPILE = 1`
 static int run_UI() {
     UI_init();
 
