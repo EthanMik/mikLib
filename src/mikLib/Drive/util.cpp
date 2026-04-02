@@ -182,57 +182,6 @@ float dist(point p1, point p2) {
     return std::hypot(p2.x - p1.x, p2.y - p1.y);
 }
 
-std::vector<point> line_circle_intersections(point center, float radius, point p1, point p2) {
-    std::vector<point> intersections = {};
-
-    // Subtract the circle's center to offset the system to origin.
-    point offset_1 = point {p1.x - center.x, p1.y - center.y};
-    point offset_2 = point {p2.x - center.x, p2.y - center.y};
-
-    double dx = offset_2.x - offset_1.x;
-    double dy = offset_2.y - offset_1.y;
-    double dr = dist(offset_1, offset_2);
-    double D = (offset_1.x * offset_2.y) - (offset_1.y * offset_2.x); // Cross product of offset 1 and 2
-    double discriminant = std::pow(radius, 2) * std::pow(dr, 2) - std::pow(D, 2);
-
-    // If our discriminant is greater than or equal to 0, the line formed as a slope of
-    // point_1 and point_2 intersects the circle at least once.
-    if (discriminant >= 0) {
-        // https://mathworld.wolfram.com/Circle-LineIntersection.html
-        point solution_1 = point {
-            (D * dy + sign(dy) * dx * std::sqrt(discriminant)) / std::pow(dr, 2) + center.x,
-            (-D * dx + fabs(dy) * std::sqrt(discriminant)) / std::pow(dr, 2) + center.y
-        };
-        point solution_2 = point {
-            (D * dy - sign(dy) * dx * std::sqrt(discriminant)) / std::pow(dr, 2) + center.x,
-            (-D * dx - fabs(dy) * std::sqrt(discriminant)) / std::pow(dr, 2) + center.y
-        };
-
-        // Find the bounded intersections.
-        // solution_1 and solution_2 are assumed to be true when the line formed as a slope between point_1 and point_2
-        // extends infinitely, however we only want to consider intersections that are part of a line segment *between*
-        // point_1 and point_2.
-
-        // Find the minimum coordinates for each line (p1 and p2 being the start and end of the segment)
-        double min_x = std::min(p1.x, p2.x);
-        double max_x = std::max(p1.x, p2.x);
-        double min_y = std::min(p1.y, p2.y);
-        double max_y = std::max(p1.y, p2.y);
-
-        // Solution 1 intersects the circle within the bounds of point_1 and point_2
-        if ((solution_1.x >= min_x && solution_1.x <= max_x) && (solution_1.y >= min_y && solution_1.y <= max_y)) {
-            intersections.push_back(solution_1);
-        }
-
-        // Solution 2 intersects the circle within the bounds of point_1 and point_2
-        if ((solution_2.x >= min_x && solution_2.x <= max_x) && (solution_2.y >= min_y && solution_2.y <= max_y)) {
-            intersections.push_back(solution_2);
-        }
-    }
-
-    return intersections;
-}
-
 bool SD_text_file_exists(const std::string& file_name) {
     if (!Brain.SDcard.isInserted()) { 
         return false; 

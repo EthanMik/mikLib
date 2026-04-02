@@ -4,10 +4,8 @@ using namespace vex;
 using namespace mik;
 
 drive_distance_params g_drive_distance_params_buffer{};
-turn_to_angle_params g_turn_to_angle_params_buffer{};
-swing_to_angle_params g_swing_to_angle_params_buffer{};
-turn_to_point_params g_turn_to_point_params_buffer{};
-swing_to_point_params g_swing_to_point_params_buffer{};
+swing_to_angle_params g_turn_impl_params_buffer{};
+turn_type g_turn_type_buffer = turn_type::TURN;
 drive_to_point_params g_drive_to_point_params_buffer{};
 drive_to_pose_params g_drive_to_pose_params_buffer{};
 
@@ -169,22 +167,6 @@ void Chassis::update_drive_max_voltage(float drive_max_voltage) {
     g_drive_distance_params_buffer.max_voltage = drive_max_voltage;
     g_drive_to_point_params_buffer.max_voltage = drive_max_voltage;
     g_drive_to_pose_params_buffer.max_voltage = drive_max_voltage;
-}
-
-void Chassis::update_heading_max_voltage(float heading_max_voltage) {
-    g_drive_distance_params_buffer.heading_max_voltage = heading_max_voltage;
-    g_drive_to_point_params_buffer.heading_max_voltage = heading_max_voltage;
-    g_drive_to_pose_params_buffer.heading_max_voltage = heading_max_voltage;
-}
-
-void Chassis::update_turn_max_voltage(float turn_max_voltage) {
-    g_turn_to_angle_params_buffer.max_voltage = turn_max_voltage;
-    g_turn_to_point_params_buffer.max_voltage = turn_max_voltage;
-}
-
-void Chassis::update_swing_max_voltage(float swing_max_voltage) {
-    g_swing_to_angle_params_buffer.max_voltage = swing_max_voltage;
-    g_swing_to_point_params_buffer.max_voltage = swing_max_voltage;
 }
 
 void Chassis::drive_with_voltage(float left_voltage, float right_voltage){
