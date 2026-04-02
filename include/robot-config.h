@@ -5,7 +5,8 @@
 
 class motor;
 class motor_group;
-class Assembly;
+// class Assembly;
+class Chassis;
 
 extern vex::brain Brain;
 extern vex::controller Controller;
@@ -14,7 +15,8 @@ extern vex::competition Competition;
 extern bool calibrating;
 extern bool force_calibrate_inertial;
 
-extern Assembly assembly;
+// extern Assembly assembly;
+extern Chassis chassis;
 
 void init(void);
 

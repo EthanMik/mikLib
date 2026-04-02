@@ -1,9 +1,5 @@
 #include "vex.h"
 
-vex::brain Brain;
-vex::controller Controller;
-vex::competition Competition;
-
 // mikLib v2.0 setup, if you are following along with video tutorials it is going to be slightly different
 
 Chassis chassis(
@@ -51,44 +47,52 @@ Chassis chassis(
 // Add your devices in assembly.h then create them here
 
 /* Creating a motor group in assembly */
-mik::motor_group Assembly::lower_intake_motors({
-	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
-	mik::motor(PORT2, false, green_18_1, "middle_intake")
-});
+// mik::motor_group Assembly::lower_intake_motors({
+// 	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
+// 	mik::motor(PORT2, false, green_18_1, "middle_intake")
+// });
 
 /* Creating upper intake motor in assembly */
-mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
+// mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
 
 /* Creating pistons in assembly */
-mik::piston Assembly::scraper_piston(PORT_B);
-mik::piston Assembly::wing_piston(PORT_A);
+// mik::piston Assembly::scraper_piston(PORT_B);
+// mik::piston Assembly::wing_piston(PORT_A);
 
 /* Creating alternative vex devices in assembly */
-vex::rotation Assembly::rotation_sensor(PORT6);
-vex::optical Assembly::optical_sensor(PORT13);
-vex::limit Assembly::limit_switch(to_triport(PORT_F));
+// vex::rotation Assembly::rotation_sensor(PORT6);
+// vex::optical Assembly::optical_sensor(PORT13);
+// vex::limit Assembly::limit_switch(to_triport(PORT_F));
 
 
 
 // mikLib initialization below, you do not need to edit
 
-Assembly assembly;
+// Assembly assembly;
+Constants constants;
+vex::brain Brain;
+vex::controller Controller;
+vex::competition Competition;
 
 static void loading_screen(bool stop) {
 	static vex::task loading_bar;
-
+	
 	if (stop) {
 		loading_bar.stop();
 		return;
 	}
-
+	
 	Controller.Screen.setCursor(1, 1);
+#ifndef FAST_COMPILE
 	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+#endif
 
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
+#ifndef FAST_COMPILE
 		Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
 		Brain.Screen.setPenColor(mik::loading_text_color.c_str());
+#endif
 		int count = 0;
 		while(1) {
 			Brain.Screen.printAt(184, 220, calibrate.c_str());

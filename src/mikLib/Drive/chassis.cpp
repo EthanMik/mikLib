@@ -1,14 +1,5 @@
 #include "mikLib/drive.h"
 
-using namespace vex;
-using namespace mik;
-
-drive_distance_params g_drive_distance_params_buffer{};
-swing_to_angle_params g_turn_impl_params_buffer{};
-turn_type g_turn_type_buffer = turn_type::TURN;
-drive_to_point_params g_drive_to_point_params_buffer{};
-drive_to_pose_params g_drive_to_pose_params_buffer{};
-
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
     double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
     double drivetrain_rpm, int forward_tracker_port, double forward_tracker_diameter,
@@ -60,68 +51,74 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
 }
 
 void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain, float control_desaturate_bias) {
-    this->control_throttle_deadband = control_throttle_deadband;
-    this->control_throttle_min_output = control_throttle_min_output;
-    this->control_throttle_curve_gain = control_throttle_curve_gain;
-    this->control_turn_deadband = control_turn_deadband;
-    this->control_turn_min_output = control_turn_min_output;
-    this->control_turn_curve_gain = control_turn_curve_gain;
-    this->control_desaturate_bias = control_desaturate_bias;
+    constants.control_throttle_deadband = control_throttle_deadband;
+    constants.control_throttle_min_output = control_throttle_min_output;
+    constants.control_throttle_curve_gain = control_throttle_curve_gain;
+    constants.control_turn_deadband = control_turn_deadband;
+    constants.control_turn_min_output = control_turn_min_output;
+    constants.control_turn_curve_gain = control_turn_curve_gain;
+    constants.control_desaturate_bias = control_desaturate_bias;
 }
 
 void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
-    this->turn_max_voltage = turn_max_voltage;
-    this->turn_kp = turn_kp;
-    this->turn_ki = turn_ki;
-    this->turn_kd = turn_kd;
-    this->turn_starti = turn_starti;
-    this->turn_slew = turn_slew;
+    constants.turn_max_voltage = turn_max_voltage;
+    constants.turn_kp = turn_kp;
+    constants.turn_ki = turn_ki;
+    constants.turn_kd = turn_kd;
+    constants.turn_starti = turn_starti;
+    constants.turn_slew = turn_slew;
 } 
 
 void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_slew) {
-    this->drive_max_voltage = drive_max_voltage;
-    this->drive_kp = drive_kp;
-    this->drive_ki = drive_ki;
-    this->drive_kd = drive_kd;
-    this->drive_starti = drive_starti;
-    this->drive_slew = drive_slew;
+    constants.drive_max_voltage = drive_max_voltage;
+    constants.drive_kp = drive_kp;
+    constants.drive_ki = drive_ki;
+    constants.drive_kd = drive_kd;
+    constants.drive_starti = drive_starti;
+    constants.drive_slew = drive_slew;
 } 
 
 void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti, float heading_slew) {
-    this->heading_max_voltage = heading_max_voltage;
-    this->heading_kp = heading_kp;
-    this->heading_ki = heading_ki;
-    this->heading_kd = heading_kd;
-    this->heading_starti = heading_starti;
-    this->heading_slew = heading_slew;
+    constants.heading_max_voltage = heading_max_voltage;
+    constants.heading_kp = heading_kp;
+    constants.heading_ki = heading_ki;
+    constants.heading_kd = heading_kd;
+    constants.heading_starti = heading_starti;
+    constants.heading_slew = heading_slew;
 
 }
 
 void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_slew) {
-    this->swing_max_voltage = swing_max_voltage;
-    this->swing_kp = swing_kp;
-    this->swing_ki = swing_ki;
-    this->swing_kd = swing_kd;
-    this->swing_starti = swing_starti;
-    this->swing_slew = swing_slew;
+    constants.swing_max_voltage = swing_max_voltage;
+    constants.swing_kp = swing_kp;
+    constants.swing_ki = swing_ki;
+    constants.swing_kd = swing_kd;
+    constants.swing_starti = swing_starti;
+    constants.swing_slew = swing_slew;
 } 
 
-void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout) {
-    this->turn_settle_error = turn_settle_error;
-    this->turn_settle_time = turn_settle_time;
-    this->turn_timeout = turn_timeout;
+void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout) {
+    constants.turn_settle_error = turn_settle_error;
+    constants.turn_settle_time = turn_settle_time;
+    constants.turn_large_settle_error = turn_large_settle_error;
+    constants.turn_large_settle_time = turn_large_settle_time;
+    constants.turn_timeout = turn_timeout;
 }
 
-void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_timeout) {
-    this->drive_settle_error = drive_settle_error;
-    this->drive_settle_time = drive_settle_time;
-    this->drive_timeout = drive_timeout;
+void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout) {
+    constants.drive_settle_error = drive_settle_error;
+    constants.drive_settle_time = drive_settle_time;
+    constants.drive_large_settle_error = drive_large_settle_error;
+    constants.drive_large_settle_time = drive_large_settle_time;
+    constants.drive_timeout = drive_timeout;
 }
 
-void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_timeout) {
-    this->swing_settle_error = swing_settle_error;
-    this->swing_settle_time = swing_settle_time;
-    this->swing_timeout = swing_timeout;
+void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout) {
+    constants.swing_settle_error = swing_settle_error;
+    constants.swing_settle_time = swing_settle_time;
+    constants.swing_large_settle_error = swing_large_settle_error;
+    constants.swing_large_settle_time = swing_large_settle_time;
+    constants.swing_timeout = swing_timeout;
 }
 
 
@@ -361,28 +358,28 @@ static float curve(float input, float deadband, float min_output, float curve_ga
 void Chassis::split_arcade_curved() {
     float throttle = vex::controller(vex::primary).Axis3.value();
     float turn = vex::controller(vex::primary).Axis1.value();
-    throttle = std::round(curve(throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
-    turn = std::round(curve(turn, control_turn_deadband, control_turn_min_output, control_turn_curve_gain));
+    throttle = std::round(curve(throttle, constants.control_throttle_deadband, constants.control_throttle_min_output, constants.control_throttle_curve_gain));
+    turn = std::round(curve(turn, constants.control_turn_deadband, constants.control_turn_min_output, constants.control_turn_curve_gain));
     if (std::fabs(throttle) + std::fabs(turn) > 100) {
         float raw_turn = turn;
         float raw_throttle = throttle;
-        throttle *= (1 - control_desaturate_bias * std::fabs(raw_turn / 100.0f));
-        turn *= (1 - (1 - control_desaturate_bias) * std::fabs(raw_throttle / 100.0f));
+        throttle *= (1 - constants.control_desaturate_bias * std::fabs(raw_turn / 100.0f));
+        turn *= (1 - (1 - constants.control_desaturate_bias) * std::fabs(raw_throttle / 100.0f));
     }
     left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
     right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
 }
 
 void Chassis::split_arcade() {
-    float throttle = deadband(vex::controller(vex::primary).Axis3.value(), control_throttle_deadband);
-    float turn = deadband(vex::controller(vex::primary).Axis1.value(), control_turn_deadband);
+    float throttle = deadband(vex::controller(vex::primary).Axis3.value(), constants.control_throttle_deadband);
+    float turn = deadband(vex::controller(vex::primary).Axis1.value(), constants.control_turn_deadband);
     left_drive.spin(vex::fwd, percent_to_volt(throttle + turn), volt);
     right_drive.spin(vex::fwd, percent_to_volt(throttle - turn), volt);
 }
 
 void Chassis::tank() {
-    float left_throttle = deadband(controller(primary).Axis3.value(), control_throttle_deadband);
-    float right_throttle = deadband(controller(primary).Axis2.value(), control_throttle_deadband);
+    float left_throttle = deadband(controller(primary).Axis3.value(), constants.control_throttle_deadband);
+    float right_throttle = deadband(controller(primary).Axis2.value(), constants.control_throttle_deadband);
     left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
     right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
@@ -390,8 +387,8 @@ void Chassis::tank() {
 void Chassis::tank_curved() {
     float left_throttle = controller(primary).Axis3.value();
     float right_throttle = controller(primary).Axis2.value();
-    left_throttle = std::round(curve(left_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
-    right_throttle = std::round(curve(right_throttle, control_throttle_deadband, control_throttle_min_output, control_throttle_curve_gain));
+    left_throttle = std::round(curve(left_throttle, constants.control_throttle_deadband, constants.control_throttle_min_output, constants.control_throttle_curve_gain));
+    right_throttle = std::round(curve(right_throttle, constants.control_throttle_deadband, constants.control_throttle_min_output, constants.control_throttle_curve_gain));
     left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
     right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }

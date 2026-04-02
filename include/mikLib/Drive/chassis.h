@@ -2,92 +2,10 @@
 
 #include "mikLib/drive.h"
 
-// Drive motions are at end of file
-
-struct drive_distance_params;
-struct turn_to_angle_params;
-struct swing_to_angle_params;
-struct drive_to_point_params;
-struct drive_to_pose_params;
-struct turn_to_point_params;
-struct swing_to_point_params;
-struct drive_constants;
-struct heading_constants;
-struct turn_constants;
-struct swing_constants;
-
-enum class turn_type { TURN, LEFT_SWING, RIGHT_SWING };
-
 class Chassis {
 public:
-    /** ALL CONSTANTS USED IN MOTIONS. */
 
-    float drive_min_voltage = 0; // Minimum voltage on the drive, used for chaining movements.
-    float drive_max_voltage; // Max voltage out of 12.
-
-    float drive_kp; // Proportional constant.
-    float drive_ki; // Integral constant.
-    float drive_kd; // Derivative constant.
-    float drive_starti; // Minimum distance in inches for integral to begin
-    float drive_slew;  // Limits drive acceleration in volt per 10 ms.
-
-    float drive_exit_error = 0; // Error to exit drive motion in inches.
-    float drive_settle_error; // Error to be considered settled in inches.
-    float drive_settle_time; // Time to be considered settled in milliseconds.
-    float drive_timeout; // Time before quitting and move on in milliseconds.
-
-    float heading_max_voltage; // Max voltage out of 12.
-    float heading_kp; // Proportional constant.
-    float heading_ki; // Integral constant.
-    float heading_kd; // Derivative constant.
-    float heading_starti; // Minimum distance in degrees for integral to begin
-    float heading_slew; // Limits heading correction acceleration in volt per 10 ms.
-
-    float turn_min_voltage = 0; // Minimum voltage for turning out of 12.
-    float turn_max_voltage; // Max voltage out of 12.
-
-    float turn_kp; // Proportional constant.
-    float turn_ki; // Integral constant.
-    float turn_kd; // Derivative constant.
-    float turn_starti; // Minimum angle in degrees for integral to begin.
-    float turn_slew; // Limits turning acceleration in volt per 10 ms.
-
-    float turn_exit_error = 0; // Error to exit turn motion in inches.
-    float turn_settle_error; // Error to be considered settled in degrees.
-    float turn_settle_time; // Time to be considered settled in milliseconds.
-    float turn_timeout; // Time before quitting and move on in milliseconds.
-
-    float swing_min_voltage = 0; // Minimum voltage for swinging out of 12.
-    float swing_opposite_voltage = 0; // Voltage on the opposite swung drivetrain side out of 12.
-    float swing_max_voltage; // Max voltage out of 12.
-
-    float swing_kp; // Proportional constant.
-    float swing_ki; // Integral constant.
-    float swing_kd; // Derivative constant.
-    float swing_starti; // Minimum distance in degrees for integral to begin
-    float swing_slew; // Limits swinging acceleration in volt per 10 ms.
-
-    float swing_exit_error; // Error to exit swing motion in inches.
-    float swing_settle_error; // Error to be considered settled in degrees.
-    float swing_settle_time; // Time to be considered settled in milliseconds.
-    float swing_timeout; // Time before quitting and move on in milliseconds.
-    
-    float boomerang_lead; // Constant scale factor that determines how far away the carrot point is. 
-    float boomerang_setback; // Distance in inches from target by which the carrot is always pushed back.
-    float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift.
-
-    float control_throttle_deadband; // Deadband percent for the throttle axis.
-    float control_throttle_min_output; // Minimum throttle output percent after deadband.
-    float control_throttle_curve_gain; // Expo gain for throttle axis (1 linear, 1.06 very curvy).
-    
-    float control_turn_deadband; // Deadband percent for the turn axis.
-    float control_turn_min_output; // Minimum turn output percent after deadband.
-    float control_turn_curve_gain; // Expo gain for turn axis (1 linear, 1.06 very curvy).
-    float control_desaturate_bias; // Desaturation bias for split_arcade_curved (0 = prioritize turn, 1 = prioritize throttle).
-
-    float drive_large_settle_error = 6; // The distance away from the target to stop applying drive slew and lock heading output, in inches.
-    float turn_large_settle_error = 15; // The angle away from the target to stop applying turn slew, in degrees.
-    float swing_large_settle_error = 15; // The angle away from the target to stop applying swing slew, in degrees.
+    // Constants are in constants.h
 
     mik::tracker_mode tracker_mode; // Type of tracking mode to use for odometry.
 
@@ -188,31 +106,37 @@ public:
      * 
      * @param turn_settle_error Error to be considered settled in degrees.
      * @param turn_settle_time Time to be considered settled in milliseconds.
+     * @param turn_large_settle_error Error to be considered large settled in inches.
+     * @param turn_large_settle_time Time to be considered settled by large error in milliseconds.
      * @param turn_timeout Time before quitting and move on in milliseconds.
      */
-    void set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout);
+    void set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout);
 
     /**
      * @brief Resets default drive exit conditions.
-     * The robot exits when error is less than settle_error for a duration of settle_time, 
+     * The robot exits when error is less than settle_error for a duration of settle_time,
      * or if the function has gone on for longer than timeout.
-     * 
+     *
      * @param drive_settle_error Error to be considered settled in inches.
      * @param drive_settle_time Time to be considered settled in milliseconds.
+     * @param drive_large_settle_error Error to be considered large settled in inches.
+     * @param drive_large_settle_time Time to be considered large settled in milliseconds.
      * @param drive_timeout Time before quitting and move on in milliseconds.
      */
-    void set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_timeout);
+    void set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout);
 
     /**
      * @brief Resets default swing exit conditions.
-     * The robot exits when error is less than settle_error for a duration of settle_time, 
+     * The robot exits when error is less than settle_error for a duration of settle_time,
      * or if the function has gone on for longer than timeout.
-     * 
+     *
      * @param swing_settle_error Error to be considered settled in degrees.
      * @param swing_settle_time Time to be considered settled in milliseconds.
+     * @param swing_large_settle_error Error to be considered large settled in degrees.
+     * @param swing_large_settle_time Time to be considered large settled in milliseconds.
      * @param swing_timeout Time before quitting and move on in milliseconds.
      */
-    void set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_timeout);
+    void set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout);
 
     /**
      * @brief Resets the tracking offsets. Used for when robots center of rotation changes, ex: clamping onto a large game object.
@@ -320,7 +244,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void turn_to_angle(float angle, turn_to_angle_params p);
+    void turn_to_angle(float angle, turn_to_angle_params p = turn_to_angle_params{});
 
     /**
      * @brief Drives the robot a given distance with a given heading.
@@ -342,7 +266,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_distance(float distance, drive_distance_params p);
+    void drive_distance(float distance, drive_distance_params p = drive_distance_params{});
 
     /**
      * Turns to a given angle with the left side of the drivetrain.
@@ -359,7 +283,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void left_swing_to_angle(float angle, swing_to_angle_params p);
+    void left_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{});
 
     /**
      * Turns to a given angle with the right side of the drivetrain.
@@ -376,7 +300,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void right_swing_to_angle(float angle, swing_to_angle_params p);
+    void right_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{});
     
     /** @return Position of the left and right drivetrain encoders averaged in inches */ 
     float get_motor_encoder_position();
@@ -458,7 +382,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void turn_to_point(float X_position, float Y_position, turn_to_point_params p);
+    void turn_to_point(float X_position, float Y_position, turn_to_point_params p = turn_to_point_params{});
     
     /**
      * @brief Turns to a specified point on the field with the left side of the drivetrain.
@@ -479,7 +403,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void left_swing_to_point(float X_position, float Y_position, swing_to_point_params p);
+    void left_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{});
 
     /**
      * @brief Turns to a specified point on the field with the right side of the drivetrain.
@@ -500,7 +424,7 @@ public:
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void right_swing_to_point(float X_position, float Y_position, swing_to_point_params p);
+    void right_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{});
 
     /**
      * @brief Drives to a specified point on the field.
@@ -522,7 +446,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_to_point(float X_position, float Y_position, drive_to_point_params p);
+    void drive_to_point(float X_position, float Y_position, drive_to_point_params p  = drive_to_point_params{});
     
     /**
      * @brief Drives to a specified point and orientation on the field.
@@ -551,7 +475,7 @@ public:
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
      */
-    void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p);
+    void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{});
 
     /** @brief disables joystick control of the drivetrain */
     void disable_control();
@@ -603,6 +527,9 @@ public:
     std::vector<point> desired_path{};
 
 private:
+    // Universal function for swinging and
+    void turn(float target_angle, float angle_offset, swing_to_angle_params p, turn_type type);
+
     bool x_pos_mirrored_ = false;
     bool y_pos_mirrored_ = false;
 
@@ -628,587 +555,4 @@ private:
 
     vex::task odom_task;
     vex::task drive_task;
-
-    void turn_impl(float target_angle, float angle_offset, swing_to_angle_params p, turn_type type);
 };
-
-extern Chassis chassis;
-
-struct drive_constants {
-  float p = chassis.drive_kp;
-  float i = chassis.drive_ki;
-  float d = chassis.drive_kd;
-  float starti = chassis.drive_starti;
-};
-
-struct heading_constants {
-  float p = chassis.heading_kp;
-  float i = chassis.heading_ki;
-  float d = chassis.heading_kd;
-  float starti = chassis.heading_starti;
-};
-
-struct turn_constants {
-  float p = chassis.turn_kp;
-  float i = chassis.turn_ki;
-  float d = chassis.turn_kd;
-  float starti = chassis.turn_starti;
-};
-
-struct swing_constants {
-  float p = chassis.swing_kp;
-  float i = chassis.swing_ki;
-  float d = chassis.swing_kd;
-  float starti = chassis.swing_starti;
-};
-
-struct drive_distance_params {
-    float heading = chassis.get_absolute_heading();
-    float min_voltage = chassis.drive_min_voltage;
-    float max_voltage = chassis.drive_max_voltage;
-    float heading_max_voltage = chassis.heading_max_voltage;
-    float exit_error = chassis.drive_exit_error;
-    float settle_error = chassis.drive_settle_error;
-    float settle_time = chassis.drive_settle_time;
-    float timeout = chassis.drive_timeout;
-    float slew = chassis.drive_slew;
-    float heading_slew = chassis.heading_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
-};
-
-struct turn_to_angle_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
-    float min_voltage = chassis.turn_min_voltage;
-    float max_voltage = chassis.turn_max_voltage;
-    float exit_error = chassis.turn_exit_error;
-    float settle_error = chassis.turn_settle_error;
-    float settle_time = chassis.turn_settle_time;
-    float timeout = chassis.turn_timeout;
-    float slew = chassis.turn_slew;
-    bool wait = true;
-    turn_constants k = turn_constants{}; 
-};
-
-struct swing_to_angle_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
-    float min_voltage = chassis.swing_min_voltage;
-    float max_voltage = chassis.swing_max_voltage;
-    float opposite_voltage = chassis.swing_opposite_voltage;
-    float exit_error = chassis.swing_exit_error;
-    float settle_error = chassis.swing_settle_error;
-    float settle_time = chassis.swing_settle_time;
-    float timeout = chassis.swing_timeout;
-    float slew = chassis.swing_slew;
-    bool wait = true;
-    swing_constants k = swing_constants{};
-};
-
-struct drive_to_point_params {
-    mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
-    float min_voltage = chassis.drive_min_voltage;
-    float max_voltage = chassis.drive_max_voltage;
-    float heading_max_voltage = chassis.heading_max_voltage;
-    float exit_error = chassis.drive_exit_error;
-    float settle_error = chassis.drive_settle_error;
-    float settle_time = chassis.drive_settle_time;
-    float timeout = chassis.drive_timeout;
-    float slew = chassis.drive_slew;
-    float heading_slew = chassis.heading_slew;
-
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
-};
-
-struct drive_to_pose_params {
-    // mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
-    float lead = chassis.boomerang_lead;
-    float setback = chassis.boomerang_setback;
-    float drift = chassis.boomerang_drift;
-    float min_voltage = chassis.drive_min_voltage;
-    float max_voltage = chassis.drive_max_voltage;
-    float heading_max_voltage = chassis.heading_max_voltage;
-    float exit_error = chassis.drive_exit_error;
-    float settle_error = chassis.drive_settle_error;
-    float settle_time = chassis.drive_settle_time;
-    float timeout = chassis.drive_timeout;
-    float slew = chassis.drive_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
-};
-
-struct turn_to_point_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
-    float angle_offset = 0;
-    float min_voltage = chassis.turn_min_voltage;
-    float max_voltage = chassis.turn_max_voltage;
-    float exit_error = chassis.turn_exit_error;
-    float settle_error = chassis.turn_settle_error;
-    float settle_time = chassis.turn_settle_time;
-    float timeout = chassis.turn_timeout;
-    float slew = chassis.turn_slew;
-    bool wait = true;
-    turn_constants k = turn_constants{};   
-};
-
-struct swing_to_point_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
-    float angle_offset = 0;
-    float min_voltage = chassis.swing_min_voltage;
-    float max_voltage = chassis.swing_max_voltage;
-    float opposite_voltage = chassis.swing_opposite_voltage;
-    float exit_error = chassis.swing_exit_error;
-    float settle_error = chassis.swing_settle_error;
-    float settle_time = chassis.swing_settle_time;
-    float timeout = chassis.swing_timeout;
-    float slew = chassis.swing_slew;
-    bool wait = true;
-    swing_constants k = swing_constants{};
-};
-
-extern drive_distance_params g_drive_distance_params_buffer;
-extern swing_to_angle_params g_turn_impl_params_buffer;
-extern turn_type g_turn_type_buffer;
-extern drive_to_point_params g_drive_to_point_params_buffer;
-extern drive_to_pose_params g_drive_to_pose_params_buffer;
-
-inline void Chassis::drive_distance(float distance, drive_distance_params p = drive_distance_params{}) {
-    desired_distance = distance;
-    desired_heading = p.heading;
-    g_drive_distance_params_buffer = p;
-
-    pid = PID(distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
-    pid_2 = PID(reduce_negative_180_to_180(p.heading - get_absolute_heading()), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-
-    motion_running = true;
-    active_min_voltage = p.min_voltage;
-    distance_traveled = 0;
-    percent_traveled = 0;
-
-    drive_task = vex::task([](){
-        const float distance = chassis.desired_distance;
-        const float heading = chassis.desired_heading;
-        drive_distance_params& p = g_drive_distance_params_buffer;
-
-        const float total_distance = fabs(distance);
-        float drive_start_position = chassis.get_forward_tracker_position();
-        float current_position = drive_start_position;
-
-        float drive_error = distance + drive_start_position - current_position;
-        float prev_drive_error = drive_error;
-        float prev_heading_output = 0;
-        float prev_drive_output = 0;
-
-        while (chassis.pid.is_settled() == false) {
-            current_position = chassis.get_forward_tracker_position();
-
-            drive_error = distance + drive_start_position - current_position;
-            chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
-            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
-            prev_drive_error = drive_error;
-
-            float heading_error = reduce_negative_180_to_180(heading - chassis.get_absolute_heading());
-            float drive_output = chassis.pid.compute(drive_error);
-            float heading_output = chassis.pid_2.compute(heading_error);
-
-            drive_output = clamp(drive_output, -p.max_voltage, p.max_voltage);
-            heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
-
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
-
-            drive_output = clamp_min_voltage(drive_output, p.min_voltage);
-
-            chassis.drive_with_voltage(drive_output + heading_output, drive_output - heading_output);
-
-            prev_drive_output = drive_output;
-            prev_heading_output = heading_output;
-
-            vex::task::sleep(10);
-        }
-
-        chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
-
-        return 0;
-    });
-    if (p.wait) {
-        this->wait();
-    }
-}
-
-inline void Chassis::turn_impl(float target_angle, float angle_offset, swing_to_angle_params p, turn_type type) {
-    desired_angle = target_angle;
-    desired_angle_offset = angle_offset;
-    g_turn_impl_params_buffer = p;
-    g_turn_type_buffer = type;
-
-    pid = PID(angle_error(target_angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
-
-    motion_running = true;
-    active_min_voltage = p.min_voltage;
-    distance_traveled = 0;
-    percent_traveled = 0;
-
-    drive_task = vex::task([](){
-        const float angle = chassis.desired_angle;
-        const float angle_offset = chassis.desired_angle_offset;
-        swing_to_angle_params& p = g_turn_impl_params_buffer;
-        const turn_type type = g_turn_type_buffer;
-
-        const float large_settle_error = (type == turn_type::TURN) ?
-            chassis.turn_large_settle_error : chassis.swing_large_settle_error;
-
-        bool crossed = false;
-        float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
-        const float total_distance = fabs(error);
-        float prev_error = error;
-        float prev_raw_error = raw_error;
-        float prev_output = 0;
-
-        while (!chassis.pid.is_settled()) {
-            raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-            if (sign(raw_error) != sign(prev_raw_error)) { crossed = true; }
-            prev_raw_error = raw_error;
-
-            error = crossed ? raw_error : angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
-
-            if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
-            chassis.distance_traveled += std::abs(error - prev_error);
-            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
-
-            prev_error = error;
-
-            float output = chassis.pid.compute(error);
-            output = clamp(output, -p.max_voltage, p.max_voltage);
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > large_settle_error);
-            output = clamp_min_voltage(output, p.min_voltage);
-
-            switch (type) {
-                case turn_type::TURN:
-                    chassis.drive_with_voltage(output, -output);
-                    break;
-                case turn_type::LEFT_SWING:
-                    chassis.left_drive.spin(fwd, output, volt);
-                    if (p.opposite_voltage != 0) {
-                        chassis.right_drive.spin(fwd, p.opposite_voltage * (output / p.max_voltage), volt);
-                    } else {
-                        chassis.right_drive.stop(hold);
-                    }
-                    break;
-                case turn_type::RIGHT_SWING:
-                    chassis.right_drive.spin(reverse, output, volt);
-                    if (p.opposite_voltage != 0) {
-                        chassis.left_drive.spin(reverse, p.opposite_voltage * (output / p.max_voltage), volt);
-                    } else {
-                        chassis.left_drive.stop(hold);
-                    }
-                    break;
-            }
-
-            prev_output = output;
-            vex::task::sleep(10);
-        }
-
-        chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
-        return 0;
-    });
-    if (p.wait) { this->wait(); }
-}
-
-inline void Chassis::turn_to_angle(float angle, turn_to_angle_params p = turn_to_angle_params{}) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    swing_to_angle_params sp;
-    sp.turn_direction = p.turn_direction;
-    sp.min_voltage = p.min_voltage;
-    sp.max_voltage = p.max_voltage;
-    sp.exit_error = p.exit_error;
-    sp.settle_error = p.settle_error;
-    sp.settle_time = p.settle_time;
-    sp.timeout = p.timeout;
-    sp.slew = p.slew;
-    sp.wait = p.wait;
-    sp.k.p = p.k.p; sp.k.i = p.k.i; sp.k.d = p.k.d; sp.k.starti = p.k.starti;
-    turn_impl(angle, 0.0f, sp, turn_type::TURN);
-}
-
-inline void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{}) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    turn_impl(angle, 0.0f, p, turn_type::LEFT_SWING);
-}
-
-inline void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{}) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    turn_impl(angle, 0.0f, p, turn_type::RIGHT_SWING);
-}
-
-inline void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_params p = turn_to_point_params{}) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    desired_X_position = X_position;
-    desired_Y_position = Y_position;
-    float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
-    swing_to_angle_params sp;
-    sp.turn_direction = p.turn_direction;
-    sp.min_voltage = p.min_voltage;
-    sp.max_voltage = p.max_voltage;
-    sp.exit_error = p.exit_error;
-    sp.settle_error = p.settle_error;
-    sp.settle_time = p.settle_time;
-    sp.timeout = p.timeout;
-    sp.slew = p.slew;
-    sp.wait = p.wait;
-    sp.k.p = p.k.p; sp.k.i = p.k.i; sp.k.d = p.k.d; sp.k.starti = p.k.starti;
-    turn_impl(angle, p.angle_offset, sp, turn_type::TURN);
-}
-
-inline void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{}) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    desired_X_position = X_position;
-    desired_Y_position = Y_position;
-    float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
-    swing_to_angle_params sp;
-    sp.turn_direction = p.turn_direction;
-    sp.min_voltage = p.min_voltage;
-    sp.max_voltage = p.max_voltage;
-    sp.opposite_voltage = p.opposite_voltage;
-    sp.exit_error = p.exit_error;
-    sp.settle_error = p.settle_error;
-    sp.settle_time = p.settle_time;
-    sp.timeout = p.timeout;
-    sp.slew = p.slew;
-    sp.wait = p.wait;
-    sp.k = p.k;
-    turn_impl(angle, p.angle_offset, sp, turn_type::LEFT_SWING);
-}
-
-inline void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{}) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    desired_X_position = X_position;
-    desired_Y_position = Y_position;
-    float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
-    swing_to_angle_params sp;
-    sp.turn_direction = p.turn_direction;
-    sp.min_voltage = p.min_voltage;
-    sp.max_voltage = p.max_voltage;
-    sp.opposite_voltage = p.opposite_voltage;
-    sp.exit_error = p.exit_error;
-    sp.settle_error = p.settle_error;
-    sp.settle_time = p.settle_time;
-    sp.timeout = p.timeout;
-    sp.slew = p.slew;
-    sp.wait = p.wait;
-    sp.k = p.k;
-    turn_impl(angle, p.angle_offset, sp, turn_type::RIGHT_SWING);
-}
-
-inline void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_params p = drive_to_point_params{}) {
-    mirror(X_position, Y_position, x_pos_mirrored_, y_pos_mirrored_);
-
-    desired_X_position = X_position;
-    desired_Y_position = Y_position;
-    g_drive_to_point_params_buffer = p;
-
-    pid = PID(hypot(X_position - get_X_position(), Y_position - get_Y_position()), p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
-    desired_heading = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
-    pid_2 = PID(desired_heading - get_absolute_heading(), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-
-    motion_running = true;
-    active_min_voltage = p.min_voltage;
-    distance_traveled = 0;
-    percent_traveled = 0;
-
-    drive_task = vex::task([](){
-        const float x_pos = chassis.desired_X_position;
-        const float y_pos = chassis.desired_Y_position;
-        const float heading = chassis.desired_heading;
-        drive_to_point_params& p = g_drive_to_point_params_buffer;
-
-        const float exit_x = x_pos - sin(to_rad(heading)) * p.exit_error;
-        const float exit_y = y_pos - cos(to_rad(heading)) * p.exit_error;
-
-        bool line_settled = false;
-        bool prev_line_settled = is_line_settled(exit_x, exit_y, heading, chassis.get_X_position(), chassis.get_Y_position());
-        float drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-        const float total_distance = drive_error;
-
-        float prev_drive_error = drive_error;
-        float prev_drive_output = 0;
-        float prev_heading_output = 0;
-        float locked_heading = heading;
-        bool heading_locked = false;
-
-        while (!chassis.pid.is_settled()){
-            line_settled = is_line_settled(exit_x, exit_y, heading, chassis.get_X_position(), chassis.get_Y_position());
-            if (line_settled && !prev_line_settled && p.min_voltage > 0) { break; }
-            prev_line_settled = line_settled;
-
-            float desired_heading = to_deg(atan2(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position()));
-            int drive_sign = 1;
-            if (p.drive_direction == mik::drive_direction::REV) {
-                desired_heading = reduce_negative_180_to_180(desired_heading + 180);
-                drive_sign = -1;
-            }
-
-            drive_error = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-            chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
-            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
-            prev_drive_error = drive_error;
-
-            float heading_error = reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading());
-
-            float drive_output = chassis.pid.compute(drive_error);
-            float heading_scale_factor = cos(to_rad(heading_error));
-            if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
-            drive_output *= heading_scale_factor * drive_sign;
-
-            if (drive_error < chassis.drive_large_settle_error) {
-                if (!heading_locked) {
-                    locked_heading = desired_heading;
-                    heading_locked = true;
-                }
-                heading_error = reduce_negative_180_to_180(locked_heading - chassis.get_absolute_heading());
-            }
-
-            if (p.drive_direction == mik::drive_direction::FASTEST) heading_error = reduce_negative_90_to_90(heading_error);
-
-            float heading_output = chassis.pid_2.compute(heading_error);
-
-            drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
-            heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
-
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
-
-            drive_output = clamp_min_voltage(drive_output, p.min_voltage);
-    
-            prev_drive_output = drive_output;
-            prev_heading_output = heading_output;
-
-            chassis.drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
-            vex::task::sleep(10);
-        }
-
-        chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
-
-        return 0;
-    });
-
-    if (p.wait) { this->wait(); }
-}
-
-inline void Chassis::drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{}) {
-    mirror(X_position, Y_position, angle, x_pos_mirrored_, y_pos_mirrored_);
-
-    desired_X_position = X_position;
-    desired_Y_position = Y_position;
-    desired_angle = angle;
-    desired_heading = angle;
-    g_drive_to_pose_params_buffer = p;
-
-    float target_distance = hypot(X_position - get_X_position(), Y_position - get_Y_position());
-    pid = PID(target_distance, p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.timeout);
-    pid_2 = PID(to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position())) - get_absolute_heading(), p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
-
-    motion_running = true;
-    active_min_voltage = p.min_voltage;
-    distance_traveled = 0;
-    percent_traveled = 0;
-
-    drive_task = vex::task([](){
-        const float x_pos = chassis.desired_X_position;
-        const float y_pos = chassis.desired_Y_position;
-        const float angle = chassis.desired_angle;
-        drive_to_pose_params& p = g_drive_to_pose_params_buffer;
-
-        const float exit_x = x_pos - sin(to_rad(angle)) * p.exit_error;
-        const float exit_y = y_pos - cos(to_rad(angle)) * p.exit_error;
-
-        bool line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
-        bool prev_line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
-        bool crossed_center_line = false;
-        bool center_line_side = is_line_settled(x_pos, y_pos, angle + 90, chassis.get_X_position(), chassis.get_Y_position());
-        bool prev_center_line_side = center_line_side;
-
-        float target_distance = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-        const float total_distance = target_distance;
-        float carrot_X = x_pos - sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
-        float carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
-        float drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
-        float prev_drive_error = drive_error;
-
-        float prev_drive_output = 0;
-
-        while (!chassis.pid.is_settled()){
-            line_settled = is_line_settled(exit_x, exit_y, angle, chassis.get_X_position(), chassis.get_Y_position());
-            if (line_settled && !prev_line_settled && p.min_voltage > 0) { break; }
-            prev_line_settled = line_settled;
-
-            center_line_side = is_line_settled(x_pos, y_pos, angle + 90, chassis.get_X_position(), chassis.get_Y_position());
-            if (center_line_side != prev_center_line_side) {
-                crossed_center_line = true;
-            }
-
-            target_distance = hypot(x_pos - chassis.get_X_position(), y_pos - chassis.get_Y_position());
-
-            carrot_X = x_pos - sin(to_rad(angle)) * (p.lead * target_distance + p.setback);
-            carrot_Y = y_pos - cos(to_rad(angle)) * (p.lead * target_distance + p.setback);
-
-            drive_error = hypot(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position());
-
-            float heading_error = reduce_negative_180_to_180(to_deg(atan2(carrot_X - chassis.get_X_position(), carrot_Y - chassis.get_Y_position())) - chassis.get_absolute_heading());
-            int drive_sign = 1;
-
-            chassis.distance_traveled += std::abs(drive_error - prev_drive_error);
-            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
-            prev_drive_error = drive_error;
-
-            if (drive_error < 7.5 || crossed_center_line || drive_error < p.setback) { 
-                heading_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading()); 
-                drive_error = target_distance;
-            }
-
-            // if (p.drive_direction == mik::drive_direction::REV) {
-            //     heading_error = reduce_negative_180_to_180(heading_error + 180);
-            //     drive_sign = -1;
-            // }
-            
-            float drive_output = chassis.pid.compute(drive_error);
-
-            float heading_scale_factor = cos(to_rad(heading_error));
-            // if (p.drive_direction != mik::drive_direction::FASTEST) heading_scale_factor = std::max(0.0f, heading_scale_factor);
-
-            drive_output *= heading_scale_factor * drive_sign;
-
-            /* if (p.drive_direction == mik::drive_direction::FASTEST) */ 
-            heading_error = reduce_negative_90_to_90(heading_error);
-            float heading_output = chassis.pid_2.compute(heading_error);
-
-            drive_output = clamp(drive_output, -fabs(heading_scale_factor) * p.max_voltage, fabs(heading_scale_factor) * p.max_voltage);
-            heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
-            
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > chassis.drive_large_settle_error);
-            drive_output = clamp_max_slip(drive_output, chassis.get_X_position(), chassis.get_Y_position(), chassis.get_absolute_heading(), carrot_X, carrot_Y, p.drift);
-            drive_output = overturn_scaling(drive_output, heading_output, p.max_voltage * fabs(heading_scale_factor));
-            drive_output = clamp_min_voltage(drive_output, p.min_voltage);        
-
-            chassis.drive_with_voltage(left_voltage_scaling(drive_output, heading_output), right_voltage_scaling(drive_output, heading_output));
-
-            prev_drive_output = drive_output;
-
-            vex::task::sleep(10);
-        }
-
-        chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
-
-        return 0;
-    });
-
-    if (p.wait) { this->wait(); }
-}

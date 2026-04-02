@@ -33,7 +33,6 @@ void test_swing() {
 
 void test_full() {
 	chassis.set_heading(0);
-
 	chassis.drive_distance(24);
 	chassis.turn_to_angle(-45);
 	chassis.drive_distance(-36);
@@ -115,26 +114,26 @@ bool config_is_testing_odom() {
 
 void config_tune_drive() {
 	data.variables = { 
-		{"drive_kp: ", chassis.drive_kp}, 
-		{"drive_ki: ", chassis.drive_ki}, 
-		{"drive_kd: ", chassis.drive_kd}, 
-		{"drive_starti: ", chassis.drive_starti}, 
-		{"drive_max_volt: ", chassis.drive_max_voltage}, 
-		{"drive_stl_err: ", chassis.drive_settle_error}, 
-		{"drive_stl_tm: ", chassis.drive_settle_time}, 
-		{"drive_tmout: ", chassis.drive_timeout}, 
-		{"drive_slew ", chassis.drive_slew},
-		{"drive_ext_err: ", chassis.drive_exit_error}
+		{"drive_kp: ", constants.drive_kp}, 
+		{"drive_ki: ", constants.drive_ki}, 
+		{"drive_kd: ", constants.drive_kd}, 
+		{"drive_starti: ", constants.drive_starti}, 
+		{"drive_max_volt: ", constants.drive_max_voltage}, 
+		{"drive_stl_err: ", constants.drive_settle_error}, 
+		{"drive_stl_tm: ", constants.drive_settle_time}, 
+		{"drive_tmout: ", constants.drive_timeout}, 
+		{"drive_slew ", constants.drive_slew},
+		{"drive_ext_err: ", constants.drive_exit_error}
 		
 
 		// You can add more parameters to tune
 
-		// {"heading_kp: ", chassis.heading_kp}, 
-		// {"heading_ki: ", chassis.heading_ki}, 
-		// {"heading_kd: ", chassis.heading_kd}, 
-		// {"heading_starti: ", chassis.heading_starti}, 
-		// {"max_volt: ", chassis.heading_max_voltage},
-		// {"heading_slew ", chassis.heading_slew}
+		// {"heading_kp: ", constants.heading_kp}, 
+		// {"heading_ki: ", constants.heading_ki}, 
+		// {"heading_kd: ", constants.heading_kd}, 
+		// {"heading_starti: ", constants.heading_starti}, 
+		// {"max_volt: ", constants.heading_max_voltage},
+		// {"heading_slew ", constants.heading_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
@@ -181,12 +180,12 @@ void config_tune_drive() {
 
 void config_tune_heading() {
 	data.variables = { 
-		{"heading_kp: ", chassis.heading_kp}, 
-		{"heading_ki: ", chassis.heading_ki}, 
-		{"heading_kd: ", chassis.heading_kd}, 
-		{"heading_starti: ", chassis.heading_starti}, 
-		{"max_volt: ", chassis.heading_max_voltage},
-		{"heading_slew: ", chassis.heading_slew}
+		{"heading_kp: ", constants.heading_kp}, 
+		{"heading_ki: ", constants.heading_ki}, 
+		{"heading_kd: ", constants.heading_kd}, 
+		{"heading_starti: ", constants.heading_starti}, 
+		{"max_volt: ", constants.heading_max_voltage},
+		{"heading_slew: ", constants.heading_slew}
 	};
 
 	int y_min = -30;
@@ -228,16 +227,16 @@ void config_tune_heading() {
 
 void config_tune_turn() {  
 	data.variables = { 
-		{"turn_kp: ", chassis.turn_kp}, 
-		{"turn_ki: ", chassis.turn_ki},
-		{"turn_kd: ", chassis.turn_kd}, 
-		{"turn_starti: ", chassis.turn_starti}, 
-		{"turn_max_volt: ", chassis.turn_max_voltage}, 
-		{"turn_stl_err: ", chassis.turn_settle_error}, 
-		{"turn_stl_tm: ", chassis.turn_settle_time}, 
-		{"turn_tmout: ", chassis.turn_timeout},
-		{"Turn_slew: ", chassis.turn_slew},
-		{"Turn_exit_err: ", chassis.turn_exit_error}
+		{"turn_kp: ", constants.turn_kp}, 
+		{"turn_ki: ", constants.turn_ki},
+		{"turn_kd: ", constants.turn_kd}, 
+		{"turn_starti: ", constants.turn_starti}, 
+		{"turn_max_volt: ", constants.turn_max_voltage}, 
+		{"turn_stl_err: ", constants.turn_settle_error}, 
+		{"turn_stl_tm: ", constants.turn_settle_time}, 
+		{"turn_tmout: ", constants.turn_timeout},
+		{"Turn_slew: ", constants.turn_slew},
+		{"Turn_exit_err: ", constants.turn_exit_error}
 	};
 
   int y_min = -10;
@@ -270,17 +269,17 @@ void config_tune_turn() {
 
 void config_tune_swing() {
 	data.variables = { 
-		{"swing_kp: ", chassis.swing_kp }, 
-		{"swing_ki: ", chassis.swing_ki }, 
-		{"swing_kd: ", chassis.swing_kd}, 
-		{"swing_starti: ", chassis.swing_starti}, 
-		{"swing_max_volt: ", chassis.swing_max_voltage}, 
-		{"swing_opp_volt: ", chassis.swing_opposite_voltage}, 
-		{"swing_stl_err: ", chassis.swing_settle_error}, 
-		{"swing_stl_tm: ", chassis.swing_settle_time}, 
-		{"swing_tmout: ", chassis.swing_timeout},
-		{"swing_slew: ", chassis.swing_slew},
-		{"swing_ext_err: ", chassis.swing_exit_error}
+		{"swing_kp: ", constants.swing_kp }, 
+		{"swing_ki: ", constants.swing_ki }, 
+		{"swing_kd: ", constants.swing_kd}, 
+		{"swing_starti: ", constants.swing_starti}, 
+		{"swing_max_volt: ", constants.swing_max_voltage}, 
+		{"swing_opp_volt: ", constants.swing_opposite_voltage}, 
+		{"swing_stl_err: ", constants.swing_settle_error}, 
+		{"swing_stl_tm: ", constants.swing_settle_time}, 
+		{"swing_tmout: ", constants.swing_timeout},
+		{"swing_slew: ", constants.swing_slew},
+		{"swing_ext_err: ", constants.swing_exit_error}
 	};
 
 	int y_min = -20;

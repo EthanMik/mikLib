@@ -1,3 +1,4 @@
+#pragma once
 #include "mikLib/ui.h"
 #include <string>
 #include <functional>
