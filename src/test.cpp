@@ -73,30 +73,12 @@ void test_odom_swing() {
 void test_odom_full() {
 	chassis.set_coordinates(0, 0, 0);
 
-	Brain.resetTimer();
 	chassis.drive_to_point(0, 24);
-	print(Brain.Timer.time(msec) / 1000);
-
-	Brain.resetTimer();
 	chassis.turn_to_point(24, 0, { .angle_offset = 180 });
-	print(Brain.Timer.time(msec) / 1000);
-
-	Brain.resetTimer();
 	chassis.drive_to_point(24, 0);
-	print(Brain.Timer.time(msec) / 1000);
-
-	Brain.resetTimer();
 	chassis.right_swing_to_point(0, 0);
-	print(Brain.Timer.time(msec) / 1000);
-
-	Brain.resetTimer();
 	chassis.drive_to_point(0, 0);
-	print(Brain.Timer.time(msec) / 1000);
-
-	Brain.resetTimer();
-	chassis.turn_to_angle(0);
-	print(Brain.Timer.time(msec) / 1000);
-	
+	chassis.turn_to_angle(0);	
 }
 
 void test_boomerang() {
@@ -714,7 +696,9 @@ void config_measure_velocity_accel() {
 
     vex::task temp([](){
 		
-		std::vector<std::pair<float, float>> angle_time{};
+		struct data { float value; float t; };
+
+		std::vector<data> angle_time{};
 
 		// Spin in place at full voltage for 1.5 seconds
 		Brain.Timer.reset();
@@ -724,7 +708,6 @@ void config_measure_velocity_accel() {
 		
 		while (Brain.Timer.time(msec) < 1500) {
 
-			// float gyro_dps = std::fabs(chassis.inertial.gyroRate(zaxis, dps));
 			float angle = chassis.inertial.rotation();
 			float t = Brain.Timer.time(msec) / 1000.0;
 
@@ -735,7 +718,7 @@ void config_measure_velocity_accel() {
 		task::sleep(500);
 		chassis.stop_drive(coast);
 
-        std::vector<std::pair<float, float>> pos_time{};
+        std::vector<data> pos_time{};
 
 		// Drive full speed for 1.5 seconds
 		chassis.drive_with_voltage(12, 12);
@@ -754,66 +737,65 @@ void config_measure_velocity_accel() {
 		chassis.stop_drive(hold);
 		chassis.set_brake_type(coast);
 
-		auto position_to_velocity = [](const std::vector<std::pair<float, float>>& unit_time){
-			std::vector<std::pair<float, float>> velocities;
+		auto position_to_velocity = [](const std::vector<data>& unit_time){
+			std::vector<data> velocities;
 			for (size_t i = 1; i < unit_time.size(); ++i) {
-				float v = ((unit_time[i].first - unit_time[i - 1].first) / (unit_time[i].second - unit_time[i - 1].second));
-				velocities.push_back({v, unit_time[i].second});
+				float v = ((unit_time[i].value - unit_time[i - 1].value) / (unit_time[i].t - unit_time[i - 1].t));
+				velocities.push_back({v, unit_time[i].t});
 			}
 			return velocities;
 		};
 
-		// 5-point centered median filter — eliminates encoder-tick spikes with only ~20ms lag
-		auto smooth_velocity_median = [](const std::vector<std::pair<float, float>>& velocity){
-			std::vector<std::pair<float, float>> smoothed;
+		// 5-point centered median filter
+		auto smooth_velocity_median = [](const std::vector<data>& velocity){
+			std::vector<data> smoothed;
 			const int half = 2;
 			for (size_t i = 0; i < velocity.size(); ++i) {
 				int start = std::max(0, (int)i - half);
 				int end   = std::min((int)velocity.size() - 1, (int)i + half);
 				std::vector<float> vals;
 				for (int j = start; j <= end; ++j) {
-					vals.push_back(velocity[j].first);
+					vals.push_back(velocity[j].value);
 				}
 				std::nth_element(vals.begin(), vals.begin() + vals.size() / 2, vals.end());
-				smoothed.push_back({vals[vals.size() / 2], velocity[i].second});
+				smoothed.push_back({vals[vals.size() / 2], velocity[i].t});
 			}
 			return smoothed;
 		};
 
-		auto max_velo_idx = [](float& max_velocity, size_t& index, const std::vector<std::pair<float, float>>& smoothed_velo){
+		auto max_velo_idx = [](float& max_velocity, size_t& index, const std::vector<data>& smoothed_velo){
 			max_velocity = -1;
 			index = 0;
 
 			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
-				if (smoothed_velo[i].first > max_velocity) {
-					max_velocity = smoothed_velo[i].first;
+				if (smoothed_velo[i].value > max_velocity) {
+					max_velocity = smoothed_velo[i].value;
 					index = i;
 				}
-			}		
+			}
 		};
 
 		// Time constant = time from first motion to reaching 63.2% of max velocity
-		auto time_constant = [](const std::vector<std::pair<float, float>>& smoothed_velo, float max_vel){
-			// Use 2% of max as noise floor so sensor drift doesn't set t_start early
-			float t_start = -1.0f;
+		auto time_constant = [](const std::vector<data>& smoothed_velo, float max_vel){
+			double t_start = -1.0;
 			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
-				if (smoothed_velo[i].first > max_vel * 0.02f) {
-					t_start = smoothed_velo[i].second;
+				if (smoothed_velo[i].value > max_vel * 0.02) {
+					t_start = smoothed_velo[i].t;
 					break;
 				}
 			}
-			if (t_start < 0.0f) return -1.0f;
+			if (t_start < 0.0) return -1.0;
 
-			const float threshold = max_vel * 0.632f;
+			const double threshold = max_vel * 0.632;
 			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
-				if (smoothed_velo[i].second >= t_start && smoothed_velo[i].first >= threshold) {
-					return smoothed_velo[i].second - t_start;
+				if (smoothed_velo[i].t >= t_start && smoothed_velo[i].value >= threshold) {
+					return smoothed_velo[i].t - t_start;
 				}
 			}
-			return -1.0f;
+			return -1.0;
 		};
 
-		auto turn_velocities = position_to_velocity(angle_time); // gyroRate already stored as velocity
+		auto turn_velocities = position_to_velocity(angle_time);
 		auto drive_velocities = position_to_velocity(pos_time);
 
 		auto smoothed_turn_velo = smooth_velocity_median(turn_velocities);
@@ -833,9 +815,9 @@ void config_measure_velocity_accel() {
 		
         console_scr->add("Turn Time Constant: ", [turn_time_constant](){ return to_string_float(turn_time_constant, 4, false) + " s"; });
 
-		auto print_unit_time = [](const std::vector<std::pair<float, float>> unit_time){
+		auto print_unit_time = [](const std::vector<data> unit_time){
 			for (const auto& p : unit_time) {
-				print(to_string_float(p.second, 3, false) + ", " + to_string_float(p.first, 3, false));
+				print(to_string_float(p.t, 3, false) + ", " + to_string_float(p.value, 3, false));
 				task::sleep(20);
 			}
 			print("End Data\n");
@@ -914,10 +896,10 @@ void config_measure_distance_reset_offsets() {
 				continue;
 			}
 
-			float eq1 = 70.25f - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
-			float eq2 = 70.25f - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
+			float eq1 = 70.25 - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
+			float eq2 = 70.25 - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
 			float det = sin(to_rad(angle2 - angle1));
-			if (fabs(det) < 0.01f) continue;
+			if (fabs(det) < 0.01) continue;
 
 			sensor_order[i].x_offset = (eq1 * cos(to_rad(angle2)) - eq2 * cos(to_rad(angle1))) / det;
 			sensor_order[i].y_offset = (eq1 * sin(to_rad(angle2)) - eq2 * sin(to_rad(angle1))) / det;
