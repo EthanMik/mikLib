@@ -35,7 +35,7 @@ float volt_to_percent(float volt) {
 }
 
 float to_rad(float angle_deg) {
-    return (angle_deg / (180.0 / M_PI));
+    return angle_deg * (M_PI / 180.0f);
 }
 
 float to_deg(float angle_rad) {
@@ -43,26 +43,20 @@ float to_deg(float angle_rad) {
 }
 
 float reduce_negative_180_to_180(float angle) {
-    while(!(angle >= -180 && angle < 180)) {
-        if(angle < -180) { angle += 360; }
-        if(angle >= 180) { angle -= 360; }
-    }
-    return angle;
+    angle = fmod(angle + 180.0, 360.0);
+    if (angle < 0) angle += 360.0;
+    return angle - 180.0;
 }
 
 float reduce_negative_90_to_90(float angle) {
-    while(!(angle >= -90 && angle < 90)) {
-        if(angle < -90) { angle += 180; }
-        if(angle >= 90) { angle -= 180; }
-    }
-    return angle;
+    angle = fmod(angle + 90.0, 180.0);
+    if (angle < 0) angle += 180.0;
+    return angle - 90.0;
 }
 
 float reduce_0_to_360(float angle) {
-    while(!(angle >= 0 && angle < 360)) {
-        if(angle < 0) { angle += 360; }
-        if(angle >= 360) { angle -= 360; }
-    }
+    angle = fmod(angle, 360.0);
+    if (angle < 0) angle += 360.0;
     return angle;
 }
 
@@ -116,8 +110,8 @@ float angle_error(float error, mik::turn_direction dir) {
     }
 }
 
-bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y){
-    return (desired_Y - current_Y) * cos(to_rad(desired_angle_deg)) <= -(desired_X - current_X) * sin(to_rad(desired_angle_deg));
+bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y, float exit_error) {
+    return (desired_Y - current_Y) * cos(to_rad(desired_angle_deg)) <= -(desired_X - current_X) * sin(to_rad(desired_angle_deg)) + exit_error;
 }
 
 float left_voltage_scaling(float drive_output, float heading_output) {

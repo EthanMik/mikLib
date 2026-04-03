@@ -19,13 +19,12 @@ public:
      * @brief PID constructor with P, I, D, and starti.
      * Starti keeps the I term at 0 until error is less than starti.
      * 
-     * @param error Difference in desired and current position.
      * @param kp Proportional constant.
      * @param ki Integral constant.
      * @param kd Derivative constant.
      * @param starti Maximum error to start integrating.
      */
-    PID(float error, float kp, float ki, float kd, float starti);
+    PID(float kp, float ki, float kd, float starti);
 
     /**
      * @brief PID constructor with settling inputs.
@@ -35,26 +34,6 @@ public:
      * it is not settled. Starti keeps the I term at 0 until error is less 
      * than starti.
      * 
-     * @param error Difference in desired and current position.
-     * @param kp Proportional constant.
-     * @param ki Integral constant.
-     * @param kd Derivative constant.
-     * @param starti Maximum error to start integrating.
-     * @param settle_error Maximum error to be considered settled.
-     * @param settle_time Minimum time to be considered settled.
-     * @param timeout Time after which to give up and move on. Using 0 will not time out movement.
-     */
-    PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout);
-
-    /**
-     * @brief PID constructor with settling inputs.
-     * The settling system works like this: The robot is settled
-     * when error is less than settle_error for a duration of settle_time,
-     * or if the function has gone on for longer than timeout. Otherwise
-     * it is not settled. Starti keeps the I term at 0 until error is less 
-     * than starti.
-     * 
-     * @param error Difference in desired and current position.
      * @param kp Proportional constant.
      * @param ki Integral constant.
      * @param kd Derivative constant.
@@ -64,7 +43,7 @@ public:
      * @param exit_error Error to be considered finished.
      * @param timeout Time after which to give up and move on. Using 0 will not time out movement.
      */
-    PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout);
+    PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout);
 
     /**
      * @brief PID constructor with settling inputs.
@@ -74,7 +53,6 @@ public:
      * it is not settled. Starti keeps the I term at 0 until error is less 
      * than starti.
      * 
-     * @param error Difference in desired and current position.
      * @param kp Proportional constant.
      * @param ki Integral constant.
      * @param kd Derivative constant.
@@ -86,7 +64,7 @@ public:
      * @param exit_error Error to be considered finished.
      * @param timeout Time after which to give up and move on. Using 0 will not time out movement.
      */
-    PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float large_settle_error, float large_settle_time, float exit_error, float timeout);
+    PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float large_settle_error, float large_settle_time, float exit_error, float timeout);
 
     /**
      * @brief Computes the output power based on the error.

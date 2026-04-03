@@ -8,27 +8,14 @@ PID::PID(float kp, float ki, float kd) :
     kd(kd)
 {};
 
-PID::PID(float error, float kp, float ki, float kd, float starti) :
-    error(error),
+PID::PID(float kp, float ki, float kd, float starti) :
     kp(kp),
     ki(ki),
     kd(kd),
     starti(starti)
 {};
 
-PID::PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout) :
-    error(error),
-    kp(kp),
-    ki(ki),
-    kd(kd),
-    starti(starti),
-    settle_error(settle_error),
-    settle_time(settle_time),
-    timeout(timeout)
-{};
-
-PID::PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout) :
-    error(error),
+PID::PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout) :
     kp(kp),
     ki(ki),
     kd(kd),
@@ -39,8 +26,7 @@ PID::PID(float error, float kp, float ki, float kd, float starti, float settle_e
     timeout(timeout)
 {};
 
-PID::PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float large_settle_error, float large_settle_time, float exit_error, float timeout) :
-    error(error),
+PID::PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float large_settle_error, float large_settle_time, float exit_error, float timeout) :
     kp(kp),
     ki(ki),
     kd(kd),

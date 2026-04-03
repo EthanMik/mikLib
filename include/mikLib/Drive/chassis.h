@@ -174,19 +174,6 @@ public:
     /** @brief Cancels the current motion the robot is in. Useful for chaining movements faster */
     void cancel_motion();
 
-    /** 
-     * @brief Changes the drive max voltage that is currently being used for a drive motion
-     * 
-     * Example: 
-     * chassis.drive_distance(12, {.drive_max_voltage = 12, .wait = false}); // Drives robot at 12 volts 
-     * chassis.wait_until(6); // Waits until robot has driven 6 inches at 12 volts
-     * update_drive_max_voltage(6); // Sets max speed to 6 volts
-     * chassis.wait(); // Finishes drive distance at 6 volts
-     * 
-     * @param drive_max_voltage voltage of the drive, 0-12.
-    */
-    void update_drive_max_voltage(float drive_max_voltage);
-
     /**
      * @brief Drives each side of the chassis at the specified voltage.
      * 
@@ -199,7 +186,7 @@ public:
      * @brief Stops both sides of the drivetrain.
      * @param mode coast, brake, hold
      */    
-    void stop_drive(vex::brakeType brake);
+    void stop_drive(vex::brakeType brake = vex::brakeType::undefined);
 
     /** @brief Calibrates the inertial sensor, if force calibrate is true
      * it will continue to calibrate until it is within threshold for 1 second
@@ -240,6 +227,8 @@ public:
      * @param max_voltage Max voltage on the drive out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered settled by large error in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -261,6 +250,8 @@ public:
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in inches.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -277,8 +268,11 @@ public:
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
+     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -294,8 +288,11 @@ public:
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
+     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -378,6 +375,8 @@ public:
      * @param max_voltage Max voltage on the drive out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered settled by large error in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -397,8 +396,11 @@ public:
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
+     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -418,8 +420,11 @@ public:
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
+     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in degrees.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -441,6 +446,8 @@ public:
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in inches.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -456,20 +463,20 @@ public:
      * robot eventually gets into position. The heading correction is optimized to only
      * try to reach the correct angle when drive error is low, and the robot will drive 
      * backwards to reach a pose if it's faster. .5 is a reasonable value for the lead. 
-     * The setback parameter is used to glide into position more effectively. It is
-     * the distance back from the target that the robot tries to drive to first.
      * Try it out in a desmos simulation https://www.desmos.com/calculator/sptjw5szex.
-     * 
+     *
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
      * @param angle Desired orientation in degrees.
-     * @param lead Constant scale factor that determines how far away the carrot point is. 
-     * @param setback Distance in inches from target by which the carrot is always pushed back.
+     * @param lead Constant scale factor that determines how far away the carrot point is.
+     * @param drift Determines the amount of horizontal drift allowed, lower values reduce drift.
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
+     * @param large_settle_error Error to be considered large settled in inches.
+     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -524,7 +531,11 @@ public:
     float desired_X_position = 0;
     float desired_Y_position = 0;
     float desired_angle_offset = 0;
-    std::vector<point> desired_path{};
+    swing_to_angle_params turn_params_buffer{};
+    turn_type turn_type_buffer = turn_type::TURN; 
+    drive_to_point_params drive_to_point_params_buffer{};
+    drive_to_pose_params drive_to_pose_params_buffer{};
+    drive_distance_params drive_distance_params_buffer{};
 
 private:
     // Universal function for swinging and

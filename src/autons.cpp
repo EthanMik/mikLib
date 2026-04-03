@@ -32,9 +32,7 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
         chassis.set_coordinates(0, 0, 0);
 
         return "";
-    }
-    chassis.drive_to_point(7.22, 8.22, { .drive_direction = reversed });
-    
+    }    
     // Place start of autonoumous here
 
     return "";

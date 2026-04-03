@@ -68,7 +68,7 @@ struct Constants {
     // Drive to pose constants, (boomerang controller).
 
     float boomerang_lead; // Constant scale factor that determines how far away the carrot point is. 
-    float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift.
+    float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift while decreasing speed.
 
     // Constants for controlling drivetrain with joysticks
 
@@ -139,7 +139,7 @@ struct drive_distance_params {
 };
 
 struct turn_to_angle_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::FASTEST;
     float min_voltage = constants.turn_min_voltage;
     float max_voltage = constants.turn_max_voltage;
     float exit_error = constants.turn_exit_error;
@@ -154,7 +154,7 @@ struct turn_to_angle_params {
 };
 
 struct swing_to_angle_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::FASTEST;
     float min_voltage = constants.swing_min_voltage;
     float max_voltage = constants.swing_max_voltage;
     float opposite_voltage = constants.swing_opposite_voltage;
@@ -170,7 +170,6 @@ struct swing_to_angle_params {
 };
 
 struct drive_to_point_params {
-    mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
     float min_voltage = constants.drive_min_voltage;
     float max_voltage = constants.drive_max_voltage;
     float heading_max_voltage = constants.heading_max_voltage;
@@ -189,7 +188,7 @@ struct drive_to_point_params {
 };
 
 struct drive_to_pose_params {
-    // mik::drive_direction drive_direction = mik::drive_direction::FASTEST;
+    vex::directionType direction = vex::directionType::undefined;
     float lead = constants.boomerang_lead;
     float drift = constants.boomerang_drift;
     float min_voltage = constants.drive_min_voltage;
@@ -208,7 +207,7 @@ struct drive_to_pose_params {
 };
 
 struct turn_to_point_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::FASTEST;
     float angle_offset = 0;
     float min_voltage = constants.turn_min_voltage;
     float max_voltage = constants.turn_max_voltage;
@@ -224,7 +223,7 @@ struct turn_to_point_params {
 };
 
 struct swing_to_point_params {
-    mik::turn_direction turn_direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::FASTEST;
     float angle_offset = 0;
     float min_voltage = constants.swing_min_voltage;
     float max_voltage = constants.swing_max_voltage;
@@ -239,11 +238,3 @@ struct swing_to_point_params {
     bool wait = true;
     swing_constants k = swing_constants{};
 };
-
-// Buffers since vex tasks have to use global scope variables
-
-extern drive_distance_params g_drive_distance_params_buffer;
-extern swing_to_angle_params g_turn_params_buffer;
-extern mik::turn_type g_turn_type_buffer;
-extern drive_to_point_params g_drive_to_point_params_buffer;
-extern drive_to_pose_params g_drive_to_pose_params_buffer;

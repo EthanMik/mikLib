@@ -81,13 +81,12 @@ void test_odom_full() {
 }
 
 void test_boomerang() {
-	chassis.set_coordinates(0, 0, 0);
+    chassis.set_coordinates(0, 0, 0);
 
     chassis.drive_to_pose(24, 24, 90);
-    chassis.drive_to_pose(24, 0, 90);
-    chassis.drive_to_pose(0, 24, 270);
-    chassis.drive_to_pose(0, 0, 180);
-    chassis.turn_to_angle(0);
+    chassis.drive_to_pose(24, 0, 270);
+    chassis.drive_to_pose(0, 24, 290);
+    chassis.drive_to_pose(0, 0, 0);
 }
 
 pid_data data;

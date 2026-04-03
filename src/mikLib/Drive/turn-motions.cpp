@@ -1,15 +1,14 @@
 #include "vex.h"
 
-swing_to_angle_params g_turn_params_buffer{};
-turn_type g_turn_type_buffer = turn_type::TURN;
-
 void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params p, turn_type type) {
+    // Tasks can only use data from global scope
     desired_angle = target_angle;
     desired_angle_offset = angle_offset;
-    g_turn_params_buffer = p;
-    g_turn_type_buffer = type;
+    turn_params_buffer = p;
+    turn_type_buffer = type;
 
-    pid = PID(angle_error(target_angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction), p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.large_settle_error, p.large_settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
+    // Create PID; exit error is only applied if min voltage is non zero
+    pid = PID(p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.large_settle_error, p.large_settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
@@ -17,14 +16,15 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
     percent_traveled = 0;
 
     drive_task = vex::task([](){
+        // Read from global scope
         const float angle = chassis.desired_angle;
         const float angle_offset = chassis.desired_angle_offset;
-        swing_to_angle_params& p = g_turn_params_buffer;
-        const turn_type type = g_turn_type_buffer;
+        swing_to_angle_params& p = chassis.turn_params_buffer;
+        const turn_type type = chassis.turn_type_buffer;
 
         bool crossed = false;
         float raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
-        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
+        float error = angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.direction);
         const float total_distance = fabs(error);
         float prev_error = error;
         float prev_raw_error = raw_error;
@@ -32,22 +32,28 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
 
         while (!chassis.pid.is_settled()) {
             raw_error = angle_error(angle - chassis.get_absolute_heading() + angle_offset);
+
+            // Check if robot has crossed the target, when robot is crossed it will no longer lock to CW or CCW
             if (sign(raw_error) != sign(prev_raw_error)) { crossed = true; }
             prev_raw_error = raw_error;
 
-            error = crossed ? raw_error : angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.turn_direction);
+            error = crossed ? raw_error : angle_error(angle - chassis.get_absolute_heading() + angle_offset, p.direction);
 
+            // If robot crosses target and min voltage is non zero immediately exit
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
-            chassis.distance_traveled += std::abs(error - prev_error);
-            chassis.percent_traveled = std::min(100.0f, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_traveled += fabs(error - prev_error);
+            chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
 
             prev_error = error;
 
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
+            // Disable slew when robot is close to target
             output = slew_scaling(output, prev_output, p.slew, fabs(error) > constants.turn_cutoff);
+
             output = clamp_min_voltage(output, p.min_voltage);
 
+            // Determine sides of drivetrain that turn
             switch (type) {
                 case turn_type::TURN:
                     chassis.drive_with_voltage(output, -output);
@@ -75,16 +81,20 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
         }
 
         chassis.motion_running = false;
-        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
+
+        // Stop the chassis if min voltage is non zero, default is coast
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); } 
+
         return 0;
     });
+    // Hold the task if wait is true
     if (p.wait) { this->wait(); }
 }
 
 void Chassis::turn_to_angle(float angle, turn_to_angle_params p) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
-    turn(angle, 0.0f, {
-        .turn_direction = p.turn_direction,
+    mirror(angle, p.direction, x_pos_mirrored_, y_pos_mirrored_);
+    turn(angle, 0, {
+        .direction = p.direction,
         .min_voltage = p.min_voltage,
         .max_voltage = p.max_voltage,
         .exit_error = p.exit_error,
@@ -98,22 +108,22 @@ void Chassis::turn_to_angle(float angle, turn_to_angle_params p) {
 }
 
 void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    mirror(angle, p.direction, x_pos_mirrored_, y_pos_mirrored_);
     turn(angle, 0, p, turn_type::LEFT_SWING);
 }
 
 void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p) {
-    mirror(angle, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    mirror(angle, p.direction, x_pos_mirrored_, y_pos_mirrored_);
     turn(angle, 0, p, turn_type::RIGHT_SWING);
 }
 
 void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_params p) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    mirror(X_position, Y_position, p.direction, x_pos_mirrored_, y_pos_mirrored_);
     desired_X_position = X_position;
     desired_Y_position = Y_position;
     float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
     turn(angle, p.angle_offset, {
-        .turn_direction = p.turn_direction,
+        .direction = p.direction,
         .min_voltage = p.min_voltage,
         .max_voltage = p.max_voltage,
         .exit_error = p.exit_error,
@@ -127,12 +137,12 @@ void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_pa
 }
 
 void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_point_params p) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    mirror(X_position, Y_position, p.direction, x_pos_mirrored_, y_pos_mirrored_);
     desired_X_position = X_position;
     desired_Y_position = Y_position;
     float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
     turn(angle, p.angle_offset, {
-        .turn_direction = p.turn_direction,
+        .direction = p.direction,
         .min_voltage = p.min_voltage,
         .max_voltage = p.max_voltage,
         .opposite_voltage = p.opposite_voltage,
@@ -147,12 +157,12 @@ void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_p
 }
 
 void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_point_params p) {
-    mirror(X_position, Y_position, p.turn_direction, x_pos_mirrored_, y_pos_mirrored_);
+    mirror(X_position, Y_position, p.direction, x_pos_mirrored_, y_pos_mirrored_);
     desired_X_position = X_position;
     desired_Y_position = Y_position;
     float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
     turn(angle, p.angle_offset, {
-        .turn_direction = p.turn_direction,
+        .direction = p.direction,
         .min_voltage = p.min_voltage,
         .max_voltage = p.max_voltage,
         .opposite_voltage = p.opposite_voltage,

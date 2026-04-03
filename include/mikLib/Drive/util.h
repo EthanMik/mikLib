@@ -141,7 +141,7 @@ float angle_error(float error, mik::turn_direction dir = mik::turn_direction::FA
  * @param current_Y The robot's Y position in inches.
  * @return Whether the robot can be considered settled.
  */
-bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y);
+bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y, float exit_error);
 
 /**
  * @brief Voltage scaling to keep from applying more than 12 volts to either side of the drive.

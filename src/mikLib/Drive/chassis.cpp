@@ -50,88 +50,6 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     );
 }
 
-void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain, float control_desaturate_bias) {
-    constants.control_throttle_deadband = control_throttle_deadband;
-    constants.control_throttle_min_output = control_throttle_min_output;
-    constants.control_throttle_curve_gain = control_throttle_curve_gain;
-    constants.control_turn_deadband = control_turn_deadband;
-    constants.control_turn_min_output = control_turn_min_output;
-    constants.control_turn_curve_gain = control_turn_curve_gain;
-    constants.control_desaturate_bias = control_desaturate_bias;
-}
-
-void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
-    constants.turn_max_voltage = turn_max_voltage;
-    constants.turn_kp = turn_kp;
-    constants.turn_ki = turn_ki;
-    constants.turn_kd = turn_kd;
-    constants.turn_starti = turn_starti;
-    constants.turn_slew = turn_slew;
-} 
-
-void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_slew) {
-    constants.drive_max_voltage = drive_max_voltage;
-    constants.drive_kp = drive_kp;
-    constants.drive_ki = drive_ki;
-    constants.drive_kd = drive_kd;
-    constants.drive_starti = drive_starti;
-    constants.drive_slew = drive_slew;
-} 
-
-void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti, float heading_slew) {
-    constants.heading_max_voltage = heading_max_voltage;
-    constants.heading_kp = heading_kp;
-    constants.heading_ki = heading_ki;
-    constants.heading_kd = heading_kd;
-    constants.heading_starti = heading_starti;
-    constants.heading_slew = heading_slew;
-
-}
-
-void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_slew) {
-    constants.swing_max_voltage = swing_max_voltage;
-    constants.swing_kp = swing_kp;
-    constants.swing_ki = swing_ki;
-    constants.swing_kd = swing_kd;
-    constants.swing_starti = swing_starti;
-    constants.swing_slew = swing_slew;
-} 
-
-void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout) {
-    constants.turn_settle_error = turn_settle_error;
-    constants.turn_settle_time = turn_settle_time;
-    constants.turn_large_settle_error = turn_large_settle_error;
-    constants.turn_large_settle_time = turn_large_settle_time;
-    constants.turn_timeout = turn_timeout;
-}
-
-void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout) {
-    constants.drive_settle_error = drive_settle_error;
-    constants.drive_settle_time = drive_settle_time;
-    constants.drive_large_settle_error = drive_large_settle_error;
-    constants.drive_large_settle_time = drive_large_settle_time;
-    constants.drive_timeout = drive_timeout;
-}
-
-void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout) {
-    constants.swing_settle_error = swing_settle_error;
-    constants.swing_settle_time = swing_settle_time;
-    constants.swing_large_settle_error = swing_large_settle_error;
-    constants.swing_large_settle_time = swing_large_settle_time;
-    constants.swing_timeout = swing_timeout;
-}
-
-
-void Chassis::set_tracking_offsets(float forward_tracker_center_distance, float sideways_tracker_center_distance) {
-    odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
-}
-
-void Chassis::set_brake_type(vex::brakeType brake) {
-    left_drive.setStopping(brake);
-    right_drive.setStopping(brake);
-    chassis.stop_behavior = brake;
-}
-
 void Chassis::wait() {
     while(motion_running) {
         task::sleep(10);
@@ -158,12 +76,6 @@ void Chassis::cancel_motion() {
     drive_task.stop();
     motion_running = false;
     if (active_min_voltage == 0) { stop_drive(chassis.stop_behavior); }
-}
-
-void Chassis::update_drive_max_voltage(float drive_max_voltage) {
-    g_drive_distance_params_buffer.max_voltage = drive_max_voltage;
-    g_drive_to_point_params_buffer.max_voltage = drive_max_voltage;
-    g_drive_to_pose_params_buffer.max_voltage = drive_max_voltage;
 }
 
 void Chassis::drive_with_voltage(float left_voltage, float right_voltage){
@@ -414,4 +326,86 @@ void Chassis::control(drive_mode dm) {
             tank_curved();
             return;
     }
+}
+
+void Chassis::set_control_constants(float control_throttle_deadband, float control_throttle_min_output, float control_throttle_curve_gain, float control_turn_deadband, float control_turn_min_output, float control_turn_curve_gain, float control_desaturate_bias) {
+    constants.control_throttle_deadband = control_throttle_deadband;
+    constants.control_throttle_min_output = control_throttle_min_output;
+    constants.control_throttle_curve_gain = control_throttle_curve_gain;
+    constants.control_turn_deadband = control_turn_deadband;
+    constants.control_turn_min_output = control_turn_min_output;
+    constants.control_turn_curve_gain = control_turn_curve_gain;
+    constants.control_desaturate_bias = control_desaturate_bias;
+}
+
+void Chassis::set_turn_constants(float turn_max_voltage, float turn_kp, float turn_ki, float turn_kd, float turn_starti, float turn_slew) {
+    constants.turn_max_voltage = turn_max_voltage;
+    constants.turn_kp = turn_kp;
+    constants.turn_ki = turn_ki;
+    constants.turn_kd = turn_kd;
+    constants.turn_starti = turn_starti;
+    constants.turn_slew = turn_slew;
+} 
+
+void Chassis::set_drive_constants(float drive_max_voltage, float drive_kp, float drive_ki, float drive_kd, float drive_starti, float drive_slew) {
+    constants.drive_max_voltage = drive_max_voltage;
+    constants.drive_kp = drive_kp;
+    constants.drive_ki = drive_ki;
+    constants.drive_kd = drive_kd;
+    constants.drive_starti = drive_starti;
+    constants.drive_slew = drive_slew;
+} 
+
+void Chassis::set_heading_constants(float heading_max_voltage, float heading_kp, float heading_ki, float heading_kd, float heading_starti, float heading_slew) {
+    constants.heading_max_voltage = heading_max_voltage;
+    constants.heading_kp = heading_kp;
+    constants.heading_ki = heading_ki;
+    constants.heading_kd = heading_kd;
+    constants.heading_starti = heading_starti;
+    constants.heading_slew = heading_slew;
+
+}
+
+void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float swing_ki, float swing_kd, float swing_starti, float swing_slew) {
+    constants.swing_max_voltage = swing_max_voltage;
+    constants.swing_kp = swing_kp;
+    constants.swing_ki = swing_ki;
+    constants.swing_kd = swing_kd;
+    constants.swing_starti = swing_starti;
+    constants.swing_slew = swing_slew;
+} 
+
+void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout) {
+    constants.turn_settle_error = turn_settle_error;
+    constants.turn_settle_time = turn_settle_time;
+    constants.turn_large_settle_error = turn_large_settle_error;
+    constants.turn_large_settle_time = turn_large_settle_time;
+    constants.turn_timeout = turn_timeout;
+}
+
+void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout) {
+    constants.drive_settle_error = drive_settle_error;
+    constants.drive_settle_time = drive_settle_time;
+    constants.drive_large_settle_error = drive_large_settle_error;
+    constants.drive_large_settle_time = drive_large_settle_time;
+    constants.drive_timeout = drive_timeout;
+}
+
+void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout) {
+    constants.swing_settle_error = swing_settle_error;
+    constants.swing_settle_time = swing_settle_time;
+    constants.swing_large_settle_error = swing_large_settle_error;
+    constants.swing_large_settle_time = swing_large_settle_time;
+    constants.swing_timeout = swing_timeout;
+}
+
+
+void Chassis::set_tracking_offsets(float forward_tracker_center_distance, float sideways_tracker_center_distance) {
+    odom.set_physical_distances(forward_tracker_center_distance, sideways_tracker_center_distance);
+}
+
+void Chassis::set_brake_type(vex::brakeType brake) {
+    left_drive.setStopping(brake);
+    right_drive.setStopping(brake);
+    chassis.stop_behavior = brake;
 }
