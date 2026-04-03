@@ -33,6 +33,8 @@ void test_odom_full();
 /** @brief Robot should drive in curves and end in starting position. */
 void test_boomerang();
 
+void test_motion_chaining();
+
 /**
  * @brief Enables a PID tuner suite.
  * `test_drive()` can be run on controller and Actual and Setpoint values will be graphed on brain.

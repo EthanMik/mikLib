@@ -22,8 +22,8 @@ void test_turn() {
 	chassis.turn_to_angle(30);
 	chassis.turn_to_angle(90);
 	chassis.turn_to_angle(225);
-	chassis.turn_to_angle(180, { .turn_direction = ccw });
-	chassis.turn_to_angle(359, { .turn_direction = cw });
+	chassis.turn_to_angle(180, { .direction = ccw });
+	chassis.turn_to_angle(359, { .direction = cw });
 }
 
 void test_swing() {
@@ -60,8 +60,8 @@ void test_odom_turn() {
 	chassis.turn_to_point(2.887,  5);
 	chassis.turn_to_point(5, 0);
 	chassis.turn_to_point(-5, -5);
-	chassis.turn_to_point(0,  -5, {.turn_direction = ccw});
-	chassis.turn_to_point(0,  5, {.turn_direction = cw});
+	chassis.turn_to_point(0,  -5, { .direction = ccw});
+	chassis.turn_to_point(0,  5, { .direction = cw});
 }
 
 void test_odom_swing() {	
@@ -84,9 +84,28 @@ void test_boomerang() {
     chassis.set_coordinates(0, 0, 0);
 
     chassis.drive_to_pose(24, 24, 90);
-    chassis.drive_to_pose(24, 0, 270);
-    chassis.drive_to_pose(0, 24, 290);
+    chassis.drive_to_pose(24, 0, 270, { .direction = fwd });
+    chassis.drive_to_pose(0, 24, 290, { .direction = fwd });
     chassis.drive_to_pose(0, 0, 0);
+}
+
+void test_motion_chaining() {
+    chassis.set_coordinates(0, 0, 0);
+
+	constants.drive_min_voltage = 4;
+	constants.turn_min_voltage = 4;
+
+	constants.turn_exit_error = 2;
+	constants.drive_exit_error = 2;
+	
+    chassis.drive_to_pose(24, 24, 90);
+    chassis.drive_to_point(24, 0);
+    chassis.turn_to_point(0, 24, { .angle_offset = 180 });
+    chassis.drive_to_point(0, 24);
+    chassis.drive_to_point(0, 0);
+    chassis.turn_to_angle(0);
+
+	chassis.stop_drive(); // When min speed is above 0, make sure to stop the drivetrain
 }
 
 pid_data data;

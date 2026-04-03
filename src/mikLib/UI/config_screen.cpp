@@ -189,7 +189,9 @@ void UI_config_screen::UI_crt_config_scr() {
     // Runs a boomerang test
     add_button(slot::TEST, "Test Boomerng", [](){ test_boomerang(); });
 
-    
+    // Runs a motion chaininng test
+    add_button(slot::TEST, "Test Chaining", [](){ test_motion_chaining(); });
+
     add_button(slot::TEST, "Test Vel/Accel", [](){ config_measure_velocity_accel(); });
 
     for (const auto& component : UI_config_scr->get_UI_components()) {
