@@ -92,18 +92,20 @@ void test_boomerang() {
 void test_motion_chaining() {
     chassis.set_coordinates(0, 0, 0);
 
-	constants.drive_min_voltage = 4;
-	constants.turn_min_voltage = 4;
-
-	constants.turn_exit_error = 2;
-	constants.drive_exit_error = 2;
+	/* You can do it this way if you want default values */
 	
-    chassis.drive_to_pose(24, 24, 90);
-    chassis.drive_to_point(24, 0);
-    chassis.turn_to_point(0, 24, { .angle_offset = 180 });
-    chassis.drive_to_point(0, 24);
-    chassis.drive_to_point(0, 0);
-    chassis.turn_to_angle(0);
+	// constants.drive_min_voltage = 4;
+	// constants.turn_min_voltage = 4;
+
+	// constants.turn_exit_error = 2;
+	// constants.drive_exit_error = 2;
+	
+    chassis.drive_to_pose(24, 24, 90, { .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(24, 0, { .exit_error = 2, .min_voltage = 4 });
+    chassis.turn_to_point(0, 24, { .angle_offset = 180, .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(0, 24, { .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(0, 0, { .exit_error = 2, .min_voltage = 4 });
+    chassis.turn_to_angle(0, { .exit_error = 2, .min_voltage = 4 });
 
 	chassis.stop_drive(); // When min speed is above 0, make sure to stop the drivetrain
 }
