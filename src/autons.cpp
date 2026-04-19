@@ -225,7 +225,6 @@ std::string skills(bool calibrate, auto_variation var, bool get_name) {
         return "";
     }
 
-    chassis.turn_to_angle(180);
     // Place start of autonoumous here
 
     return "";
