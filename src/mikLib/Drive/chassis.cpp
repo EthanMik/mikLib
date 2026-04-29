@@ -26,8 +26,6 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     wheel_diameter(wheel_diameter),
     drivetrain_rpm(drivetrain_rpm),
 
-    drive_in_to_deg_ratio(0),
-
     forward_tracker_diameter(forward_tracker_diameter),
     forward_tracker_center_distance(forward_tracker_center_distance),
     forward_tracker_inch_to_deg_ratio(M_PI * forward_tracker_diameter / 360.0),
@@ -36,14 +34,6 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     sideways_tracker_center_distance(sideways_tracker_center_distance),
     sideways_tracker_inch_to_deg_ratio(M_PI * sideways_tracker_diameter / 360.0)
 {
-    float motor_rpm;
-    switch (right_drive.getMotors()[0].gear_cartridge()) {
-        case vex::gearSetting::ratio6_1:  motor_rpm = 600; break;
-        case vex::gearSetting::ratio18_1: motor_rpm = 200; break;
-        case vex::gearSetting::ratio36_1: motor_rpm = 100; break;
-    }
-    drive_in_to_deg_ratio = (drivetrain_rpm / motor_rpm) / 360.0 * M_PI * fabs(wheel_diameter);
-
     odom.set_physical_distances(
         tracker_mode == mik::tracker_mode::MOTOR_ENCODER ? 0 : forward_tracker_center_distance, 
         sideways_tracker_center_distance
@@ -142,17 +132,45 @@ float Chassis::get_motor_encoder_position() {
 }
 
 float Chassis::get_left_drive_position(int index) {
-    if (index == -1) {
-        return left_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
-    }
-    return left_drive.getMotors()[index].position(deg) * drive_in_to_deg_ratio; 
+    auto mtrs = left_drive.getMotors();
+
+    auto motor_pos_inches = [&](mik::motor& mtr) {
+        float motor_rpm;
+        switch (mtr.gear_cartridge()) {
+            case vex::gearSetting::ratio6_1:  motor_rpm = 600; break;
+            case vex::gearSetting::ratio18_1: motor_rpm = 200; break;
+            case vex::gearSetting::ratio36_1: motor_rpm = 100; break;
+        }
+        return mtr.position(deg) * (drivetrain_rpm / motor_rpm) / 360.0 * M_PI * fabs(wheel_diameter);
+    };
+
+    if (index > 0 && index < (int)mtrs.size())
+        return motor_pos_inches(mtrs[index]);
+
+    float average_position = 0;
+    for (auto& mtr : mtrs) average_position += motor_pos_inches(mtr);
+    return average_position / mtrs.size();
 }
 
 float Chassis::get_right_drive_position(int index) {
-    if (index == -1) {
-        return right_drive.averagePosition(deg) * drive_in_to_deg_ratio; 
-    }
-    return right_drive.getMotors()[index].position(deg) * drive_in_to_deg_ratio; 
+    auto mtrs = right_drive.getMotors();
+
+    auto motor_pos_inches = [&](mik::motor& mtr) {
+        float motor_rpm;
+        switch (mtr.gear_cartridge()) {
+            case vex::gearSetting::ratio6_1:  motor_rpm = 600; break;
+            case vex::gearSetting::ratio18_1: motor_rpm = 200; break;
+            case vex::gearSetting::ratio36_1: motor_rpm = 100; break;
+        }
+        return mtr.position(deg) * (drivetrain_rpm / motor_rpm) / 360.0 * M_PI * fabs(wheel_diameter);
+    };
+
+    if (index > 0 && index < (int)mtrs.size())
+        return motor_pos_inches(mtrs[index]);
+
+    float average_position = 0;
+    for (auto& mtr : mtrs) average_position += motor_pos_inches(mtr);
+    return average_position / mtrs.size();
 } 
 
 float Chassis::get_forward_tracker_position() {

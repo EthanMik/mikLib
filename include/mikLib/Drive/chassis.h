@@ -550,7 +550,6 @@ private:
 
     float wheel_diameter;
     float drivetrain_rpm;
-    float drive_in_to_deg_ratio;
 
     float forward_tracker_diameter;
     float forward_tracker_center_distance;
