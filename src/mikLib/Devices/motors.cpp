@@ -378,3 +378,18 @@ float mik::motor_group::to_volt(float voltage, vex::voltageUnits velocityUnits) 
 std::vector<mik::motor>& mik::motor_group::getMotors() {
     return motors;
 }
+
+mik::motor_group mik::motor_group::getMotorsKeyword(const std::string& keyword) {
+    std::string lowerKeyword = keyword;
+    std::transform(lowerKeyword.begin(), lowerKeyword.end(), lowerKeyword.begin(), ::tolower);
+
+    std::vector<mik::motor> matched;
+    for (auto& mtr : motors) {
+        std::string lowerName = mtr.name();
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        if (lowerName.find(lowerKeyword) != std::string::npos) {
+            matched.push_back(mtr);
+        }
+    }
+    return mik::motor_group(matched);
+}

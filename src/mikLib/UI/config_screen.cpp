@@ -106,7 +106,6 @@ void UI_config_screen::UI_crt_config_scr() {
         auton_scr->save_auton_SD(); 
     });
 
-    // Spins each motor forwards for half a second
     add_button(slot::MACRO, "Motor Menu", [](){ 
         UI_select_scr({motors_scr->get_motors_screen()});
         disable_user_control();
@@ -192,7 +191,7 @@ void UI_config_screen::UI_crt_config_scr() {
     // Runs a motion chaininng test
     add_button(slot::TEST, "Test Chaining", [](){ test_motion_chaining(); });
 
-    add_button(slot::TEST, "Test Vel/Accel", [](){ config_measure_velocity_accel(); });
+    add_button(slot::TEST, "Test Holonomic", [](){ test_holonomic(); });
 
     for (const auto& component : UI_config_scr->get_UI_components()) {
         component->set_y_pos(component->get_y_pos() - 45);

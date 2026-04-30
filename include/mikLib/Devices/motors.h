@@ -305,6 +305,12 @@ public:
      */   
     std::vector<mik::motor>& getMotors();
 
+    /** 
+     * @param keyword The keyword to use to search for motors inside the group
+     * @return The wrapped vex motors inside of a vector that names match the keyword
+     */   
+    mik::motor_group getMotorsKeyword(const std::string& keyword);
+
 
 private:
 

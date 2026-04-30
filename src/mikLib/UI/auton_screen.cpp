@@ -35,9 +35,7 @@ void UI_auton_screen::queue_autons(bool calibrating, bool set_description) {
 }
 
 UI_auton_screen::UI_auton_screen() {
-#ifndef FAST_COMPILE
     UI_crt_auton_scr();
-#endif
 }
 
 std::shared_ptr<screen> UI_auton_screen::get_auton_screen() {
@@ -88,19 +86,34 @@ void UI_auton_screen::start_auton_test() {
 void UI_auton_screen::exit_auton_task() {
     controller_scr_input = vex::task([](){
     auton_scr->input_overlay = true;
+    bool user_ctrl_enabled = false;
     while (auton_scr->input_overlay) {
         if (!auton_scr->auto_running && auton_scr->end_card) {
-            Controller.Screen.setCursor(1, 1);
-            Controller.Screen.print("    Auton Finished");
-            Controller.Screen.setCursor(2, 1);
-            Controller.Screen.print(("   " + to_string_float(((Brain.Timer.time(vex::timeUnits::msec) - auton_scr->auto_start_time ) / 1000.0f), 3) + " sec elapsed").c_str());
-            Controller.Screen.setCursor(3, 1);
-            Controller.Screen.print("     Control Enabled");
-            enable_user_control();
-            auton_scr->end_card = false;
+            if (auton_scr->odom_display) {
+                if (!user_ctrl_enabled) {
+                    enable_user_control();
+                    user_ctrl_enabled = true;
+                }
+                Controller.Screen.setCursor(1, 1);
+                Controller.Screen.print(("Theta: " + to_string_float(chassis.get_absolute_heading())).c_str());
+                Controller.Screen.setCursor(2, 1);
+                Controller.Screen.print(("X: "+ to_string_float(chassis.get_X_position())).c_str());
+                Controller.Screen.setCursor(3, 1);
+                Controller.Screen.print(("Y: " + to_string_float(chassis.get_Y_position())).c_str());
+            } else {
+                Controller.Screen.setCursor(1, 1);
+                Controller.Screen.print("    Auton Finished");
+                Controller.Screen.setCursor(2, 1);
+                Controller.Screen.print(("   " + to_string_float(((Brain.Timer.time(vex::timeUnits::msec) - auton_scr->auto_start_time ) / 1000.0f), 3) + " sec elapsed").c_str());
+                Controller.Screen.setCursor(3, 1);
+                Controller.Screen.print("     Control Enabled");
+                enable_user_control();
+                auton_scr->end_card = false;
+            }
         }
         if (btnB_new_press(Controller.ButtonB.pressing())) {
             if (!auton_scr->auto_running) {
+                auton_scr->end_card = false;
                 auton_scr->restart_controller_overlay();
                 disable_user_control(true);
             } else {
@@ -290,8 +303,8 @@ void UI_auton_screen::UI_crt_auton_scr() {
         off_sawp_tgl_lbl, off_sawp_tgl_txt, red_blue_tgl, rings_goal_tgl, quals_elims_tgl, 
         off_sawp_tgl, show_alignment_btn, prev_auto_var_btn, auto_var_num_txt_, description_box_btn, description_box, heading_btn, label_label, heading_lbl, x_lbl, y_lbl});
     
-    set_description();
 #endif
+    set_description();
 }
 
 void UI_auton_screen::update_var_display() {

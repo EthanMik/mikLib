@@ -8,7 +8,7 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
     turn_type_buffer = type;
 
     // Create PID; exit error is only applied if min voltage is non zero
-    pid = PID(p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.large_settle_error, p.large_settle_time, p.min_voltage > 0 ? p.exit_error : 0, p.timeout);
+    pid = PID(p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.exit_error, p.timeout);
 
     motion_running = true;
     active_min_voltage = p.min_voltage;

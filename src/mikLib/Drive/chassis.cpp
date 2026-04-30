@@ -111,6 +111,10 @@ float Chassis::get_absolute_heading(){
     return reduce_0_to_360(inertial.rotation() * 360.0 / inertial_scale); 
 }
 
+float Chassis::get_rotation() {
+    return inertial.rotation() * 360.0 / inertial_scale;
+}
+
 void Chassis::mirror_all_auton_x_pos() {
     x_pos_mirrored_ = true;
 }
@@ -322,6 +326,40 @@ void Chassis::tank_curved() {
     left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
     right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
+ 
+static mik::motor_group left_front_motors = chassis.left_drive.getMotorsKeyword("front");
+static mik::motor_group left_back_motors = chassis.left_drive.getMotorsKeyword("back");
+static mik::motor_group right_front_motors = chassis.right_drive.getMotorsKeyword("front");
+static mik::motor_group right_back_motors = chassis.right_drive.getMotorsKeyword("back");
+
+void Chassis::split_arcade_holonomic() {
+    float throttle = deadband(controller(primary).Axis3.value(), 5);
+    float turn = deadband(controller(primary).Axis1.value(), 5);
+    float strafe = deadband(controller(primary).Axis4.value(), 5);
+
+    left_front_motors.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
+    left_back_motors.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
+
+    right_front_motors.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
+    right_back_motors.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
+}
+
+void Chassis::field_centric_holonomic() {
+    float forward = deadband(controller(primary).Axis3.value(), 5);
+    float turn = deadband(controller(primary).Axis1.value(), 5);
+    float strafe = deadband(controller(primary).Axis4.value(), 5);
+
+    float angle = to_rad(get_absolute_heading());
+
+    float throttle = forward * cos(angle) + strafe * sin(angle);
+    strafe = -forward * sin(angle) + strafe * cos(angle);
+
+    left_front_motors.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
+    left_back_motors.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
+    
+    right_front_motors.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
+    right_back_motors.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
+}
 
 void Chassis::control(drive_mode dm) {
     if (control_disabled) { 
@@ -331,18 +369,12 @@ void Chassis::control(drive_mode dm) {
     selected_drive_mode = dm;
 
     switch (dm) {
-        case drive_mode::SPLIT_ARCADE:
-            split_arcade();
-            return;
-        case drive_mode::SPLIT_ARCADE_CURVED:
-            split_arcade_curved();
-            return;
-        case drive_mode::TANK:
-            tank();
-            return;
-        case drive_mode::TANK_CURVED:
-            tank_curved();
-            return;
+        case drive_mode::SPLIT_ARCADE: return split_arcade();
+        case drive_mode::SPLIT_ARCADE_CURVED: return split_arcade_curved();
+        case drive_mode::TANK: return tank();
+        case drive_mode::TANK_CURVED: return tank_curved();
+        case drive_mode::FIELD_CENTRIC_HOLONOMIC: return field_centric_holonomic();
+        case drive_mode::SPLIT_ARCADE_HOLONOMIC: return split_arcade_holonomic();
     }
 }
 
@@ -393,27 +425,21 @@ void Chassis::set_swing_constants(float swing_max_voltage, float swing_kp, float
     constants.swing_slew = swing_slew;
 } 
 
-void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout) {
+void Chassis::set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout) {
     constants.turn_settle_error = turn_settle_error;
     constants.turn_settle_time = turn_settle_time;
-    constants.turn_large_settle_error = turn_large_settle_error;
-    constants.turn_large_settle_time = turn_large_settle_time;
     constants.turn_timeout = turn_timeout;
 }
 
-void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout) {
+void Chassis::set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_timeout) {
     constants.drive_settle_error = drive_settle_error;
     constants.drive_settle_time = drive_settle_time;
-    constants.drive_large_settle_error = drive_large_settle_error;
-    constants.drive_large_settle_time = drive_large_settle_time;
     constants.drive_timeout = drive_timeout;
 }
 
-void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout) {
+void Chassis::set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_timeout) {
     constants.swing_settle_error = swing_settle_error;
     constants.swing_settle_time = swing_settle_time;
-    constants.swing_large_settle_error = swing_large_settle_error;
-    constants.swing_large_settle_time = swing_large_settle_time;
     constants.swing_timeout = swing_timeout;
 }
 

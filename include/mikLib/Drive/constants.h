@@ -17,8 +17,6 @@ struct Constants {
     float drive_exit_error = 0; // Error to exit drive motion in inches.
     float drive_settle_error; // Error to be considered settled in inches.
     float drive_settle_time; // Time to be considered settled in milliseconds.
-    float drive_large_settle_error; // Error to be considered large settled in inches.
-    float drive_large_settle_time; // Time to be considered large settled in milliseconds.
     float drive_timeout; // Time before quitting and move on in milliseconds.
 
     float heading_max_voltage; // Max voltage out of 12.
@@ -42,8 +40,6 @@ struct Constants {
     float turn_exit_error = 0; // Error to exit turn motion in inches.
     float turn_settle_error; // Error to be considered settled in degrees.
     float turn_settle_time; // Time to be considered settled in milliseconds.
-    float turn_large_settle_error; // Error to be considered large settled in inches.
-    float turn_large_settle_time; // Time to be considered settled by large error in milliseconds.
     float turn_timeout; // Time before quitting and move on in milliseconds.
 
     // Swing constants, turning with one side of drivetrain
@@ -61,8 +57,6 @@ struct Constants {
     float swing_exit_error; // Error to exit swing motion in inches.
     float swing_settle_error; // Error to be considered settled in degrees.
     float swing_settle_time; // Time to be considered settled in milliseconds.
-    float swing_large_settle_error; // Error to be considered large settled in degrees.
-    float swing_large_settle_time; // Time to be considered large settled in milliseconds.
     float swing_timeout; // Time before quitting and move on in milliseconds.
     
     // Drive to pose constants, (boomerang controller).
@@ -128,8 +122,6 @@ struct drive_distance_params {
     float exit_error = constants.drive_exit_error;
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
-    float large_settle_error = constants.drive_large_settle_error;
-    float large_settle_time = constants.drive_large_settle_time;
     float timeout = constants.drive_timeout;
     float slew = constants.drive_slew;
     float heading_slew = constants.heading_slew;
@@ -145,8 +137,6 @@ struct turn_to_angle_params {
     float exit_error = constants.turn_exit_error;
     float settle_error = constants.turn_settle_error;
     float settle_time = constants.turn_settle_time;
-    float large_settle_error = constants.turn_large_settle_error;
-    float large_settle_time = constants.turn_large_settle_time;
     float timeout = constants.turn_timeout;
     float slew = constants.turn_slew;
     bool wait = true;
@@ -161,8 +151,6 @@ struct swing_to_angle_params {
     float exit_error = constants.swing_exit_error;
     float settle_error = constants.swing_settle_error;
     float settle_time = constants.swing_settle_time;
-    float large_settle_error = constants.swing_large_settle_error;
-    float large_settle_time = constants.swing_large_settle_time;
     float timeout = constants.swing_timeout;
     float slew = constants.swing_slew;
     bool wait = true;
@@ -176,8 +164,24 @@ struct drive_to_point_params {
     float exit_error = constants.drive_exit_error;
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
-    float large_settle_error = constants.drive_large_settle_error;
-    float large_settle_time = constants.drive_large_settle_time;
+    float timeout = constants.drive_timeout;
+    float slew = constants.drive_slew;
+    float heading_slew = constants.heading_slew;
+
+    bool wait = true;
+    drive_constants drive_k = drive_constants{};
+    heading_constants heading_k = heading_constants{};
+};
+
+struct holonomic_to_pose_params {
+    float min_voltage = constants.drive_min_voltage;
+    float max_voltage = constants.drive_max_voltage;
+    float heading_max_voltage = constants.heading_max_voltage;
+    float exit_error = constants.drive_exit_error;
+    float settle_error = constants.drive_settle_error;
+    float settle_time = constants.drive_settle_time;
+    float turn_settle_error = constants.turn_settle_error;
+    float turn_settle_time = constants.turn_settle_time;
     float timeout = constants.drive_timeout;
     float slew = constants.drive_slew;
     float heading_slew = constants.heading_slew;
@@ -197,8 +201,6 @@ struct drive_to_pose_params {
     float exit_error = constants.drive_exit_error;
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
-    float large_settle_error = constants.drive_large_settle_error;
-    float large_settle_time = constants.drive_large_settle_time;
     float timeout = constants.drive_timeout;
     float slew = constants.drive_slew;
     bool wait = true;
@@ -214,8 +216,6 @@ struct turn_to_point_params {
     float exit_error = constants.turn_exit_error;
     float settle_error = constants.turn_settle_error;
     float settle_time = constants.turn_settle_time;
-    float large_settle_error = constants.turn_large_settle_error;
-    float large_settle_time = constants.turn_large_settle_time;
     float timeout = constants.turn_timeout;
     float slew = constants.turn_slew;
     bool wait = true;
@@ -231,8 +231,6 @@ struct swing_to_point_params {
     float exit_error = constants.swing_exit_error;
     float settle_error = constants.swing_settle_error;
     float settle_time = constants.swing_settle_time;
-    float large_settle_error = constants.swing_large_settle_error;
-    float large_settle_time = constants.swing_large_settle_time;
     float timeout = constants.swing_timeout;
     float slew = constants.swing_slew;
     bool wait = true;

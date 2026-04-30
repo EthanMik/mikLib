@@ -1,46 +1,53 @@
 #include "vex.h"
 
+vex::brain Brain;
+vex::controller Controller;
+
 // mikLib v2.0 setup, if you are following along with video tutorials it is going to be slightly different
 
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT11, true, blue_6_1, "left front motor"),
-        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
-        mik::motor(PORT13, true, blue_6_1, "left back motor"),
+        mik::motor(PORT11, false, blue_6_1, "left front motor"), // For holonomic drives, you must include "front" and "back" for the motor names
+        mik::motor(PORT12, false, blue_6_1, "left front motor"),
+        mik::motor(PORT19, false, blue_6_1, "left back motor"),
+        mik::motor(PORT20, false, blue_6_1, "left back motor"),
+        mik::motor(PORT13, false, blue_6_1, "left middle motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT2, false, blue_6_1, "right front motor"),
-        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
-        mik::motor(PORT6, false, blue_6_1, "right back motor"),
+        mik::motor(PORT14, true, blue_6_1, "right front motor"),
+        mik::motor(PORT15, true, blue_6_1, "right front motor"),
+        mik::motor(PORT17, true, blue_6_1, "right back motor"),
+        mik::motor(PORT18, true, blue_6_1, "right back motor"),
+        mik::motor(PORT16, true, blue_6_1, "right middle motor"),
     }),
 	
-    PORT3,  // Inertial sensor port
-    360,    // Inertial scale (reading after a full 360° turn)
+    PORT1,  // Inertial sensor port
+    356,    // Inertial scale (rotation reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
     3.05,   // Drivetrain wheel diameter (in). Negative flips direction.
     355.55,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
 
-    PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
-    -2.5,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
-    0,    // Forward tracker center distance (in). Positive = right of center, negative = left.
+    PORT_E,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    -2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    3.11,    // Forward tracker center distance (in). Positive = right of center, negative = left.
 
-    PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
-    -1,     // Sideways tracker center distance (in). Positive = behind center, negative = in front.
+    PORT_G,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
+    -2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
+    2.11,     // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
         mik::distance(
-			PORT10,		   // Distance sensor port
-            front_sensor,  // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
-            3,             // X offset from tracking center (in). Positive = right of center, negative = left. 
-            -4             // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+			PORT5,		   // Distance sensor port
+            rear_sensor,  // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
+            0,             // X offset from tracking center (in). Positive = right of center, negative = left. 
+            0             // Y offset from tracking center (in). Positive = in front of center, negative = behind.
         ),
-        mik::distance(PORT11, right_sensor, 4, -5),
-
+        mik::distance(PORT3, left_sensor, -6.15, 4),
+        mik::distance(PORT4, right_sensor, 3.66, 4),
     })
 );
 
@@ -70,8 +77,6 @@ Chassis chassis(
 
 // Assembly assembly;
 Constants constants;
-vex::brain Brain;
-vex::controller Controller;
 vex::competition Competition;
 
 static void loading_screen(bool stop) {

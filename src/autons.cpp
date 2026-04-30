@@ -10,10 +10,10 @@ void default_constants() {
     chassis.set_turn_constants(12, .4, .03, 3, 15, 0);
     chassis.set_swing_constants(12, .4, .01, 2, 15, 0);
 
-    // Each exit condition set is in the form of (settle_error, settle_time, large_settle_error, large_settle_time, timeout).
-    chassis.set_turn_exit_conditions(1, 100, 3, 500, 3000);
-    chassis.set_drive_exit_conditions(1, 100, 3, 500, 5000);
-    chassis.set_swing_exit_conditions(1, 100, 3, 500, 3000);
+    // Each exit condition set is in the form of (settle_error, settle_time, timeout).
+    chassis.set_turn_exit_conditions(1, 200, 3000);
+    chassis.set_drive_exit_conditions(2, 200, 5000);
+    chassis.set_swing_exit_conditions(1, 200, 3000);
 
     constants.boomerang_lead = .5;
     constants.boomerang_drift = 2;
@@ -33,8 +33,11 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
 
         return "";
     }    
-    // Place start of autonoumous here
 
+    chassis.turn_to_angle(180, { .max_voltage = 3, .settle_error = .1, .settle_time = 1000 });
+
+    // Place start of autonoumous here
+    
     return "";
 }
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) {

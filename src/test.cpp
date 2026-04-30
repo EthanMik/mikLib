@@ -107,7 +107,21 @@ void test_motion_chaining() {
     chassis.drive_to_point(0, 0, { .exit_error = 2, .min_voltage = 4 });
     chassis.turn_to_angle(0, { .exit_error = 2, .min_voltage = 4 });
 
-	chassis.stop_drive(); // When min speed is above 0, make sure to stop the drivetrain
+	chassis.stop_drive(hold); // When min speed is above 0, make sure to stop the drivetrain
+}
+
+void test_holonomic() {
+	// For holonomic drivetrains you can run faster speeds since they are generally slower
+    constants.drive_max_voltage = 11;
+	constants.heading_max_voltage = 12;
+    constants.drive_slew = 0;
+
+	chassis.set_coordinates(0, 0, 0);
+
+	chassis.holonomic_to_pose(0, 24, 270);
+	chassis.holonomic_to_pose(24, 0, 180);
+	chassis.holonomic_to_pose(24, 24, 90);
+	chassis.holonomic_to_pose(0, 0, 0);
 }
 
 pid_data data;
@@ -831,7 +845,8 @@ void config_measure_velocity_accel() {
 
         console_scr->add("Max Drive Velocity: ", [max_drive_vel](){ return to_string_float(max_drive_vel, 3, false) + " ft/s"; });
         console_scr->add("Drive Time Constant: ", [drive_time_constant](){ return to_string_float(drive_time_constant, 4, false) + " s"; });
-		
+
+		console_scr->add("Max Turn Velocity: ", [max_turn_vel](){ return to_string_float(max_turn_vel, 3, false) + " deg/s"; });
         console_scr->add("Turn Time Constant: ", [turn_time_constant](){ return to_string_float(turn_time_constant, 4, false) + " s"; });
 
 		auto print_unit_time = [](const std::vector<data> unit_time){
@@ -878,7 +893,7 @@ void config_measure_distance_reset_offsets() {
 		};
 
 		const float iterations = 10.0;
-		const float bracket = 15.0;
+		const float bracket = 30.0;
 		const float cardinals[] = { 0.0, 90.0, 180.0, 270.0 };
 		const float facing_offsets[] = { 0.0, 270.0, 180.0, 90.0 };
 
@@ -963,14 +978,13 @@ void config_measure_odometry_offsets() {
 			chassis.sideways_tracker.resetPosition();
 			chassis.right_drive.resetPosition();
 	
-			float start_heading = chassis.inertial.rotation();
+			float start_heading = chassis.get_rotation();
 			float target = i % 2 == 0 ? 90 : 270;
 	
-			chassis.turn_to_angle(target, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			chassis.turn_to_angle(target, { .max_voltage = 4, .settle_error = .5, .settle_time = 500 });
 			task::sleep(250);
 	
-			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
-	
+			float t_delta = to_rad(reduce_negative_180_to_180(chassis.get_rotation() - start_heading));
 	
 			float f_delta = chassis.get_forward_tracker_position();
 			float s_delta = chassis.get_sideways_tracker_position();

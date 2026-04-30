@@ -33,7 +33,11 @@ void test_odom_full();
 /** @brief Robot should drive in curves and end in starting position. */
 void test_boomerang();
 
+/** @brief Robot should chain through motions quickly and end in starting position */
 void test_motion_chaining();
+
+/** @brief Robot should turn in place driving to corners and return in its starting position */
+void test_holonomic();
 
 /**
  * @brief Enables a PID tuner suite.

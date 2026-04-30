@@ -14,10 +14,12 @@ namespace mik {
 // Drive Globals
     /** @brief Enumerates the available driver‑control schemes. */
     enum class drive_mode {
-        SPLIT_ARCADE,         // Left stick Y, right stick X
-        SPLIT_ARCADE_CURVED,  // Split arcade with curved turns (from lemlib)
-        TANK,                 // Tank drive
-        TANK_CURVED,          // Tank drive with curved turn (from lemlib)
+        SPLIT_ARCADE,            // Left stick Y, right stick X
+        SPLIT_ARCADE_CURVED,     // Split arcade with curved turns (from lemlib)
+        TANK,                    // Tank drive
+        TANK_CURVED,             // Tank drive with curved turn (from lemlib)
+        FIELD_CENTRIC_HOLONOMIC, // Field centric driving for holonomic drivetrains
+        SPLIT_ARCADE_HOLONOMIC   // Split Arcade that allows strafing
     };
 
     /** @brief Explicitly specifies rotation direction when turning or swinging. */

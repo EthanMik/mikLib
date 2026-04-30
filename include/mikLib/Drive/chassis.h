@@ -106,11 +106,9 @@ public:
      * 
      * @param turn_settle_error Error to be considered settled in degrees.
      * @param turn_settle_time Time to be considered settled in milliseconds.
-     * @param turn_large_settle_error Error to be considered large settled in inches.
-     * @param turn_large_settle_time Time to be considered settled by large error in milliseconds.
      * @param turn_timeout Time before quitting and move on in milliseconds.
      */
-    void set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_large_settle_error, float turn_large_settle_time, float turn_timeout);
+    void set_turn_exit_conditions(float turn_settle_error, float turn_settle_time, float turn_timeout);
 
     /**
      * @brief Resets default drive exit conditions.
@@ -119,11 +117,9 @@ public:
      *
      * @param drive_settle_error Error to be considered settled in inches.
      * @param drive_settle_time Time to be considered settled in milliseconds.
-     * @param drive_large_settle_error Error to be considered large settled in inches.
-     * @param drive_large_settle_time Time to be considered large settled in milliseconds.
      * @param drive_timeout Time before quitting and move on in milliseconds.
      */
-    void set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_large_settle_error, float drive_large_settle_time, float drive_timeout);
+    void set_drive_exit_conditions(float drive_settle_error, float drive_settle_time, float drive_timeout);
 
     /**
      * @brief Resets default swing exit conditions.
@@ -132,11 +128,9 @@ public:
      *
      * @param swing_settle_error Error to be considered settled in degrees.
      * @param swing_settle_time Time to be considered settled in milliseconds.
-     * @param swing_large_settle_error Error to be considered large settled in degrees.
-     * @param swing_large_settle_time Time to be considered large settled in milliseconds.
      * @param swing_timeout Time before quitting and move on in milliseconds.
      */
-    void set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_large_settle_error, float swing_large_settle_time, float swing_timeout);
+    void set_swing_exit_conditions(float swing_settle_error, float swing_settle_time, float swing_timeout);
 
     /**
      * @brief Resets the tracking offsets. Used for when robots center of rotation changes, ex: clamping onto a large game object.
@@ -193,6 +187,9 @@ public:
      */
     void calibrate_inertial();
 
+    /** @return inertial rotation scaled by inertial scale in deg. */
+    float get_rotation();
+
     /** @return Field‑relative inertial heading (deg, 0‑360). */
     float get_absolute_heading();
     
@@ -227,8 +224,6 @@ public:
      * @param max_voltage Max voltage on the drive out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
-     * @param large_settle_error Error to be considered large settled in degrees.
-     * @param large_settle_time Time to be considered settled by large error in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -250,8 +245,6 @@ public:
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
-     * @param large_settle_error Error to be considered large settled in inches.
-     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -375,8 +368,6 @@ public:
      * @param max_voltage Max voltage on the drive out of 12.
      * @param settle_error Error to be considered settled in degrees.
      * @param settle_time Time to be considered settled in milliseconds.
-     * @param large_settle_error Error to be considered large settled in degrees.
-     * @param large_settle_time Time to be considered settled by large error in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param k PID and starti constants. Do k. to access constants.
      * @param wait Yields program until motion has finished, true by default.
@@ -446,8 +437,6 @@ public:
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
-     * @param large_settle_error Error to be considered large settled in inches.
-     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -475,8 +464,6 @@ public:
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
      * @param settle_error Error to be considered settled in inches.
      * @param settle_time Time to be considered settled in milliseconds.
-     * @param large_settle_error Error to be considered large settled in inches.
-     * @param large_settle_time Time to be considered large settled in milliseconds.
      * @param timeout Time before quitting and move on in milliseconds.
      * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
      * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
@@ -484,16 +471,60 @@ public:
      */
     void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{});
 
+    /**
+     * @brief Drives and turns simultaneously to a desired pose on a holonomic chassis.
+     * Uses two PID loops — one for drive distance and one for heading — running concurrently
+     * so translation and rotation happen at the same time. The heading controller is optimized
+     * to turn the shorter direction. The motion exits only once both PID loops have settled:
+     * drive uses the drive exit conditions, heading uses the turn exit conditions.
+     * Drive gains come from drive_k and heading gains come from heading_k (defaults to heading constants).
+     *
+     * @param X_position Desired x position in inches.
+     * @param Y_position Desired y position in inches.
+     * @param angle Desired orientation in degrees.
+     * @param max_voltage Max voltage on the drive out of 12.
+     * @param heading_max_voltage Max voltage for heading correction out of 12.
+     * @param settle_error Drive error to be considered settled in inches.
+     * @param settle_time Drive time to be considered settled in milliseconds.
+     * @param turn_settle_error Turn Error to be considered settled in degrees.
+     * @param turn_settle_time Turn Time to be considered settled in milliseconds.
+     * @param timeout Time before quitting and moving on in milliseconds.
+     * @param drive_k Drive PID and starti constants.
+     * @param heading_k Heading PID and starti constants.
+     * @param wait Yields program until motion has finished, true by default.
+     */
+    void holonomic_to_pose(float X_position, float Y_position, float angle, holonomic_to_pose_params p = holonomic_to_pose_params{});
+
     /** @brief disables joystick control of the drivetrain */
     void disable_control();
     /** @brief enables joystick control of the drivetrain */
     void enable_control();
 
     // Drive control modes
+
+    /** @brief Drive using split-arcade layout: left stick (Axis3) for throttle, right stick (Axis1) for turn, with deadband applied. */
     void split_arcade();
+
+    /**
+     * @brief Drive using split-arcade layout with an exponential response curve applied to both throttle and turn axes.
+     * Desaturates combined output to stay within motor limits.
+     */
     void split_arcade_curved();
+
+    /** @brief Drive using tank layout: left stick (Axis3) controls left side, right stick (Axis2) controls right side, with deadband applied. */
     void tank();
+
+    /** @brief Drive using tank layout with an exponential response curve applied to each stick independently. */
     void tank_curved();
+
+    /**
+     * @brief Drive a holonomic (X-drive / mecanum) chassis with field-centric control.
+     * Joystick inputs are rotated by the current absolute heading so forward is always field-forward.
+     */
+    void field_centric_holonomic();
+
+    /** @brief Drive a holonomic chassis with robot-centric split-arcade control: Axis3 throttle, Axis1 turn, Axis4 strafe. */
+    void split_arcade_holonomic();
 
     /**
      * @brief Dispatch joystick input based on the selected drive mode.
@@ -536,6 +567,7 @@ public:
     drive_to_point_params drive_to_point_params_buffer{};
     drive_to_pose_params drive_to_pose_params_buffer{};
     drive_distance_params drive_distance_params_buffer{};
+    holonomic_to_pose_params holonomic_to_pose_params_buffer{};
 
 private:
     // Universal function for swinging and
