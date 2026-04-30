@@ -58,6 +58,12 @@ void Chassis::wait_until(float units, vex::percentUnits percent_units) {
     }
 } 
 
+void Chassis::wait_until_within(float units) {
+    while (distance_from_target > units && motion_running) {
+        task::sleep(10);
+    }
+}
+
 bool Chassis::is_in_motion() {
     return motion_running;
 }

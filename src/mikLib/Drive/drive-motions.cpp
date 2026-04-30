@@ -18,6 +18,7 @@ void Chassis::drive_distance(float distance, drive_distance_params p) {
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
     percent_traveled = 0;
+    distance_from_target = fabs(distance);
 
     drive_task = vex::task([](){
         // Read from global scope
@@ -40,6 +41,7 @@ void Chassis::drive_distance(float distance, drive_distance_params p) {
             drive_error = distance + drive_start_position - current_position;
             chassis.distance_traveled += fabs(drive_error - prev_drive_error);
             chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_from_target = fabs(drive_error);
             prev_drive_error = drive_error;
 
             float heading_error = reduce_negative_180_to_180(heading - chassis.get_absolute_heading());
@@ -90,6 +92,7 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
     percent_traveled = 0;
+    distance_from_target = hypot(X_position - get_X_position(), Y_position - get_Y_position());
 
     drive_task = vex::task([](){
         // Read from global scope
@@ -123,6 +126,7 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
             // Update distance traveled
             chassis.distance_traveled += fabs(drive_error - prev_drive_error);
             chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_from_target = drive_error;
             prev_drive_error = drive_error;
 
 
@@ -188,6 +192,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
     percent_traveled = 0;
+    distance_from_target = hypot(X_position - get_X_position(), Y_position - get_Y_position());
 
     drive_task = vex::task([](){
         const float forward_prioritization = 95; // How much the robot will prioritize going forward, > 90 means it will choose forward direction more by 5 degrees
@@ -263,6 +268,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
 
             chassis.distance_traveled += fabs(drive_error - prev_drive_error);
             chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_from_target = target_distance;
             prev_drive_error = drive_error;
 
             float drive_output = chassis.pid.compute(drive_error);
@@ -301,6 +307,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
     if (p.wait) { this->wait(); }
 }
 
+// Grab motor groups based on their names, this code is kinda sketchy but works without blowing up chassis constructor
 static mik::motor_group left_front_motors = chassis.left_drive.getMotorsKeyword("front");
 static mik::motor_group left_back_motors = chassis.left_drive.getMotorsKeyword("back");
 static mik::motor_group right_front_motors = chassis.right_drive.getMotorsKeyword("front");
@@ -315,11 +322,13 @@ void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle,
     holonomic_to_pose_params_buffer = p;
 
     pid = PID(p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, 0, p.timeout);
-    pid_2 = PID(p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti, p.turn_settle_error, p.turn_settle_time, p.exit_error, p.timeout);
+    pid_2 = PID(p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti, p.turn_settle_error, p.turn_settle_time, 0, p.timeout);
+    float target_distance = hypot(X_position - chassis.get_X_position(), Y_position - chassis.get_Y_position());
 
     motion_running = true;
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
+    distance_from_target = target_distance;
     percent_traveled = 0;
 
     drive_task = vex::task([](){
@@ -346,6 +355,7 @@ void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle,
             float turn_error = reduce_negative_180_to_180(angle - chassis.get_absolute_heading());
 
             chassis.distance_traveled += fabs(drive_error - prev_drive_error);
+            chassis.distance_from_target = drive_error;
             chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
             prev_drive_error = drive_error;
 

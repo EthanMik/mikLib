@@ -14,6 +14,7 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
     active_min_voltage = p.min_voltage;
     distance_traveled = 0;
     percent_traveled = 0;
+    distance_from_target = fabs(angle_error(target_angle - get_absolute_heading() + angle_offset, p.direction));
 
     drive_task = vex::task([](){
         // Read from global scope
@@ -43,6 +44,7 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
             if (p.min_voltage != 0 && sign(error) != sign(prev_error)) break;
             chassis.distance_traveled += fabs(error - prev_error);
             chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_from_target = fabs(error);
 
             prev_error = error;
 

@@ -157,10 +157,16 @@ public:
 
     /** 
      * @brief Yield to the scheduler until the current motion the robots in has traveled specifed units. 
-     * @param units units of motion.
+     * @param units units of motion (inches or degrees)
      * @param percent Uses a 0-100, with 0 being start and 100 being end of motion.
     */
     void wait_until(float units, vex::percentUnits percent_units);
+
+    /**
+     * @brief Yields to the scheduler until the current motion is within specified units of the the target.
+     * @param units units of motion (inches or degrees).
+     */
+    void wait_until_within(float units);
 
     /** @return True if the robot is in motion. */
     bool is_in_motion();
@@ -216,7 +222,8 @@ public:
     /**
      * @brief Turns the robot to a field-centric angle.
      * Optimizes direction, so it turns whichever way is closer to the 
-     * current heading of the robot, unless a turn direction is specified.
+     * current heading of the robot, unless a turn direction is specified. 
+     * Uses degrees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
@@ -236,7 +243,7 @@ public:
      * to drive at the opposite heading from the one given to get there faster.
      * You can control the heading, but if you choose not to, it will drive with the
      * heading it's currently facing. It uses forward tracker to find distance traveled. 
-     * Use negative distance to go backwards
+     * Use negative distance to go backwards. Uses inches for tracking distance.
      * 
      * @param distance Desired distance in inches.
      * @param heading Desired heading in degrees.
@@ -255,7 +262,7 @@ public:
     /**
      * Turns to a given angle with the left side of the drivetrain.
      * Like turn_to_angle(), is optimized for turning the shorter
-     * direction, unless a turn direction is specified
+     * direction, unless a turn direction is specified. Uses degreees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
@@ -275,7 +282,7 @@ public:
     /**
      * Turns to a given angle with the right side of the drivetrain.
      * Like turn_to_angle(), is optimized for turning the shorter
-     * direction, unless a turn direction is specified
+     * direction, unless a turn direction is specified. Uses degrees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
      * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
@@ -359,6 +366,7 @@ public:
      * angle_offset parameter turns the robot extra relative to the 
      * desired target. For example, if you want the back of your robot
      * to point at (36, 42), you would run turn_to_point(36, 42, {.angle_offset = 180}).
+     * Uses degrees for tracking distance.
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -380,6 +388,7 @@ public:
      * angle_offset parameter turns the robot extra relative to the 
      * desired target. For example, if you want the back of your robot
      * to point at (36, 42), you would run left_swing_to_point(36, 42, {.angle_offset = 180}).
+     * Uses degrees for tracking distance.
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -404,6 +413,7 @@ public:
      * angle_offset parameter turns the robot extra relative to the 
      * desired target. For example, if you want the back of your robot
      * to point at (36, 42), you would run right_swing_to_point(36, 42, {.angle_offset = 180}).
+     * Uses degrees for tracking distance.
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -428,7 +438,7 @@ public:
      * The drive error is the euclidean distance to the desired point, and the heading error
      * is the turn correction from the current heading to the desired point. Uses optimizations
      * like driving backwards whenever possible and scaling the drive output with the cosine
-     * of the angle to the point.
+     * of the angle to the point. Uses inches for tracking distance.
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -453,6 +463,7 @@ public:
      * try to reach the correct angle when drive error is low, and the robot will drive 
      * backwards to reach a pose if it's faster. .5 is a reasonable value for the lead. 
      * Try it out in a desmos simulation https://www.desmos.com/calculator/sptjw5szex.
+     * Uses inches for tracking distance.
      *
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -473,11 +484,12 @@ public:
 
     /**
      * @brief Drives and turns simultaneously to a desired pose on a holonomic chassis.
-     * Uses two PID loops — one for drive distance and one for heading — running concurrently
+     * Uses two PID loops, one for drive distance and one for heading, running concurrently
      * so translation and rotation happen at the same time. The heading controller is optimized
      * to turn the shorter direction. The motion exits only once both PID loops have settled:
      * drive uses the drive exit conditions, heading uses the turn exit conditions.
      * Drive gains come from drive_k and heading gains come from heading_k (defaults to heading constants).
+     * Uses inches for tracking distance.
      *
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
@@ -545,6 +557,7 @@ public:
     bool calibrating = false;
     bool motion_running;
     float distance_traveled;
+    float distance_from_target;
     float percent_traveled; // Percent of the current motion traveled, 0-100.
     float active_min_voltage = 0;
     
