@@ -8,8 +8,8 @@ vex::controller Controller;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT11, false, blue_6_1, "left front motor"), // For holonomic drives, you must include "front" and "back" for the motor names
-        mik::motor(PORT12, false, blue_6_1, "left front motor"),
+        mik::motor(PORT11, false, blue_6_1, "left front motor"), // For holonomic drivetrains, you must include "front" and "back" for the motor names
+        mik::motor(PORT12, false, blue_6_1, "left front motor"), // For 5.5W motors in the drivetrain use "green_18_1" for their cartridge
         mik::motor(PORT19, false, blue_6_1, "left back motor"),
         mik::motor(PORT20, false, blue_6_1, "left back motor"),
         mik::motor(PORT13, false, blue_6_1, "left middle motor"),
