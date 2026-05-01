@@ -9,9 +9,12 @@
   "files": [
     { "name": "include/vex.h", "type": "File", "specialType": "" },
     { "name": "include/assembly.h", "type": "File", "specialType": "" },
-    { "name": "include/autons.h", "type": "File", "specialType": "" },
     { "name": "include/robot-config.h", "type": "File", "specialType": "" },
     { "name": "include/test.h", "type": "File", "specialType": "" },
+
+    { "name": "include/autonomous/autons.h", "type": "File", "specialType": "" },
+    { "name": "include/autonomous/constants.h", "type": "File", "specialType": "" },
+    { "name": "include/autonomous/macros.h", "type": "File", "specialType": "" },
 
     { "name": "include/mikLib/globals.h", "type": "File", "specialType": "" },
     { "name": "include/mikLib/drive.h", "type": "File", "specialType": "" },
@@ -60,9 +63,26 @@
     { "name": "makefile", "type": "File", "specialType": "" },
     { "name": "src/main.cpp", "type": "File", "specialType": "" },
     { "name": "src/robot-config.cpp", "type": "File", "specialType": "device_config" },
-    { "name": "src/autons.cpp", "type": "File", "specialType": "" },
     { "name": "src/assembly.cpp", "type": "File", "specialType": "" },
     { "name": "src/test.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/autonomous/constants.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/macros.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/skills.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/autonomous/Blue/blue_left_elim.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Blue/blue_left_sawp.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Blue/blue_left_winpoint.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Blue/blue_right_elim.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Blue/blue_right_sawp.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Blue/blue_right_winpoint.cpp", "type": "File", "specialType": "" },
+
+    { "name": "src/autonomous/Red/red_left_elim.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Red/red_left_sawp.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Red/red_left_winpoint.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Red/red_right_elim.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Red/red_right_sawp.cpp", "type": "File", "specialType": "" },
+    { "name": "src/autonomous/Red/red_right_winpoint.cpp", "type": "File", "specialType": "" },
 
     { "name": "src/mikLib/Devices/distance.cpp", "type": "File", "specialType": "" },
     { "name": "src/mikLib/Devices/motors.cpp", "type": "File", "specialType": "" },
@@ -107,6 +127,7 @@
     { "name": "vex/mkrules.mk", "type": "File", "specialType": "" },
 
     { "name": "include", "type": "Directory" },
+    { "name": "include/autonomous", "type": "Directory" },
     { "name": "include/mikLib", "type": "Directory" },
     { "name": "include/mikLib/Drive", "type": "Directory" },
     { "name": "include/mikLib/Devices", "type": "Directory" },
@@ -115,6 +136,9 @@
     { "name": "include/mikLib/UI/controller", "type": "Directory" },
     { "name": "include/mikLib/UI/graphics", "type": "Directory" },
     { "name": "src", "type": "Directory" },
+    { "name": "src/autonomous", "type": "Directory" },
+    { "name": "src/autonomous/Blue", "type": "Directory" },
+    { "name": "src/autonomous/Red", "type": "Directory" },
     { "name": "src/mikLib", "type": "Directory" },
     { "name": "src/mikLib/Devices", "type": "Directory" },
     { "name": "src/mikLib/Drive", "type": "Directory" },
