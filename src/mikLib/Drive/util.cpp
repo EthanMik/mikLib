@@ -78,6 +78,12 @@ void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_directio
     }
 }
 
+void mirror(float& angle, bool mirror_x, bool mirror_y) {
+    float dummy_x = 0, dummy_y = 0;
+    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mirror(dummy_x, dummy_y, angle, unused, mirror_x, mirror_y);
+}
+
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y) {
     mik::turn_direction unused = mik::turn_direction::FASTEST;
     mirror(x, y, angle, unused, mirror_x, mirror_y);

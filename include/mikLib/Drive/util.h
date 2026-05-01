@@ -100,6 +100,7 @@ float reduce_0_to_360(float angle);
  * @param mirror_x Whether to negate X.
  * @param mirror_y Whether to negate Y.
  */
+void mirror(float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);

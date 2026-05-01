@@ -9,7 +9,7 @@ static int run_UI() {
 
     // Running the auton selector on the controller disables user control,
     // press X on the controller to close auton selector and enable user control
-    UI_controller_auton_selector(); 
+    UI_controller_auton_selector(); // Comment out this line to disable Controller UI
 
     UI_render();
     return 0;

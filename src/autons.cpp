@@ -34,8 +34,6 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
         return "";
     }    
 
-    chassis.turn_to_angle(180, { .max_voltage = 3, .settle_error = .1, .settle_time = 1000 });
-
     // Place start of autonoumous here
     
     return "";

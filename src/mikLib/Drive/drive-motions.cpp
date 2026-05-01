@@ -8,6 +8,8 @@ void Chassis::drive_distance(float distance, drive_distance_params p) {
     if (std::isnan(p.heading)) desired_heading = get_absolute_heading();
     else desired_heading = p.heading;
 
+    mirror(desired_heading, x_pos_mirrored_, y_pos_mirrored_);
+
     drive_distance_params_buffer = p;
 
     // Create PID; exit error is only applied if min voltage is non zero
