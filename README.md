@@ -15,9 +15,10 @@ An easy to use odometry VEXcode template with UI support.
    - Swing to heading and point
    - Drive inches and to point
    - Drive to pose via boomerang
-   - Follow path via pure pursuit
+   - Holonomic to pose
    - Motion Chaining
 - User control
+   - Field centric
    - Split Arcade
    - Tank
    - Drive curve versions
