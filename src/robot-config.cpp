@@ -71,7 +71,7 @@ vex::limit Assembly::limit_switch(to_triport(PORT_F));
 
 // mikLib initialization below, you do not need to edit
 
-// Assembly assembly;
+Assembly assembly;
 Constants constants;
 vex::competition Competition;
 
