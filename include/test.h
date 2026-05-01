@@ -178,6 +178,10 @@ void config_measure_velocity_accel();
 /** @brief Measures the offsets of the forward and sideways tracker by turning prints output the the console screen */
 void config_measure_odometry_offsets();
 
+/** Measures the distance sensor offsets of the robot, note that it is more accurate to use CAD model. To find the offsets
+ * place robots tracking center in the middle of intersection of the 4 field tiles in the far upper right corner of the field.
+ * Make sure there are no obstructions. The robot should be facing a top and right wall.
+ */
 void config_measure_distance_reset_offsets();
 
 /** @brief Triggers a component plugged into a 3 wire port at specified port */
