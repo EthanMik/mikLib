@@ -33,10 +33,11 @@ void test_odom_full();
 /** @brief Robot should drive in curves and end in starting position. */
 void test_boomerang();
 
-/** @brief Robot should drive in an S shape forwards and backwards and end in starting position.
- * Play around with settle error and lookahead distance if robot is driving sporadic.
- */
-void test_pursuit();
+/** @brief Robot should chain through motions quickly and end in starting position */
+void test_motion_chaining();
+
+/** @brief Robot should turn in place driving to corners and return in its starting position */
+void test_holonomic();
 
 /**
  * @brief Enables a PID tuner suite.
@@ -121,12 +122,6 @@ extern std::vector<std::string> error_data;
 void PID_tuner();
 
 std::vector<mik::motor*> config_get_motors();
-
-/** @brief Stops all motors connected to robot. Used when disabling user control. */
-void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);
-
-/** @brief Changes braketype to all motors connected to robot. Used when disabling user control. */
-void set_brake_all_motors(vex::brakeType mode);
 
 /** @brief Logs errors during robot calibration, checks inertial, SD, and drivetrain motors
  * It is recommended to add other motors and devices to this function

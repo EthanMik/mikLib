@@ -1,8 +1,5 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 void default_constants() {
     // Each controller constant in the form of throttle, turn (deadband, min_output, curve_gain), desaturate_bias.
     chassis.set_control_constants(5, 10, 1.019, 5, 10, 1.019, 0.5);
@@ -15,12 +12,11 @@ void default_constants() {
 
     // Each exit condition set is in the form of (settle_error, settle_time, timeout).
     chassis.set_turn_exit_conditions(1, 200, 3000);
-    chassis.set_drive_exit_conditions(1.5, 200, 5000);
+    chassis.set_drive_exit_conditions(2, 200, 5000);
     chassis.set_swing_exit_conditions(1, 200, 3000);
 
-    chassis.boomerang_lead = .5;
-    chassis.boomerang_setback = 2;  
-    chassis.boomerang_drift = 2;  // Change to 8 if you are not running all omni wheels
+    constants.boomerang_lead = .5;
+    constants.boomerang_drift = 2;
 }
 
 /* When creating autons with odometry, use a path planner, https://path.jerryio.com/.
@@ -36,10 +32,10 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
         chassis.set_coordinates(0, 0, 0);
 
         return "";
-    }
-    
-    // Place start of autonoumous here
+    }    
 
+    // Place start of autonoumous here
+    
     return "";
 }
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) {
@@ -230,7 +226,6 @@ std::string skills(bool calibrate, auto_variation var, bool get_name) {
         return "";
     }
 
-    chassis.turn_to_angle(180);
     // Place start of autonoumous here
 
     return "";

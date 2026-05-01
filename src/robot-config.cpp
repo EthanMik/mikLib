@@ -1,54 +1,48 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 vex::brain Brain;
 vex::controller Controller;
-vex::competition Competition;
 
 // mikLib v2.0 setup, if you are following along with video tutorials it is going to be slightly different
 
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, false, blue_6_1, "left front motor"),
+        mik::motor(PORT1, false, blue_6_1, "left front motor"), // For holonomic drivetrains, you must include "front" and "back" for the motor names
         mik::motor(PORT2, false, blue_6_1, "left middle motor"),
         mik::motor(PORT3, false, blue_6_1, "left back motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
         mik::motor(PORT4, true, blue_6_1, "right front motor"),
-        mik::motor(PORT4, true, blue_6_1, "right middle motor"),
+        mik::motor(PORT5, true, blue_6_1, "right middle motor"),
         mik::motor(PORT6, true, blue_6_1, "right back motor"),
     }),
 	
     PORT7,  // Inertial sensor port
-    360,    // Inertial scale (reading after a full 360° turn)
+    360,    // Inertial scale (rotation reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
     2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
     450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
-	6,      // Drivetrain center distance (in), (half drivetrain track width).
 
     PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
     2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
-    0.5,    // Forward tracker center distance (in). Positive = right of center, negative = left.
+    0,      // Forward tracker center distance (in). Positive = right of center, negative = left.
 
     PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
-    -1,     // Sideways tracker center distance (in). Positive = behind center, negative = in front.
+    -2,     // Sideways tracker wheel diameter (in). Negative flips direction. Pushing robot right at 0° should increase X
+    0,      // Sideways tracker center distance (in). Positive = behind center, negative = in front.
 
     // Distance sensors mounted on a face of the robot
     mik::distance_reset({
         mik::distance(
-			PORT10,		   // Distance sensor port
-            front_sensor,  // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
-            3,             // X offset from tracking center (in). Positive = right of center, negative = left. 
-            -4             // Y offset from tracking center (in). Positive = in front of center, negative = behind.
+			PORT8,		   // Distance sensor port
+            rear_sensor,   // "front_sensor", "rear_sensor", "left_sensor", "right_sensor"
+            4,             // X offset from tracking center (in). Positive = right of center, negative = left. 
+            6              // Y offset from tracking center (in). Positive = in front of center, negative = behind.
         ),
-        mik::distance(PORT11, right_sensor, 4, -5),
-
+        mik::distance(PORT3, left_sensor, -6, 4),
     })
 );
 
@@ -74,25 +68,32 @@ vex::limit Assembly::limit_switch(to_triport(PORT_F));
 
 
 
+
 // mikLib initialization below, you do not need to edit
 
-Assembly assembly;
+// Assembly assembly;
+Constants constants;
+vex::competition Competition;
 
 static void loading_screen(bool stop) {
 	static vex::task loading_bar;
-
+	
 	if (stop) {
 		loading_bar.stop();
 		return;
 	}
-
+	
 	Controller.Screen.setCursor(1, 1);
+#ifndef FAST_COMPILE
 	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
+#endif
 
 	loading_bar = vex::task([](){
 		std::string calibrate = "Calibrating";
+#ifndef FAST_COMPILE
 		Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
 		Brain.Screen.setPenColor(mik::loading_text_color.c_str());
+#endif
 		int count = 0;
 		while(1) {
 			Brain.Screen.printAt(184, 220, calibrate.c_str());
@@ -114,6 +115,7 @@ static void loading_screen(bool stop) {
 }
 
 static void handle_disconnected_devices() {
+#ifndef FAST_COMPILE
 	int errors = run_diagnostic();
 	if (errors > 0) {
 		Controller.rumble(".");
@@ -123,6 +125,7 @@ static void handle_disconnected_devices() {
 		Controller.Screen.print("[Config]->[Error Data]");
 		task::sleep(500);
 	}
+#endif
 }
 
 static void reset_screens() {
@@ -145,7 +148,9 @@ void init(void) {
 	loading_screen(false);
 
 	// Setup motors
+#ifndef FAST_COMPILE
 	motors_scr->init_motors();
+#endif
 
 	// Calibrate inertial
 	chassis.calibrate_inertial();
@@ -182,3 +187,16 @@ bool control_disabled(void) {
 	};
   	return user_control_disabled;
 }
+
+void stop_all_motors(vex::brakeType mode) {
+	for (auto motor : mik::motor_registry()) {
+		motor->stop(mode);
+	}
+}
+
+void set_brake_all_motors(vex::brakeType mode) {  
+	for (auto motor : mik::motor_registry()) {
+		motor->setBrake(mode);
+	}
+}
+

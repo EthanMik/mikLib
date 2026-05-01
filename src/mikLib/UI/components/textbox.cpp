@@ -1,4 +1,5 @@
 #include "mikLib/ui.h"
+#include <cctype>
 
 using namespace mik;
 
@@ -115,11 +116,11 @@ const std::string& textbox::get_text_color() {
 
 void textbox::wrap_text() {
     std::vector<std::string> words;
-    std::istringstream iss(text);
-    std::string word;
-
-    while (iss >> word)
-        words.push_back(word);
+    for (size_t i = 0, n = text.size(), j; i < n; i = j) {
+        while (i < n && std::isspace((unsigned char)text[i])) ++i;
+        for (j = i; j < n && !std::isspace((unsigned char)text[j]); ++j);
+        if (i < j) words.push_back(text.substr(i, j - i));
+    }
 
     std::string line;
     for (int i = 0; i < words.size(); ++i) {

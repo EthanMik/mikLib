@@ -1,8 +1,5 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 void test_constants() {
   	default_constants();
 }
@@ -25,8 +22,8 @@ void test_turn() {
 	chassis.turn_to_angle(30);
 	chassis.turn_to_angle(90);
 	chassis.turn_to_angle(225);
-	chassis.turn_to_angle(180, { .turn_direction = ccw });
-	chassis.turn_to_angle(359, { .turn_direction = cw });
+	chassis.turn_to_angle(180, { .direction = ccw });
+	chassis.turn_to_angle(359, { .direction = cw });
 }
 
 void test_swing() {
@@ -36,7 +33,6 @@ void test_swing() {
 
 void test_full() {
 	chassis.set_heading(0);
-
 	chassis.drive_distance(24);
 	chassis.turn_to_angle(-45);
 	chassis.drive_distance(-36);
@@ -64,8 +60,8 @@ void test_odom_turn() {
 	chassis.turn_to_point(2.887,  5);
 	chassis.turn_to_point(5, 0);
 	chassis.turn_to_point(-5, -5);
-	chassis.turn_to_point(0,  -5, {.turn_direction = ccw});
-	chassis.turn_to_point(0,  5, {.turn_direction = cw});
+	chassis.turn_to_point(0,  -5, { .direction = ccw});
+	chassis.turn_to_point(0,  5, { .direction = cw});
 }
 
 void test_odom_swing() {	
@@ -81,55 +77,52 @@ void test_odom_full() {
 	chassis.drive_to_point(24, 0);
 	chassis.right_swing_to_point(0, 0);
 	chassis.drive_to_point(0, 0);
-	chassis.turn_to_angle(0);
+	chassis.turn_to_angle(0);	
 }
 
 void test_boomerang() {
-	chassis.set_coordinates(0, 0, 0);
+    chassis.set_coordinates(0, 0, 0);
 
     chassis.drive_to_pose(24, 24, 90);
-    chassis.drive_to_pose(24, 0, 90);
-    chassis.drive_to_pose(0, 24, 270);
-    chassis.drive_to_pose(0, 0, 180);
-    chassis.turn_to_angle(0);
+    chassis.drive_to_pose(24, 0, 270, { .direction = fwd });
+    chassis.drive_to_pose(0, 24, 290, { .direction = fwd });
+    chassis.drive_to_pose(0, 0, 0);
 }
 
-std::vector<point> path = {
-	{  0.000,   0.000 },
-	{ -0.098,   1.997 },
-	{ -0.004,   3.993 },
-	{  0.419,   5.944 },
-	{  1.314,   7.722 },
-	{  2.789,   9.053 },
-	{  4.622,   9.831 },
-	{  6.588,  10.189 },
-	{  8.582,  10.324 },
-	{ 10.582,  10.364 },
-	{ 12.582,  10.406 },
-	{ 14.576,  10.542 },
-	{ 16.547,  10.871 },
-	{ 18.439,  11.506 },
-	{ 20.138,  12.549 },
-	{ 21.491,  14.014 },
-	{ 22.444,  15.768 },
-	{ 23.037,  17.676 },
-	{ 23.393,  19.643 },
-	{ 23.536,  21.637 },
-	{ 23.554,  23.664 },
-	{ 24.554,  24.664 },
-};
+void test_motion_chaining() {
+    chassis.set_coordinates(0, 0, 0);
 
-void test_pursuit() {
-	test_constants();
+	/* You can do it this way if you want default values */
+	
+	// constants.drive_min_voltage = 4;
+	// constants.turn_min_voltage = 4;
+
+	// constants.turn_exit_error = 2;
+	// constants.drive_exit_error = 2;
+	
+    chassis.drive_to_pose(24, 24, 90, { .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(24, 0, { .exit_error = 2, .min_voltage = 4 });
+    chassis.turn_to_point(0, 24, { .angle_offset = 180, .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(0, 24, { .exit_error = 2, .min_voltage = 4 });
+    chassis.drive_to_point(0, 0, { .exit_error = 2, .min_voltage = 4 });
+    chassis.turn_to_angle(0, { .exit_error = 2, .min_voltage = 4 });
+
+	chassis.stop_drive(hold); // When min speed is above 0, make sure to stop the drivetrain
+}
+
+void test_holonomic() {
+	// For holonomic drivetrains you can run faster speeds since they are generally slower
+    constants.drive_max_voltage = 11;
+	constants.heading_max_voltage = 12;
+    constants.drive_slew = 0;
+
 	chassis.set_coordinates(0, 0, 0);
 
-	chassis.follow_path(path, {.lookahead_distance = 3, .settle_error = 1});
-	// Reversing path
-	std::vector<point> reversed_path(path.rbegin(), path.rend());
-	chassis.follow_path(reversed_path, {.lookahead_distance = 4, .settle_error = 3});
-	chassis.turn_to_angle(0);
+	chassis.holonomic_to_pose(0, 24, 270);
+	chassis.holonomic_to_pose(24, 0, 180);
+	chassis.holonomic_to_pose(24, 24, 90);
+	chassis.holonomic_to_pose(0, 0, 0);
 }
-
 
 pid_data data;
 std::vector<std::string> error_data;
@@ -155,24 +148,26 @@ bool config_is_testing_odom() {
 
 void config_tune_drive() {
 	data.variables = { 
-		{"drive_kp: ", chassis.drive_kp}, 
-		{"drive_ki: ", chassis.drive_ki}, 
-		{"drive_kd: ", chassis.drive_kd}, 
-		{"drive_starti: ", chassis.drive_starti}, 
-		{"drive_max_volt: ", chassis.drive_max_voltage}, 
-		{"drive_stl_err: ", chassis.drive_settle_error}, 
-		{"drive_stl_tm: ", chassis.drive_settle_time}, 
-		{"drive_tmout: ", chassis.drive_timeout}, 
-		{"drive_slew ", chassis.drive_slew},
+		{"drive_kp: ", constants.drive_kp}, 
+		{"drive_ki: ", constants.drive_ki}, 
+		{"drive_kd: ", constants.drive_kd}, 
+		{"drive_starti: ", constants.drive_starti}, 
+		{"drive_max_volt: ", constants.drive_max_voltage}, 
+		{"drive_stl_err: ", constants.drive_settle_error}, 
+		{"drive_stl_tm: ", constants.drive_settle_time}, 
+		{"drive_tmout: ", constants.drive_timeout}, 
+		{"drive_slew ", constants.drive_slew},
+		{"drive_ext_err: ", constants.drive_exit_error}
+		
 
 		// You can add more parameters to tune
 
-		// {"heading_kp: ", chassis.heading_kp}, 
-		// {"heading_ki: ", chassis.heading_ki}, 
-		// {"heading_kd: ", chassis.heading_kd}, 
-		// {"heading_starti: ", chassis.heading_starti}, 
-		// {"max_volt: ", chassis.heading_max_voltage},
-		// {"heading_slew ", chassis.heading_slew}
+		// {"heading_kp: ", constants.heading_kp}, 
+		// {"heading_ki: ", constants.heading_ki}, 
+		// {"heading_kd: ", constants.heading_kd}, 
+		// {"heading_starti: ", constants.heading_starti}, 
+		// {"max_volt: ", constants.heading_max_voltage},
+		// {"heading_slew ", constants.heading_slew}
 	};
 
 	std::function<float(double)> actual_plot = [](double x){ return chassis.get_forward_tracker_position(); };
@@ -219,12 +214,12 @@ void config_tune_drive() {
 
 void config_tune_heading() {
 	data.variables = { 
-		{"heading_kp: ", chassis.heading_kp}, 
-		{"heading_ki: ", chassis.heading_ki}, 
-		{"heading_kd: ", chassis.heading_kd}, 
-		{"heading_starti: ", chassis.heading_starti}, 
-		{"max_volt: ", chassis.heading_max_voltage},
-		{"heading_slew ", chassis.heading_slew}
+		{"heading_kp: ", constants.heading_kp}, 
+		{"heading_ki: ", constants.heading_ki}, 
+		{"heading_kd: ", constants.heading_kd}, 
+		{"heading_starti: ", constants.heading_starti}, 
+		{"max_volt: ", constants.heading_max_voltage},
+		{"heading_slew: ", constants.heading_slew}
 	};
 
 	int y_min = -30;
@@ -266,15 +261,16 @@ void config_tune_heading() {
 
 void config_tune_turn() {  
 	data.variables = { 
-		{"turn_kp: ", chassis.turn_kp}, 
-		{"turn_ki: ", chassis.turn_ki},
-		{"turn_kd: ", chassis.turn_kd}, 
-		{"turn_starti: ", chassis.turn_starti}, 
-		{"turn_max_volt: ", chassis.turn_max_voltage}, 
-		{"turn_stl_err: ", chassis.turn_settle_error}, 
-		{"turn_stl_tm: ", chassis.turn_settle_time}, 
-		{"turn_tmout: ", chassis.turn_timeout},
-		{"Turn_slew: ", chassis.turn_slew}
+		{"turn_kp: ", constants.turn_kp}, 
+		{"turn_ki: ", constants.turn_ki},
+		{"turn_kd: ", constants.turn_kd}, 
+		{"turn_starti: ", constants.turn_starti}, 
+		{"turn_max_volt: ", constants.turn_max_voltage}, 
+		{"turn_stl_err: ", constants.turn_settle_error}, 
+		{"turn_stl_tm: ", constants.turn_settle_time}, 
+		{"turn_tmout: ", constants.turn_timeout},
+		{"Turn_slew: ", constants.turn_slew},
+		{"Turn_exit_err: ", constants.turn_exit_error}
 	};
 
   int y_min = -10;
@@ -307,16 +303,17 @@ void config_tune_turn() {
 
 void config_tune_swing() {
 	data.variables = { 
-		{"swing_kp: ", chassis.swing_kp }, 
-		{"swing_ki: ", chassis.swing_ki }, 
-		{"swing_kd: ", chassis.swing_kd}, 
-		{"swing_starti: ", chassis.swing_starti}, 
-		{"swing_max_volt: ", chassis.swing_max_voltage}, 
-		{"swing_opp_volt: ", chassis.swing_opposite_voltage}, 
-		{"swing_stl_err: ", chassis.swing_settle_error}, 
-		{"swing_stl_tm: ", chassis.swing_settle_time}, 
-		{"swing_tmout: ", chassis.swing_timeout},
-		{"swing_slew: ", chassis.swing_slew}
+		{"swing_kp: ", constants.swing_kp }, 
+		{"swing_ki: ", constants.swing_ki }, 
+		{"swing_kd: ", constants.swing_kd}, 
+		{"swing_starti: ", constants.swing_starti}, 
+		{"swing_max_volt: ", constants.swing_max_voltage}, 
+		{"swing_opp_volt: ", constants.swing_opposite_voltage}, 
+		{"swing_stl_err: ", constants.swing_settle_error}, 
+		{"swing_stl_tm: ", constants.swing_settle_time}, 
+		{"swing_tmout: ", constants.swing_timeout},
+		{"swing_slew: ", constants.swing_slew},
+		{"swing_ext_err: ", constants.swing_exit_error}
 	};
 
 	int y_min = -20;
@@ -501,19 +498,6 @@ std::vector<mik::motor*> config_get_motors() {
 	return mik::motor_registry();
 }
 
-
-void stop_all_motors(vex::brakeType mode) {
-	for (auto motor : config_get_motors()) {
-		motor->stop(mode);
-	}
-}
-
-void set_brake_all_motors(vex::brakeType mode) {  
-	for (auto motor : config_get_motors()) {
-		motor->setBrake(mode);
-	}
-}
-
 int run_diagnostic() {
 	error_data.clear();
 	int errors = 0;
@@ -678,8 +662,18 @@ void config_odom_data() {
 		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
 		console_scr->add("Forward Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
 		console_scr->add("Sideways Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
-		console_scr->add("Motor Encoder: ", [](){ return chassis.get_motor_encoder_position(); });
 
+		console_scr->add("Right Drive: ", [](){ return chassis.get_right_drive_position(); });
+		console_scr->add("Left Drive: ", [](){ return chassis.get_left_drive_position(); });
+
+		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
+			auto motor = chassis.right_drive.getMotors()[i];
+			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_right_drive_position(i), 5, false) + ""; });
+		}
+		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
+			auto motor = chassis.left_drive.getMotors()[i];
+			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_left_drive_position(i), 5, false) + ""; });
+		}
 		return 0;
 	});
 
@@ -734,104 +728,146 @@ void config_measure_velocity_accel() {
 	disable_user_control();
 
     vex::task temp([](){
-        std::vector<std::pair<float, float>> pos_time{};
+		
+		struct data { float value; float t; };
 
-		chassis.drive_distance(72, {.max_voltage = 12, .heading_max_voltage = 12, .wait = false});
+		std::vector<data> angle_time{};
 
+		// Spin in place at full voltage for 1.5 seconds
 		Brain.Timer.reset();
+		chassis.inertial.resetRotation();
+		
+		chassis.drive_with_voltage(12, -12);
+		
+		while (Brain.Timer.time(msec) < 1500) {
+
+			float angle = chassis.inertial.rotation();
+			float t = Brain.Timer.time(msec) / 1000.0;
+
+			angle_time.push_back({angle, t});
+			task::sleep(20); 
+		}
+		chassis.turn_to_angle(0);
+		task::sleep(500);
+		chassis.stop_drive(coast);
+
+        std::vector<data> pos_time{};
+
+		// Drive full speed for 1.5 seconds
+		chassis.drive_with_voltage(12, 12);
+
+		Brain.resetTimer();
 		chassis.right_drive.resetPosition();
+		chassis.left_drive.resetPosition();
 		chassis.forward_tracker.resetPosition();
 
         while (Brain.Timer.time(msec) < 1500) {
-            float pos = chassis.get_forward_tracker_position() / 12.0f;
-			float t = Brain.Timer.time(msec) / 1000.0f;
+            float pos = chassis.get_forward_tracker_position() / 12.0;
+			float t = Brain.Timer.time(msec) / 1000.0;
             pos_time.push_back({pos, t});
-            task::sleep(10);
+            task::sleep(20);
         }
-		chassis.cancel_motion();
-		task::sleep(100);
+		chassis.stop_drive(hold);
 		chassis.set_brake_type(coast);
-		chassis.stop_drive(vex::brakeType::coast);
 
-        std::vector<std::pair<float, float>> velocities;
-		for (size_t i = 1; i < pos_time.size(); ++i) {
-			float v = ((pos_time[i].first - pos_time[i - 1].first) / (pos_time[i].second - pos_time[i - 1].second));
-			velocities.push_back({v, pos_time[i].second});
-		}
-
-		std::vector<std::pair<float, float>> smoothed_velo;
-        for (size_t i = 2; i < velocities.size() - 2; ++i) {
-			float avg_v = (velocities[i - 2].first + velocities[i - 1].first +
-			velocities[i].first + velocities[i + 1].first + velocities[i + 2].first) / 5.0f;
-			smoothed_velo.push_back({avg_v, velocities[i].second});
-        }
-
-		std::vector<std::pair<float, float>> acceling;
-		float max_vel = -1.0;
-		size_t max_index = 0;
-
-		for (size_t i = 0; i < smoothed_velo.size(); ++i) {
-			if (smoothed_velo[i].first > max_vel) {
-				max_vel = smoothed_velo[i].first;
-				max_index = i;
+		auto position_to_velocity = [](const std::vector<data>& unit_time){
+			std::vector<data> velocities;
+			for (size_t i = 1; i < unit_time.size(); ++i) {
+				float v = ((unit_time[i].value - unit_time[i - 1].value) / (unit_time[i].t - unit_time[i - 1].t));
+				velocities.push_back({v, unit_time[i].t});
 			}
-		}
+			return velocities;
+		};
 
-		for (size_t i = 0; i <= max_index; ++i) {
-            float v = smoothed_velo[i].first;
-            
-            if (v > max_vel * 0.10 && v < max_vel * 0.90) {
-                acceling.push_back(smoothed_velo[i]);
-            }
-        }
+		// 5-point centered median filter
+		auto smooth_velocity_median = [](const std::vector<data>& velocity){
+			std::vector<data> smoothed;
+			const int half = 2;
+			for (size_t i = 0; i < velocity.size(); ++i) {
+				int start = std::max(0, (int)i - half);
+				int end   = std::min((int)velocity.size() - 1, (int)i + half);
+				std::vector<float> vals;
+				for (int j = start; j <= end; ++j) {
+					vals.push_back(velocity[j].value);
+				}
+				std::nth_element(vals.begin(), vals.begin() + vals.size() / 2, vals.end());
+				smoothed.push_back({vals[vals.size() / 2], velocity[i].t});
+			}
+			return smoothed;
+		};
 
-		float sum_a = 0;
-		float sum_t = 0;
+		auto max_velo_idx = [](float& max_velocity, size_t& index, const std::vector<data>& smoothed_velo){
+			max_velocity = -1;
+			index = 0;
+
+			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+				if (smoothed_velo[i].value > max_velocity) {
+					max_velocity = smoothed_velo[i].value;
+					index = i;
+				}
+			}
+		};
+
+		// Time constant = time from first motion to reaching 63.2% of max velocity
+		auto time_constant = [](const std::vector<data>& smoothed_velo, float max_vel){
+			double t_start = -1.0;
+			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+				if (smoothed_velo[i].value > max_vel * 0.02) {
+					t_start = smoothed_velo[i].t;
+					break;
+				}
+			}
+			if (t_start < 0.0) return -1.0;
+
+			const double threshold = max_vel * 0.632;
+			for (size_t i = 0; i < smoothed_velo.size(); ++i) {
+				if (smoothed_velo[i].t >= t_start && smoothed_velo[i].value >= threshold) {
+					return smoothed_velo[i].t - t_start;
+				}
+			}
+			return -1.0;
+		};
+
+		auto turn_velocities = position_to_velocity(angle_time);
+		auto drive_velocities = position_to_velocity(pos_time);
+
+		auto smoothed_turn_velo = smooth_velocity_median(turn_velocities);
+		auto smoothed_drive_velo = smooth_velocity_median(drive_velocities);
+
+		float max_drive_vel, max_turn_vel = -1.0;
+		size_t max_drive_index, max_turn_index = 0;
 		
-		float start_time = acceling[0].second;
+		max_velo_idx(max_drive_vel, max_drive_index, smoothed_drive_velo);
+		max_velo_idx(max_turn_vel, max_turn_index, smoothed_turn_velo);
 
-        for (size_t i = 0; i < acceling.size(); ++i) {
-            float v = acceling[i].first;
-            float t = acceling[i].second - start_time;
-            
-            sum_a += v * t;
-            sum_t += t * t;
-        }
-		float constant_accel = sum_a / sum_t; 
+		float drive_time_constant = time_constant(smoothed_drive_velo, max_drive_vel);
+		float turn_time_constant = time_constant(smoothed_turn_velo, max_turn_vel);
 
-        console_scr->add("Max Velocity: ", [max_vel](){ return to_string_float(max_vel, 3, false) + " ft/s"; });
-        console_scr->add("Constant Accel: ", [constant_accel](){ return to_string_float(constant_accel, 3, false) + " ft/s^2"; });
+        console_scr->add("Max Drive Velocity: ", [max_drive_vel](){ return to_string_float(max_drive_vel, 3, false) + " ft/s"; });
+        console_scr->add("Drive Time Constant: ", [drive_time_constant](){ return to_string_float(drive_time_constant, 4, false) + " s"; });
 
-		
+		console_scr->add("Max Turn Velocity: ", [max_turn_vel](){ return to_string_float(max_turn_vel, 3, false) + " deg/s"; });
+        console_scr->add("Turn Time Constant: ", [turn_time_constant](){ return to_string_float(turn_time_constant, 4, false) + " s"; });
+
+		auto print_unit_time = [](const std::vector<data> unit_time){
+			for (const auto& p : unit_time) {
+				print(to_string_float(p.t, 3, false) + ", " + to_string_float(p.value, 3, false));
+				task::sleep(20);
+			}
+			print("End Data\n");
+		};
+
 		print("Start Data, Position (second, ft)");
-		for (const auto& p : pos_time) {
-			print(to_string_float(p.second, 3, false) + ", " + to_string_float(p.first, 3, false));
-			task::sleep(20);
-		}
-		print("End Data");
+		print_unit_time(pos_time);
 
-		// You can uncomment this if you want to see all data 
+		print("Start Data, Angle (degrees, ft)");
+		print_unit_time(angle_time);
 
-		// print("Start Data, Velocity (second, ft/s)");
-		// for (const auto& v : velocities) {
-		// 	print(to_string_float(v.second, 3, false) + ", " + to_string_float(v.first, 3, false));
-		// 	task::sleep(20);
-		// }
-		// print("End Data");
+		print("Start Data, Smoothed Drive Velocity (second, ft/s)");
+		print_unit_time(smoothed_drive_velo);
 
-		// print("Start Data, Smoothed Velocity (second, ft/s)");
-		// for (const auto& s : smoothed_velo) {
-		// 	print(to_string_float(s.second, 3, false) + ", " + to_string_float(s.first, 3, false));
-		// 	task::sleep(20);
-		// }
-		// print("End Data");
-
-		print("Start Data, Acceleration Phase (second, ft/s)");
-		for (const auto& a : acceling) {
-			print(to_string_float(a.second, 3, false) + ", " + to_string_float(a.first, 3, false));
-			task::sleep(20);
-		}
-		print("End Data");
+		print("Start Data, Smoothed Turn Velocity (second, ft/s)");
+		print_unit_time(smoothed_turn_velo);
 
 		enable_user_control();
         return 0;
@@ -857,7 +893,7 @@ void config_measure_distance_reset_offsets() {
 		};
 
 		const float iterations = 10.0;
-		const float bracket = 15.0;
+		const float bracket = 30.0;
 		const float cardinals[] = { 0.0, 90.0, 180.0, 270.0 };
 		const float facing_offsets[] = { 0.0, 270.0, 180.0, 90.0 };
 
@@ -894,10 +930,10 @@ void config_measure_distance_reset_offsets() {
 				continue;
 			}
 
-			float eq1 = 70.25f - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
-			float eq2 = 70.25f - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
+			float eq1 = 70.25 - dist1 * cos(to_rad(angle1 + facing_offsets[i])) - robot_y1;
+			float eq2 = 70.25 - dist2 * cos(to_rad(angle2 + facing_offsets[i])) - robot_y2;
 			float det = sin(to_rad(angle2 - angle1));
-			if (fabs(det) < 0.01f) continue;
+			if (fabs(det) < 0.01) continue;
 
 			sensor_order[i].x_offset = (eq1 * cos(to_rad(angle2)) - eq2 * cos(to_rad(angle1))) / det;
 			sensor_order[i].y_offset = (eq1 * sin(to_rad(angle2)) - eq2 * sin(to_rad(angle1))) / det;
@@ -942,29 +978,25 @@ void config_measure_odometry_offsets() {
 			chassis.sideways_tracker.resetPosition();
 			chassis.right_drive.resetPosition();
 	
-			float start_heading = chassis.inertial.rotation();
+			float start_heading = chassis.get_rotation();
 			float target = i % 2 == 0 ? 90 : 270;
 	
-			chassis.turn_to_angle(target, { .max_voltage = 6, .settle_error = 1, .settle_time = 300 });
+			chassis.turn_to_angle(target, { .max_voltage = 4, .settle_error = .5, .settle_time = 500 });
 			task::sleep(250);
 	
-			float t_delta = to_rad(reduce_negative_180_to_180(chassis.inertial.rotation() - start_heading));
-	
+			float t_delta = to_rad(reduce_negative_180_to_180(chassis.get_rotation() - start_heading));
 	
 			float f_delta = chassis.get_forward_tracker_position();
 			float s_delta = chassis.get_sideways_tracker_position();
-			float d_delta = chassis.get_motor_encoder_position();
 	
 			f_offset += f_delta / t_delta;
 			s_offset += s_delta / t_delta;
-			d_offset += d_delta / t_delta;
 		}
 	
 		f_offset /= iterations;
 		s_offset /= iterations;
 		d_offset /= iterations;
 
-		console_scr->add("Drivetrain Center Distance: ", [d_offset](){ return to_string_float(-d_offset, 3, false) + " in"; });
 		console_scr->add("Forward Tracker Center Distance: ", [f_offset](){ return to_string_float(-f_offset, 3, false) + " in"; });
 		console_scr->add("Sideways Tracker Center Distance: ", [s_offset](){ return to_string_float(-s_offset, 3, false) + " in"; });
 

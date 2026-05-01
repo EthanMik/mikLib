@@ -19,13 +19,12 @@ public:
      * @brief PID constructor with P, I, D, and starti.
      * Starti keeps the I term at 0 until error is less than starti.
      * 
-     * @param error Difference in desired and current position.
      * @param kp Proportional constant.
      * @param ki Integral constant.
      * @param kd Derivative constant.
      * @param starti Maximum error to start integrating.
      */
-    PID(float error, float kp, float ki, float kd, float starti);
+    PID(float kp, float ki, float kd, float starti);
 
     /**
      * @brief PID constructor with settling inputs.
@@ -35,16 +34,16 @@ public:
      * it is not settled. Starti keeps the I term at 0 until error is less 
      * than starti.
      * 
-     * @param error Difference in desired and current position.
      * @param kp Proportional constant.
      * @param ki Integral constant.
      * @param kd Derivative constant.
      * @param starti Maximum error to start integrating.
      * @param settle_error Maximum error to be considered settled.
      * @param settle_time Minimum time to be considered settled.
+     * @param exit_error Error to be considered finished.
      * @param timeout Time after which to give up and move on. Using 0 will not time out movement.
      */
-    PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout);
+    PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout);
 
     /**
      * @brief Computes the output power based on the error.
@@ -74,10 +73,12 @@ public:
     float starti = 0;
     float settle_error = 0;
     float settle_time = 0;
+    float exit_error = 0;
     float timeout = 0;
     float accumulated_error = 0;
     float previous_error = 0;
     float output = 0;
     float time_spent_settled = 0;
     float time_spent_running = 0;
+    bool exiting = false;
 };

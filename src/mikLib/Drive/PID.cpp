@@ -8,22 +8,21 @@ PID::PID(float kp, float ki, float kd) :
     kd(kd)
 {};
 
-PID::PID(float error, float kp, float ki, float kd, float starti) :
-    error(error),
+PID::PID(float kp, float ki, float kd, float starti) :
     kp(kp),
     ki(ki),
     kd(kd),
     starti(starti)
 {};
 
-PID::PID(float error, float kp, float ki, float kd, float starti, float settle_error, float settle_time, float timeout) :
-    error(error),
+PID::PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout) :
     kp(kp),
     ki(ki),
     kd(kd),
     starti(starti),
     settle_error(settle_error),
     settle_time(settle_time),
+    exit_error(exit_error),
     timeout(timeout)
 {};
 
@@ -31,7 +30,7 @@ float PID::compute(float error) {
     if (fabs(error) < starti){
         accumulated_error += error;
     }
-    if ((error > 0 && previous_error < 0) || (error < 0 && previous_error > 0)) { 
+    if (sign(error) != sign(previous_error)) { 
         accumulated_error = 0; 
     }
 
@@ -45,6 +44,10 @@ float PID::compute(float error) {
         time_spent_settled = 0;
     }
 
+    if (fabs(error) < exit_error && exit_error != 0) {
+        exiting = true;
+    }
+
     time_spent_running += 10;
 
     return output;
@@ -55,6 +58,10 @@ bool PID::is_settled(){
         return true;
     }
     if (time_spent_settled > settle_time) {
+        return true;
+    }
+    if (exiting) {
+        exiting = false;
         return true;
     }
     return false;

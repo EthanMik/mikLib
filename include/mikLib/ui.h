@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <algorithm>
 #include <functional>
-#include <sstream>
-#include <iomanip>
 #include <type_traits>
 
 #include "v5.h"

@@ -1,16 +1,15 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 task UI;
 
+// If you want to disable Brain UI, and reduce upload times
+// Go into `makefile` and set `FAST_COMPILE = 1`
 static int run_UI() {
     UI_init();
 
     // Running the auton selector on the controller disables user control,
     // press X on the controller to close auton selector and enable user control
-    UI_controller_auton_selector(); 
+    UI_controller_auton_selector(); // Comment out this line to disable Controller UI
 
     UI_render();
     return 0;
@@ -38,8 +37,9 @@ void user_control(void) {
     while (true) {
         if (!control_disabled()) {
             // Add your user control code here
-            chassis.control(drive_mode::SPLIT_ARCADE);
-            assembly.control();
+            
+            chassis.control(drive_mode::FIELD_CENTRIC_HOLONOMIC);
+            // assembly.control();
         }
         task::sleep(5);
     }

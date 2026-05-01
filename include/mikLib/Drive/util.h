@@ -1,6 +1,7 @@
 #pragma once
 
-#include <sstream>
+#include <cstdio>
+#include <string>
 #include <vector>
 #include "mikLib/globals.h"
 
@@ -99,6 +100,7 @@ float reduce_0_to_360(float angle);
  * @param mirror_x Whether to negate X.
  * @param mirror_y Whether to negate Y.
  */
+void mirror(float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
@@ -140,7 +142,7 @@ float angle_error(float error, mik::turn_direction dir = mik::turn_direction::FA
  * @param current_Y The robot's Y position in inches.
  * @return Whether the robot can be considered settled.
  */
-bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y);
+bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y, float exit_error);
 
 /**
  * @brief Voltage scaling to keep from applying more than 12 volts to either side of the drive.
@@ -319,9 +321,9 @@ auto to_string(const T& value) -> typename std::enable_if<
     !std::is_same<T, std::nullptr_t>::value,
     std::string>::type
 {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%g", static_cast<double>(value));
+    return std::string(buf);
 }
 
 template<int ID>

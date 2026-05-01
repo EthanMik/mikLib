@@ -1,5 +1,7 @@
 #include "mikLib/ui.h"
 #include "mikLib/drive.h"
+#include <cstdio>
+#include <cctype>
 
 using namespace mik;
 using namespace vex;
@@ -37,16 +39,22 @@ UI_auton_screen::UI_auton_screen() {
 }
 
 std::shared_ptr<screen> UI_auton_screen::get_auton_screen() {
+#ifndef FAST_COMPILE
     return(UI_auton_scr);
+#else
+    return nullptr;
+#endif
 }
 
 void UI_auton_screen::start_auton() {
+#ifndef FAST_COMPILE
     Brain.Screen.clearScreen();
     Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
     Brain.Screen.setFillColor(mik::loading_text_bg_color.c_str());
     Brain.Screen.setPenColor(mik::loading_text_color.c_str());
     Brain.Screen.printAt(160, 220, "Competition Mode");
     Brain.Screen.render();
+#endif
     disable_controller_overlay();
     time_limit = false;
     if (!robot_is_calibrated) {
@@ -78,19 +86,34 @@ void UI_auton_screen::start_auton_test() {
 void UI_auton_screen::exit_auton_task() {
     controller_scr_input = vex::task([](){
     auton_scr->input_overlay = true;
+    bool user_ctrl_enabled = false;
     while (auton_scr->input_overlay) {
         if (!auton_scr->auto_running && auton_scr->end_card) {
-            Controller.Screen.setCursor(1, 1);
-            Controller.Screen.print("    Auton Finished");
-            Controller.Screen.setCursor(2, 1);
-            Controller.Screen.print(("   " + to_string_float(((Brain.Timer.time(vex::timeUnits::msec) - auton_scr->auto_start_time ) / 1000.0f), 3) + " sec elapsed").c_str());
-            Controller.Screen.setCursor(3, 1);
-            Controller.Screen.print("     Control Enabled");
-            enable_user_control();
-            auton_scr->end_card = false;
+            if (auton_scr->odom_display) {
+                if (!user_ctrl_enabled) {
+                    enable_user_control();
+                    user_ctrl_enabled = true;
+                }
+                Controller.Screen.setCursor(1, 1);
+                Controller.Screen.print(("Theta: " + to_string_float(chassis.get_absolute_heading())).c_str());
+                Controller.Screen.setCursor(2, 1);
+                Controller.Screen.print(("X: "+ to_string_float(chassis.get_X_position())).c_str());
+                Controller.Screen.setCursor(3, 1);
+                Controller.Screen.print(("Y: " + to_string_float(chassis.get_Y_position())).c_str());
+            } else {
+                Controller.Screen.setCursor(1, 1);
+                Controller.Screen.print("    Auton Finished");
+                Controller.Screen.setCursor(2, 1);
+                Controller.Screen.print(("   " + to_string_float(((Brain.Timer.time(vex::timeUnits::msec) - auton_scr->auto_start_time ) / 1000.0f), 3) + " sec elapsed").c_str());
+                Controller.Screen.setCursor(3, 1);
+                Controller.Screen.print("     Control Enabled");
+                enable_user_control();
+                auton_scr->end_card = false;
+            }
         }
         if (btnB_new_press(Controller.ButtonB.pressing())) {
             if (!auton_scr->auto_running) {
+                auton_scr->end_card = false;
                 auton_scr->restart_controller_overlay();
                 disable_user_control(true);
             } else {
@@ -106,6 +129,7 @@ void UI_auton_screen::exit_auton_task() {
 }
 
 void UI_auton_screen::UI_crt_auton_scr() {
+#ifndef FAST_COMPILE
     UI_auton_scr = UI_crt_scr(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT - 45);
 
     auto tgl_outline_1 = UI_crt_grp({
@@ -279,11 +303,14 @@ void UI_auton_screen::UI_crt_auton_scr() {
         off_sawp_tgl_lbl, off_sawp_tgl_txt, red_blue_tgl, rings_goal_tgl, quals_elims_tgl, 
         off_sawp_tgl, show_alignment_btn, prev_auto_var_btn, auto_var_num_txt_, description_box_btn, description_box, heading_btn, label_label, heading_lbl, x_lbl, y_lbl});
     
+#endif
     set_description();
 }
 
 void UI_auton_screen::update_var_display() {
+#ifndef FAST_COMPILE
     auto_var_num_txt->replace_graphic(UI_crt_txt(to_string(var_num), 243, 169, auton_text_color, auton_num_bg_color, UI_distance_units::pixels));
+#endif
 }
 
 
@@ -314,12 +341,14 @@ void UI_auton_screen::UI_select_auton(autons auton) {
     }
 
     if (off_sawp && quals_elims) {
+#ifndef FAST_COMPILE
         for (const auto& component : UI_auton_scr->get_UI_components()) {
             if (off_sawp_ID == component->get_ID()) {
                 auto* toggle_component = static_cast<toggle*>(component.get());
                 toggle_component->unpress();
             }
         }
+#endif
         control_panel[1][0].unpush();
         off_sawp = false;
     }
@@ -344,18 +373,24 @@ mik::alliance_colors UI_auton_screen::get_alliance_color() {
 }
 
 bool UI_auton_screen::set_description() {
-    UI_auton_scr->refresh();    
+#ifndef FAST_COMPILE
+    UI_auton_scr->refresh();
+#endif
     queue_autons(false, true);
+#ifndef FAST_COMPILE
     description_textbox->set_text(output);
+#endif
     description_output = output;
     if (output == "") {
         return false;
     }
-    return true; 
+    return true;
 }
 
 void UI_auton_screen::set_description(std::string text) {
+#ifndef FAST_COMPILE
     description_textbox->set_text(text);
+#endif
     description_output = text;
 }
 
@@ -460,19 +495,19 @@ void UI_auton_screen::set_previous_selected_auto() {
     var_num = 1;
     var = auto_variation::ONE;
 
+#ifndef FAST_COMPILE
     flip_toggle(red_blue_tgl, false);
     flip_toggle(rings_goal_tgl, false);
     flip_toggle(quals_elims_tgl, false);
     flip_toggle(off_sawp_tgl, false);
+#endif
 
     std::vector<std::string> output = get_SD_file_txt("auton.txt");
 
     restoring_from_sd = true;
     for (auto it = output.rbegin(); it != output.rend(); ++it) {
         int r = 0, c = 0, count = 0;
-        std::stringstream ss(*it);
-        if (!(ss >> r >> c)) continue;
-        ss >> count;
+        if (sscanf(it->c_str(), "%d %d %d", &r, &c, &count) < 2) continue;
 
         if (count > 0) {
             var_num = count;
@@ -502,12 +537,14 @@ void UI_auton_screen::flip_toggle_controller(std::pair<int, int> cursor_position
 
 
 void UI_auton_screen::flip_toggle(std::shared_ptr<UI_component> tgl, bool state) {
+#ifndef FAST_COMPILE
     auto* toggle_component = static_cast<toggle*>(tgl.get());
     if (!state) {
         toggle_component->unpress();
     } else {
         toggle_component->press();
     }
+#endif
 }
 
 auto_variation UI_auton_screen::int_to_auto_variation(int num) {
@@ -532,11 +569,12 @@ void UI_auton_screen::controller_description_scr() {
     controller_scr_overlay = vex::task([](){
         std::vector<std::string> wrapped_text;
         std::vector<std::string> words;
-        std::istringstream iss(auton_scr->description_output);
-        std::string word;
-
-        while (iss >> word)
-            words.push_back(word);
+        const auto& desc = auton_scr->description_output;
+        for (size_t i = 0, n = desc.size(), j; i < n; i = j) {
+            while (i < n && std::isspace((unsigned char)desc[i])) ++i;
+            for (j = i; j < n && !std::isspace((unsigned char)desc[j]); ++j);
+            if (i < j) words.push_back(desc.substr(i, j - i));
+        }
         
         std::string line;
         for (int i = 0; i < words.size(); ++i) {
@@ -643,22 +681,100 @@ void UI_auton_screen::disable_controller_overlay() {
 
 void UI_auton_screen::enable_controller_overlay() {
     disable_user_control(true);
+
+    auto toggle_blue_red = [this](){
+        UI_select_auton(autons::RED_BLUE); 
+        #ifndef FAST_COMPILE
+        flip_toggle(red_blue_tgl, red_blue); 
+        #endif
+        save_auton_SD();
+    };
+
+    auto toggle_left_right = [this](){
+        UI_select_auton(autons::RINGS_GOAL); 
+        #ifndef FAST_COMPILE
+        flip_toggle(rings_goal_tgl, rings_goal); 
+        #endif
+        save_auton_SD();
+    };
+
+    auto toggle_qual_elim = [this](){
+        UI_select_auton(autons::QUALS_ELIMS);
+        #ifndef FAST_COMPILE
+        flip_toggle(quals_elims_tgl, quals_elims);
+        #endif
+        save_auton_SD();
+    };
+
+    auto toggle_off_sawp = [this]() { 
+        UI_select_auton(autons::OFF_SAWP); 
+        #ifndef FAST_COMPILE
+        flip_toggle(off_sawp_tgl, off_sawp); 
+        #endif
+        save_auton_SD();
+    };
+
+    auto toggle_off_skills = [this](){
+        UI_select_auton(autons::OFF_SKILLS); 
+        #ifndef FAST_COMPILE
+        flip_toggle(config_scr->auto_skills_tgl, off_skills); 
+        #endif
+        save_auton_SD(); 
+    };
+
+    auto toggle_variations = [this](){
+        next_var(); 
+        update_var_display(); 
+        flip_toggle_controller({1, 2}); 
+        save_auton_SD(var_num);
+    };
+
+    auto description_screen = [this](){
+        controller_description_scr();
+    };
+
+    auto calibrate_screen = [this](){
+        controller_calibrate_scr();
+        queue_autons(true, false);
+    };
+
+    auto run_auto = [this](){
+        start_auton_test();
+    };
+
+    auto toggle_time_limiter = [this](){
+        enable_time_limit(); 
+        #ifndef FAST_COMPILE
+        flip_toggle(config_scr->time_cap_auto_tgl, time_limit); 
+        #endif
+        save_auton_SD();
+    };
+
+    auto recalibrate_inertial = [](){
+        chassis.calibrate_inertial();
+    };
+
+    auto toggle_odom_display = [this]() {
+        enable_odom_display(); 
+        save_auton_SD();
+    };
+
     control_panel = {
-        {{controller_btn(false, "[Blue]", "[Red]", [this](){ UI_select_auton(autons::RED_BLUE); flip_toggle(red_blue_tgl, red_blue); save_auton_SD(); } )},
-         {controller_btn(false, "[Left]", "[Right]", [this](){ UI_select_auton(autons::RINGS_GOAL); flip_toggle(rings_goal_tgl, rings_goal); save_auton_SD(); })},
-         {controller_btn(false, "[Qual]", "[Elim]", [this](){ UI_select_auton(autons::QUALS_ELIMS); flip_toggle(quals_elims_tgl, quals_elims); save_auton_SD(); })}}, 
+        {{controller_btn(false, "[Blue]", "[Red]", toggle_blue_red )},
+         {controller_btn(false, "[Left]", "[Right]", toggle_left_right)},
+         {controller_btn(false, "[Qual]", "[Elim]", toggle_qual_elim)}}, 
 
-        {{controller_btn(false, "[Off]", "[Sawp]", [this](){ UI_select_auton(autons::OFF_SAWP); flip_toggle(off_sawp_tgl, off_sawp); save_auton_SD(); } )}, 
-         {controller_btn(false, "[Off]", "[Skills]", [this](){ UI_select_auton(autons::OFF_SKILLS); flip_toggle(config_scr->auto_skills_tgl, off_skills); save_auton_SD(); } )}, 
-         {controller_btn(true, [this](){ next_var(); update_var_display(); flip_toggle_controller({1, 2}); save_auton_SD(var_num); } )}}, 
+        {{controller_btn(false, "[Off]", "[Sawp]",  toggle_off_sawp )}, 
+         {controller_btn(false, "[Off]", "[Skills]", toggle_off_skills)}, 
+         {controller_btn(true, toggle_variations )}}, 
 
-        {{controller_btn(true, "[Desc]", "[###]", [this](){ controller_description_scr(); } )}, 
-         {controller_btn(true, "[Calib]", "[###]", [this](){ controller_calibrate_scr(); queue_autons(true, false); } )},
-         {controller_btn(true, "[Run]", "[##]", [](){ auton_scr->start_auton_test(); })}},
+        {{controller_btn(true, "[Desc]", "[###]", description_screen )}, 
+         {controller_btn(true, "[Calib]", "[###]", calibrate_screen )},
+         {controller_btn(true, "[Run]", "[##]", run_auto )}},
 
-        {{controller_btn(false, "[Off]", "[Cap]", [this](){ enable_time_limit(); flip_toggle(config_scr->time_cap_auto_tgl, time_limit); save_auton_SD(); } )}, 
-         {controller_btn(true, "[RCal]", "[...]", [](){ chassis.calibrate_inertial(); } )}, 
-         {controller_btn(false, "[Off]", "[Odom]", [this](){ enable_odom_display(); save_auton_SD(); } )}}
+        {{controller_btn(false, "[Off]", "[Cap]", toggle_time_limiter )}, 
+         {controller_btn(true, "[RCal]", "[...]", recalibrate_inertial )}, 
+         {controller_btn(false, "[Off]", "[Odom]", toggle_odom_display )}}
     };
     
     
@@ -690,7 +806,9 @@ void UI_auton_screen::restart_controller_overlay() {
                     auton_scr->cursor_position.second--;
                 }
             } else if (btnA_new_press(Controller.ButtonA.pressing())) {
+#ifndef FAST_COMPILE
                 UI_select_scr(auton_scr->get_auton_screen());
+#endif
                 int r = auton_scr->cursor_position.first;
                 int c = auton_scr->cursor_position.second;
                 auton_scr->control_panel[r][c].push();

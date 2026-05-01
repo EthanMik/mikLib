@@ -60,12 +60,11 @@ public:
     bool is_rev_encoder = false;
 
 private:
-    bool is_three_wire;
     int port;
 
     vex::triport expander;
     vex::rotation rotation_tracker;
-    vex::encoder encoder_tracker;
+    vex::encoder* encoder_tracker;
 };
 
 }

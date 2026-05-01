@@ -1,8 +1,5 @@
 #include "vex.h"
 
-using namespace vex;
-using namespace mik;
-
 // The code in this file is example and can be deleted
 
 // This is example code for a push back robot with two 5.5W motors on the lower intake,

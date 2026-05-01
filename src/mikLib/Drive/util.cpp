@@ -3,8 +3,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <string>
-#include <sstream>
-#include <iomanip>
 #include "mikLib/Drive/util.h"
 #include "mikLib/globals.h"
 #include "robot-config.h"
@@ -37,7 +35,7 @@ float volt_to_percent(float volt) {
 }
 
 float to_rad(float angle_deg) {
-    return (angle_deg / (180.0 / M_PI));
+    return angle_deg * (M_PI / 180.0f);
 }
 
 float to_deg(float angle_rad) {
@@ -45,26 +43,20 @@ float to_deg(float angle_rad) {
 }
 
 float reduce_negative_180_to_180(float angle) {
-    while(!(angle >= -180 && angle < 180)) {
-        if(angle < -180) { angle += 360; }
-        if(angle >= 180) { angle -= 360; }
-    }
-    return angle;
+    angle = fmod(angle + 180.0, 360.0);
+    if (angle < 0) angle += 360.0;
+    return angle - 180.0;
 }
 
 float reduce_negative_90_to_90(float angle) {
-    while(!(angle >= -90 && angle < 90)) {
-        if(angle < -90) { angle += 180; }
-        if(angle >= 90) { angle -= 180; }
-    }
-    return angle;
+    angle = fmod(angle + 90.0, 180.0);
+    if (angle < 0) angle += 180.0;
+    return angle - 90.0;
 }
 
 float reduce_0_to_360(float angle) {
-    while(!(angle >= 0 && angle < 360)) {
-        if(angle < 0) { angle += 360; }
-        if(angle >= 360) { angle -= 360; }
-    }
+    angle = fmod(angle, 360.0);
+    if (angle < 0) angle += 360.0;
     return angle;
 }
 
@@ -84,6 +76,12 @@ void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_directio
     if (mirror_x ^ mirror_y) {
         turn_direction = turn_direction == mik::turn_direction::CW ? mik::turn_direction::CCW : mik::turn_direction::CW;
     }
+}
+
+void mirror(float& angle, bool mirror_x, bool mirror_y) {
+    float dummy_x = 0, dummy_y = 0;
+    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mirror(dummy_x, dummy_y, angle, unused, mirror_x, mirror_y);
 }
 
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y) {
@@ -118,8 +116,8 @@ float angle_error(float error, mik::turn_direction dir) {
     }
 }
 
-bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y){
-    return (desired_Y - current_Y) * cos(to_rad(desired_angle_deg)) <= -(desired_X - current_X) * sin(to_rad(desired_angle_deg));
+bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y, float exit_error) {
+    return (desired_Y - current_Y) * cos(to_rad(desired_angle_deg)) <= -(desired_X - current_X) * sin(to_rad(desired_angle_deg)) + exit_error;
 }
 
 float left_voltage_scaling(float drive_output, float heading_output) {
@@ -182,57 +180,6 @@ float overturn_scaling(float drive_output, float heading_output, float max_speed
 
 float dist(point p1, point p2) {
     return std::hypot(p2.x - p1.x, p2.y - p1.y);
-}
-
-std::vector<point> line_circle_intersections(point center, float radius, point p1, point p2) {
-    std::vector<point> intersections = {};
-
-    // Subtract the circle's center to offset the system to origin.
-    point offset_1 = point {p1.x - center.x, p1.y - center.y};
-    point offset_2 = point {p2.x - center.x, p2.y - center.y};
-
-    double dx = offset_2.x - offset_1.x;
-    double dy = offset_2.y - offset_1.y;
-    double dr = dist(offset_1, offset_2);
-    double D = (offset_1.x * offset_2.y) - (offset_1.y * offset_2.x); // Cross product of offset 1 and 2
-    double discriminant = std::pow(radius, 2) * std::pow(dr, 2) - std::pow(D, 2);
-
-    // If our discriminant is greater than or equal to 0, the line formed as a slope of
-    // point_1 and point_2 intersects the circle at least once.
-    if (discriminant >= 0) {
-        // https://mathworld.wolfram.com/Circle-LineIntersection.html
-        point solution_1 = point {
-            (D * dy + sign(dy) * dx * std::sqrt(discriminant)) / std::pow(dr, 2) + center.x,
-            (-D * dx + fabs(dy) * std::sqrt(discriminant)) / std::pow(dr, 2) + center.y
-        };
-        point solution_2 = point {
-            (D * dy - sign(dy) * dx * std::sqrt(discriminant)) / std::pow(dr, 2) + center.x,
-            (-D * dx - fabs(dy) * std::sqrt(discriminant)) / std::pow(dr, 2) + center.y
-        };
-
-        // Find the bounded intersections.
-        // solution_1 and solution_2 are assumed to be true when the line formed as a slope between point_1 and point_2
-        // extends infinitely, however we only want to consider intersections that are part of a line segment *between*
-        // point_1 and point_2.
-
-        // Find the minimum coordinates for each line (p1 and p2 being the start and end of the segment)
-        double min_x = std::min(p1.x, p2.x);
-        double max_x = std::max(p1.x, p2.x);
-        double min_y = std::min(p1.y, p2.y);
-        double max_y = std::max(p1.y, p2.y);
-
-        // Solution 1 intersects the circle within the bounds of point_1 and point_2
-        if ((solution_1.x >= min_x && solution_1.x <= max_x) && (solution_1.y >= min_y && solution_1.y <= max_y)) {
-            intersections.push_back(solution_1);
-        }
-
-        // Solution 2 intersects the circle within the bounds of point_1 and point_2
-        if ((solution_2.x >= min_x && solution_2.x <= max_x) && (solution_2.y >= min_y && solution_2.y <= max_y)) {
-            intersections.push_back(solution_2);
-        }
-    }
-
-    return intersections;
 }
 
 bool SD_text_file_exists(const std::string& file_name) {
@@ -415,9 +362,9 @@ std::string port_to_string(int port) {
 }
 
 std::string to_string_float(float num, int precision, bool remove_trailing_zero) {
-    std::ostringstream oss;
-    oss << std::fixed << std::setprecision(precision) << num;
-    std::string str = oss.str();
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%.*f", precision, num);
+    std::string str(buf);
     if (remove_trailing_zero && str.find('.') != std::string::npos) {
         str.erase(str.find_last_not_of('0') + 1);
         if (!str.empty() && str.back() == '.')

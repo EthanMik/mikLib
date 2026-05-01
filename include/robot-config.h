@@ -5,7 +5,8 @@
 
 class motor;
 class motor_group;
-class Assembly;
+// class Assembly;
+class Chassis;
 
 extern vex::brain Brain;
 extern vex::controller Controller;
@@ -14,7 +15,8 @@ extern vex::competition Competition;
 extern bool calibrating;
 extern bool force_calibrate_inertial;
 
-extern Assembly assembly;
+// extern Assembly assembly;
+extern Chassis chassis;
 
 void init(void);
 
@@ -28,3 +30,9 @@ void enable_user_control(void);
  * competition switch or field controller override this function
  */
 bool control_disabled(void);
+
+/** @brief Stops all motors connected to robot. Used when disabling user control. */
+void stop_all_motors(vex::brakeType mode = vex::brakeType::coast);
+
+/** @brief Changes braketype to all motors connected to robot. Used when disabling user control. */
+void set_brake_all_motors(vex::brakeType mode);

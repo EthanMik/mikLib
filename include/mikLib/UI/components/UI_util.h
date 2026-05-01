@@ -5,6 +5,8 @@
 
 namespace mik { class screen; class label; }
 
+#ifndef FAST_COMPILE
+
 int UI_get_cursor_x_position();
 int UI_get_cursor_y_position();
 
@@ -75,3 +77,5 @@ std::shared_ptr<mik::UI_component> UI_crt_gfx(std::vector<std::shared_ptr<mik::d
 std::shared_ptr<mik::UI_component> UI_crt_bg(std::shared_ptr<mik::drawable> graphic);
 
 std::shared_ptr<mik::screen> UI_crt_scr(int x, int y, int w, int h);
+
+#endif

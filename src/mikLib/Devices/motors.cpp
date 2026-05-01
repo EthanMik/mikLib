@@ -254,6 +254,15 @@ float mik::motor_group::position(vex::rotationUnits units) {
     return motors[0].position(units);
 }
 
+float mik::motor_group::averagePosition(vex::rotationUnits units) {
+    if (motors.empty()) return 0;
+    float position = 0;
+    for (auto& motor : motors) {
+        position += motor.position(units);
+    }
+    return position / motors.size();
+}
+
 float mik::motor_group::voltage(vex::voltageUnits units) {
     if (motors.empty()) { return 0; }
     return motors[0].voltage(units);
@@ -368,4 +377,19 @@ float mik::motor_group::to_volt(float voltage, vex::voltageUnits velocityUnits) 
 
 std::vector<mik::motor>& mik::motor_group::getMotors() {
     return motors;
+}
+
+mik::motor_group mik::motor_group::getMotorsKeyword(const std::string& keyword) {
+    std::string lowerKeyword = keyword;
+    std::transform(lowerKeyword.begin(), lowerKeyword.end(), lowerKeyword.begin(), ::tolower);
+
+    std::vector<mik::motor> matched;
+    for (auto& mtr : motors) {
+        std::string lowerName = mtr.name();
+        std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+        if (lowerName.find(lowerKeyword) != std::string::npos) {
+            matched.push_back(mtr);
+        }
+    }
+    return mik::motor_group(matched);
 }

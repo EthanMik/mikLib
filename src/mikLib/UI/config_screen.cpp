@@ -106,7 +106,6 @@ void UI_config_screen::UI_crt_config_scr() {
         auton_scr->save_auton_SD(); 
     });
 
-    // Spins each motor forwards for half a second
     add_button(slot::MACRO, "Motor Menu", [](){ 
         UI_select_scr({motors_scr->get_motors_screen()});
         disable_user_control();
@@ -189,10 +188,10 @@ void UI_config_screen::UI_crt_config_scr() {
     // Runs a boomerang test
     add_button(slot::TEST, "Test Boomerng", [](){ test_boomerang(); });
 
-    // Runs a pure pursuit test
-    add_button(slot::TEST, "Test Pursuit", [](){ test_pursuit(); });
+    // Runs a motion chaininng test
+    add_button(slot::TEST, "Test Chaining", [](){ test_motion_chaining(); });
 
-    add_button(slot::TEST, "Test Vel/Accel", [](){ config_measure_velocity_accel(); });
+    add_button(slot::TEST, "Test Holonomic", [](){ test_holonomic(); });
 
     for (const auto& component : UI_config_scr->get_UI_components()) {
         component->set_y_pos(component->get_y_pos() - 45);
@@ -214,95 +213,45 @@ void UI_config_screen::UI_crt_pnematics_scr() {
 
     auto expander_port_idx = std::make_shared<int>(0);
 
-    float x = .23;
-    float y = .60;
-
-    auto port_A_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_A) : config_test_three_wire_port(*expander_port_idx - 1, PORT_A); });
-    auto port_A = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_A_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, pnematic_text_color, pnematic_A_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_A->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_A_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, pnematic_text_color, pnematic_A_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_A_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("A", x+txt_x, y+txt_y, pnematic_text_color, pnematic_A_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 1.48;
-    y = .60;
-
-    auto port_B_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_B) : config_test_three_wire_port(*expander_port_idx - 1, PORT_B); });
-    auto port_B = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_B_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, pnematic_text_color, pnematic_B_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_B->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_B_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, pnematic_text_color, pnematic_B_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_B_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("B", x+txt_x, y+txt_y, pnematic_text_color, pnematic_B_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 2.73;
-    y = .60;
-
-    auto port_C_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_C) : config_test_three_wire_port(*expander_port_idx - 1, PORT_C); });
-    auto port_C = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_C_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, pnematic_text_color, pnematic_C_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_C->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_C_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, pnematic_text_color, pnematic_C_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_C_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("C", x+txt_x, y+txt_y, pnematic_text_color, pnematic_C_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 3.98;
-    y = .60;
-
-    auto port_D_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_D) : config_test_three_wire_port(*expander_port_idx - 1, PORT_D); });
-    auto port_D = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_D_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, pnematic_text_color, pnematic_D_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_D->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_D_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, pnematic_text_color, pnematic_D_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_D_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("D", x+txt_x, y+txt_y, pnematic_text_color, pnematic_D_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = .23;
-    y = 1.62;
-
-    auto port_E_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_E) : config_test_three_wire_port(*expander_port_idx - 1, PORT_E); });
-    auto port_E = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_E_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, pnematic_text_color, pnematic_E_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_E->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_E_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, pnematic_text_color, pnematic_E_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_E_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("E", x+txt_x, y+txt_y, pnematic_text_color, pnematic_E_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 1.48;
-    y = 1.62;
-
-    auto port_F_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_F) : config_test_three_wire_port(*expander_port_idx - 1, PORT_F); });
-    auto port_F = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_F_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, pnematic_text_color, pnematic_F_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_F->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_F_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, pnematic_text_color, pnematic_F_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_F_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("F", x+txt_x, y+txt_y, pnematic_text_color, pnematic_F_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 2.73;
-    y = 1.62;
-
-    auto port_G_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_G) : config_test_three_wire_port(*expander_port_idx - 1, PORT_G); });
-    auto port_G = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_G_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, pnematic_text_color, pnematic_G_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_G->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_G_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, pnematic_text_color, pnematic_G_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_G_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("G", x+txt_x, y+txt_y, pnematic_text_color, pnematic_G_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    x = 3.98;
-    y = 1.62;
-
-    auto port_H_btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches), [expander_port_idx](){ *expander_port_idx == 0 ? config_test_three_wire_port(PORT_H) : config_test_three_wire_port(*expander_port_idx - 1, PORT_H); });
-    auto port_H = UI_crt_tgl(UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_H_btn_bg_color, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, pnematic_text_color, pnematic_H_btn_bg_color, UI_distance_units::inches)}), [](){});
-    port_H->set_states(
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_H_btn_bg_color, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, pnematic_text_color, pnematic_H_btn_bg_color, UI_distance_units::inches)}),
-        UI_crt_grp({ UI_crt_rec(x, y, .75, .75, pnematic_H_btn_bg_color, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt("H", x+txt_x, y+txt_y, pnematic_text_color, pnematic_H_btn_bg_color, UI_distance_units::inches)})
-    );
-
-    auto reset_port_btns = [port_A, port_B, port_C, port_D, port_E, port_F, port_G, port_H]() {
-        static_cast<toggle*>(port_A.get())->unpress();
-        static_cast<toggle*>(port_B.get())->unpress();
-        static_cast<toggle*>(port_C.get())->unpress();
-        static_cast<toggle*>(port_D.get())->unpress();
-        static_cast<toggle*>(port_E.get())->unpress();
-        static_cast<toggle*>(port_F.get())->unpress();
-        static_cast<toggle*>(port_G.get())->unpress();
-        static_cast<toggle*>(port_H.get())->unpress();
+    struct port_entry {
+        const char* label;
+        const std::string* bg_color;
+        float x, y;
+        int port_id;
+    };
+    const port_entry ports[8] = {
+        { "A", &pnematic_A_btn_bg_color, .23f,  .60f,  PORT_A },
+        { "B", &pnematic_B_btn_bg_color, 1.48f, .60f,  PORT_B },
+        { "C", &pnematic_C_btn_bg_color, 2.73f, .60f,  PORT_C },
+        { "D", &pnematic_D_btn_bg_color, 3.98f, .60f,  PORT_D },
+        { "E", &pnematic_E_btn_bg_color, .23f,  1.62f, PORT_E },
+        { "F", &pnematic_F_btn_bg_color, 1.48f, 1.62f, PORT_F },
+        { "G", &pnematic_G_btn_bg_color, 2.73f, 1.62f, PORT_G },
+        { "H", &pnematic_H_btn_bg_color, 3.98f, 1.62f, PORT_H },
+    };
+    std::vector<std::shared_ptr<UI_component>> port_btns, port_toggles;
+    port_btns.reserve(8);
+    port_toggles.reserve(8);
+    for (int i = 0; i < 8; ++i) {
+        const auto& p = ports[i];
+        float x = p.x, y = p.y;
+        int pid = p.port_id;
+        const std::string& bg = *p.bg_color;
+        auto btn = UI_crt_btn(UI_crt_img("", x, y, .75, .75, UI_distance_units::inches),
+            [expander_port_idx, pid](){ *expander_port_idx == 0 ? config_test_three_wire_port(pid) : config_test_three_wire_port(*expander_port_idx - 1, pid); });
+        auto tgl = UI_crt_tgl(
+            UI_crt_grp({ UI_crt_rec(x, y, .75, .75, bg, pnematic_port_btn_outline_color, 5, UI_distance_units::inches), UI_crt_txt(p.label, x+txt_x, y+txt_y, pnematic_text_color, bg, UI_distance_units::inches)}),
+            [](){});
+        tgl->set_states(
+            UI_crt_grp({ UI_crt_rec(x, y, .75, .75, bg, pnematic_port_btn_outline_pressing_color, 5, UI_distance_units::inches), UI_crt_txt(p.label, x+txt_x, y+txt_y, pnematic_text_color, bg, UI_distance_units::inches)}),
+            UI_crt_grp({ UI_crt_rec(x, y, .75, .75, bg, pnematic_port_btn_outline_pressed_color, 5, UI_distance_units::inches), UI_crt_txt(p.label, x+txt_x, y+txt_y, pnematic_text_color, bg, UI_distance_units::inches)})
+        );
+        port_btns.push_back(btn);
+        port_toggles.push_back(tgl);
+    }
+    auto reset_port_btns = [port_toggles]() {
+        for (auto& t : port_toggles)
+            static_cast<toggle*>(t.get())->unpress();
     };
 
     int btn_height = 10;
@@ -381,7 +330,9 @@ void UI_config_screen::UI_crt_pnematics_scr() {
         exit_bg->set_states(UI_crt_rec(2, 2, 40, 40, pnematic_close_btn_bg_color, pnematic_close_btn_pressing_color, 2, UI_distance_units::pixels), UI_crt_rec(2, 2, 40, 40, pnematic_close_btn_bg_color, pnematic_close_btn_pressed_color, 2, UI_distance_units::pixels));
     auto exit_txt = UI_crt_gfx({UI_crt_rec(4, 4, 36, 36, pnematic_close_btn_bg_color, UI_distance_units::pixels), UI_crt_txt("X", 17, 27, pnematic_text_color, pnematic_close_btn_bg_color, mik::UI_distance_units::pixels)});
 
-    UI_pnematics_scr->add_UI_components({bg, title_txt, exit_bg, exit_txt, expander_txt, expander_minus7_btn, expander_minus7_lbl, expander_minus1_btn, expander_minus1_lbl, expander_plus1_btn, expander_plus1_lbl, expander_plus7_btn, expander_plus7_lbl, port_A_btn, port_A, port_B_btn, port_B, port_C_btn, port_C, port_D_btn, port_D, port_E_btn, port_E, port_F_btn, port_F, port_G_btn, port_G, port_H_btn, port_H});
+    std::vector<std::shared_ptr<UI_component>> all_comps = {bg, title_txt, exit_bg, exit_txt, expander_txt, expander_minus7_btn, expander_minus7_lbl, expander_minus1_btn, expander_minus1_lbl, expander_plus1_btn, expander_plus1_lbl, expander_plus7_btn, expander_plus7_lbl};
+    for (int i = 0; i < 8; ++i) { all_comps.push_back(port_btns[i]); all_comps.push_back(port_toggles[i]); }
+    UI_pnematics_scr->add_UI_components(all_comps);
 }
 
 void UI_config_screen::swap_mode(std::shared_ptr<UI_component> txtbox, bool mode) {

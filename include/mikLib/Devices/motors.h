@@ -188,6 +188,13 @@ public:
      */
     float position(vex::rotationUnits units);
     
+    /**
+     * @brief Gets the average position of the group's encoders.
+     * @returns Returns a float that represents the current position of the motors in the units defined in the parameter.
+     * @param units The measurement unit for the position.
+     */
+    float averagePosition(vex::rotationUnits units);
+
     /** 
      * @brief Gets the current voltage of the first motor in the group.
      * @return Returns a float that represents the current voltage of the motor in the units defined in the parameter.
@@ -297,6 +304,12 @@ public:
      * @return The wrapped vex motors in a vector
      */   
     std::vector<mik::motor>& getMotors();
+
+    /** 
+     * @param keyword The keyword to use to search for motors inside the group
+     * @return The wrapped vex motors inside of a vector that names match the keyword
+     */   
+    mik::motor_group getMotorsKeyword(const std::string& keyword);
 
 
 private:

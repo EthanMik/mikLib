@@ -14,10 +14,12 @@ namespace mik {
 // Drive Globals
     /** @brief Enumerates the available driver‑control schemes. */
     enum class drive_mode {
-        SPLIT_ARCADE,         // Left stick Y, right stick X
-        SPLIT_ARCADE_CURVED,  // Split arcade with curved turns (from lemlib)
-        TANK,                 // Tank drive
-        TANK_CURVED,          // Tank drive with curved turn (from lemlib)
+        SPLIT_ARCADE,            // Left stick Y, right stick X
+        SPLIT_ARCADE_CURVED,     // Split arcade with curved turns (from lemlib)
+        TANK,                    // Tank drive
+        TANK_CURVED,             // Tank drive with curved turn (from lemlib)
+        FIELD_CENTRIC_HOLONOMIC, // Field centric driving for holonomic drivetrains
+        SPLIT_ARCADE_HOLONOMIC   // Split Arcade that allows strafing
     };
 
     /** @brief Explicitly specifies rotation direction when turning or swinging. */
@@ -32,7 +34,8 @@ namespace mik {
         FWD,      // Drives to point in forward direction
         REV       // Drives it point in reverse direction
     };
-
+    
+    enum class turn_type { TURN, LEFT_SWING, RIGHT_SWING };
     enum auto_variation : int { ONE = 1, TWO = 2, THREE = 3, FOUR = 4 };
     enum class distance_position { FRONT_SENSOR, REAR_SENSOR, LEFT_SENSOR, RIGHT_SENSOR };
     enum class wall_position { TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, AUTO };
@@ -81,6 +84,7 @@ namespace mik {
     inline constexpr auto_variation three = auto_variation::THREE;
     inline constexpr auto_variation four  = auto_variation::FOUR;
 
+#ifndef FAST_COMPILE
 // UI Globals
 
     // UI main color palette
@@ -234,7 +238,8 @@ namespace mik {
     inline const std::string& motors_ports_btn_closed_color = UI_red;
     inline const std::string& motors_ports_btn_open_color = UI_med_gray;
     inline const std::string& motors_ports_btn_current_color = UI_white;
-    
+#endif
+
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 
 
     inline constexpr color black          = color::BLACK;
