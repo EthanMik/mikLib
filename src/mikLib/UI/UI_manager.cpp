@@ -2,9 +2,10 @@
 
 using namespace mik;
 
+#ifndef FAST_COMPILE
 std::vector<std::shared_ptr<mik::screen>> UI_render_queue = {};
 static std::vector<std::shared_ptr<mik::screen>> UI_render_buffer;
-
+#endif
 std::shared_ptr<mik::UI_auton_screen> auton_scr = std::make_shared<mik::UI_auton_screen>();
 #ifndef FAST_COMPILE
 std::shared_ptr<mik::UI_console_screen> console_scr = std::make_shared<mik::UI_console_screen>();
@@ -225,12 +226,12 @@ void UI_select_scr(std::shared_ptr<mik::screen> scr) {
 #endif
 }
 
-void UI_swap_screens(const std::vector<std::shared_ptr<mik::screen>>& scr) {
 #ifndef FAST_COMPILE
+void UI_swap_screens(const std::vector<std::shared_ptr<mik::screen>>& scr) {
     UI_render_buffer = scr;
     is_screen_swapping = true;
-#endif
 }
+#endif
 
 void UI_render() {
 #ifndef FAST_COMPILE

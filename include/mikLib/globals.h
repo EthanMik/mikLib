@@ -238,11 +238,6 @@ namespace mik {
     inline const std::string& motors_ports_btn_closed_color = UI_red;
     inline const std::string& motors_ports_btn_open_color = UI_med_gray;
     inline const std::string& motors_ports_btn_current_color = UI_white;
-#else
-    // Minimal fallbacks required by console_screen.h templates when FAST_COMPILE is set
-    inline const std::string console_bg_color =   "#000000";
-    inline const std::string console_text_color = "#ffffff";
-    inline const std::string loading_text_color = "#ffffff";
 #endif
 
     enum class color { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, BRIGHT_BLACK, BRIGHT_RED, BRIGHT_GREEN, BRIGHT_YELLOW, BRIGHT_BLUE, BRIGHT_MAGENTA, BRIGHT_CYAN, BRIGHT_WHITE }; 

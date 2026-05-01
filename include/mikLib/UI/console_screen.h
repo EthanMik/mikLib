@@ -2,6 +2,8 @@
 
 #include "mikLib/ui.h"
 
+#ifndef FAST_COMPILE
+
 namespace mik {
 
 // Look at test.cpp to see examples on how to use console screen
@@ -103,3 +105,4 @@ void UI_console_screen::add_impl(const std::string& label_text, data_type&& data
     text_start_pos_y += 20;    
 }
 }
+#endif

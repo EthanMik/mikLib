@@ -32,7 +32,6 @@ DEFINES += -DFAST_COMPILE
 SRC_C := $(filter-out src/test.cpp, $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/components/*.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/graphics/*.cpp), $(SRC_C))
-SRC_C += src/mikLib/UI/graphics/logo.cpp
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/config_screen.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/console_screen.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/graph_screen.cpp), $(SRC_C))

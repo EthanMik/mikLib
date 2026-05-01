@@ -806,7 +806,9 @@ void UI_auton_screen::restart_controller_overlay() {
                     auton_scr->cursor_position.second--;
                 }
             } else if (btnA_new_press(Controller.ButtonA.pressing())) {
+#ifndef FAST_COMPILE
                 UI_select_scr(auton_scr->get_auton_screen());
+#endif
                 int r = auton_scr->cursor_position.first;
                 int c = auton_scr->cursor_position.second;
                 auton_scr->control_panel[r][c].push();

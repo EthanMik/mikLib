@@ -2,6 +2,8 @@
 
 #include "mikLib/ui.h"
 
+#ifndef FAST_COMPILE
+
 namespace mik {
 
 class label : public UI_component
@@ -94,3 +96,5 @@ mik::label::label(const std::string& label, F&& data_func, float x, float y, con
 
     formatted_data = "";
 };
+
+#endif
