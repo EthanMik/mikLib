@@ -64,6 +64,19 @@ struct Constants {
     float boomerang_lead; // Constant scale factor that determines how far away the carrot point is. 
     float boomerang_drift; // Determines the amount of horizontal drift allowed, lower values reduce drift while decreasing speed.
 
+    // Pure pursuit constants
+
+    float pursuit_max_velocity; // Maximum linear velocity in (in/s).
+    float pursuit_max_accel; // Maximum linear acceleration in (in/s).
+    float pursuit_friction_limit; // lateral friction limit (in/s).
+
+    float pursuit_kV; // 12.0 / theoretical max velocity in (in/s).
+    float pursuit_kS; // Minimum motor voltage to overcome static friction.
+    float pursuit_kA; // Extra voltage to apply to reach desired velocity (in/s^2).
+
+    float pursuit_lookahead;  // Distance to look ahead in the path (in).
+    float pursuit_timeout; // Time before quitting and move on in milliseconds.
+
     // Constants for controlling drivetrain with joysticks
 
     float control_throttle_deadband; // Deadband percent for the throttle axis.
@@ -189,6 +202,20 @@ struct holonomic_to_pose_params {
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};
+};
+
+struct follow_path_params {
+    float max_velocity = constants.pursuit_max_velocity;
+    float max_accel = constants.pursuit_max_accel;
+    float friction = constants.pursuit_friction_limit;
+
+    float kV = constants.pursuit_kV;
+    float kS = constants.pursuit_kS;
+    float kA = constants.pursuit_kA;
+
+    float lookahead = constants.pursuit_lookahead;
+
+    float timeout = constants.pursuit_lookahead;
 };
 
 struct drive_to_pose_params {

@@ -23,6 +23,7 @@ Chassis chassis(
     360,    // Inertial scale (rotation reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
+	14,      // Drivetrain track width (in). Width from center of wheel to wheel
     2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
     450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
 

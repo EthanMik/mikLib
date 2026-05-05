@@ -26,7 +26,7 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
     if (get_name) return "blue left winpoint";
 
     // Mirror autons here
-
+    
     if (calibrate) {
         // Run startup sequence that you want in pre-auton, do before field controller plug in
         chassis.set_coordinates(0, 0, 0);
@@ -34,8 +34,8 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
         return "";
     }    
 
-    // Place start of autonoumous here
-    
+    chassis.follow_path({{0, 0}, {0, 18}, {6, 24}, {24, 24}});
+
     return "";
 }
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) {

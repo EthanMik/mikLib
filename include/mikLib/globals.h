@@ -4,9 +4,15 @@
 #include "v5_vcs.h"
 #include <string>
 
-typedef struct point{
-    double x;
-    double y;
+struct point{
+    float x, y;
+};
+
+struct bezier {
+    point start;
+    point end;
+    point c1;
+    point c2;
 };
 
 namespace mik {

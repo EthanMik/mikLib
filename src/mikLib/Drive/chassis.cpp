@@ -1,7 +1,7 @@
 #include "mikLib/drive.h"
 
 Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
-    double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
+    double inertial_scale, bool force_calibrate_inertial, double track_width, double wheel_diameter,
     double drivetrain_rpm, int forward_tracker_port, double forward_tracker_diameter,
     double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
     double sideways_tracker_center_distance, mik::distance_reset reset_sensors
@@ -23,6 +23,7 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
     inertial_scale(inertial_scale),
     force_calibrate_inertial(force_calibrate_inertial), 
 
+    track_width(track_width),
     wheel_diameter(wheel_diameter),
     drivetrain_rpm(drivetrain_rpm),
 

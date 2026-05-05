@@ -29,7 +29,7 @@ public:
      * @param reset_sensors Distance sensors parallel to a robot face that can reset odometry axes.
      */
     Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int inertial_port,
-        double inertial_scale, bool force_calibrate_inertial, double wheel_diameter,
+        double inertial_scale, bool force_calibrate_inertial, double track_width, double wheel_diameter,
         double drivetrain_rpm, int forward_tracker_port, double forward_tracker_diameter,
         double forward_tracker_center_distance, int sideways_tracker_port, double sideways_tracker_diameter,
         double sideways_tracker_center_distance, mik::distance_reset reset_sensors
@@ -417,6 +417,8 @@ public:
      */
     void holonomic_to_pose(float X_position, float Y_position, float angle, holonomic_to_pose_params p = holonomic_to_pose_params{});
 
+    void follow_path(bezier segment, follow_path_params p = follow_path_params{});
+
 // USER CONTROL 
 
     /** @brief disables joystick control of the drivetrain */
@@ -631,6 +633,7 @@ private:
     bool force_calibrate_inertial;
     const float minimum_calibration_error = .05;
 
+    float track_width;
     float wheel_diameter;
     float drivetrain_rpm;
 
