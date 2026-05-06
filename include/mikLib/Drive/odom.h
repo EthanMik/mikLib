@@ -33,7 +33,7 @@ public:
 	 * @param forward_tracker_position Current position of the sensor in inches.
 	 * @param sideways_tracker_position Current position of the sensor in inches.
 	 */
-	void set_position(point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position);
+	void set_position(mik::point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position);
 
 	/**
 	 * Does the odometry math to update position
@@ -48,7 +48,7 @@ public:
 	 */
 	void update_position(float forward_tracker_position, float sideways_tracker_position, float orientation_deg);
 
-	point position;
+	mik::point position;
 	float orientation_deg; 
 	
 	float forward_tracker_center_distance;

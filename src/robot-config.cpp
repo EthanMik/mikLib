@@ -8,27 +8,27 @@ vex::controller Controller;
 Chassis chassis(
     // Left drivetrain motors (left/right is looking from behind the robot)
     mik::motor_group({
-        mik::motor(PORT1, false, blue_6_1, "left front motor"), // For holonomic drivetrains, you must include "front" and "back" for the motor names
-        mik::motor(PORT2, false, blue_6_1, "left middle motor"),
-        mik::motor(PORT3, false, blue_6_1, "left back motor"),
+        mik::motor(PORT11, true, blue_6_1, "left front motor"), // For holonomic drivetrains, you must include "front" and "back" for the motor names
+        mik::motor(PORT12, true, blue_6_1, "left middle motor"),
+        mik::motor(PORT13, true, blue_6_1, "left back motor"),
     }),
     // Right drivetrain motors
     mik::motor_group({
-        mik::motor(PORT4, true, blue_6_1, "right front motor"),
-        mik::motor(PORT5, true, blue_6_1, "right middle motor"),
-        mik::motor(PORT6, true, blue_6_1, "right back motor"),
+        mik::motor(PORT2, false, blue_6_1, "right front motor"),
+        mik::motor(PORT5, false, blue_6_1, "right middle motor"),
+        mik::motor(PORT6, false, blue_6_1, "right back motor"),
     }),
 	
-    PORT7,  // Inertial sensor port
+    PORT3,  // Inertial sensor port
     360,    // Inertial scale (rotation reading after a full 360° turn)
 	false,  // Forces inertial sensor to recalibrate until it is within minimum threshold of 0.05 deg for 1 second
 	
-	14,      // Drivetrain track width (in). Width from center of wheel to wheel
+	12.5,      // Drivetrain track width (in). Width from center of wheel to wheel
     2.75,   // Drivetrain wheel diameter (in). Negative flips direction.
     450,    // Drivetrain RPM. Cartridge * gear ratio, (Ex: 600 * (36/48) = 450).
 
-    PORT0,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
-    2,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
+    PORT4,  // Forward tracker port. PORT0 if unused. Accepts "PORT_A"
+    -2.42,      // Forward tracker wheel diameter (in). Negative flips direction. Pushing robot forward at 0° should increase Y
     0,      // Forward tracker center distance (in). Positive = right of center, negative = left.
 
     PORT0,  // Sideways tracker port. PORT0 if unused. Accepts "PORT_A"
@@ -49,23 +49,23 @@ Chassis chassis(
 
 // Add your devices in assembly.h then create them here
 
-/* Creating a motor group in assembly */
-mik::motor_group Assembly::lower_intake_motors({
-	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
-	mik::motor(PORT2, false, green_18_1, "middle_intake")
-});
+// /* Creating a motor group in assembly */
+// mik::motor_group Assembly::lower_intake_motors({
+// 	mik::motor(PORT0, true, green_18_1, "bottom_intake"),
+// 	mik::motor(PORT0, false, green_18_1, "middle_intake")
+// });
 
-/* Creating upper intake motor in assembly */
-mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
+// /* Creating upper intake motor in assembly */
+// mik::motor Assembly::upper_intake_motor(PORT0, false, blue_6_1, "upper_intake");
 
-/* Creating pistons in assembly */
-mik::piston Assembly::scraper_piston(PORT_B);
-mik::piston Assembly::wing_piston(PORT_A);
+// /* Creating pistons in assembly */
+// mik::piston Assembly::scraper_piston(PORT_B);
+// mik::piston Assembly::wing_piston(PORT_A);
 
-/* Creating alternative vex devices in assembly */
-vex::rotation Assembly::rotation_sensor(PORT6);
-vex::optical Assembly::optical_sensor(PORT13);
-vex::limit Assembly::limit_switch(to_triport(PORT_F));
+// /* Creating alternative vex devices in assembly */
+// vex::rotation Assembly::rotation_sensor(PORT0);
+// vex::optical Assembly::optical_sensor(PORT0);
+// vex::limit Assembly::limit_switch(to_triport(PORT_F));
 
 
 

@@ -5,6 +5,7 @@
 #include <string>
 #include "mikLib/Drive/util.h"
 #include "mikLib/globals.h"
+#include "mikLib/Drive/constants.h"
 #include "robot-config.h"
 
 
@@ -178,7 +179,98 @@ float overturn_scaling(float drive_output, float heading_output, float max_speed
     return drive_output;
 }
 
-float dist(point p1, point p2) {
+std::vector<mik::path> motion_profile(const mik::bezier& segment, follow_path_params p, float track_width) {
+    mik::point cubic = { -segment.start.x + 3 * segment.c1.x - 3 * segment.c2.x + segment.end.x, -segment.start.y + 3*segment.c1.y - 3*segment.c2.y + segment.end.y };
+    mik::point quadratic = { 3 * segment.start.x - 6 * segment.c1.x + 3 * segment.c2.x, 3 * segment.start.y - 6 * segment.c1.y + 3 * segment.c2.y };
+    mik::point linear = { -3 * segment.start.x + 3 * segment.c1.x, -3 * segment.start.y + 3 * segment.c1.y };
+    mik::point constant = { segment.start.x, segment.start.y };
+    
+    std::vector<mik::path> path;
+    float distance = 0.0;
+    const float dt = 0.1;
+    float t = 0.0;
+
+    path.push_back(mik::path{
+        .x = constant.x,
+        .y = constant.y,
+        .heading = atan2f(linear.y, linear.x),
+        .acceleration = 0,
+        .velocity = 0,
+        .distance = 0,
+        .curvature = 0
+    });
+
+    mik::path prev_path = path.back();
+
+    while (t < 1.0) {
+        mik::point pt = { cubic.x * t * t * t + quadratic.x * t * t + linear.x * t + constant.x, cubic.y * t * t * t + quadratic.y * t * t + linear.y * t + constant.y };
+        mik::point pt_d1 = { 3 * cubic.x * t * t + 2 * quadratic.x * t + linear.x, 3 * cubic.y * t * t + 2 * quadratic.y*t + linear.y };
+        mik::point pt_d2 = { 6 * cubic.x * t + 2 * quadratic.x, 6 * cubic.y * t + 2 * quadratic.y };
+        float speed = sqrt(pt_d1.x * pt_d1.x + pt_d1.y * pt_d1.y);
+
+        float curvature = (pt_d1.x * pt_d2.y - pt_d1.y * pt_d2.x) / (speed * speed * speed);
+
+        float max_speed_curvature = 2 * p.max_velocity / (2 + track_width * fabs(curvature));
+        float max_speed_friction = sqrt(p.friction * p.max_accel / (fabs(curvature)));
+        float max_speed_accel = sqrt(prev_path.velocity * prev_path.velocity + 2 * p.max_accel * dt);
+        float max_speed = fmin(fmin(max_speed_accel, p.max_velocity), fmin(max_speed_curvature, max_speed_friction));
+
+        distance += dist({pt.x, pt.y}, {path.back().x, path.back().y});
+
+        prev_path = mik::path{
+            .x = pt.x,
+            .y = pt.y,
+            .heading = atan2f(pt_d1.y, pt_d1.x),
+            .acceleration = 0,
+            .velocity = max_speed,
+            .distance = distance,
+            .curvature = max_speed_curvature
+        };
+
+        path.push_back(prev_path);
+
+        float step = dt / speed;
+        t += step;
+    }
+
+    t = 1.0;
+    int i = path.size() - 1;
+    float prev_velocity = 0;
+
+    while (t > 0 && i >= 0) {
+        mik::point pt = { cubic.x * t * t * t + quadratic.x * t * t + linear.x * t + constant.x, cubic.y * t * t * t + quadratic.y*t*t + linear.y*t + constant.y };
+        mik::point pt_d1 = { 3 * cubic.x * t * t + 2 * quadratic.x * t + linear.x, 3 * cubic.y * t * t + 2 * quadratic.y*t + linear.y };
+        mik::point pt_d2 = { 6 * cubic.x*t + 2 * quadratic.x, 6 * cubic.y*t + 2 * quadratic.y };
+
+        if (prev_velocity < path[i].velocity) path[i].velocity = prev_velocity;
+
+        if (i < (int)path.size() - 1) {
+            float ds = dist({path[i].x, path[i].y}, {path[i + 1].x, path[i + 1].y});
+            if (ds > 0) {
+                path[i].acceleration = (path[i + 1].velocity * path[i + 1].velocity - path[i].velocity * path[i].velocity) / (2.0 * ds);
+            }
+        }
+
+        float speed = sqrt(pt_d1.x * pt_d1.x + pt_d1.y * pt_d1.y);
+
+        float curvature = (pt_d1.x * pt_d2.y - pt_d1.y * pt_d2.x) / (speed * speed * speed);
+
+        float max_speed_curvature = 2 * p.max_velocity / (2 + track_width * fabs(curvature));
+        float max_speed_friction = sqrt(p.friction * p.max_accel / (fabs(curvature)));
+        float max_speed_accel = sqrt(prev_velocity * prev_velocity + 2 * p.max_accel * dt);
+        float max_speed = fminf(fminf(max_speed_accel, p.max_velocity), fminf(max_speed_curvature, max_speed_friction));
+
+        prev_velocity = max_speed;
+
+        float step = dt / speed;
+        t -= step;
+        i--;
+    }
+
+    return path;
+}
+
+float dist(mik::point p1, mik::point p2) {
     return std::hypot(p2.x - p1.x, p2.y - p1.y);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "mikLib/drive.h"
+#include <math.h>
+#include "mikLib/globals.h"
 
 struct Constants {
     // Drive constants, heading constants are used to keep robot facing toward target while driving
@@ -67,12 +68,13 @@ struct Constants {
     // Pure pursuit constants
 
     float pursuit_max_velocity; // Maximum linear velocity in (in/s).
+
     float pursuit_max_accel; // Maximum linear acceleration in (in/s).
     float pursuit_friction_limit; // lateral friction limit (in/s).
 
     float pursuit_kV; // 12.0 / theoretical max velocity in (in/s).
     float pursuit_kS; // Minimum motor voltage to overcome static friction.
-    float pursuit_kA; // Extra voltage to apply to reach desired velocity (in/s^2).
+    float pursuit_kA; // (12 - kS) / max_accel (in/s^2).
 
     float pursuit_lookahead;  // Distance to look ahead in the path (in).
     float pursuit_timeout; // Time before quitting and move on in milliseconds.
@@ -215,7 +217,7 @@ struct follow_path_params {
 
     float lookahead = constants.pursuit_lookahead;
 
-    float timeout = constants.pursuit_lookahead;
+    float timeout = constants.pursuit_timeout;
 };
 
 struct drive_to_pose_params {

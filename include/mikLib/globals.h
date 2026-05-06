@@ -4,19 +4,27 @@
 #include "v5_vcs.h"
 #include <string>
 
-struct point{
-    float x, y;
-};
-
-struct bezier {
-    point start;
-    point end;
-    point c1;
-    point c2;
-};
-
 namespace mik {
+    struct point{
+        float x, y;
+    };
+    
+    struct bezier {
+        mik::point start;
+        mik::point c1;
+        mik::point c2;
+        mik::point end;
+    };
 
+    struct path {
+        float x, y;
+        float heading;
+        float curvature;
+        float velocity;
+        float acceleration;
+        float distance;
+    };
+    
 // Drive Globals
     /** @brief Enumerates the available driver‑control schemes. */
     enum class drive_mode {

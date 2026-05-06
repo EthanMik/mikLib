@@ -392,99 +392,8 @@ void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle,
     if (p.wait) { this->wait(); }
 }
 
-namespace mik {
-    struct path {
-        float x, y;
-        float heading;
-        float curvature;
-        float velocity;
-        float acceleration;
-        float distance;
-    };
-}
-
-static std::vector<mik::path> motion_profile(const bezier& segment, follow_path_params p) {
-    struct coeffs { point cubic, quadratic, linear, constant; };
-
-    point cubic = { -segment.start.x + 3 * segment.c1.x - 3 * segment.c2.x + segment.end.x, -segment.start.y + 3*segment.c1.y - 3*segment.c2.y + segment.end.y }; 
-    point quadratic = { 3 * segment.start.x - 6 * segment.c1.x + 3 * segment.c2.x, 3 * segment.start.y - 6 * segment.c1.y + 3 * segment.c2.y };
-    point linear = { -3 * segment.start.x + 3 * segment.c1.x, -3 * segment.start.y + 3 * segment.c1.y };
-    point constant = { segment.start.x, segment.start.y };
-
-    std::vector<mik::path> path;
-    float distance = 0.0;
-    float t = 0.0;
-
-    while (t < 1.0) {
-        float ct = fminf(t, 1.f);
-
-        point p = { cubic.x * t * t * t + quadratic.x * t * t + linear.x * t + constant.x, cubic.y * t * t * t + quadratic.y*t*t + linear.y*t + constant.y };
-        point p_d1 = { 3 * cubic.x * t * t + 2 * quadratic.x * t + linear.x, 3 * cubic.y * t * t + 2 * quadratic.y*t + linear.y };
-        point p_d2 = { 6 * cubic.x*t + 2 * quadratic.x, 6 * cubic.y*t + 2 * quadratic.y };
-
-        float speed = hypotf(p_d1.x, p_d1.y);
-        float heading  = speed > 1e-7f ? atan2f(p_d1.y, p_d1.x) : 0.0;
-        float curvature = speed > 1e-7f ? (p_d1.x * p_d2.y - p_d1.y * p_d2.x) / (speed * speed * speed) : 0.0;
-
-        if (!path.empty()) {
-            float dx = p.x - path.back().x;
-            float dy = p.y - path.back().y;
-            distance += hypotf(dx, dy);
-        }
-
-        path.push_back({ p.x, p.y, heading, curvature, 0, 0, distance });
-
-        float step = speed > 1e-7f ? 0.5 / speed : 0.5;
-        t += step;
-    }
-
-    int points = path.size();
-
-    for (int i = 0; i < points; ++i) {
-        float k = fabsf(path[i].curvature);
-        float v_wheel = p.max_velocity;
-        float v_friction = p.max_velocity;
-
-        if (k > 1e-6f) {
-            v_wheel = 2.f * p.max_velocity / (2.0 + track_width * k);
-            v_friction = sqrtf(p.friction / k);
-        }
-
-        path[i].velocity = fminf(p.max_velocity, fminf(v_wheel, v_friction));
-    }
-
-    path[0].velocity = 0.0;
-    for (int i = 1; i < points; ++i) {
-        float ds = path[i].distance - path[i - 1].distance;
-        path[i].velocity = fminf(path[i].velocity, sqrtf(path[i - 1].velocity * path[i - 1].velocity + 2.f * p.max_accel * ds));
-    }
-
-    path[points - 1].velocity = 0.0;
-    for (int i = points - 2; i >= 0; --i) {
-        float ds = path[i + 1].distance - path[i].distance;
-        path[i].velocity = fminf(path[i].velocity, sqrtf(path[i + 1].velocity * path[i + 1].velocity + 2.f * p.max_accel * ds));
-    }
-
-    for (int i = 0; i < points; ++i) {
-        float dv, ds;
-        if (i == 0) {
-            dv = path[1].velocity - path[0].velocity;
-            ds = path[1].distance - path[0].distance;
-        } else if (i == points - 1) {
-            dv = path[points - 1].velocity - path[points - 2].velocity;
-            ds = path[points - 1].distance - path[points - 2].distance;
-        } else {
-            dv = path[i + 1].velocity - path[i - 1].velocity;
-            ds = path[i + 1].distance - path[i - 1].distance;
-        }
-        path[i].acceleration = ds > 1e-7f ? path[i].velocity * dv / ds : 0.0;
-    }
-
-    return path;
-}
-
 void Chassis::follow_path(bezier segment, follow_path_params p) {
-    std::vector<mik::path> path;
+    std::vector<mik::path> path = motion_profile(segment, p, track_width);
     int points = path.size();
 
     int closest_idx = 0;
@@ -549,6 +458,9 @@ void Chassis::follow_path(bezier segment, follow_path_params p) {
             target_left_vel *= p.max_velocity / ratio;
             target_right_vel *= p.max_velocity / ratio;
         }
+
+        float cross_track = dist({path[closest_idx].x, path[closest_idx].y}, {get_X_position(), get_Y_position()});
+        print(to_string(path[closest_idx].distance) + ", " + to_string(cross_track));
 
         float left_output = p.kS * sign(target_left_vel) + p.kV * target_left_vel + p.kA * target_acc;
         float right_output = p.kS * sign(target_right_vel) + p.kV * target_right_vel + p.kA * target_acc;

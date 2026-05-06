@@ -119,7 +119,7 @@ void UI_config_screen::UI_crt_config_scr() {
 
     add_button(slot::MACRO, "Odom Offsets", [](){ config_measure_odometry_offsets(); });
 
-    add_button(slot::MACRO, "Reset Offsets", [](){ config_measure_distance_reset_offsets(); });
+    add_button(slot::MACRO, "Measure Vel", [](){ config_measure_velocity_accel(); });
 
 
     // Clears PID data off SD card

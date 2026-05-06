@@ -5,7 +5,7 @@ void odom::set_physical_distances(float forward_tracker_center_distance, float s
     this->sideways_tracker_center_distance = sideways_tracker_center_distance;
 }
 
-void odom::set_position(point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position){
+void odom::set_position(mik::point position, float orientation_deg, float forward_tracker_position, float sideways_tracker_position){
     this->forward_tracker_position = forward_tracker_position;
     this->sideways_tracker_position = sideways_tracker_position;
     this->position = position;

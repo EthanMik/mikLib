@@ -843,7 +843,17 @@ void config_measure_velocity_accel() {
 		float drive_time_constant = time_constant(smoothed_drive_velo, max_drive_vel);
 		float turn_time_constant = time_constant(smoothed_turn_velo, max_turn_vel);
 
-        console_scr->add("Max Drive Velocity: ", [max_drive_vel](){ return to_string_float(max_drive_vel, 3, false) + " ft/s"; });
+		float max_drive_accel = 0;
+		for (size_t i = 1; i <= max_drive_index && i < smoothed_drive_velo.size(); ++i) {
+			float dt = smoothed_drive_velo[i].t - smoothed_drive_velo[i - 1].t;
+			if (dt > 0) {
+				float a = (smoothed_drive_velo[i].value - smoothed_drive_velo[i - 1].value) / dt;
+				if (a > max_drive_accel) max_drive_accel = a;
+			}
+		}
+
+        console_scr->add("Max Drive Velocity: ", [max_drive_vel](){ return to_string_float(max_drive_vel * 12, 3, false) + " in/s"; });
+        console_scr->add("Max Drive Accel: ", [max_drive_accel](){ return to_string_float(max_drive_accel * 12, 2, false) + " in/s^2"; });
         console_scr->add("Drive Time Constant: ", [drive_time_constant](){ return to_string_float(drive_time_constant, 4, false) + " s"; });
 
 		console_scr->add("Max Turn Velocity: ", [max_turn_vel](){ return to_string_float(max_turn_vel, 3, false) + " deg/s"; });

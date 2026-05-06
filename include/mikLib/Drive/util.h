@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "mikLib/globals.h"
+#include "mikLib/Drive/constants.h"
 
 /**
  * @brief "Clamps" a number between a min and max.
@@ -212,7 +213,7 @@ float clamp_max_slip(float drive_output, float current_X, float current_Y, float
 
 
 /** @return the distance between two x, y points */
-float dist(point p1, point p2);
+float dist(mik::point p1, mik::point p2);
 
 /** @return -1 for negative numbers and 1 for positive numbers */
 template <typename T>
@@ -220,24 +221,7 @@ constexpr T sign(T value) {
 	return value < 0 ? -1 : 1;
 }
 
-/**
- * @brief Compute the intersection points between a circle and a line segment.
- * Determines where (if anywhere) the closed segment from `p1` to `p2`
- * intersects the circle centered at `center` with radius `radius`.
- * Intersection points that fall outside the segment bounds are discarded.
- * Segment endpoints that lie on the circle count as intersections.
- *
- * @param center Center of the circle.
- * @param radius Radius of the circle (same units as the point coordinates).
- * @param p1 First endpoint of the line segment.
- * @param p2 Second endpoint of the line segment.
- * 
- * @return A vector containing 0, 1, or 2 intersection points that lie on the
- * segment. In a tangential (single-touch) case, floating-point effects
- * may produce two nearly identical points; callers may wish to
- * deduplicate.
- */
-std::vector<point> line_circle_intersections(point center, float radius, point p1, point p2);
+std::vector<mik::path> motion_profile(const mik::bezier& segment, follow_path_params p, float track_width);
 
 /**
  * @brief Checks to see whether specified text file exists on SD card.
