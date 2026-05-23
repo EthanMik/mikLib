@@ -38,7 +38,7 @@ void user_control(void) {
         if (!control_disabled()) {
             // Add your user control code here
             
-            chassis.control(drive_mode::FIELD_CENTRIC_HOLONOMIC);
+            chassis.control(drive_mode::SPLIT_ARCADE_HOLONOMIC);
             assembly.control();
         }
         task::sleep(5);

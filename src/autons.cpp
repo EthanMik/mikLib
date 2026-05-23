@@ -84,17 +84,69 @@ std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name
 
 std::string blue_left_sawp(bool calibrate, auto_variation var, bool get_name) {
     if (get_name) return "blue left sawp";
-
+    
     // Mirror autons here
-
+    
+    // [sawp2]
     if (calibrate) {
         // Run startup sequence that you want in pre-auton, do before field controller plug in
-        chassis.set_coordinates(0, 0, 0);
-
+        chassis.set_coordinates(49.58, 23.87, 90);
         return "";
     }
+    
+    assembly.unjam_intake_task();
+    stop_intake();
+    color_sort_auton(color_sort::RED);
 
-    // Place start of autonoumous here
+    float time = Brain.Timer.time(msec);
+    assembly.LB_motors.stop(hold);
+    assembly.LB_motors.spin(fwd, -12, velocity_units::volt);
+    task::sleep(600);
+    LB_task(INACTIVE);
+    
+    chassis.turn_to_point(21.7, 24.3, {.angle_offset = 180});
+    constants.drive_max_voltage = 6;
+    chassis.drive_to_point(21.7, 24.3, {.min_voltage = 6, .exit_error = 3.5, .wait = false});
+    chassis.wait_until_within(3);
+    assembly.mogo_clamp_piston.set(true);
+    chassis.cancel_motion();
+
+    default_constants();
+    task::sleep(200);
+    start_intake();
+    chassis.turn_to_point(23.59, 44.5);
+    chassis.drive_to_point(23.59, 44.5);
+    chassis.turn_to_point(47.41, 1.25);
+    assembly.lift_piston.set(true);
+    chassis.drive_to_point(47.41, 1.25);
+    start_intake(false);
+    intake_ring_halfway();
+    assembly.lift_piston.set(false);
+    chassis.drive_distance(-8);
+    assembly.mogo_clamp_piston.set(false);
+    constants.drive_max_voltage = 12;
+    chassis.drive_distance(20.92);
+
+    chassis.turn_to_point(23.64, -23.17, {.angle_offset = 180});
+    constants.drive_max_voltage = 6;
+    chassis.drive_to_point(23.64, -23.17);
+    default_constants();
+    assembly.mogo_clamp_piston.set(true);
+    task::sleep(200);
+    default_constants();
+    chassis.turn_to_point(23.59, -44.5);
+    start_intake();
+    chassis.drive_to_point(23.59, -44.5);
+    LB_task(SCORING);
+    chassis.turn_to_point(10.81, -33.89);
+    chassis.drive_to_point(10.81, -33.89);
+    stop_intake();
+    chassis.stop_drive(hold);
+
+    Brain.Screen.printAt(30, 30, "%f", Brain.Timer.time(msec) - time);
+    // [sawp2]
+
+
 
     return "";
 }
@@ -115,35 +167,49 @@ std::string blue_left_elim(bool calibrate, auto_variation var, bool get_name) {
     return "";
 }
 std::string blue_right_winpoint(bool calibrate, auto_variation var, bool get_name) {
+    // [left-elim]
     if (get_name) return "blue right winpoint";
 
     // Mirror autons here
 
     if (calibrate) {
         // Run startup sequence that you want in pre-auton, do before field controller plug in
-        chassis.set_coordinates(0, 0, 0);
+        chassis.set_coordinates(-50.25, -16.37, 90);
 
         return "";
     }
 
     // Place start of autonoumous here
 
+
+
+    chassis.drive_to_pose(-22.45, -21.99, 140, {.min_voltage = 5, .exit_error = 5, .lead = 0.3});
+    chassis.drive_to_point(-7.17, -45.14);
+    chassis.drive_to_point(-22.2, -22.14);
+    intake();
+    chassis.drive_to_point(-46.5, -47.5);
+    chassis.turn_to_point(-59.81, -47.53);
+    chassis.drive_to_point(-59.81, -47.53);
+    chassis.drive_to_point(-31.84, -47.37);
+    task::sleep(640);
+    // [left-elim]
     return "";
 }
 std::string blue_right_sawp(bool calibrate, auto_variation var, bool get_name) {
+    // [waittest]
     if (get_name) return "blue right sawp";
-
+    
     // Mirror autons here
 
     if (calibrate) {
         // Run startup sequence that you want in pre-auton, do before field controller plug in
-        chassis.set_coordinates(0, 0, 0);
 
         return "";
     }
 
     // Place start of autonoumous here
-
+    
+    // [waittest]
     return "";
 }
 std::string blue_right_elim(bool calibrate, auto_variation var, bool get_name) {
