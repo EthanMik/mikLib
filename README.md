@@ -16,6 +16,7 @@ An easy to use odometry VEXcode template with UI support.
    - Drive inches and to point
    - Drive to pose via boomerang
    - Holonomic to pose
+   - Strafe Distance
    - Motion Chaining
 - User control
    - Field centric
