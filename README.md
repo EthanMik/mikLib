@@ -16,11 +16,11 @@ An easy to use odometry VEXcode template with UI support.
    - Drive inches and to point
    - Drive to pose via boomerang
    - Holonomic to pose
-   - Strafe Distance
-   - Motion Chaining
+   - Strafe distance
+   - Motion chaining
 - User control
    - Field centric
-   - Split Arcade
+   - Split arcade
    - Tank
    - Drive curve versions
 - UI
