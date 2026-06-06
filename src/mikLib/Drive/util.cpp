@@ -161,7 +161,7 @@ float clamp_max_slip(float drive_output, float current_X, float current_Y, float
     const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
 
     const float radius = (dist * dist) / (2.0 * perp_dist);
-    const float max_slip = sqrt(drift * radius * 9.8);
+    const float max_slip = sqrt(drift * radius);
     return clamp(drive_output, -max_slip, max_slip);  
 }
 

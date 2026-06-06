@@ -42,8 +42,9 @@ public:
      * @param settle_time Minimum time to be considered settled.
      * @param exit_error Error to be considered finished.
      * @param timeout Time after which to give up and move on. Using 0 will not time out movement.
+     * @param stall_timeout Time after which to give up and move on when robot is close to 0 velocity. Using 0 for either timeouts will disable it.
      */
-    PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout);
+    PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout, float stall_timeout = 0);
 
     /**
      * @brief Computes the output power based on the error.
@@ -75,10 +76,12 @@ public:
     float settle_time = 0;
     float exit_error = 0;
     float timeout = 0;
+    float stall_timeout = 0;
     float accumulated_error = 0;
     float previous_error = 0;
     float output = 0;
     float time_spent_settled = 0;
     float time_spent_running = 0;
+    float time_spent_stalled = 0;
     bool exiting = false;
 };

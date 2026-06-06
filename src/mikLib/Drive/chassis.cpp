@@ -15,6 +15,12 @@ Chassis::Chassis(mik::motor_group left_drive, mik::motor_group right_drive, int 
 
     left_drive(left_drive),
     right_drive(right_drive),
+    
+    // Grab the holonomic motors based off name
+    left_front_drive(left_drive.getMotorsKeyword("front")),
+    left_back_drive(left_drive.getMotorsKeyword("back")),
+    right_front_drive(right_drive.getMotorsKeyword("front")),
+    right_back_drive(right_drive.getMotorsKeyword("back")),
 
     reset_sensors(reset_sensors),
 
@@ -332,22 +338,17 @@ void Chassis::tank_curved() {
     left_drive.spin(fwd, percent_to_volt(left_throttle), volt);
     right_drive.spin(fwd, percent_to_volt(right_throttle), volt);
 }
- 
-static mik::motor_group left_front_motors = chassis.left_drive.getMotorsKeyword("front");
-static mik::motor_group left_back_motors = chassis.left_drive.getMotorsKeyword("back");
-static mik::motor_group right_front_motors = chassis.right_drive.getMotorsKeyword("front");
-static mik::motor_group right_back_motors = chassis.right_drive.getMotorsKeyword("back");
 
 void Chassis::split_arcade_holonomic() {
     float throttle = deadband(controller(primary).Axis3.value(), 5);
     float turn = deadband(controller(primary).Axis1.value(), 5);
     float strafe = deadband(controller(primary).Axis4.value(), 5);
 
-    left_front_motors.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
-    left_back_motors.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
+    left_front_drive.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
+    left_back_drive.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
 
-    right_front_motors.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
-    right_back_motors.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
+    right_front_drive.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
+    right_back_drive.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
 }
 
 void Chassis::field_centric_holonomic() {
@@ -360,11 +361,11 @@ void Chassis::field_centric_holonomic() {
     float throttle = forward * cos(angle) + strafe * sin(angle);
     strafe = -forward * sin(angle) + strafe * cos(angle);
 
-    left_front_motors.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
-    left_back_motors.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
+    left_front_drive.spin(fwd, percent_to_volt(throttle + turn + strafe), volt);
+    left_back_drive.spin(fwd, percent_to_volt(throttle + turn - strafe), volt);
     
-    right_front_motors.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
-    right_back_motors.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
+    right_front_drive.spin(fwd, percent_to_volt(throttle - turn - strafe), volt);
+    right_back_drive.spin(fwd, percent_to_volt(throttle - turn + strafe), volt);
 }
 
 void Chassis::control(drive_mode dm) {

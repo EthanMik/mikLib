@@ -377,7 +377,7 @@ public:
      * @param Y_position Desired y position in inches.
      * @param angle Desired orientation in degrees.
      * @param lead Constant scale factor that determines how far away the carrot point is.
-     * @param drift Determines the amount of horizontal drift allowed, lower values reduce drift.
+     * @param drift Limits speed while turning. Higher values increase lateral speed.
      * @param min_voltage Minimum voltage on the drive, used for chaining movements.
      * @param max_voltage Max voltage on the drive out of 12.
      * @param heading_max_voltage Max voltage for getting to heading out of 12.
@@ -390,6 +390,29 @@ public:
      * @param wait Yields program until motion has finished, true by default.
      */
     void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{});
+
+    /**
+     * @brief Drives the robot a given distance with a given heading.
+     * Drive distance does not optimize for direction, so it won't try
+     * to drive at the opposite heading from the one given to get there faster.
+     * You can control the heading, but if you choose not to, it will drive with the
+     * heading it's currently facing. It uses sideways tracker to find distance traveled. 
+     * Use negative distance to go left. Uses inches for tracking distance.
+     * 
+     * @param distance Desired distance in inches.
+     * @param heading Desired heading in degrees.
+     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
+     * @param max_voltage Max voltage on the drive out of 12.
+     * @param heading_max_voltage Max voltage for getting to heading out of 12.
+     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
+     * @param settle_error Error to be considered settled in inches.
+     * @param settle_time Time to be considered settled in milliseconds.
+     * @param timeout Time before quitting and move on in milliseconds.
+     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
+     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
+     * @param wait Yields program until motion has finished, true by default.
+     */
+    void strafe_distance(float distance, strafe_distance_params p = strafe_distance_params{});
 
     /**
      * @brief Drives and turns simultaneously to a desired pose on a holonomic chassis.
@@ -582,6 +605,11 @@ public:
     mik::motor_group left_drive;
     mik::motor_group right_drive;
 
+    mik::motor_group left_front_drive;
+    mik::motor_group left_back_drive;
+    mik::motor_group right_front_drive;
+    mik::motor_group right_back_drive;
+
     mik::distance_reset reset_sensors;
 
     bool calibrating = false;
@@ -616,6 +644,7 @@ public:
     drive_to_point_params drive_to_point_params_buffer{};
     drive_to_pose_params drive_to_pose_params_buffer{};
     drive_distance_params drive_distance_params_buffer{};
+    strafe_distance_params strafe_distance_params_buffer{};
     holonomic_to_pose_params holonomic_to_pose_params_buffer{};
 
 private:
