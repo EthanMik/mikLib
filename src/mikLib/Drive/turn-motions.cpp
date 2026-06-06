@@ -7,7 +7,6 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
     turn_params_buffer = p;
     turn_type_buffer = type;
 
-    // Create PID; exit error is only applied if min voltage is non zero
     pid = PID(p.k.p, p.k.i, p.k.d, p.k.starti, p.settle_error, p.settle_time, p.exit_error, p.timeout);
 
     motion_running = true;
@@ -111,12 +110,14 @@ void Chassis::turn_to_angle(float angle, turn_to_angle_params p) {
 
 void Chassis::left_swing_to_angle(float angle, swing_to_angle_params p) {
     mirror(angle, p.direction, x_pos_mirrored_, y_pos_mirrored_);
-    turn(angle, 0, p, turn_type::LEFT_SWING);
+    turn_type type = (x_pos_mirrored_ ^ y_pos_mirrored_) ? turn_type::RIGHT_SWING : turn_type::LEFT_SWING;
+    turn(angle, 0, p, type);
 }
 
 void Chassis::right_swing_to_angle(float angle, swing_to_angle_params p) {
     mirror(angle, p.direction, x_pos_mirrored_, y_pos_mirrored_);
-    turn(angle, 0, p, turn_type::RIGHT_SWING);
+    turn_type type = (x_pos_mirrored_ ^ y_pos_mirrored_) ? turn_type::LEFT_SWING : turn_type::RIGHT_SWING;
+    turn(angle, 0, p, type);
 }
 
 void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_params p) {
@@ -143,6 +144,7 @@ void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_p
     desired_X_position = X_position;
     desired_Y_position = Y_position;
     float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
+    turn_type type = (x_pos_mirrored_ ^ y_pos_mirrored_) ? turn_type::RIGHT_SWING : turn_type::LEFT_SWING;
     turn(angle, p.angle_offset, {
         .direction = p.direction,
         .min_voltage = p.min_voltage,
@@ -155,7 +157,7 @@ void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_p
         .slew = p.slew,
         .wait = p.wait,
         .k = p.k,
-    }, turn_type::LEFT_SWING);
+    }, type);
 }
 
 void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_point_params p) {
@@ -163,6 +165,7 @@ void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_
     desired_X_position = X_position;
     desired_Y_position = Y_position;
     float angle = to_deg(atan2(X_position - get_X_position(), Y_position - get_Y_position()));
+    turn_type type = (x_pos_mirrored_ ^ y_pos_mirrored_) ? turn_type::LEFT_SWING : turn_type::RIGHT_SWING;
     turn(angle, p.angle_offset, {
         .direction = p.direction,
         .min_voltage = p.min_voltage,
@@ -175,5 +178,5 @@ void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_
         .slew = p.slew,
         .wait = p.wait,
         .k = p.k,
-    }, turn_type::RIGHT_SWING);
+    }, type);
 }
