@@ -15,7 +15,7 @@ PID::PID(float kp, float ki, float kd, float starti) :
     starti(starti)
 {};
 
-PID::PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout) :
+PID::PID(float kp, float ki, float kd, float starti, float settle_error, float settle_time, float exit_error, float timeout, float stall_timeout) :
     kp(kp),
     ki(ki),
     kd(kd),
@@ -23,7 +23,8 @@ PID::PID(float kp, float ki, float kd, float starti, float settle_error, float s
     settle_error(settle_error),
     settle_time(settle_time),
     exit_error(exit_error),
-    timeout(timeout)
+    timeout(timeout),
+    stall_timeout(stall_timeout)
 {};
 
 float PID::compute(float error) {
@@ -34,7 +35,8 @@ float PID::compute(float error) {
         accumulated_error = 0; 
     }
 
-    output = kp * error + ki * accumulated_error + kd * (error - previous_error);
+    float derivative = error - previous_error;
+    output = kp * error + ki * accumulated_error + kd * (derivative);
 
     previous_error = error;
 
@@ -48,12 +50,21 @@ float PID::compute(float error) {
         exiting = true;
     }
 
+    if (fabs(derivative) < 0.05) {
+        time_spent_stalled += 10;
+    } else {
+        time_spent_stalled = 0;
+    }
+
     time_spent_running += 10;
 
     return output;
 }
 
 bool PID::is_settled(){
+    if (time_spent_stalled > stall_timeout && stall_timeout != 0 && timeout != 0) {
+        return true;
+    }
     if (time_spent_running > timeout && timeout != 0) {
         return true;
     }

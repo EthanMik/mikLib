@@ -213,7 +213,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
             reverse = fabs(intial_heading_error) > forward_prioritization;
         }
         // Flip target angle when reversing so the carrot point stays behind the robot
-        if (reverse) reduce_0_to_360(angle += 180);
+        if (reverse) angle =  reduce_0_to_360(angle + 180);
         bool settling = false;
         bool prev_crossed_line = is_line_settled(x, y, angle, chassis.get_X_position(), chassis.get_Y_position(), p.exit_error);
 
@@ -248,7 +248,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
             float carrot_settled = is_line_settled(x, y, angle, carrot_x, carrot_y, p.exit_error);
             bool crossed_line = line_settled == carrot_settled;
 
-            if (!crossed_line && prev_crossed_line && p.min_voltage != 0 && settling) { break; }
+            if (!(crossed_line == prev_crossed_line) && p.min_voltage != 0 && settling) { break; }
             prev_crossed_line = crossed_line;
 
             drive_error = hypot(carrot_x - chassis.get_X_position(), carrot_y - chassis.get_Y_position());
@@ -309,11 +309,85 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
     if (p.wait) { this->wait(); }
 }
 
-// Grab motor groups based on their names, this code is kinda sketchy but works without blowing up chassis constructor
-static mik::motor_group left_front_motors = chassis.left_drive.getMotorsKeyword("front");
-static mik::motor_group left_back_motors = chassis.left_drive.getMotorsKeyword("back");
-static mik::motor_group right_front_motors = chassis.right_drive.getMotorsKeyword("front");
-static mik::motor_group right_back_motors = chassis.right_drive.getMotorsKeyword("back");
+void Chassis::strafe_distance(float distance, strafe_distance_params p) {
+    // Tasks can only use data from global scope
+    desired_distance = distance;
+
+    // Default heading to current heading if not specified
+    if (std::isnan(p.heading)) desired_heading = get_absolute_heading();
+    else desired_heading = p.heading;
+
+    mirror(desired_heading, x_pos_mirrored_, y_pos_mirrored_);
+
+    strafe_distance_params_buffer = p;
+
+    // Create PID; exit error is only applied if min voltage is non zero
+    pid = PID(p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.exit_error, p.timeout);
+    pid_2 = PID(p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
+
+    motion_running = true;
+    active_min_voltage = p.min_voltage;
+    distance_traveled = 0;
+    percent_traveled = 0;
+    distance_from_target = fabs(distance);
+
+    drive_task = vex::task([](){
+        // Read from global scope
+        const float distance = chassis.desired_distance;
+        const float heading = chassis.desired_heading;
+        strafe_distance_params& p = chassis.strafe_distance_params_buffer;
+
+        const float total_distance = fabs(distance);
+        float drive_start_position = chassis.get_sideways_tracker_position();
+        float current_position = drive_start_position;
+
+        float drive_error = distance + drive_start_position - current_position;
+        float prev_drive_error = drive_error;
+        float prev_heading_output = 0;
+        float prev_drive_output = 0;
+
+        while (!chassis.pid.is_settled()) {
+            current_position = chassis.get_sideways_tracker_position();
+
+            drive_error = distance + drive_start_position - current_position;
+            chassis.distance_traveled += fabs(drive_error - prev_drive_error);
+            chassis.percent_traveled = fmin(100, (chassis.distance_traveled / total_distance) * 100);
+            chassis.distance_from_target = fabs(drive_error);
+            prev_drive_error = drive_error;
+
+            float heading_error = reduce_negative_180_to_180(heading - chassis.get_absolute_heading());
+            float drive_output = chassis.pid.compute(drive_error);
+            float heading_output = chassis.pid_2.compute(heading_error);
+
+            drive_output = clamp(drive_output, -p.max_voltage, p.max_voltage);
+            heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
+
+            // Disable drive slew when robot is close to target
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
+            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
+
+            drive_output = clamp_min_voltage(drive_output, p.min_voltage);
+
+            chassis.left_front_drive.spin(fwd,  drive_output + heading_output, volt);
+            chassis.left_back_drive.spin(fwd,  -drive_output + heading_output, volt);
+            chassis.right_front_drive.spin(fwd, -drive_output - heading_output, volt);
+            chassis.right_back_drive.spin(fwd,  drive_output - heading_output, volt);
+
+            prev_drive_output = drive_output;
+            prev_heading_output = heading_output;
+
+            vex::task::sleep(10);
+        }
+
+        chassis.motion_running = false;
+        // Stop the chassis if min voltage is non zero, default is coast
+        if (p.min_voltage == 0) { chassis.stop_drive(chassis.stop_behavior); }
+
+        return 0;
+    });
+    // Hold the task if wait is true
+    if (p.wait) { this->wait(); }
+}
 
 void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle, holonomic_to_pose_params p) {
     mirror(X_position, Y_position, angle, x_pos_mirrored_, y_pos_mirrored_);
@@ -373,10 +447,10 @@ void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle,
             float heading_to_target = atan2(y - chassis.get_Y_position(), x - chassis.get_X_position());
             float current_angle = to_rad(chassis.get_absolute_heading());
 
-            left_front_motors.spin(fwd, drive_output * cos(current_angle + heading_to_target - M_PI / 4) + turn_output, volt);
-            left_back_motors.spin(fwd,  drive_output * cos(-current_angle - heading_to_target + 3 * M_PI / 4) + turn_output, volt);
-            right_front_motors.spin(fwd, drive_output * cos(-current_angle - heading_to_target + 3 * M_PI / 4) - turn_output, volt);
-            right_back_motors.spin(fwd,  drive_output * cos(current_angle + heading_to_target - M_PI / 4) - turn_output, volt);
+            chassis.left_front_drive.spin(fwd, drive_output * cos(current_angle + heading_to_target - M_PI / 4) + turn_output, volt);
+            chassis.left_back_drive.spin(fwd,  drive_output * cos(-current_angle - heading_to_target + 3 * M_PI / 4) + turn_output, volt);
+            chassis.right_front_drive.spin(fwd, drive_output * cos(-current_angle - heading_to_target + 3 * M_PI / 4) - turn_output, volt);
+            chassis.right_back_drive.spin(fwd,  drive_output * cos(current_angle + heading_to_target - M_PI / 4) - turn_output, volt);
 
             prev_drive_output = drive_output;
 
