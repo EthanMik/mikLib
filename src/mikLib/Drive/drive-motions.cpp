@@ -12,7 +12,6 @@ void Chassis::drive_distance(float distance, drive_distance_params p) {
 
     drive_distance_params_buffer = p;
 
-    // Create PID; exit error is only applied if min voltage is non zero
     pid = PID(p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.exit_error, p.timeout);
     pid_2 = PID(p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
 
@@ -317,11 +316,11 @@ void Chassis::strafe_distance(float distance, strafe_distance_params p) {
     if (std::isnan(p.heading)) desired_heading = get_absolute_heading();
     else desired_heading = p.heading;
 
+    if (x_pos_mirrored_ ^ y_pos_mirrored_) desired_distance = -desired_distance;
     mirror(desired_heading, x_pos_mirrored_, y_pos_mirrored_);
 
     strafe_distance_params_buffer = p;
 
-    // Create PID; exit error is only applied if min voltage is non zero
     pid = PID(p.drive_k.p, p.drive_k.i, p.drive_k.d, p.drive_k.starti, p.settle_error, p.settle_time, p.exit_error, p.timeout);
     pid_2 = PID(p.heading_k.p, p.heading_k.i, p.heading_k.d, p.heading_k.starti);
 
