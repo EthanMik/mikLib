@@ -3,7 +3,7 @@
 
 [<img src="https://img.shields.io/github/downloads/EthanMik/mikLib/total?style=for-the-badge&color=cc0000">](https://github.com/EthanMik/mikLib/releases)
 
-An easy to use odometry VEXcode template with UI support.\
+An easy to use odometry VEXcode template with UI support.
 
 > For updates and help, join [mikLib](https://discord.gg/UKbzef8GrA) Discord
 
