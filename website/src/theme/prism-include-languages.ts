@@ -14,14 +14,9 @@ export default function prismIncludeLanguages(PrismObject: PrismLib): void {
           pattern: /\b[A-Z]\w*(?=\s+[a-z_]\w*)/,
           greedy: true,
         },
-        // Match identifiers before :: (namespace/class usage like mik::motor)
+        // Match identifiers before :: (namespace/class like mik::, Assembly::)
         {
           pattern: /\b[a-z_]\w*(?=\s*::)/i,
-          greedy: true,
-        },
-        // Match identifiers after :: (class/function like motor, motor_group)
-        {
-          pattern: /(?<=::)\s*[a-z_]\w*/i,
           greedy: true,
         },
         // Keep existing class-name patterns
@@ -32,6 +27,45 @@ export default function prismIncludeLanguages(PrismObject: PrismLib): void {
             : []),
       ],
     });
+
+    // Assembly::name() empty parens → yellow (function definition)
+    PrismObject.languages.insertBefore('cpp', 'class-name', {
+      'assembly-fn': {
+        pattern: /(?<=[A-Z]\w*::)\s*[a-z_]\w*(?=\s*\(\s*\))/,
+        greedy: true,
+      },
+    });
+
+    // Assembly::name(args) non-empty parens → blue (variable/constructor)
+    PrismObject.languages.insertBefore('cpp', 'assembly-fn', {
+      'variable': {
+        pattern: /(?<=[A-Z]\w*::)\s*[a-z_]\w*(?=\s*\([^)]*\S[^)]*\))/,
+        greedy: true,
+      },
+    });
+
+    // Control flow keywords → purple
+    PrismObject.languages.insertBefore('cpp', 'keyword', {
+      'control-keyword': {
+        pattern: /\b(?:if|else|for|while|do|switch|case|break|continue|return|goto)\b/,
+        greedy: true,
+      },
+    });
+
+    // Add type names after lowercase namespace :: to class-name (green)
+    const existingClassName = PrismObject.languages.cpp['class-name'];
+    const namespaceMemberPattern = {
+      pattern: /(?<=[a-z_]\w*::)\s*[a-z_]\w*/,
+      greedy: true,
+    };
+    PrismObject.languages.cpp['class-name'] = [
+      namespaceMemberPattern,
+      ...(Array.isArray(existingClassName)
+        ? existingClassName
+        : existingClassName
+          ? [existingClassName]
+          : []),
+    ];
 
     // Add bracket tokens — VSCode bracket pair colorizer style
     PrismObject.languages.insertBefore('cpp', 'operator', {

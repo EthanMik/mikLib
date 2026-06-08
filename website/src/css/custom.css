@@ -237,7 +237,19 @@ table tr:nth-child(even) {
 }
 
 .prism-code .token.function {
+  color: #dcdcaa !important;
+}
+
+.prism-code .token.variable {
   color: #9cdcfe !important;
+}
+
+.prism-code .token.assembly-fn {
+  color: #dcdcaa !important;
+}
+
+.prism-code .token.control-keyword {
+  color: #c586c0 !important;
 }
 
 .prism-code .token.paren-brace,
@@ -246,7 +258,7 @@ table tr:nth-child(even) {
 }
 
 .prism-code .token.brace {
-  color: #179fff !important;
+  color: #c586c0 !important;
 }
 
 .prism-code .token.bracket {
