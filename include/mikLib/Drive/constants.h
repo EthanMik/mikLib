@@ -115,7 +115,7 @@ struct swing_constants {
 };
 
 struct turn_to_angle_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::undefined;
     float min_voltage = constants.turn_min_voltage;
     float max_voltage = constants.turn_max_voltage;
     float exit_error = constants.turn_exit_error;
@@ -128,7 +128,7 @@ struct turn_to_angle_params {
 };
 
 struct swing_to_angle_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::undefined;
     float min_voltage = constants.swing_min_voltage;
     float max_voltage = constants.swing_max_voltage;
     float opposite_voltage = constants.swing_opposite_voltage;
@@ -142,7 +142,7 @@ struct swing_to_angle_params {
 };
 
 struct turn_to_point_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::undefined;
     float angle_offset = 0;
     float min_voltage = constants.turn_min_voltage;
     float max_voltage = constants.turn_max_voltage;
@@ -156,7 +156,7 @@ struct turn_to_point_params {
 };
 
 struct swing_to_point_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
+    mik::turn_direction direction = mik::turn_direction::undefined;
     float angle_offset = 0;
     float min_voltage = constants.swing_min_voltage;
     float max_voltage = constants.swing_max_voltage;
@@ -187,6 +187,7 @@ struct drive_distance_params {
 };
 
 struct drive_to_point_params {
+    vex::directionType direction = vex::directionType::undefined;
     float min_voltage = constants.drive_min_voltage;
     float max_voltage = constants.drive_max_voltage;
     float heading_max_voltage = constants.heading_max_voltage;

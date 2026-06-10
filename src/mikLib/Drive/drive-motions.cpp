@@ -113,16 +113,16 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
         float locked_heading = heading;
         bool heading_locked = false;
 
-        while (!chassis.pid.is_settled()){
+        while (!chassis.pid.is_settled()) {
             // When robot crosses the target, exit the motion
             line_settled = is_line_settled(x, y, heading, chassis.get_X_position(), chassis.get_Y_position(), p.exit_error);
-            if (!(line_settled == prev_line_settled) && p.min_voltage != 0) { break; }
+            if (!(line_settled == prev_line_settled) && p.min_voltage != 0) break;
             prev_line_settled = line_settled;
 
             float desired_heading = to_deg(atan2(x - chassis.get_X_position(), y - chassis.get_Y_position()));
-
+            float reversed_heading = desired_heading + (p.direction == reverse ? 180 : 0); 
             drive_error = hypot(x - chassis.get_X_position(), y - chassis.get_Y_position());
-            float heading_error = reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading());
+            float heading_error = reduce_negative_180_to_180(reversed_heading - chassis.get_absolute_heading());
 
             // Update distance traveled
             chassis.distance_traveled += fabs(drive_error - prev_drive_error);
@@ -130,21 +130,20 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
             chassis.distance_from_target = drive_error;
             prev_drive_error = drive_error;
 
-
             float drive_output = chassis.pid.compute(drive_error);
-            float heading_scale_factor = cos(to_rad(heading_error)); // Cosine scaling optimization
+            float heading_scale_factor = cos(to_rad(reduce_negative_180_to_180(desired_heading - chassis.get_absolute_heading()))); // Cosine scaling optimization
             drive_output *= heading_scale_factor;
 
             // Lock heading when robot is close to target
             if (drive_error < constants.drive_cutoff) {
                 if (!heading_locked) {
-                    locked_heading = desired_heading;
+                    locked_heading = reversed_heading;
                     heading_locked = true;
                 }
                 heading_error = reduce_negative_180_to_180(locked_heading - chassis.get_absolute_heading());
             }
 
-            heading_error = reduce_negative_90_to_90(heading_error);
+            if (p.direction == vex::directionType::undefined) heading_error = reduce_negative_90_to_90(heading_error);
 
             float heading_output = chassis.pid_2.compute(heading_error);
 
@@ -153,8 +152,10 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
 
             // Disable drive slew when robot is close to target
             drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
-
             heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
+
+            if (p.direction == fwd && !heading_locked) drive_output = fmax(drive_output, 0);
+            else if (p.direction == reverse && !heading_locked) drive_output = fmin(drive_output, 0);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
     
@@ -206,10 +207,10 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
         drive_to_pose_params& p = chassis.drive_to_pose_params_buffer;
 
         // Determine drive direction; if undefined, choose based on initial heading error
-        const float intial_heading_error = reduce_negative_180_to_180(to_deg(atan2(x - chassis.get_X_position(), y - chassis.get_Y_position())) - chassis.get_absolute_heading());
+        const float initial_heading_error = reduce_negative_180_to_180(to_deg(atan2(x - chassis.get_X_position(), y - chassis.get_Y_position())) - chassis.get_absolute_heading());
         bool reverse = p.direction == vex::directionType::rev;
         if (p.direction == vex::directionType::undefined) {
-            reverse = fabs(intial_heading_error) > forward_prioritization;
+            reverse = fabs(initial_heading_error) > forward_prioritization;
         }
         // Flip target angle when reversing so the carrot point stays behind the robot
         if (reverse) angle =  reduce_0_to_360(angle + 180);
