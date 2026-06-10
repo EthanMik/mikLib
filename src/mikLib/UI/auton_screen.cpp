@@ -785,7 +785,7 @@ void UI_auton_screen::enable_controller_overlay() {
 void UI_auton_screen::restart_controller_overlay() {
     controller_selector_scr();
 
-    controller_scr_input = vex::task([](){
+    controller_scr_input = vex::task([this](){
         auton_scr->input_overlay = true;
 
         while(auton_scr->input_overlay) {
@@ -824,7 +824,9 @@ void UI_auton_screen::restart_controller_overlay() {
                 task::sleep(200);
                 auton_scr->disable_controller_overlay();
                 break;
-            } 
+            } else if (Controller.ButtonY.pressing()) {
+                this->start_auton_test();
+            }
             task::sleep(50);
         }
         return 0;
