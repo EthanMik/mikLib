@@ -120,15 +120,15 @@ void mirror(float& x, float& y, bool mirror_x, bool mirror_y);
  * @brief Normalize an angular error according to a direction preference.
  *
  * For direction::CW, negative `error` values are wrapped by adding 360 so the
- * result is ≥ 0. For direction::CCW, positive `error` values are wrapped by
- * subtracting 360 so the result is ≤ 0. For direction::FASTEST (default), the
+ * result is ≥ 0. For direction::cw positive `error` values are wrapped by
+ * subtracting 360 so the result is ≤ 0. For direction::undefined (default), the
  * value is reduced to the range (-180, 180] via reduce_negative_180_to_180().
  *
  * @param error Signed angular difference in degrees (e.g., target - current).
- * @param dir Direction preference: CW, CCW, or FASTEST (default).
+ * @param dir Direction preference: cw, ccw, or fastest (default).
  * @return Normalized angular error in degrees consistent with `dir`.
  */
-float angle_error(float error, mik::turn_direction dir = mik::turn_direction::FASTEST);
+float angle_error(float error, mik::turn_direction dir = mik::turn_direction::undefined);
 
 /**
  * @brief Settling control for odometry functions.
