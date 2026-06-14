@@ -50,7 +50,7 @@ void Chassis::turn(float target_angle, float angle_offset, swing_to_angle_params
             float output = chassis.pid.compute(error);
             output = clamp(output, -p.max_voltage, p.max_voltage);
             // Disable slew when robot is close to target
-            output = slew_scaling(output, prev_output, p.slew, fabs(error) > constants.turn_cutoff);
+            output = slew_scaling(output, prev_output, p.k.slew, fabs(error) > constants.turn_cutoff);
 
             output = clamp_min_voltage(output, p.min_voltage);
 
@@ -102,9 +102,8 @@ void Chassis::turn_to_angle(float angle, turn_to_angle_params p) {
         .settle_error = p.settle_error,
         .settle_time = p.settle_time,
         .timeout = p.timeout,
-        .slew = p.slew,
         .wait = p.wait,
-        .k = {p.k.p, p.k.i, p.k.d, p.k.starti},
+        .k = {p.k.p, p.k.i, p.k.d, p.k.starti, p.k.slew},
     }, turn_type::TURN);
 }
 
@@ -133,9 +132,8 @@ void Chassis::turn_to_point(float X_position, float Y_position, turn_to_point_pa
         .settle_error = p.settle_error,
         .settle_time = p.settle_time,
         .timeout = p.timeout,
-        .slew = p.slew,
         .wait = p.wait,
-        .k = {p.k.p, p.k.i, p.k.d, p.k.starti},
+        .k = {p.k.p, p.k.i, p.k.d, p.k.starti, p.k.slew},
     }, turn_type::TURN);
 }
 
@@ -154,7 +152,6 @@ void Chassis::left_swing_to_point(float X_position, float Y_position, swing_to_p
         .settle_error = p.settle_error,
         .settle_time = p.settle_time,
         .timeout = p.timeout,
-        .slew = p.slew,
         .wait = p.wait,
         .k = p.k,
     }, type);
@@ -175,7 +172,6 @@ void Chassis::right_swing_to_point(float X_position, float Y_position, swing_to_
         .settle_error = p.settle_error,
         .settle_time = p.settle_time,
         .timeout = p.timeout,
-        .slew = p.slew,
         .wait = p.wait,
         .k = p.k,
     }, type);

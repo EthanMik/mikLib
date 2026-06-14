@@ -53,8 +53,8 @@ void Chassis::drive_distance(float distance, drive_distance_params p) {
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
             // Disable drive slew when robot is close to target
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.drive_k.slew, fabs(drive_error) > constants.drive_cutoff);
+            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_k.slew);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 
@@ -151,8 +151,8 @@ void Chassis::drive_to_point(float X_position, float Y_position, drive_to_point_
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
             // Disable drive slew when robot is close to target
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.drive_k.slew, fabs(drive_error) > constants.drive_cutoff);
+            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_k.slew);
 
             if (p.direction == fwd && !heading_locked) drive_output = fmax(drive_output, 0);
             else if (p.direction == reverse && !heading_locked) drive_output = fmin(drive_output, 0);
@@ -280,7 +280,7 @@ void Chassis::drive_to_pose(float X_position, float Y_position, float angle, dri
             drive_output = clamp(drive_output, -p.max_voltage, p.max_voltage);
 
             // Disable slew during settling
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, !settling);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.drive_k.slew, !settling);
             // Limit voltage to prevent slipping into the wrong arc
             drive_output = clamp_max_slip(drive_output, chassis.get_X_position(), chassis.get_Y_position(), current_heading, carrot_x, carrot_y, p.drift);
             // Scale down drive output when heading error is large to prevent overturning
@@ -363,8 +363,8 @@ void Chassis::strafe_distance(float distance, strafe_distance_params p) {
             heading_output = clamp(heading_output, -p.heading_max_voltage, p.heading_max_voltage);
 
             // Disable drive slew when robot is close to target
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
-            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_slew);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.drive_k.slew, fabs(drive_error) > constants.drive_cutoff);
+            heading_output = slew_scaling(heading_output, prev_heading_output, p.heading_k.slew);
 
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 
@@ -441,7 +441,7 @@ void Chassis::holonomic_to_pose(float X_position, float Y_position, float angle,
             drive_output = clamp(drive_output, -p.max_voltage, p.max_voltage);
             turn_output  = clamp(turn_output, -p.heading_max_voltage, p.heading_max_voltage);
 
-            drive_output = slew_scaling(drive_output, prev_drive_output, p.slew, fabs(drive_error) > constants.drive_cutoff);
+            drive_output = slew_scaling(drive_output, prev_drive_output, p.drive_k.slew, fabs(drive_error) > constants.drive_cutoff);
             drive_output = clamp_min_voltage(drive_output, p.min_voltage);
 
             float heading_to_target = atan2(y - chassis.get_Y_position(), x - chassis.get_X_position());

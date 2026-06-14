@@ -77,12 +77,7 @@ struct Constants {
 
     float turn_cutoff = 20; // Degrees, that within, slew will stop being applied.
     float drive_cutoff = 7; // Inches, that within, slew will stop being applied and heading correction stops.
-};
-
-struct drive_constants;
-struct heading_constants;
-struct turn_constants;
-struct swing_constants;
+}; 
 
 extern Constants constants;
 
@@ -91,6 +86,7 @@ struct drive_constants {
   float i = constants.drive_ki;
   float d = constants.drive_kd;
   float starti = constants.drive_starti;
+  float slew = constants.drive_slew;
 };
 
 struct heading_constants {
@@ -98,6 +94,7 @@ struct heading_constants {
   float i = constants.heading_ki;
   float d = constants.heading_kd;
   float starti = constants.heading_starti;
+  float slew = constants.heading_slew;
 };
 
 struct turn_constants {
@@ -105,6 +102,7 @@ struct turn_constants {
   float i = constants.turn_ki;
   float d = constants.turn_kd;
   float starti = constants.turn_starti;
+  float slew = constants.turn_slew;
 };
 
 struct swing_constants {
@@ -112,6 +110,7 @@ struct swing_constants {
   float i = constants.swing_ki;
   float d = constants.swing_kd;
   float starti = constants.swing_starti;
+  float slew = constants.swing_slew;
 };
 
 struct turn_to_angle_params {
@@ -122,7 +121,6 @@ struct turn_to_angle_params {
     float settle_error = constants.turn_settle_error;
     float settle_time = constants.turn_settle_time;
     float timeout = constants.turn_timeout;
-    float slew = constants.turn_slew;
     bool wait = true;
     turn_constants k = turn_constants{};
 };
@@ -136,7 +134,6 @@ struct swing_to_angle_params {
     float settle_error = constants.swing_settle_error;
     float settle_time = constants.swing_settle_time;
     float timeout = constants.swing_timeout;
-    float slew = constants.swing_slew;
     bool wait = true;
     swing_constants k = swing_constants{};
 };
@@ -150,7 +147,6 @@ struct turn_to_point_params {
     float settle_error = constants.turn_settle_error;
     float settle_time = constants.turn_settle_time;
     float timeout = constants.turn_timeout;
-    float slew = constants.turn_slew;
     bool wait = true;
     turn_constants k = turn_constants{};
 };
@@ -165,7 +161,6 @@ struct swing_to_point_params {
     float settle_error = constants.swing_settle_error;
     float settle_time = constants.swing_settle_time;
     float timeout = constants.swing_timeout;
-    float slew = constants.swing_slew;
     bool wait = true;
     swing_constants k = swing_constants{};
 };
@@ -179,8 +174,6 @@ struct drive_distance_params {
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
     float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};
@@ -195,8 +188,6 @@ struct drive_to_point_params {
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
     float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
 
     bool wait = true;
     drive_constants drive_k = drive_constants{};
@@ -214,7 +205,6 @@ struct drive_to_pose_params {
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
     float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};
@@ -230,8 +220,6 @@ struct holonomic_to_pose_params {
     float turn_settle_error = constants.turn_settle_error;
     float turn_settle_time = constants.turn_settle_time;
     float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
 
     bool wait = true;
     drive_constants drive_k = drive_constants{};
@@ -247,8 +235,6 @@ struct strafe_distance_params {
     float settle_error = constants.drive_settle_error;
     float settle_time = constants.drive_settle_time;
     float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
     bool wait = true;
     drive_constants drive_k = drive_constants{};
     heading_constants heading_k = heading_constants{};

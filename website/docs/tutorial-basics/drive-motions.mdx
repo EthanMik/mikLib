@@ -1,0 +1,45 @@
+---
+sidebar_position: 5
+---
+
+# Motion Algorithms
+
+## Drive Motions
+
+All drive motions take in a struct which contain all the constants used for that motion. 
+Changing these values only modifies them for that motion, and consecutive onces will use defaults.
+Check out ```constants.h``` to see all params for each motion.
+
+```cpp
+chassis.drive_distance(4, { 
+    .drive_k.p = 1.5, .drive_k.d = 10, // Changed drive PID to kP of 1.5 and kD of 10
+    .heading_k = 0, .heading_k.d = 0, // Removing heading correction
+});
+```
+
+You are also able to pass the entire struct at once
+
+```cpp
+
+```
+
+### Drive Distance
+
+This motion drives the robot forward either backwards or forwards at a specified angle.
+If no angle is applied it will drive at its current heading. 
+
+To move forward 10 inches at its current heading
+
+```cpp
+chassis.drive_distance(10);
+```
+
+To move backwards 20 inches locked at 45 degrees absolute heading
+
+```cpp
+chassis.drive_distance(-20, { .heading = 45 });
+```
+
+
+## Turn Motions
+
