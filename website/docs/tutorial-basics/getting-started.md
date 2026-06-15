@@ -44,6 +44,11 @@ should open in location specified.
 
 ![Import Template](./img/getting-started/import2.png)
 
+If you are using the c++ extension make sure in `.vscode/c_cpp_properties.json`, 
+the `cppStandard` is set to `20`
+
+![Import Template](./img/getting-started/vscode.png)
+
 Navigate to the folder src then robot-config.cpp to get started!
 
 ![Import Template](./img/getting-started/robot-config.png)

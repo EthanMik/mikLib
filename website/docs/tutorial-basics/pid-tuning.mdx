@@ -16,6 +16,10 @@ You can check out this [video](https://www.youtube.com/watch?v=89Jj4shI0hc&t=664
 
 The default constants are in `autons.cpp` with 4 different PID controllers.
 
+:::important
+Max voltage is on a 0-12 scale
+:::
+
 ```cpp
 // Each constant set is in the form of (maxVoltage, kP, kI, kD, startI, slew).
 chassis.set_drive_constants(8, 1.5, 0, 10, 0, 2);
