@@ -156,12 +156,11 @@ float slew_scaling(float drive_output, float prev_drive_output, float slew, bool
 
 float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift) {
     const float heading = to_rad(current_angle_deg);
+    if (drift <= 0) return drive_output;
 
-    const float perp_dist = fabs(sin(heading) * (desired_Y - current_Y) - cos(heading) * (desired_X - current_X));
+    const float perp_dist = fabs(cos(heading) * (desired_X - current_X) + sin(heading) * (desired_Y - current_Y));
     const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
-
-    const float radius = (dist * dist) / (2.0 * perp_dist);
-    const float max_slip = sqrt(drift * radius);
+    const float max_slip = sqrt((dist * dist) / (2 * fabs(perp_dist)) * drift);
     return clamp(drive_output, -max_slip, max_slip);  
 }
 
