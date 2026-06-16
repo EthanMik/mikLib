@@ -192,6 +192,8 @@ the left side of the drivetrain, and right stick controlling right side.
 chassis.control(drive_mode::TANK);
 ```
 
+### Control Curved
+
 Both split arcade and tank support curved versions.
 
 ```cpp
@@ -201,6 +203,8 @@ chassis.control(drive_mode::TANK_CURVED);
 
 Using curved drive provides finer control and will arc while turning and driving.
 
+### Holonomic
+
 Holonomic drivetrains can use 
 
 ```cpp
@@ -209,6 +213,8 @@ chassis.control(drive_mode::FIELD_CENTRIC_HOLONOMIC);
 ```
 
 Field centric uses the inertial sensor to determine which direction it should go, meaning wherever you point the left stick no matter the orientation, the robot will drive in that direction.
+
+### Constants
 
 The constants for drive modes are ```deadband```, ```min_output```, ```curve_gain```,
 and ```desaturate_bias```. With the scale being 0-100. Deadband applies to all drive

@@ -1,0 +1,167 @@
+---
+sidebar_position: 6
+---
+
+# UI
+
+How to use mikLib UI
+
+:::important
+To disable Brain UI and make mikLib upload wirelessly faster, go to `makefile` and
+set `FAST_COMPILE = 1`.
+:::
+
+## Auton Screen
+
+### Controller UI
+
+The auton screen appears on the controller at the start of the program.
+
+<img src={require('./img/ui/controller.png').default} alt="i drew this pixel art lol" width="15%"  style={{ paddingBottom: '20px' }} />
+
+| Button | Action |
+|----------|----------|
+| Dpad | Move Cursor |
+| A | Select |
+| B | Back |
+| X | Close Selector |
+| Y | Calibrate Auto |
+| Double Tap Y | Run Auto |
+
+:::important
+If you have a micro SD card inside the brain configured to FAT32 the last selected auton will save on program restart
+:::
+
+There are 5 toggles to select which determine what auto to run as well as a variation toggle that cycles 1-4.
+
+`[Red/Blue]`  `[Left/Right]`  `[Qual/Elim]`  `[Off/SAWP]`  `[Off/Skills]`  `[1]`
+
+<img src={require('./img/ui/autons.png').default} alt="Holonomic Setup" width="70%"  style={{ paddingBottom: '20px' }} />
+
+With each auton set up in this format
+
+```cpp
+std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name) {
+    if (get_name) return "blue left winpoint";
+
+    if (calibrate) {
+        chassis.set_coordinates(0, 0, 0);
+        return "";
+    }    
+
+    chassis.drive_to_point(24, 24);
+    
+    return "";
+}
+```
+- `[Desc]` Will display the name of the auton `blue left winpoint`.
+- `[Calib]` Will set the robots coordinates
+- `[Run]` Will have the robot drive to 24, 24 
+
+:::important
+The calibrate section allows you can run motions to align the robot, so in a competition
+you would place the robot down aligned with the field tiles, press calibrate to lock its position.
+Then position it where you actually want it. After that you can plug into field controller and wait for auton to run.
+:::
+
+:::note
+If you run auton through UI it can be cancelled anytime with back button
+:::
+
+### Variations
+
+Auton variations allow you do run different autos with the same
+toggles, with 4 available per selection `one`, `two`, `three`, and `four`. 
+
+```cpp
+std::string blw_var2(bool calibrate, auto_variation var, bool get_name) {
+    if (get_name) return "blw var 2";
+
+    if (calibrate) {
+        chassis.set_coordinates(10, 10, 0);
+        return "";
+    }    
+
+    chassis.turn_to_point(12, 12);
+    
+    return "";
+}
+
+// Base auto, call variations from here
+std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name) {
+    if (var == one) { } // If [1] run this auto
+    if (var == two) return blw_var2(calibrate, var, get_name); // if [2] run btw var2
+
+    if (get_name) return "blue left winpoint";
+
+
+    if (calibrate) {
+        chassis.set_coordinates(0, 0, 0);
+        return "";
+    }    
+
+    chassis.drive_to_point(24, 24);
+    
+    return "";
+}
+```
+
+- `[Blue] [Left] [Qual] [1]` runs `chassis.drive_to_point(24, 24);`
+- `[Blue] [Left] [Qual] [2]` runs `chassis.turn_to_point(12, 12);`
+
+### Extra modifiers
+
+<img src={require('./img/ui/controller-bottom.png').default} alt="i drew this pixel art lol" width="15%"  style={{ paddingBottom: '20px' }} />
+
+There are 3 extra buttons at the bottom of the controller screen
+
+- `[Off/Cap]` When auton is ran it will timeout after 15 seconds. 60 seconds for skills run
+- `[RCal]` Recalibrates the inertial sensor
+- `[Off/Odom]` Displays odom coords while auto is running
+
+### Brain UI
+
+On the middle tab of the home screen holds the auton selector on the Brain. It works the exact same 
+as controller selector, with some of the functionality on the config tab. 
+
+<img src={require('./img/ui/auton-brain.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+
+## Console Screen
+
+poopoo
+
+## Config Screen
+
+There are 3 columns of buttons on the config screen, `Macro`, `Data` and `Tune`. You can scroll down on the config screen
+by pressing down for a second and while holding move finger down.
+
+### Macro Column
+
+| Button | Description |
+| --- | --- |
+| **Run Auto** | Run selected auto by the auton selector, waits 3 seconds before starting |
+| **Time Cap Auto** | Limits max time allowed for ran auton to 15 seconds, or 60 seconds for auton skills |
+| **Driver Skills** | Starts a practice driver skills run. Waits 3 seconds before starting and then puts a 60 second timer on controller. Controller vibrates at 30, 15 and 5 seconds |
+| **Auto Skills** | Selects skills auton |
+| **Motor Menu** | Opens motor menu HYPERLINK TS |
+| **Motor Menu** | Opens motor menu HYPERLINK TS |
+| **Pnematic Menu** | Opens pnematic menu HYPERLINK TS |
+| **Odom Offsets** | Turns robot 10 times and computes odom offsets, displayed on console screen |
+| **Reset Offsets** | Turns in place near field walls to find distance reset offsets. [Place robot here](./chassis-setup/#distance-resets) |
+| **Wipe SD** | Clears SD card. Wipes selected auto and saved tuning parameters |
+
+### Data Column
+
+| Button | Description |
+| --- | --- |
+| **Error Data** | Displays any errors on console screen (disconnected devices) detected on startup. If errors are detected on startup the controller will buzz  |
+| **Motor Temps** | Displays motor temps on console screen. Around 80% is when the motors are overheated |
+| **Motor Wattage** | How many watts the motor is pulling. Mainly used to determine friction within the drive or intake |
+| **Odom Data** | Displays inertial angles and tracker/drivetrain positions. All units are units |
+| **Motor Menu** | Opens motor menu HYPERLINK TS |
+| **Motor Menu** | Opens motor menu HYPERLINK TS |
+| **Pnematic Menu** | Opens pnematic menu HYPERLINK TS |
+| **Odom Offsets** | Turns robot 10 times and computes odom offsets, displayed on console screen |
+| **Reset Offsets** | Turns in place near field walls to find distance reset offsets. [Place robot here](./chassis-setup/#distance-resets) |
+| **Wipe SD** | Clears SD card. Wipes selected auto and saved tuning parameters |
