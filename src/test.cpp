@@ -578,11 +578,11 @@ void config_motor_wattage() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task watt([](){
-		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 5, false) + " Watts    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 5, false) + " Watts    "; });
+		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averagePower(), 3, false) + " watts    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averagePower(), 3, false) + " watts    "; });
 
 		for (auto motor : config_get_motors()) {
-			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->power(), 5, false) + " Watts    "; });
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->power(), 3, false) + " watts    "; });
 		}
 		return 0;
 	});
@@ -608,10 +608,10 @@ void config_motor_torque() {
 	UI_select_scr(console_scr->get_console_screen()); 
 	
 	vex::task temp([](){		
-		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 5, false) + " Nm    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 5, false) + " Nm    "; });
+		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageTorque(), 3, false) + " Nm    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageTorque(), 3, false) + " Nm    "; });
 		for (auto motor : config_get_motors()) {
-			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->torque(), 5, false) + " Nm    "; });
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->torque(), 3, false) + " Nm    "; });
 		}
 		return 0;
 	});
@@ -623,10 +623,10 @@ void config_motor_efficiency() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 5, false) + "%% Eff    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 5, false) + "%% Eff     "; });
+		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageEfficiency(), 3, false) + "%% eff    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageEfficiency(), 3, false) + "%% eff     "; });
 		for (auto motor : config_get_motors()) {
-			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->efficiency(), 5, false) + "%% Eff    "; });
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->efficiency(), 3, false) + "%% eff    "; });
 		}
 		return 0;
 	});
@@ -638,10 +638,10 @@ void config_motor_current() {
 	UI_select_scr(console_scr->get_console_screen()); 
 
 	vex::task temp([](){
-		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 5, false) + " Amps    "; });
-		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 5, false) + " Amps    "; });
+		console_scr->add("right_drive: ", []() { return to_string_float(chassis.right_drive.averageCurrent(), 3, false) + " amps    "; });
+		console_scr->add("left_drive: ", []() { return to_string_float(chassis.left_drive.averageCurrent(), 3, false) + " amps    "; });
 		for (auto motor : config_get_motors()) {
-			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->current(), 5, false) + " Amps    "; });
+			console_scr->add(motor->name() + ": ", [motor]() { return to_string_float(motor->current(), 3, false) + " amps    "; });
 		}
 		return 0;
 	});
@@ -656,23 +656,23 @@ void config_odom_data() {
 			chassis.set_coordinates(0, 0, 0);
 		}
 	
-		console_scr->add("X: ", [](){ return chassis.get_X_position(); });
-		console_scr->add("Y: ", [](){ return chassis.get_Y_position(); });
-		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
-		console_scr->add("Rotation: ", [](){ return chassis.inertial.rotation(); });
-		console_scr->add("Forward Tracker: ", [](){ return chassis.get_forward_tracker_position(); });
-		console_scr->add("Sideways Tracker: ", [](){ return chassis.get_sideways_tracker_position(); });
+		console_scr->add("X: ", [](){ return to_string_float(chassis.get_X_position(), 3, false) + " in    "; });
+		console_scr->add("Y: ", [](){ return to_string_float(chassis.get_Y_position(), 3, false) + " in    "; });
+		console_scr->add("Heading: ", [](){ return to_string_float(chassis.get_absolute_heading(), 3, false) + " deg    "; });
+		console_scr->add("Rotation: ", [](){ return to_string_float(chassis.inertial.rotation(), 3, false) + " deg    "; });
+		console_scr->add("Forward Tracker: ", [](){ return to_string_float(chassis.get_forward_tracker_position(), 3, false) + " in    "; });
+		console_scr->add("Sideways Tracker: ", [](){ return to_string_float(chassis.get_sideways_tracker_position(), 3, false) + " in    "; });
 
-		console_scr->add("Right Drive: ", [](){ return chassis.get_right_drive_position(); });
-		console_scr->add("Left Drive: ", [](){ return chassis.get_left_drive_position(); });
+		console_scr->add("Right Drive: ", [](){ return to_string_float(chassis.get_right_drive_position(), 3, false) + " in    "; });
+		console_scr->add("Left Drive: ", [](){ return to_string_float(chassis.get_left_drive_position(), 3, false) + " in    "; });
 
 		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
 			auto motor = chassis.right_drive.getMotors()[i];
-			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_right_drive_position(i), 5, false) + ""; });
+			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_right_drive_position(i), 3, false) + " in    "; });
 		}
 		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
 			auto motor = chassis.left_drive.getMotors()[i];
-			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_left_drive_position(i), 5, false) + ""; });
+			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_left_drive_position(i), 3, false) + " in    "; });
 		}
 		return 0;
 	});
@@ -691,9 +691,9 @@ void config_reset_data() {
 			return 0;
 		}
 
-		console_scr->add("Odom X: ", [](){ return chassis.get_X_position(); });
-		console_scr->add("Odom Y: ", [](){ return chassis.get_Y_position(); });
-		console_scr->add("Heading: ", [](){ return chassis.get_absolute_heading(); });
+		console_scr->add("Odom X: ", [](){ return to_string_float(chassis.get_X_position(), 3, false) + " in    "; });
+		console_scr->add("Odom Y: ", [](){ return to_string_float(chassis.get_Y_position(), 3, false) + " in    "; });
+		console_scr->add("Heading: ", [](){ return to_string_float(chassis.get_absolute_heading(), 3, false) + " deg    "; });
 
 		for (auto& sensor : chassis.reset_sensors.get_distance_sensors()) {
 			auto sensor_pos = sensor.position();
