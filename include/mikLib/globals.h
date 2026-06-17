@@ -130,11 +130,11 @@ namespace mik {
     inline const std::string pnematic_A_btn_bg_color = "#303030";
     inline const std::string pnematic_B_btn_bg_color = "#595959";
     inline const std::string pnematic_C_btn_bg_color = "#858585";
-    inline const std::string pnematic_D_btn_bg_color = "#cccccc";
+    inline const std::string pnematic_D_btn_bg_color = "#adadad";
     inline const std::string pnematic_E_btn_bg_color = "#303030";
     inline const std::string pnematic_F_btn_bg_color = "#595959";
     inline const std::string pnematic_G_btn_bg_color = "#858585";
-    inline const std::string pnematic_H_btn_bg_color = "#cccccc";
+    inline const std::string pnematic_H_btn_bg_color = "#adadad";
 
     // Auton screen colors
     inline const std::string& auton_bg_color = UI_black;

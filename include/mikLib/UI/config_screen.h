@@ -24,14 +24,11 @@ private:
     void swap_mode(std::shared_ptr<UI_component> txtbox, bool mode);
 
     void UI_crt_config_scr();
-    void UI_crt_pnematics_scr();
 
     int macro_row = 1;
     int data_row = 1;
     int test_row = 1;
 
     std::shared_ptr<screen> UI_config_scr = nullptr;
-    std::shared_ptr<screen> UI_pnematics_scr = nullptr;
-    std::shared_ptr<screen> UI_motor_scr = nullptr;
 };
 }

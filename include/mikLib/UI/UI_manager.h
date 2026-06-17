@@ -15,6 +15,7 @@ extern std::shared_ptr<mik::UI_console_screen> console_scr;
 extern std::shared_ptr<mik::UI_graph_screen> graph_scr;
 extern std::shared_ptr<mik::UI_config_screen> config_scr;
 extern std::shared_ptr<mik::UI_motors_screen> motors_scr;
+extern std::shared_ptr<mik::UI_pneumatic_screen> pneumatic_scr;
 
 #endif
 
