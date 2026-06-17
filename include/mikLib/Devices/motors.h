@@ -47,7 +47,10 @@ private:
 class motor_group 
 {
 public:
-    /** @brief Constructs an array of mik motors that can be controlled at the same time  */
+    /** 
+     * @brief Constructs an array of mik motors that can be controlled at the same time  
+     * @param motors Vector of motors to be grouped
+    */
     motor_group(const std::vector<mik::motor>& motors);
 
     /** 

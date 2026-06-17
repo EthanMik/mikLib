@@ -13,7 +13,9 @@ public:
     void reset_graph();
 
     void set_plot_bounds(float y_min_bound, float y_max_bound, float x_min_bound, float x_max_bound, float x_step, float tick_rate_ms, int graphic_buffer = 100);
-    void set_plot(const std::vector<std::function<float(float)>>& plots, const std::vector<std::pair<std::string, uint32_t>>& labels);
+    void set_plot(const std::vector<std::function<float(float)>>& plots, const std::vector<std::pair<std::string, std::string>>& labels);
+    void set_plot(const std::function<float(float)>& plot, const std::pair<std::string, std::string>& label);
+    void set_title(const std::string& title);
     
 private:
     void UI_crt_graph_scr();
@@ -41,13 +43,16 @@ private:
     bool undefined = false;
 
     std::vector<std::function<float(float)>> plots{};
-    std::vector<std::pair<std::string, uint32_t>> labels{};
+    std::vector<std::pair<std::string, std::string>> labels{};
     
+    std::string title = "PID Output";
+
     vex::task graph_task;
-    graphic* graph_lines; 
+    graphic* graph_lines;
     graphic* legend_labels;
     graphic* legend_text;
     graphic* y_axis;
+    graphic* graph_name;
 
     std::shared_ptr<screen> UI_graph_scr = nullptr;
 };

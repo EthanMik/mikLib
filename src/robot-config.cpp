@@ -50,21 +50,21 @@ Chassis chassis(
 
 /* Creating a motor group in assembly */
 mik::motor_group Assembly::lower_intake_motors({
-	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
-	mik::motor(PORT2, false, green_18_1, "middle_intake")
+	mik::motor(PORT8, true, green_18_1, "bottom_intake"),
+	mik::motor(PORT9, false, green_18_1, "middle_intake")
 });
 
 /* Creating upper intake motor in assembly */
-mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
+mik::motor Assembly::upper_intake_motor(PORT10, false, blue_6_1, "upper_intake");
 
 /* Creating pistons in assembly */
-mik::piston Assembly::scraper_piston(PORT_B);
-mik::piston Assembly::wing_piston(PORT_A);
+mik::piston Assembly::scraper_piston(PORT_A);
+mik::piston Assembly::wing_piston(PORT_B);
 
 /* Creating alternative vex devices in assembly */
-vex::rotation Assembly::rotation_sensor(PORT6);
-vex::optical Assembly::optical_sensor(PORT13);
-vex::limit Assembly::limit_switch(to_triport(PORT_F));
+vex::rotation Assembly::rotation_sensor(PORT11);
+vex::optical Assembly::optical_sensor(PORT12);
+vex::limit Assembly::limit_switch(to_triport(PORT_C));
 
 
 

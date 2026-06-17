@@ -11,6 +11,13 @@ To disable Brain UI and make mikLib upload wirelessly faster, go to `makefile` a
 set `FAST_COMPILE = 1`.
 :::
 
+If you want to swap to a screen write code below. Available screens are `auton_scr`, `console_scr`, `graph_scr`, `config_scr`, `motors_scr` and `pnematic_scr`
+
+```cpp
+// Swaps to console screen
+UI_select_scr(console_src->get_console_screen());
+```
+
 ## Auton Screen
 
 ### Controller UI
@@ -25,8 +32,7 @@ The auton screen appears on the controller at the start of the program.
 | A | Select |
 | B | Back |
 | X | Close Selector |
-| Y | Calibrate Auto |
-| Double Tap Y | Run Auto |
+| Y | Calibrate Auto. Double press to run auto |
 
 :::important
 If you have a micro SD card inside the brain configured to FAT32 the last selected auton will save on program restart
@@ -129,12 +135,42 @@ as controller selector, with some of the functionality on the config tab.
 
 ## Console Screen
 
-poopoo
+
+The console screen is the 4th tab on the homepage, and can be accessed by scrolling to the right. It allows text to be displayed and updated asynchronously. 
+Config buttons that need to display text will use this screen. Clicking on any text will hover it light gray and remove it from the list.
+
+:::important
+Do not spam console_scr->add or the program will crash, use `print` or `std::cout` instead
+:::
+
+### Adding Text
+
+#### Static Text
+
+```cpp
+console_scr->add("Hello World!");
+```
+
+#### Updated Text
+```cpp
+console_scr->add("Time: ", [](){ return Brain.Timer.time(msec); });
+
+// Rounded to 2 decimal places, removes trailing zeros
+console_scr->add("Angle: ", [](){ return to_string_float(chassis.get_absolute_heading(), 2); });
+```
+
+:::note
+Any raw floats passed in by default will be rounded to 5 decimal places.
+:::
+
+<img src={require('./img/ui/console.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
 
 ## Config Screen
 
-There are 3 columns of buttons on the config screen, `Macro`, `Data` and `Tune`. You can scroll down on the config screen
+There are 3 columns of buttons on the config screen, `Macro`, `Data` and `Test/Tune`. You can scroll down on the config screen
 by pressing down for a second and while holding move finger down.
+
+<img src={require('./img/ui/config.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
 
 ### Macro Column
 
@@ -144,7 +180,6 @@ by pressing down for a second and while holding move finger down.
 | **Time Cap Auto** | Limits max time allowed for ran auton to 15 seconds, or 60 seconds for auton skills |
 | **Driver Skills** | Starts a practice driver skills run. Waits 3 seconds before starting and then puts a 60 second timer on controller. Controller vibrates at 30, 15 and 5 seconds |
 | **Auto Skills** | Selects skills auton |
-| **Motor Menu** | Opens motor menu HYPERLINK TS |
 | **Motor Menu** | Opens motor menu HYPERLINK TS |
 | **Pnematic Menu** | Opens pnematic menu HYPERLINK TS |
 | **Odom Offsets** | Turns robot 10 times and computes odom offsets, displayed on console screen |
@@ -157,11 +192,95 @@ by pressing down for a second and while holding move finger down.
 | --- | --- |
 | **Error Data** | Displays any errors on console screen (disconnected devices) detected on startup. If errors are detected on startup the controller will buzz  |
 | **Motor Temps** | Displays motor temps on console screen. Around 80% is when the motors are overheated |
-| **Motor Wattage** | How many watts the motor is pulling. Mainly used to determine friction within the drive or intake |
+| **Motor Wattage** | How many watts each motor is pulling. Mainly used to determine friction within the drive or intake |
 | **Odom Data** | Displays inertial angles and tracker/drivetrain positions. All units are units |
-| **Motor Menu** | Opens motor menu HYPERLINK TS |
-| **Motor Menu** | Opens motor menu HYPERLINK TS |
-| **Pnematic Menu** | Opens pnematic menu HYPERLINK TS |
-| **Odom Offsets** | Turns robot 10 times and computes odom offsets, displayed on console screen |
-| **Reset Offsets** | Turns in place near field walls to find distance reset offsets. [Place robot here](./chassis-setup/#distance-resets) |
-| **Wipe SD** | Clears SD card. Wipes selected auto and saved tuning parameters |
+| **Reset Data** | Displays where the distance sensors think the robot is. Laid out in the format, odom x, y, and heading. Then each distance sensors `wall facing`, computed `x or y position` and `D: distance in inches`. Use this [simulation](https://ethanmik.github.io/Wall-Reset-Simulator/) for troubleshooting   |
+| **PID Data** | Displays all constants changed during [tune mode](./pid-tuning/#tuner-setup) |
+| **Motor Torque** | Displays how much torque each motor is applying |
+| **Motor Eff** | Displays how efficient each motor is (output power / input power) |
+| **Motor Current** | How many amps each motor is pulling, used usually to see if you have bad motor |
+
+### Test/Tune
+
+| Button | Description |
+| --- | --- |
+| **Tune Mode** | Cycles between two tune modes, `relative` and `odom`. When the button is pressed it will run `test_constants()`. When set to relative it will not use odom points while in tuning mode and odom mode will.  |
+| **Tune Drive** | Enables [tuning mode](./pid-tuning/#tuner-setup) for drive |
+| **Tune Heading** | Enables tuning mode for heading |
+| **Tune Tune** | Enables tuning mode for turn |
+| **Tune Swing** | Enables tuning mode for swing |
+| **Test Full** | Run a mix of all relative or odom motions |
+| **Test Boomerang** | Runs drive to pose |
+| **Test Chaining** | Runs motion chained test full  |
+| **Test Holonomic** | Runs holonomic motions |
+
+## Graph Screen
+
+The graph screen is used when tune mode is selected on the [config screen](#config-screen). 
+
+### Setting up plotting
+
+To plot on the graph first set up the bounds, and or title
+
+```cpp
+int y_min = 0;
+int y_max = 360;
+
+int x_min = 0;
+int x_max = 5000;
+
+int x_step = 1; // How much to increase x by each tick
+int tick_rate_ms = 1; // How long before graphing next data point
+
+graph_scr->set_plot_bounds(y_min, y_max, x_min, x_max, x_step, tick_rate_ms);
+graph_scr->set_title("Graphing Sin");
+```
+
+Then add in the data you want to plot
+
+```cpp
+graph_scr->set_plot([](double x) { return 360 * sin(x * .01); }, {"sin", "#4a86e8"});
+```
+
+Now you can graph your function
+
+```cpp
+graph_scr->graph();
+```
+
+<img src={require('./img/ui/graph1.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+:::note
+To reset the graph and start re-graphing the function press the reset button in the bottom right corner
+::: 
+
+You can also plot multiple functions at the same time. Using the same bounds
+
+```cpp
+graph_scr->set_title("Graphing Heading");
+graph_scr->set_plot({
+    [](double x) { return chassis.get_absolute_heading(); },
+    [](double x) { return 100; }
+}, {
+    {"angle", "#2e8b59"},
+    {"line", "#ff6e39"}
+});
+```
+
+<img src={require('./img/ui/graph2.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+## Motors Screen
+
+The motors screen displays all mik::motors.
+
+- If a motor is plugged in then its port will appear white.
+- To spin a motor backwards press the left arrow, with right arrow for forwards. Press arrow again stop the motor
+- The voltage at which the motor is spun at is determined which voltage is selected to the right
+
+<img src={require('./img/ui/motors1.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+Motor on PORT1 is plugged in, with the rest unplugged
+
+<img src={require('./img/ui/motors2.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+Motor on PORT1 is spinning forward at 6 volts

@@ -248,6 +248,11 @@ chassis.drive_to_point(24, 24);
 However by applying exit error and min voltage to the motions it gets us to the destination and
 shaves path down to 1.58 seconds.
 
+:::important
+If min speed is above zero on the last motion the robot **will not stop**.
+Make sure to add in `chassis.stop_drive()`.
+:::
+
 ## Async
 
 The last thing you can do with all these motions is async them. By setting `wait` to false,

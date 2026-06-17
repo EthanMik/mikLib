@@ -189,7 +189,13 @@ void UI_config_screen::UI_crt_config_scr() {
     add_button(slot::TEST, "Test Boomerng", [](){ test_boomerang(); });
 
     // Runs a motion chaininng test
-    add_button(slot::TEST, "Test Chaining", [](){ test_motion_chaining(); });
+    add_button(slot::TEST, "Test Chaining", [](){ 
+        if (config_is_testing_odom()) {
+            test_odom_motion_chaining();
+        } else {
+            test_motion_chaining(); 
+        } 
+    });
 
     add_button(slot::TEST, "Test Holonomic", [](){ test_holonomic(); });
 
