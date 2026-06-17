@@ -672,11 +672,11 @@ void config_odom_data() {
 
 		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
 			auto motor = chassis.right_drive.getMotors()[i];
-			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_right_drive_position(i), 3, false) + " in    "; });
+			console_scr->add(motor->name() + ": ", [i]() { return to_string_float(chassis.get_right_drive_position(i), 3, false) + " in    "; });
 		}
 		for (size_t i = 0; i < chassis.right_drive.getMotors().size(); ++i) {
 			auto motor = chassis.left_drive.getMotors()[i];
-			console_scr->add(motor.name() + ": ", [i]() { return to_string_float(chassis.get_left_drive_position(i), 3, false) + " in    "; });
+			console_scr->add(motor->name() + ": ", [i]() { return to_string_float(chassis.get_left_drive_position(i), 3, false) + " in    "; });
 		}
 		return 0;
 	});

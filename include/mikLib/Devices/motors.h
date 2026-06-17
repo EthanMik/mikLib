@@ -53,6 +53,12 @@ public:
     */
     motor_group(const std::vector<mik::motor>& motors);
 
+    /**
+     * @brief Constructs a group that shares (does not copy) the given motors.
+     * @param motors Pointers to the motors to be grouped
+     */
+    motor_group(std::vector<mik::motor*> motors);
+
     /** 
      * @brief return the number of motors in the motor group
      * @return number of motors
@@ -306,7 +312,7 @@ public:
     /** 
      * @return The wrapped vex motors in a vector
      */   
-    std::vector<mik::motor>& getMotors();
+    std::vector<mik::motor*>& getMotors();
 
     /** 
      * @param keyword The keyword to use to search for motors inside the group
@@ -321,7 +327,7 @@ private:
     
     float set_voltage = 6; 
 
-    std::vector<mik::motor> motors;
+    std::vector<mik::motor*> motors;
 };
 
 /** @return Reference to the global registry of all logged motors */
