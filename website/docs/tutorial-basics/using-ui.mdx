@@ -271,16 +271,20 @@ graph_scr->set_plot({
 
 ## Motors Screen
 
-The motors screen displays all mik::motors.
+The motors screen displays all mik::motors. It can be accessed on the config screen or by scrolling to the 
 
 - If a motor is plugged in then its port will appear white.
 - To spin a motor backwards press the left arrow, with right arrow for forwards. Press arrow again stop the motor
 - The voltage at which the motor is spun at is determined which voltage is selected to the right
 
-<img src={require('./img/ui/motors1.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+<img src={require('./img/ui/motor_scr1.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
 
 Motor on PORT1 is plugged in, with the rest unplugged
 
-<img src={require('./img/ui/motors2.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+<img src={require('./img/ui/motor_scr2.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
 
 Motor on PORT1 is spinning forward at 6 volts
+
+## Pneumatic Screen
+
+The pneumatic screen allows you to open and close all solenoids. It can be accessed by pressing 
