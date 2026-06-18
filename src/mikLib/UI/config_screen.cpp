@@ -111,7 +111,7 @@ void UI_config_screen::UI_crt_config_scr() {
     });
 
     // Opens pnematic menu
-    add_button(slot::MACRO, "Pnematic Menu", [](){
+    add_button(slot::MACRO, "Pneumatic Menu", [](){
         UI_select_scr(pneumatic_scr->get_pneumatic_screen()); 
         disable_user_control(); 
     });

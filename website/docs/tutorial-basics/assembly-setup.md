@@ -6,15 +6,15 @@ sidebar_position: 3
 
 How to configure user control in assembly.cpp and main.cpp
 
+## Assembly Setup
+
 :::note
 Using the assembly class is completely optional, there are many other ways to structure user control. In this example the robot has 1 intake motor and 1 piston.
 :::
 
-## Assembly Setup
-
 ### Creating Devices
 
-Navigate to include/assembly.h. This is what holds non drivetrain related devices.
+Navigate to `include/assembly.h`. This is what holds non drivetrain related devices.
 To add a devices declare it as
 
 ```cpp

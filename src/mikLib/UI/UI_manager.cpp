@@ -207,8 +207,6 @@ void UI_init() {
     });
 
 
-    UI_select_scr(pneumatic_scr->get_pneumatic_screen());
-
     selector_panel_scr->add_UI_components({console_tgl, auton_tgl, graph_tgl, config_tgl, motors_tgl, pneumatic_tgl});
 
     // init rendering

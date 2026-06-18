@@ -11,11 +11,11 @@ To disable Brain UI and make mikLib upload wirelessly faster, go to `makefile` a
 set `FAST_COMPILE = 1`.
 :::
 
-If you want to swap to a screen write code below. Available screens are `auton_scr`, `console_scr`, `graph_scr`, `config_scr`, `motors_scr` and `pnematic_scr`
+If you want to swap to a screen write code below. Available screens are `auton_scr`, `console_scr`, `graph_scr`, `config_scr`, `motors_scr` and `pneumatic_scr`
 
 ```cpp
 // Swaps to console screen
-UI_select_scr(console_src->get_console_screen());
+UI_select_scr(console_scr->get_console_screen());
 ```
 
 ## Auton Screen
@@ -127,7 +127,7 @@ There are 3 extra buttons at the bottom of the controller screen
 
 ### Brain UI
 
-On the middle tab of the home screen holds the auton selector on the Brain. It works the exact same 
+The 2nd tab of the home screen holds the auton selector on the Brain. It works the exact same 
 as controller selector, with some of the functionality on the config tab. 
 
 <img src={require('./img/ui/auton-brain.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
@@ -176,12 +176,12 @@ by pressing down for a second and while holding move finger down.
 
 | Button | Description |
 | --- | --- |
-| **Run Auto** | Run selected auto by the auton selector, waits 3 seconds before starting |
+| **Run Auto** | Run selected auto by the auton selector, runs a 3 second countdown before starting |
 | **Time Cap Auto** | Limits max time allowed for ran auton to 15 seconds, or 60 seconds for auton skills |
 | **Driver Skills** | Starts a practice driver skills run. Waits 3 seconds before starting and then puts a 60 second timer on controller. Controller vibrates at 30, 15 and 5 seconds |
 | **Auto Skills** | Selects skills auton |
-| **Motor Menu** | Opens motor menu HYPERLINK TS |
-| **Pnematic Menu** | Opens pnematic menu HYPERLINK TS |
+| **Motor Menu** | Goes to [motors screen](#motors-screen) |
+| **Pneumatic Menu** | Goes to [pneumatic screen](#pneumatic-screen) |
 | **Odom Offsets** | Turns robot 10 times and computes odom offsets, displayed on console screen |
 | **Reset Offsets** | Turns in place near field walls to find distance reset offsets. [Place robot here](./chassis-setup/#distance-resets) |
 | **Wipe SD** | Clears SD card. Wipes selected auto and saved tuning parameters |
@@ -193,7 +193,7 @@ by pressing down for a second and while holding move finger down.
 | **Error Data** | Displays any errors on console screen (disconnected devices) detected on startup. If errors are detected on startup the controller will buzz  |
 | **Motor Temps** | Displays motor temps on console screen. Around 80% is when the motors are overheated |
 | **Motor Wattage** | How many watts each motor is pulling. Mainly used to determine friction within the drive or intake |
-| **Odom Data** | Displays inertial angles and tracker/drivetrain positions. All units are units |
+| **Odom Data** | Displays inertial angles and tracker/drivetrain positions. Heading is in degrees, positions in inches |
 | **Reset Data** | Displays where the distance sensors think the robot is. Laid out in the format, odom x, y, and heading. Then each distance sensors `wall facing`, computed `x or y position` and `D: distance in inches`. Use this [simulation](https://ethanmik.github.io/Wall-Reset-Simulator/) for troubleshooting   |
 | **PID Data** | Displays all constants changed during [tune mode](./pid-tuning/#tuner-setup) |
 | **Motor Torque** | Displays how much torque each motor is applying |
@@ -207,10 +207,10 @@ by pressing down for a second and while holding move finger down.
 | **Tune Mode** | Cycles between two tune modes, `relative` and `odom`. When the button is pressed it will run `test_constants()`. When set to relative it will not use odom points while in tuning mode and odom mode will.  |
 | **Tune Drive** | Enables [tuning mode](./pid-tuning/#tuner-setup) for drive |
 | **Tune Heading** | Enables tuning mode for heading |
-| **Tune Tune** | Enables tuning mode for turn |
+| **Tune Turn** | Enables tuning mode for turn |
 | **Tune Swing** | Enables tuning mode for swing |
 | **Test Full** | Run a mix of all relative or odom motions |
-| **Test Boomerang** | Runs drive to pose |
+| **Test Boomerng** | Runs drive to pose |
 | **Test Chaining** | Runs motion chained test full  |
 | **Test Holonomic** | Runs holonomic motions |
 
@@ -271,7 +271,7 @@ graph_scr->set_plot({
 
 ## Motors Screen
 
-The motors screen displays all mik::motors. It can be accessed on the config screen or by scrolling to the 
+The motors screen displays all mik::motors. It can be accessed on the config screen or by scrolling to the 5th tab on the homepage
 
 - If a motor is plugged in then its port will appear white.
 - To spin a motor backwards press the left arrow, with right arrow for forwards. Press arrow again stop the motor
@@ -287,4 +287,9 @@ Motor on PORT1 is spinning forward at 6 volts
 
 ## Pneumatic Screen
 
-The pneumatic screen allows you to open and close all solenoids. It can be accessed by pressing 
+The pneumatic screen allows you to open and close all solenoids. It can be accessed by pressing on the `Pneumatic Menu` button on the config
+screen or by scrolling to the 6th tab on the homepage  
+
+<img src={require('./img/ui/pneumatic.png').default} width="50%"  style={{ paddingBottom: '20px' }} />
+
+You can also use buttons at the bottom to change what triport the pnematic screen activates. By default it will use `Brain` ports 
