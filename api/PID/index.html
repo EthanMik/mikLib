@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-api/PID" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">PID | mikLib</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://ethanmik.github.io/mikLib/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://ethanmik.github.io/mikLib/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://ethanmik.github.io/mikLib/api/PID"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="PID | mikLib"><meta data-rh="true" name="description" content="Generic PID class"><meta data-rh="true" property="og:description" content="Generic PID class"><link data-rh="true" rel="icon" href="/mikLib/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://ethanmik.github.io/mikLib/api/PID"><link data-rh="true" rel="alternate" href="https://ethanmik.github.io/mikLib/api/PID" hreflang="en"><link data-rh="true" rel="alternate" href="https://ethanmik.github.io/mikLib/api/PID" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"API Reference","item":"https://ethanmik.github.io/mikLib/category/api-reference"},{"@type":"ListItem","position":2,"name":"PID","item":"https://ethanmik.github.io/mikLib/api/PID"}]}</script><meta name="google-site-verification" content="pyfM0V29IPl0HqCsNjRKdZOC4KG1JazqdaGpZj3i27s"><link rel="stylesheet" href="/mikLib/assets/css/styles.8a86d60e.css">
+<script src="/mikLib/assets/js/runtime~main.a83a0989.js" defer="defer"></script>
+<script src="/mikLib/assets/js/main.5ce67689.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>document.documentElement.setAttribute("data-theme","dark"),document.documentElement.setAttribute("data-theme-choice","dark"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/mikLib/"><b class="navbar__title text--truncate">mikLib</b></a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/EthanMik/mikLib" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/mikLib/"><span title="mikLib" class="linkLabel_WmDU">mikLib</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/mikLib/category/tutorials"><span title="Tutorials" class="categoryLinkLabel_W154">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--active" href="/mikLib/category/api-reference"><span title="API Reference" class="categoryLinkLabel_W154">API Reference</span></a><button aria-label="Collapse sidebar category &#x27;API Reference&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/Chassis"><span title="Chassis" class="linkLabel_WmDU">Chassis</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/Constants"><span title="Constants" class="linkLabel_WmDU">Constants</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/odom"><span title="Odom" class="linkLabel_WmDU">Odom</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/mikLib/api/PID"><span title="PID" class="linkLabel_WmDU">PID</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/util"><span title="Util" class="linkLabel_WmDU">Util</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/mikLib/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/mikLib/category/api-reference"><span>API Reference</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">PID</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>PID</h1></header>
+<p>Generic PID class</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="constructors">Constructors<a href="#constructors" class="hash-link" aria-label="Direct link to Constructors" title="Direct link to Constructors" translate="no">​</a></h2>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token function" style="color:rgb(220, 220, 170)">PID</span><span class="token bracket">(</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token function" style="color:rgb(220, 220, 170)">PID</span><span class="token bracket">(</span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kp</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> ki</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kd</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token function" style="color:rgb(220, 220, 170)">PID</span><span class="token bracket">(</span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kp</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> ki</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kd</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> starti</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token function" style="color:rgb(220, 220, 170)">PID</span><span class="token bracket">(</span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kp</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> ki</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> kd</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> starti</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain">    </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> settle_error</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> settle_time</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> exit_error</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain">    </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> timeout</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> stall_timeout </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token number" style="color:rgb(181, 206, 168)">0</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+<p><code>starti</code> keeps the integral term at <code>0</code> until <code>error</code> drops below it, which
+prevents integral windup on large errors.</p>
+<p>The settling constructor adds exit conditions. The controller is <strong>settled</strong>
+when <code>error</code> stays below <code>settle_error</code> for <code>settle_time</code>, or once the motion
+has run longer than <code>timeout</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Parameter</th><th>Description</th></tr></thead><tbody><tr><td><code>kp</code></td><td>Proportional constant.</td></tr><tr><td><code>ki</code></td><td>Integral constant.</td></tr><tr><td><code>kd</code></td><td>Derivative constant.</td></tr><tr><td><code>starti</code></td><td>Maximum error at which the integral term starts accumulating.</td></tr><tr><td><code>settle_error</code></td><td>Maximum error to be considered settled.</td></tr><tr><td><code>settle_time</code></td><td>Minimum time (ms) under <code>settle_error</code> to be considered settled.</td></tr><tr><td><code>exit_error</code></td><td>Error at which the motion is considered finished.</td></tr><tr><td><code>timeout</code></td><td>Time (ms) after which to give up and move on. <code>0</code> disables it.</td></tr><tr><td><code>stall_timeout</code></td><td>Time (ms) to give up when the robot is near 0 velocity. <code>0</code> disables it.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="methods">Methods<a href="#methods" class="hash-link" aria-label="Direct link to Methods" title="Direct link to Methods" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="compute">compute<a href="#compute" class="hash-link" aria-label="Direct link to compute" title="Direct link to compute" translate="no">​</a></h3>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> </span><span class="token function" style="color:rgb(220, 220, 170)">compute</span><span class="token bracket">(</span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> error</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+<p>Computes the output power from the current <code>error</code>. Includes two
+optimizations: the integral term resets to <code>0</code> whenever the robot crosses
+<code>error == 0</code>, and integral only accumulates while <code>error</code> is below <code>starti</code>.</p>
+<ul>
+<li class=""><strong>Returns</strong> — the output power.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="is_settled">is_settled<a href="#is_settled" class="hash-link" aria-label="Direct link to is_settled" title="Direct link to is_settled" translate="no">​</a></h3>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token keyword" style="color:rgb(86, 156, 214)">bool</span><span class="token plain"> </span><span class="token function" style="color:rgb(220, 220, 170)">is_settled</span><span class="token bracket">(</span><span class="token bracket">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+<p>Returns whether the movement has settled, per the settling rules described
+above.</p>
+<ul>
+<li class=""><strong>Returns</strong> — <code>true</code> if the movement is settled.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="public-members">Public members<a href="#public-members" class="hash-link" aria-label="Direct link to Public members" title="Direct link to Public members" translate="no">​</a></h2>
+<p>These are readable at any time (e.g. for graphing or debugging):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Member</th><th>Description</th></tr></thead><tbody><tr><td><code>error</code></td><td>Current error.</td></tr><tr><td><code>kp</code>, <code>ki</code>, <code>kd</code></td><td>Active PID gains.</td></tr><tr><td><code>starti</code></td><td>Integral gating threshold.</td></tr><tr><td><code>settle_error</code>, <code>settle_time</code></td><td>Active settle conditions.</td></tr><tr><td><code>exit_error</code></td><td>Active exit error.</td></tr><tr><td><code>timeout</code>, <code>stall_timeout</code></td><td>Active timeouts.</td></tr><tr><td><code>accumulated_error</code></td><td>Running integral sum.</td></tr><tr><td><code>previous_error</code></td><td>Error from the previous <code>compute()</code> call.</td></tr><tr><td><code>output</code></td><td>Last computed output.</td></tr><tr><td><code>time_spent_settled</code></td><td>Time (ms) the controller has been within <code>settle_error</code>.</td></tr><tr><td><code>time_spent_running</code></td><td>Total time (ms) the controller has been running.</td></tr><tr><td><code>time_spent_stalled</code></td><td>Time (ms) the controller has been near 0 velocity.</td></tr><tr><td><code>exiting</code></td><td><code>true</code> once an exit condition has been met.</td></tr></tbody></table></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/mikLib/api/odom"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Odom</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/mikLib/api/util"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Util</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#constructors" class="table-of-contents__link toc-highlight">Constructors</a></li><li><a href="#methods" class="table-of-contents__link toc-highlight">Methods</a><ul><li><a href="#compute" class="table-of-contents__link toc-highlight">compute</a></li><li><a href="#is_settled" class="table-of-contents__link toc-highlight">is_settled</a></li></ul></li><li><a href="#public-members" class="table-of-contents__link toc-highlight">Public members</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mikLib/">Tutorial</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://discord.gg/Dpv5aZ3dK6" target="_blank" rel="noopener noreferrer" class="footer__link-item">VRC Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/EthanMik/mikLib" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.youtube.com/@ethanmik2587" target="_blank" rel="noopener noreferrer" class="footer__link-item">Youtube<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div></div></footer></div>
+</body>
+</html>

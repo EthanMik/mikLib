@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-api/Constants" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Constants | mikLib</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://ethanmik.github.io/mikLib/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://ethanmik.github.io/mikLib/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://ethanmik.github.io/mikLib/api/Constants"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Constants | mikLib"><meta data-rh="true" name="description" content="Tuning constants in mikLib"><meta data-rh="true" property="og:description" content="Tuning constants in mikLib"><link data-rh="true" rel="icon" href="/mikLib/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://ethanmik.github.io/mikLib/api/Constants"><link data-rh="true" rel="alternate" href="https://ethanmik.github.io/mikLib/api/Constants" hreflang="en"><link data-rh="true" rel="alternate" href="https://ethanmik.github.io/mikLib/api/Constants" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"API Reference","item":"https://ethanmik.github.io/mikLib/category/api-reference"},{"@type":"ListItem","position":2,"name":"Constants","item":"https://ethanmik.github.io/mikLib/api/Constants"}]}</script><meta name="google-site-verification" content="pyfM0V29IPl0HqCsNjRKdZOC4KG1JazqdaGpZj3i27s"><link rel="stylesheet" href="/mikLib/assets/css/styles.8a86d60e.css">
+<script src="/mikLib/assets/js/runtime~main.a83a0989.js" defer="defer"></script>
+<script src="/mikLib/assets/js/main.5ce67689.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>document.documentElement.setAttribute("data-theme","dark"),document.documentElement.setAttribute("data-theme-choice","dark"),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/mikLib/"><b class="navbar__title text--truncate">mikLib</b></a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/EthanMik/mikLib" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/mikLib/"><span title="mikLib" class="linkLabel_WmDU">mikLib</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/mikLib/category/tutorials"><span title="Tutorials" class="categoryLinkLabel_W154">Tutorials</span></a><button aria-label="Expand sidebar category &#x27;Tutorials&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--active" href="/mikLib/category/api-reference"><span title="API Reference" class="categoryLinkLabel_W154">API Reference</span></a><button aria-label="Collapse sidebar category &#x27;API Reference&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/Chassis"><span title="Chassis" class="linkLabel_WmDU">Chassis</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/mikLib/api/Constants"><span title="Constants" class="linkLabel_WmDU">Constants</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/odom"><span title="Odom" class="linkLabel_WmDU">Odom</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/PID"><span title="PID" class="linkLabel_WmDU">PID</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/mikLib/api/util"><span title="Util" class="linkLabel_WmDU">Util</span></a></li></ul></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/mikLib/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><a class="breadcrumbs__link" href="/mikLib/category/api-reference"><span>API Reference</span></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Constants</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Constants</h1></header>
+<p>Tuning constants in mikLib</p>
+<ul>
+<li class="">The global <a href="#constants-struct" class=""><code>Constants</code></a> struct, which holds
+every motion constant used in <a class="" href="/mikLib/api/Chassis">Chassis</a>.</li>
+<li class="">The <a href="#pid-gain-structs" class="">PID structs</a> (<code>drive_constants</code>, etc.).</li>
+<li class="">The <a href="#motion-parameter-structs" class="">motion parameter structs</a>
+(<code>turn_to_angle_params</code>, etc.) passed to each motion.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="constants-struct">Constants struct<a href="#constants-struct" class="hash-link" aria-label="Direct link to Constants struct" title="Direct link to Constants struct" translate="no">​</a></h2>
+<p>A single global instance, <code>constants</code>, stores the defaults applied to every
+motion. Set these once at startup (or via the <a class="" href="/mikLib/api/Chassis#setters">Chassis setters</a>).</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="drive-constants">Drive constants<a href="#drive-constants" class="hash-link" aria-label="Direct link to Drive constants" title="Direct link to Drive constants" translate="no">​</a></h3>
+<p>Used while driving. Heading constants keep the robot facing the target while it drives.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>drive_min_voltage</code></td><td>Minimum voltage on the drive, used for chaining movements.</td></tr><tr><td><code>drive_max_voltage</code></td><td>Max voltage out of 12.</td></tr><tr><td><code>drive_kp</code> / <code>drive_ki</code> / <code>drive_kd</code></td><td>Proportional / integral / derivative constants.</td></tr><tr><td><code>drive_starti</code></td><td>Minimum distance (inches) for integral to begin.</td></tr><tr><td><code>drive_slew</code></td><td>Limits drive acceleration in volts per 10 ms.</td></tr><tr><td><code>drive_exit_error</code></td><td>Error (inches) at which the drive motion exits.</td></tr><tr><td><code>drive_settle_error</code></td><td>Error (inches) to be considered settled.</td></tr><tr><td><code>drive_settle_time</code></td><td>Time (ms) to be considered settled.</td></tr><tr><td><code>drive_timeout</code></td><td>Time (ms) before quitting and moving on.</td></tr><tr><td><code>heading_max_voltage</code></td><td>Max heading-correction voltage out of 12.</td></tr><tr><td><code>heading_kp</code> / <code>heading_ki</code> / <code>heading_kd</code></td><td>Heading PID constants.</td></tr><tr><td><code>heading_starti</code></td><td>Minimum distance (degrees) for integral to begin.</td></tr><tr><td><code>heading_slew</code></td><td>Limits heading-correction acceleration in volts per 10 ms.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="turn-constants">Turn constants<a href="#turn-constants" class="hash-link" aria-label="Direct link to Turn constants" title="Direct link to Turn constants" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>turn_min_voltage</code></td><td>Minimum voltage for turning out of 12.</td></tr><tr><td><code>turn_max_voltage</code></td><td>Max voltage out of 12.</td></tr><tr><td><code>turn_kp</code> / <code>turn_ki</code> / <code>turn_kd</code></td><td>Turn PID constants.</td></tr><tr><td><code>turn_starti</code></td><td>Minimum angle (degrees) for integral to begin.</td></tr><tr><td><code>turn_slew</code></td><td>Limits turning acceleration in volts per 10 ms.</td></tr><tr><td><code>turn_exit_error</code></td><td>Error at which the turn motion exits.</td></tr><tr><td><code>turn_settle_error</code></td><td>Error (degrees) to be considered settled.</td></tr><tr><td><code>turn_settle_time</code></td><td>Time (ms) to be considered settled.</td></tr><tr><td><code>turn_timeout</code></td><td>Time (ms) before quitting and moving on.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="swing-constants">Swing constants<a href="#swing-constants" class="hash-link" aria-label="Direct link to Swing constants" title="Direct link to Swing constants" translate="no">​</a></h3>
+<p>Swinging turns the robot using one side of the drivetrain.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>swing_min_voltage</code></td><td>Minimum voltage for swinging out of 12.</td></tr><tr><td><code>swing_opposite_voltage</code></td><td>Voltage on the opposite (non-swung) side out of 12.</td></tr><tr><td><code>swing_max_voltage</code></td><td>Max voltage out of 12.</td></tr><tr><td><code>swing_kp</code> / <code>swing_ki</code> / <code>swing_kd</code></td><td>Swing PID constants.</td></tr><tr><td><code>swing_starti</code></td><td>Minimum distance (degrees) for integral to begin.</td></tr><tr><td><code>swing_slew</code></td><td>Limits swinging acceleration in volts per 10 ms.</td></tr><tr><td><code>swing_exit_error</code></td><td>Error at which the swing motion exits.</td></tr><tr><td><code>swing_settle_error</code></td><td>Error (degrees) to be considered settled.</td></tr><tr><td><code>swing_settle_time</code></td><td>Time (ms) to be considered settled.</td></tr><tr><td><code>swing_timeout</code></td><td>Time (ms) before quitting and moving on.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="boomerang-control-and-slew-cutoffs">Boomerang, control, and slew cutoffs<a href="#boomerang-control-and-slew-cutoffs" class="hash-link" aria-label="Direct link to Boomerang, control, and slew cutoffs" title="Direct link to Boomerang, control, and slew cutoffs" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>boomerang_lead</code></td><td>Scale factor for how far away the carrot point is.</td></tr><tr><td><code>boomerang_drift</code></td><td>Lower values give slower speeds while turning. Use higher (~8) for traction drives.</td></tr><tr><td><code>control_throttle_deadband</code></td><td>Deadband percent for the throttle axis.</td></tr><tr><td><code>control_throttle_min_output</code></td><td>Minimum throttle output percent after deadband.</td></tr><tr><td><code>control_throttle_curve_gain</code></td><td>Expo gain for throttle (1 linear, 1.06 very curvy).</td></tr><tr><td><code>control_turn_deadband</code></td><td>Deadband percent for the turn axis.</td></tr><tr><td><code>control_turn_min_output</code></td><td>Minimum turn output percent after deadband.</td></tr><tr><td><code>control_turn_curve_gain</code></td><td>Expo gain for the turn axis.</td></tr><tr><td><code>control_desaturate_bias</code></td><td>Desaturation bias for <code>split_arcade_curved</code> (0 = prioritize turn, 1 = prioritize throttle).</td></tr><tr><td><code>turn_cutoff</code></td><td>Degrees within which slew stops being applied.</td></tr><tr><td><code>drive_cutoff</code></td><td>Inches within which slew stops and heading correction stops.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="pid-structs">PID structs<a href="#pid-structs" class="hash-link" aria-label="Direct link to PID structs" title="Direct link to PID structs" translate="no">​</a></h2>
+<p>Each motion&#x27;s <code>k</code> (or <code>drive_k</code> / <code>heading_k</code>) field takes one of these. Their
+fields default to the matching values in <code>constants</code>, so you only override what
+you need:</p>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token comment" style="color:rgb(106, 153, 85)">// Sets the only the drive PID kP</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token class-name" style="color:rgb(78, 201, 176)">drive_constants</span><span class="token plain"> k </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token brace">{</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token plain">p </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token number" style="color:rgb(181, 206, 168)">2.0</span><span class="token plain"> </span><span class="token brace">}</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token keyword" style="color:rgb(86, 156, 214)">struct</span><span class="token plain"> </span><span class="token class-name" style="color:rgb(78, 201, 176)">drive_constants</span><span class="token plain">   </span><span class="token brace">{</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> p</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> i</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> d</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> starti</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> slew</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"> </span><span class="token brace">}</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token keyword" style="color:rgb(86, 156, 214)">struct</span><span class="token plain"> </span><span class="token class-name" style="color:rgb(78, 201, 176)">heading_constants</span><span class="token plain"> </span><span class="token brace">{</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> p</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> i</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> d</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> starti</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> slew</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"> </span><span class="token brace">}</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token keyword" style="color:rgb(86, 156, 214)">struct</span><span class="token plain"> </span><span class="token class-name" style="color:rgb(78, 201, 176)">turn_constants</span><span class="token plain">    </span><span class="token brace">{</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> p</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> i</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> d</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> starti</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> slew</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"> </span><span class="token brace">}</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#9CDCFE"><span class="token plain"></span><span class="token keyword" style="color:rgb(86, 156, 214)">struct</span><span class="token plain"> </span><span class="token class-name" style="color:rgb(78, 201, 176)">swing_constants</span><span class="token plain">   </span><span class="token brace">{</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(86, 156, 214)">float</span><span class="token plain"> p</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> i</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> d</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> starti</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> slew</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><span class="token plain"> </span><span class="token brace">}</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>p</code></td><td>Proportional constant.</td></tr><tr><td><code>i</code></td><td>Integral constant.</td></tr><tr><td><code>d</code></td><td>Derivative constant.</td></tr><tr><td><code>starti</code></td><td>Minimum error for the integral term to begin.</td></tr><tr><td><code>slew</code></td><td>Limits acceleration in volts per 10 ms.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="motion-parameter-structs">Motion parameter structs<a href="#motion-parameter-structs" class="hash-link" aria-label="Direct link to Motion parameter structs" title="Direct link to Motion parameter structs" translate="no">​</a></h2>
+<p>Every <a class="" href="/mikLib/api/Chassis">Chassis</a> motion takes an optional params struct as its last
+argument. All fields default to the global <code>constants</code>, so you override only
+what you need with designated initializers:</p>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#9CDCFE;--prism-background-color:#1E1E1E"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#9CDCFE;background-color:#1E1E1E"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#9CDCFE"><span class="token plain">chassis</span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token function" style="color:rgb(220, 220, 170)">turn_to_angle</span><span class="token bracket">(</span><span class="token number" style="color:rgb(181, 206, 168)">90</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token brace">{</span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token plain">max_voltage </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token number" style="color:rgb(181, 206, 168)">6</span><span class="token punctuation" style="color:rgb(212, 212, 212)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(212, 212, 212)">.</span><span class="token plain">direction </span><span class="token operator" style="color:rgb(212, 212, 212)">=</span><span class="token plain"> </span><span class="token class-name" style="color:rgb(78, 201, 176)">mik</span><span class="token double-colon punctuation" style="color:rgb(212, 212, 212)">::</span><span class="token class-name" style="color:rgb(78, 201, 176)">turn_direction</span><span class="token double-colon punctuation" style="color:rgb(212, 212, 212)">::</span><span class="token class-name" style="color:rgb(78, 201, 176)">cw</span><span class="token brace">}</span><span class="token paren-after-brace">)</span><span class="token punctuation" style="color:rgb(212, 212, 212)">;</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="turn_to_angle_params--turn_to_point_params">turn_to_angle_params / turn_to_point_params<a href="#turn_to_angle_params--turn_to_point_params" class="hash-link" aria-label="Direct link to turn_to_angle_params / turn_to_point_params" title="Direct link to turn_to_angle_params / turn_to_point_params" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>direction</code></td><td>The way the robot should turn (ccw, cw, or shortest path).</td></tr><tr><td><code>angle_offset</code></td><td><em>(point only)</em> Angle turned past the desired heading, in degrees.</td></tr><tr><td><code>min_voltage</code></td><td>Minimum voltage on the drive, used for chaining movements.</td></tr><tr><td><code>max_voltage</code></td><td>Max voltage on the drive out of 12.</td></tr><tr><td><code>exit_error</code></td><td>Distance from target (degrees) within which the motion exits.</td></tr><tr><td><code>settle_error</code></td><td>Error (degrees) to be considered settled.</td></tr><tr><td><code>settle_time</code></td><td>Time (ms) to be considered settled.</td></tr><tr><td><code>timeout</code></td><td>Time (ms) before quitting and moving on.</td></tr><tr><td><code>wait</code></td><td>Yields the program until the motion finishes (default <code>true</code>).</td></tr><tr><td><code>k</code></td><td>A <a href="#pid-structs" class=""><code>turn_constants</code></a> override.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="swing_to_angle_params--swing_to_point_params">swing_to_angle_params / swing_to_point_params<a href="#swing_to_angle_params--swing_to_point_params" class="hash-link" aria-label="Direct link to swing_to_angle_params / swing_to_point_params" title="Direct link to swing_to_angle_params / swing_to_point_params" translate="no">​</a></h3>
+<p>Same as the turn params above, plus:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>opposite_voltage</code></td><td>Voltage on the opposite side of the drivetrain out of 12.</td></tr><tr><td><code>k</code></td><td>A <a href="#pid-structs" class=""><code>swing_constants</code></a> override.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="drive_distance_params--strafe_distance_params">drive_distance_params / strafe_distance_params<a href="#drive_distance_params--strafe_distance_params" class="hash-link" aria-label="Direct link to drive_distance_params / strafe_distance_params" title="Direct link to drive_distance_params / strafe_distance_params" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>heading</code></td><td>Desired heading in degrees. Defaults to the current heading.</td></tr><tr><td><code>min_voltage</code></td><td>Minimum voltage on the drive, used for chaining movements.</td></tr><tr><td><code>max_voltage</code></td><td>Max voltage on the drive out of 12.</td></tr><tr><td><code>heading_max_voltage</code></td><td>Max voltage for getting to heading out of 12.</td></tr><tr><td><code>exit_error</code></td><td>Distance from target (inches) within which the motion exits.</td></tr><tr><td><code>settle_error</code></td><td>Error (inches) to be considered settled.</td></tr><tr><td><code>settle_time</code></td><td>Time (ms) to be considered settled.</td></tr><tr><td><code>timeout</code></td><td>Time (ms) before quitting and moving on.</td></tr><tr><td><code>wait</code></td><td>Yields the program until the motion finishes (default <code>true</code>).</td></tr><tr><td><code>drive_k</code> / <code>heading_k</code></td><td><a href="#pid-structs" class=""><code>drive_constants</code></a> / <a href="#pid-structs" class=""><code>heading_constants</code></a> overrides.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="drive_to_point_params--drive_to_pose_params">drive_to_point_params / drive_to_pose_params<a href="#drive_to_point_params--drive_to_pose_params" class="hash-link" aria-label="Direct link to drive_to_point_params / drive_to_pose_params" title="Direct link to drive_to_point_params / drive_to_pose_params" translate="no">​</a></h3>
+<p>The drive params above, plus:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>direction</code></td><td>Force a forward or reverse approach. Defaults to choosing automatically.</td></tr><tr><td><code>lead</code></td><td><em>(pose only)</em> Scale factor for how far away the carrot point is.</td></tr><tr><td><code>drift</code></td><td><em>(pose only)</em> Limits speed while turning; higher values increase lateral speed out of 10.</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="holonomic_to_pose_params">holonomic_to_pose_params<a href="#holonomic_to_pose_params" class="hash-link" aria-label="Direct link to holonomic_to_pose_params" title="Direct link to holonomic_to_pose_params" translate="no">​</a></h3>
+<p>The drive params above, plus separate turn settling:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody><tr><td><code>turn_settle_error</code></td><td>Turn error (degrees) to be considered settled.</td></tr><tr><td><code>turn_settle_time</code></td><td>Turn time (ms) to be considered settled.</td></tr></tbody></table></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/mikLib/api/Chassis"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Chassis</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/mikLib/api/odom"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Odom</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#constants-struct" class="table-of-contents__link toc-highlight">Constants struct</a><ul><li><a href="#drive-constants" class="table-of-contents__link toc-highlight">Drive constants</a></li><li><a href="#turn-constants" class="table-of-contents__link toc-highlight">Turn constants</a></li><li><a href="#swing-constants" class="table-of-contents__link toc-highlight">Swing constants</a></li><li><a href="#boomerang-control-and-slew-cutoffs" class="table-of-contents__link toc-highlight">Boomerang, control, and slew cutoffs</a></li></ul></li><li><a href="#pid-structs" class="table-of-contents__link toc-highlight">PID structs</a></li><li><a href="#motion-parameter-structs" class="table-of-contents__link toc-highlight">Motion parameter structs</a><ul><li><a href="#turn_to_angle_params--turn_to_point_params" class="table-of-contents__link toc-highlight">turn_to_angle_params / turn_to_point_params</a></li><li><a href="#swing_to_angle_params--swing_to_point_params" class="table-of-contents__link toc-highlight">swing_to_angle_params / swing_to_point_params</a></li><li><a href="#drive_distance_params--strafe_distance_params" class="table-of-contents__link toc-highlight">drive_distance_params / strafe_distance_params</a></li><li><a href="#drive_to_point_params--drive_to_pose_params" class="table-of-contents__link toc-highlight">drive_to_point_params / drive_to_pose_params</a></li><li><a href="#holonomic_to_pose_params" class="table-of-contents__link toc-highlight">holonomic_to_pose_params</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mikLib/">Tutorial</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://discord.gg/Dpv5aZ3dK6" target="_blank" rel="noopener noreferrer" class="footer__link-item">VRC Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/EthanMik/mikLib" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.youtube.com/@ethanmik2587" target="_blank" rel="noopener noreferrer" class="footer__link-item">Youtube<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div></div></footer></div>
+</body>
+</html>
