@@ -6,7 +6,7 @@ sidebar_position: 1
 
 # Chassis
 
-The chassis class is how you interact with the robot.
+How to interact with the robot
 
 
 ## Constructor

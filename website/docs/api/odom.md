@@ -6,7 +6,9 @@ sidebar_position: 3
 
 # Odom
 
-General-use odometry class. The relevant outputs are `position` (an x/y
+Generic odometry class
+
+The relevant outputs are `position` (an x/y
 [point](#public-members)) and `orientation_deg`. Requires an inertial sensor for heading. 
 The math uses the [Pilons arc method](https://wiki.purduesigbots.com/software/odometry).
 

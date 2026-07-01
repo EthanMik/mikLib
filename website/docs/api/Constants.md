@@ -6,7 +6,7 @@ sidebar_position: 2
 
 # Constants
 
-Tuning constants in mikLib:
+Tuning constants in mikLib
 
 - The global [`Constants`](#constants-struct) struct, which holds
   every motion constant used in [Chassis](./Chassis).

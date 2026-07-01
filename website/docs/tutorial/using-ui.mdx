@@ -50,6 +50,8 @@ With each auton set up in this format
 std::string blue_left_winpoint(bool calibrate, auto_variation var, bool get_name) {
     if (get_name) return "blue left winpoint";
 
+    // Mirror autos here
+
     if (calibrate) {
         chassis.set_coordinates(0, 0, 0);
         return "";
@@ -72,6 +74,63 @@ Then position it where you actually want it. After that you can plug into field 
 
 :::note
 If you run auton through UI it can be cancelled anytime with back button
+:::
+
+### Mirroring
+
+In order to properly mirror autons and distance reset, the VEX coordinate system needs to be used.
+Planning autos on [path.jerryio](https://path.jerryio.com/) is the easiest way to get the correct points
+
+<img src={require('./img/ui/vex-coordinates.png').default} alt="field img" width="40%"  style={{ paddingBottom: '20px' }} />
+
+This auto is a red right winpoint.
+
+<img src={require('./img/ui/raw-auto.png').default} alt="field img" width="50%"  style={{ paddingBottom: '20px' }} />
+
+```cpp
+std::string red_right_winpoint(bool calibrate, auto_variation var, bool get_name) {
+    if (get_name) return "red right winpoint";
+
+    if (calibrate) {
+        chassis.set_coordinates(-59.08, -58.58, 0);
+        return "";
+    }
+
+    chassis.drive_to_point(-24.15, -47.17);
+    chassis.drive_to_point(-46.78, -24.19);
+    return "";
+}
+```
+
+To mirror it across the field to blue, we need to mirror the x and y pos. 
+
+<img src={require('./img/ui/mirror-auto.png').default} alt="field img" width="50%"  style={{ paddingBottom: '20px' }} />
+
+```cpp
+std::string blue_right_winpoint(bool calibrate, auto_variation var, bool get_name) {
+    if (get_name) return "blue right winpoint";
+
+    // Mirror across field, applies to all drive motions
+    chassis.mirror_all_auton_x_pos();
+    chassis.mirror_all_auton_y_pos();
+
+    if (calibrate) {
+        // Call red right winpoint mirrored
+        red_right_winpoint(calibrate, var, get_name);
+        return "";
+    }
+
+    red_right_winpoint(calibrate, var, get_name);
+    return "";
+}
+```
+
+Mirroring x or y pos also handles mirroring angles and converting left swing to right swing
+
+:::note
+Mirroring stays on until the program restarts or you call `chassis.disable_mirroring()`.
+This only matters when testing multiple autos in one session. Switching to a
+non-mirrored auto without a restart will still run mirrored.
 :::
 
 ### Variations

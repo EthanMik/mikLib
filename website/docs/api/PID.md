@@ -6,7 +6,7 @@ sidebar_position: 4
 
 # PID
 
-A generic PID class
+Generic PID class
 
 ## Constructors
 
