@@ -734,12 +734,16 @@ void UI_auton_screen::enable_controller_overlay() {
     };
 
     auto calibrate_screen = [this](){
-        controller_calibrate_scr();
-        queue_autons(true, false);
+        if (!chassis.calibrating) {
+            controller_calibrate_scr();
+            queue_autons(true, false);
+        }
     };
 
     auto run_auto = [this](){
-        start_auton_test();
+        if (!chassis.calibrating) {
+            start_auton_test();
+        }
     };
 
     auto toggle_time_limiter = [this](){
@@ -751,7 +755,7 @@ void UI_auton_screen::enable_controller_overlay() {
     };
 
     auto recalibrate_inertial = [](){
-        chassis.calibrate_inertial();
+        if (!chassis.calibrating) chassis.calibrate_inertial();
     };
 
     auto toggle_odom_display = [this]() {
@@ -832,7 +836,9 @@ void UI_auton_screen::restart_controller_overlay() {
                 int now = Brain.Timer.time(vex::timeUnits::msec);
                 if (Y_press_pending && now - last_Y_press_time <= double_tap_window) {
                     Y_press_pending = false;
-                    auton_scr->start_auton_test();
+                    if (!chassis.calibrating) {
+                        auton_scr->start_auton_test();
+                    }
                 } else {
                     Y_press_pending = true;
                     last_Y_press_time = now;
@@ -841,8 +847,10 @@ void UI_auton_screen::restart_controller_overlay() {
 
             if (Y_press_pending && Brain.Timer.time(vex::timeUnits::msec) - last_Y_press_time > double_tap_window) {
                 Y_press_pending = false;
-                auton_scr->controller_calibrate_scr();
-                auton_scr->queue_autons(true, false);
+                if (!chassis.calibrating) {
+                    auton_scr->controller_calibrate_scr();
+                    auton_scr->queue_autons(true, false);
+                }
             }
             task::sleep(50);
         }

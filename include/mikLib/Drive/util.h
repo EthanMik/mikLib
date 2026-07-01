@@ -54,14 +54,14 @@ float volt_to_percent(float volt);
 
 /**
  * @brief Converts an angle in degrees to radians.
- * @param angle The angle in degrees.
+ * @param angle_deg The angle in degrees.
  * @return Angle in radians.
  */
 float to_rad(float angle_deg);
 
 /**
  * @brief Converts an angle in radians to degrees.
- * @param angle The angle in radians.
+ * @param angle_rad The angle in radians.
  * @return Angle in degrees.
  */
 float to_deg(float angle_rad);
@@ -100,8 +100,8 @@ float reduce_0_to_360(float angle);
  * @param mirror_x Whether to negate X.
  * @param mirror_y Whether to negate Y.
  */
-void mirror(float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
+void mirror(float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y);
 void mirror(float& x, float& y, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
 void mirror(float& angle, mik::turn_direction& turn_direction, bool mirror_x, bool mirror_y);
@@ -140,6 +140,7 @@ float angle_error(float error, mik::turn_direction dir = mik::turn_direction::un
  * @param desired_angle_deg The direction of the line to be drawn.
  * @param current_X The robot's X position in inches.
  * @param current_Y The robot's Y position in inches.
+ * @param exit_error Distance from the line in inches within which the robot is considered settled.
  * @return Whether the robot can be considered settled.
  */
 bool is_line_settled(float desired_X, float desired_Y, float desired_angle_deg, float current_X, float current_Y, float exit_error);
@@ -204,7 +205,7 @@ float clamp_min_voltage(float drive_output, float drive_min_voltage);
  * @param current_Y The robot's current Y position in inches.
  * @param current_angle_deg The robot's current heading in degrees.
  * @param desired_X The robot's desired X position in inches.
- * @param desired_Ym The robot's desired Y position in inches.
+ * @param desired_Y The robot's desired Y position in inches.
  * @param drift A constant to determine how aggressive drift is reduced, higher means more drift.
  * @return The voltage with slip clamping applied.
  */
@@ -220,24 +221,6 @@ constexpr T sign(T value) {
 	return value < 0 ? -1 : 1;
 }
 
-/**
- * @brief Compute the intersection points between a circle and a line segment.
- * Determines where (if anywhere) the closed segment from `p1` to `p2`
- * intersects the circle centered at `center` with radius `radius`.
- * Intersection points that fall outside the segment bounds are discarded.
- * Segment endpoints that lie on the circle count as intersections.
- *
- * @param center Center of the circle.
- * @param radius Radius of the circle (same units as the point coordinates).
- * @param p1 First endpoint of the line segment.
- * @param p2 Second endpoint of the line segment.
- * 
- * @return A vector containing 0, 1, or 2 intersection points that lie on the
- * segment. In a tangential (single-touch) case, floating-point effects
- * may produce two nearly identical points; callers may wish to
- * deduplicate.
- */
-std::vector<point> line_circle_intersections(point center, float radius, point p1, point p2);
 
 /**
  * @brief Checks to see whether specified text file exists on SD card.
@@ -256,6 +239,7 @@ void wipe_SD_file(const std::string& file_name);
 /**
  * @brief Appends a string to a file on SD on a newline.
  * @param file_name The name of file on SD. MUST USE .TXT FILE.
+ * @param data The string to append to the file.
  */
 void write_to_SD_file(const std::string& file_name, const std::string& data);
 
@@ -277,7 +261,7 @@ void remove_duplicates_SD_file(const std::string& file_name, const std::string& 
 std::vector<std::string> get_SD_file_txt(const std::string& file_name);
 
 /** @brief Prints to terminal via serial.
- * @param data The datatype to be printed to terminal.
+ * @param num The value to be printed to terminal. Overloads accept int, double, string, bool, etc.
  * @param clr The color of the text in the terminal (default is white).
  */
 void print(float num, const mik::color& clr = mik::color::WHITE);

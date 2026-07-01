@@ -72,8 +72,8 @@ public:
 
     /**
      * @brief Stops both sides of the drivetrain.
-     * @param mode coast, brake, hold
-    */    
+     * @param brake coast, brake, hold
+    */
     void stop_drive(vex::brakeType brake = vex::brakeType::undefined);
 
     /** @brief Calibrates the inertial sensor, if force calibrate is true
@@ -164,7 +164,8 @@ public:
      * 
      * @param sensor_pos The side of the robot that the distance sensor is mounted.
      * @param max_reset_distance The maxiumum allowed of distance in inches that an odom axis can be changed.
-     * 
+     * @param reset_attempts Number of resets to attempt, takes median of result.
+     *
      * @return True if the desired axis was reset successfully.
      */
     bool reset_axis(mik::distance_position sensor_pos, float max_reset_distance, int reset_attempts = 1);
@@ -195,15 +196,7 @@ public:
      * Uses degrees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #turn_to_angle_params.
      */
     void turn_to_angle(float angle, turn_to_angle_params p = turn_to_angle_params{});
 
@@ -216,17 +209,7 @@ public:
      * Use negative distance to go backwards. Uses inches for tracking distance.
      * 
      * @param distance Desired distance in inches.
-     * @param heading Desired heading in degrees.
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for getting to heading out of 12.
-     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in inches.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
-     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #drive_distance_params.
      */
     void drive_distance(float distance, drive_distance_params p = drive_distance_params{});
 
@@ -236,16 +219,7 @@ public:
      * direction, unless a turn direction is specified. Uses degreees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #swing_to_angle_params.
      */
     void left_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{});
 
@@ -255,16 +229,7 @@ public:
      * direction, unless a turn direction is specified. Uses degrees for tracking distance.
      * 
      * @param angle Desired angle in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #swing_to_angle_params.
      */
     void right_swing_to_angle(float angle, swing_to_angle_params p = swing_to_angle_params{});
 
@@ -278,16 +243,7 @@ public:
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
-     * @param angle_offset Angle turned past the desired heading in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #turn_to_point_params.
      */
     void turn_to_point(float X_position, float Y_position, turn_to_point_params p = turn_to_point_params{});
     
@@ -301,17 +257,7 @@ public:
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
-     * @param angle_offset Angle turned past the desired heading in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #swing_to_point_params.
      */
     void left_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{});
 
@@ -325,17 +271,7 @@ public:
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
-     * @param angle_offset Angle turned past the desired heading in degrees.
-     * @param turn_direction The way the robot should turn, (ccw, cw, or shortest path)
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param opposite_voltage Voltage on the opposite side of the drivetrain out of 12.
-     * @param exit_error Distance from target in degrees; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in degrees.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param k PID and starti constants. Do k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #swing_to_point_params.
      */
     void right_swing_to_point(float X_position, float Y_position, swing_to_point_params p = swing_to_point_params{});
 
@@ -349,16 +285,7 @@ public:
      * 
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for getting to heading out of 12.
-     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in inches.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
-     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #drive_to_point_params.
      */
     void drive_to_point(float X_position, float Y_position, drive_to_point_params p  = drive_to_point_params{});
     
@@ -376,18 +303,7 @@ public:
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
      * @param angle Desired orientation in degrees.
-     * @param lead Constant scale factor that determines how far away the carrot point is.
-     * @param drift Limits speed while turning. Higher values increase lateral speed.
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for getting to heading out of 12.
-     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in inches.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
-     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #drive_to_pose_params.
      */
     void drive_to_pose(float X_position, float Y_position, float angle, drive_to_pose_params p = drive_to_pose_params{});
 
@@ -400,17 +316,7 @@ public:
      * Use negative distance to go left. Uses inches for tracking distance.
      * 
      * @param distance Desired distance in inches.
-     * @param heading Desired heading in degrees.
-     * @param min_voltage Minimum voltage on the drive, used for chaining movements.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for getting to heading out of 12.
-     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
-     * @param settle_error Error to be considered settled in inches.
-     * @param settle_time Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and move on in milliseconds.
-     * @param drive_k Drive PID and starti constants. Do drive_k. to access constants.
-     * @param heading_k Heading PID and starti constants. Do heading_k. to access constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #strafe_distance_params.
      */
     void strafe_distance(float distance, strafe_distance_params p = strafe_distance_params{});
 
@@ -426,17 +332,7 @@ public:
      * @param X_position Desired x position in inches.
      * @param Y_position Desired y position in inches.
      * @param angle Desired orientation in degrees.
-     * @param max_voltage Max voltage on the drive out of 12.
-     * @param heading_max_voltage Max voltage for heading correction out of 12.
-     * @param exit_error Distance from target in inches; when the robot is within this error the motion exits.
-     * @param settle_error Drive error to be considered settled in inches.
-     * @param settle_time Drive time to be considered settled in milliseconds.
-     * @param turn_settle_error Turn Error to be considered settled in degrees.
-     * @param turn_settle_time Turn Time to be considered settled in milliseconds.
-     * @param timeout Time before quitting and moving on in milliseconds.
-     * @param drive_k Drive PID and starti constants.
-     * @param heading_k Heading PID and starti constants.
-     * @param wait Yields program until motion has finished, true by default.
+     * @param p Optional tuning parameters; see #holonomic_to_pose_params.
      */
     void holonomic_to_pose(float X_position, float Y_position, float angle, holonomic_to_pose_params p = holonomic_to_pose_params{});
 
@@ -510,7 +406,7 @@ public:
 
     /**
      * @brief Resets default drive constants.
-     * Driving includes drive_distance(), drive_to_point(), drive_to_pose(), and follow_path()
+     * Driving includes drive_distance(), drive_to_point(), drive_to_pose(), holonomic_to_pose(), and strafe_distance()
      * 
      * @param drive_max_voltage Max voltage out of 12.
      * @param drive_kp Proportional constant.
@@ -523,7 +419,7 @@ public:
     /**
      * @brief Resets default heading constants.
      * Heading control keeps the robot facing the right direction
-     * and is part of drive_distance(), drive_to_point(), drive_to_pose(), and follow_path()
+     * and is part of drive_distance(), drive_to_point(), drive_to_pose(), holonomic_to_pose(), and strafe_distance()
      * 
      * @param heading_max_voltage Max voltage out of 12.
      * @param heading_kp Proportional constant.
@@ -590,7 +486,7 @@ public:
 
     /**
      * @brief Globally sets the brake mode for both drive motor groups.
-     * @param mode coast, brake, hold
+     * @param brake coast, brake, hold
      */
     void set_brake_type(vex::brakeType brake);
 

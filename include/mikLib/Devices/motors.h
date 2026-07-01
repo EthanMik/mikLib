@@ -16,8 +16,9 @@ class motor : public vex::motor {
 public:
     /**
      * @brief Creates a new motor object with a name on the port specified and sets the reversed flag.
-     * @param port The port index for this motor. The index is zero-based.
-     * @param reverse Sets the reverse flag for the new motor object.
+     * @param port The port the motor is plugged into (1-21).
+     * @param reversed Sets the reverse flag for the new motor object.
+     * @param gear_cartridge The installed gear cartridge (red, green, or blue).
      * @param name Sets the name for the motor
      */
     motor(int port, bool reversed, vex::gearSetting gear_cartridge, std::string name);
@@ -28,7 +29,7 @@ public:
     motor(motor&& other) noexcept;
     ~motor();
     
-    /** @return True is motor is reversed */
+/** @return True is motor is reversed */
     bool reversed() const;
     /** @return The gear cartidge used in mik::motor, default is 6 to 1 */
     vex::gearSetting gear_cartridge() const;
@@ -136,11 +137,12 @@ public:
     bool spinFor(vex::directionType dir, float rotation, vex::rotationUnits units, bool waitForCompletion=true);
 
     /**
-     * @brief Turn on the motors and spin them to a relative target time value at a specified velocity.
+     * @brief Turn on the motors and spin them for a relative target time value at a specified voltage.
      * @param time Sets the amount of time.
      * @param units The measurement unit for the time value.
-     * @param velocity Sets the amount of velocity.
-     * @param units_v The measurement unit for the velocity value.       
+     * @param voltage Sets the amount of voltage.
+     * @param units_v The measurement unit for the voltage value.
+     * @param waitForCompletion (Optional) If true, the program waits until the time elapses before continuing. True by default.
      */
     void spinFor(float time, vex::timeUnits units, float voltage, vex::voltageUnits units_v, bool waitForCompletion=true);
     

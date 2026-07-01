@@ -2,22 +2,27 @@
 
 task UI;
 
-// If you want to disable Brain UI, and reduce upload times
+// If you want to disable Brain UI, cut wireless upload times to ~7s
 // Go into `makefile` and set `FAST_COMPILE = 1`
 static int run_UI() {
     UI_init();
-
-    // Running the auton selector on the controller disables user control,
-    // press X on the controller to close auton selector and enable user control
-    UI_controller_auton_selector(); // Comment out this line to disable Controller UI
-
     UI_render();
     return 0;
 }
 
 void pre_auton() {
-    init();
+    init({
+        // Running the auton selector on the controller disables user control,
+        // press X on the controller to close auton selector and enable user control
+        .enable_controller_selector = true,
+
+        // Warns disconnected motors and chassis devices. 
+        // Displayed on `Error Data` on Config Tab
+        .check_disconnected_devices = true
+    });
+
     default_constants();
+
     UI = task(run_UI);
 }
 

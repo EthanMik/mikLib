@@ -2,9 +2,6 @@
 /build
 compile_commands.json
 
-# Doxygen generated XML
-/xml
-
 # Docusaurus
 /website/node_modules
 /website/build

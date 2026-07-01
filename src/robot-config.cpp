@@ -83,7 +83,6 @@ static void loading_screen(bool stop) {
 		return;
 	}
 	
-	Controller.Screen.setCursor(1, 1);
 #ifndef FAST_COMPILE
 	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
 #endif
@@ -97,8 +96,6 @@ static void loading_screen(bool stop) {
 		int count = 0;
 		while(1) {
 			Brain.Screen.printAt(184, 220, calibrate.c_str());
-			Controller.Screen.setCursor(1, 1);
-			Controller.Screen.print((calibrate).c_str());
 			task::sleep(200);
 			calibrate.append(".");
 			count++;
@@ -106,8 +103,6 @@ static void loading_screen(bool stop) {
 				count = 0;
 				calibrate = "Calibrating";
 				Brain.Screen.printAt(184, 220, (calibrate + "     ").c_str());
-				Controller.Screen.setCursor(1, 1);
-				Controller.Screen.print((calibrate + "     ").c_str());
 			}
 		}
 		return 0;
@@ -124,25 +119,20 @@ static void handle_disconnected_devices() {
 		Controller.Screen.setCursor(2, 1);
 		Controller.Screen.print("[Config]->[Error Data]");
 		task::sleep(500);
+		Controller.Screen.clearScreen();
 	}
 #endif
 }
 
-static void reset_screens() {
-	Brain.Screen.clearScreen();
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("                                  ");
-	Brain.Screen.setCursor(1,1);
-	vex::task::sleep(50);
-	Brain.Screen.clearScreen();
-	Brain.Screen.setFillColor(vex::color::black);
-	Brain.Screen.setPenWidth(1);
-	Brain.Screen.setPenColor(vex::color::white);
-}
-
-void init(void) {
+void init(init_options options) {
 	// Disable user control during initialization to prevent inputs
 	disable_user_control(false);
+	
+	// Check disconnected devices
+	if (options.check_disconnected_devices) handle_disconnected_devices();
+	
+	// Load auton selector
+	if (options.enable_controller_selector) UI_controller_auton_selector();
 
 	// Start loading screen
 	loading_screen(false);
@@ -157,12 +147,6 @@ void init(void) {
 
 	// Stop loading screen
 	loading_screen(true);
-
-	// Check disconnected devices
-	handle_disconnected_devices();
-
-	// Init brain and controller screen
-	reset_screens();
 }
 
 static bool user_control_disabled = false;
