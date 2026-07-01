@@ -5,6 +5,8 @@
 
 An easy to use odometry VEXcode template with UI support.
 
+Documentation can be found [here](https://ethanmik.github.io/mikLib/)
+
 > For updates and help, join [mikLib](https://discord.gg/UKbzef8GrA) Discord
 
 
