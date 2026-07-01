@@ -141,8 +141,6 @@ scroll, then press **Wipe SD**.
 
 ### Tuning Graphs
 
-i need to fix the turning graphs to 0-360 :pensive: 
-
 Here are the graphs for each tuned PID controller
 
 <figure style={{ margin: 0, marginBottom: '32px' }}>
@@ -164,14 +162,13 @@ Here are the graphs for each tuned PID controller
 Degrees are wrapped from 0-360. Seeing discontinuity in turning graphs is normal
 :::
 
-// Add heading PID graphs :sob:
-
 ## Exit Conditions
 
 There are three exit conditions, which you can also adjust inside the Tuner
 
 :::note
-As of mikLib v2.1 it is not recommended to adjust exit conditions for motion chaining
+For better consistency increase settle time since 
+it gives the robot more time to get into the right position
 :::
 
 | Exit Condition | What it does |
