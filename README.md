@@ -5,10 +5,7 @@
 
 An easy to use odometry VEXcode template with UI support.
 
-Documentation can be found [here](https://ethanmik.github.io/mikLib/)
-
 > For updates and help, join [mikLib](https://discord.gg/UKbzef8GrA) Discord
-
 
 ## Features
 - Generic PID class
@@ -49,6 +46,10 @@ Documentation can be found [here](https://ethanmik.github.io/mikLib/)
 5. Import the project opening the VEX extension and selecting "Import" from the file menu and selecting the mikLib.zip file you downloaded.
 
 6. Configure your robot through robot-config.cpp
+
+## Documentation
+
+Documentation can be found [here](https://ethanmik.github.io/mikLib/)
 
 ## Tutorials
 - [How to setup Tracking Wheels](https://youtu.be/ZLTW1LMl5fk)
