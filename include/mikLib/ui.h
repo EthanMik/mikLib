@@ -41,6 +41,7 @@
 #include "mikLib/UI/config_screen.h"
 #include "mikLib/UI/graph_screen.h"
 #include "mikLib/UI/motors_screen.h"
+#include "mikLib/UI/pneumatic_screen.h"
 
 #include "mikLib/UI/UI_manager.h"
 

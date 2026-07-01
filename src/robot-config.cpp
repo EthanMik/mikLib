@@ -50,21 +50,21 @@ Chassis chassis(
 
 /* Creating a motor group in assembly */
 mik::motor_group Assembly::lower_intake_motors({
-	mik::motor(PORT1, true, green_18_1, "bottom_intake"),
-	mik::motor(PORT2, false, green_18_1, "middle_intake")
+	mik::motor(PORT8, true, green_18_1, "bottom_intake"),
+	mik::motor(PORT9, false, green_18_1, "middle_intake")
 });
 
 /* Creating upper intake motor in assembly */
-mik::motor Assembly::upper_intake_motor(PORT16, false, blue_6_1, "upper_intake");
+mik::motor Assembly::upper_intake_motor(PORT10, false, blue_6_1, "upper_intake");
 
 /* Creating pistons in assembly */
-mik::piston Assembly::scraper_piston(PORT_B);
-mik::piston Assembly::wing_piston(PORT_A);
+mik::piston Assembly::scraper_piston(PORT_A);
+mik::piston Assembly::wing_piston(PORT_B);
 
 /* Creating alternative vex devices in assembly */
-vex::rotation Assembly::rotation_sensor(PORT6);
-vex::optical Assembly::optical_sensor(PORT13);
-vex::limit Assembly::limit_switch(to_triport(PORT_F));
+vex::rotation Assembly::rotation_sensor(PORT11);
+vex::optical Assembly::optical_sensor(PORT12);
+vex::limit Assembly::limit_switch(to_triport(PORT_C));
 
 
 
@@ -83,7 +83,6 @@ static void loading_screen(bool stop) {
 		return;
 	}
 	
-	Controller.Screen.setCursor(1, 1);
 #ifndef FAST_COMPILE
 	Brain.Screen.drawImageFromBuffer((uint8_t*)mikLib_logo, 0, 0, mikLib_logo_size);
 #endif
@@ -97,8 +96,6 @@ static void loading_screen(bool stop) {
 		int count = 0;
 		while(1) {
 			Brain.Screen.printAt(184, 220, calibrate.c_str());
-			Controller.Screen.setCursor(1, 1);
-			Controller.Screen.print((calibrate).c_str());
 			task::sleep(200);
 			calibrate.append(".");
 			count++;
@@ -106,8 +103,6 @@ static void loading_screen(bool stop) {
 				count = 0;
 				calibrate = "Calibrating";
 				Brain.Screen.printAt(184, 220, (calibrate + "     ").c_str());
-				Controller.Screen.setCursor(1, 1);
-				Controller.Screen.print((calibrate + "     ").c_str());
 			}
 		}
 		return 0;
@@ -124,25 +119,20 @@ static void handle_disconnected_devices() {
 		Controller.Screen.setCursor(2, 1);
 		Controller.Screen.print("[Config]->[Error Data]");
 		task::sleep(500);
+		Controller.Screen.clearScreen();
 	}
 #endif
 }
 
-static void reset_screens() {
-	Brain.Screen.clearScreen();
-	Controller.Screen.setCursor(1, 1);
-	Controller.Screen.print("                                  ");
-	Brain.Screen.setCursor(1,1);
-	vex::task::sleep(50);
-	Brain.Screen.clearScreen();
-	Brain.Screen.setFillColor(vex::color::black);
-	Brain.Screen.setPenWidth(1);
-	Brain.Screen.setPenColor(vex::color::white);
-}
-
-void init(void) {
+void init(init_options options) {
 	// Disable user control during initialization to prevent inputs
 	disable_user_control(false);
+	
+	// Check disconnected devices
+	if (options.check_disconnected_devices) handle_disconnected_devices();
+	
+	// Load auton selector
+	if (options.enable_controller_selector) UI_controller_auton_selector();
 
 	// Start loading screen
 	loading_screen(false);
@@ -157,12 +147,6 @@ void init(void) {
 
 	// Stop loading screen
 	loading_screen(true);
-
-	// Check disconnected devices
-	handle_disconnected_devices();
-
-	// Init brain and controller screen
-	reset_screens();
 }
 
 static bool user_control_disabled = false;

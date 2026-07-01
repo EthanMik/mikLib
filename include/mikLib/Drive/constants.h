@@ -77,178 +77,176 @@ struct Constants {
 
     float turn_cutoff = 20; // Degrees, that within, slew will stop being applied.
     float drive_cutoff = 7; // Inches, that within, slew will stop being applied and heading correction stops.
-};
-
-struct drive_constants;
-struct heading_constants;
-struct turn_constants;
-struct swing_constants;
+}; 
 
 extern Constants constants;
 
+/** @brief PID and slew gains for drive (forward/backward) motions. */
 struct drive_constants {
-  float p = constants.drive_kp;
-  float i = constants.drive_ki;
-  float d = constants.drive_kd;
-  float starti = constants.drive_starti;
+  float p = constants.drive_kp;        ///< Proportional constant.
+  float i = constants.drive_ki;        ///< Integral constant.
+  float d = constants.drive_kd;        ///< Derivative constant.
+  float starti = constants.drive_starti; ///< Minimum distance in inches for integral to begin.
+  float slew = constants.drive_slew;   ///< Limits drive acceleration in volts per 10 ms.
 };
 
+/** @brief PID and slew gains for heading correction while driving. */
 struct heading_constants {
-  float p = constants.heading_kp;
-  float i = constants.heading_ki;
-  float d = constants.heading_kd;
-  float starti = constants.heading_starti;
+  float p = constants.heading_kp;      ///< Proportional constant.
+  float i = constants.heading_ki;      ///< Integral constant.
+  float d = constants.heading_kd;      ///< Derivative constant.
+  float starti = constants.heading_starti; ///< Minimum distance in degrees for integral to begin.
+  float slew = constants.heading_slew; ///< Limits heading correction acceleration in volts per 10 ms.
 };
 
+/** @brief PID and slew gains for turn motions. */
 struct turn_constants {
-  float p = constants.turn_kp;
-  float i = constants.turn_ki;
-  float d = constants.turn_kd;
-  float starti = constants.turn_starti;
+  float p = constants.turn_kp;         ///< Proportional constant.
+  float i = constants.turn_ki;         ///< Integral constant.
+  float d = constants.turn_kd;         ///< Derivative constant.
+  float starti = constants.turn_starti; ///< Minimum angle in degrees for integral to begin.
+  float slew = constants.turn_slew;    ///< Limits turning acceleration in volts per 10 ms.
 };
 
+/** @brief PID and slew gains for swing motions. */
 struct swing_constants {
-  float p = constants.swing_kp;
-  float i = constants.swing_ki;
-  float d = constants.swing_kd;
-  float starti = constants.swing_starti;
+  float p = constants.swing_kp;        ///< Proportional constant.
+  float i = constants.swing_ki;        ///< Integral constant.
+  float d = constants.swing_kd;        ///< Derivative constant.
+  float starti = constants.swing_starti; ///< Minimum distance in degrees for integral to begin.
+  float slew = constants.swing_slew;   ///< Limits swinging acceleration in volts per 10 ms.
 };
 
+/** @brief Optional parameters for Chassis::turn_to_angle(). */
 struct turn_to_angle_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
-    float min_voltage = constants.turn_min_voltage;
-    float max_voltage = constants.turn_max_voltage;
-    float exit_error = constants.turn_exit_error;
-    float settle_error = constants.turn_settle_error;
-    float settle_time = constants.turn_settle_time;
-    float timeout = constants.turn_timeout;
-    float slew = constants.turn_slew;
-    bool wait = true;
-    turn_constants k = turn_constants{};
+    mik::turn_direction direction = mik::turn_direction::undefined; ///< The way the robot should turn (ccw, cw, or shortest path).
+    float min_voltage = constants.turn_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.turn_max_voltage; ///< Max voltage on the drive out of 12.
+    float exit_error = constants.turn_exit_error;   ///< Distance from target in degrees; within this error the motion exits.
+    float settle_error = constants.turn_settle_error; ///< Error to be considered settled in degrees.
+    float settle_time = constants.turn_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.turn_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                               ///< Yields program until motion has finished, true by default.
+    turn_constants k = turn_constants{};            ///< PID and starti constants. Use k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::left_swing_to_angle() and Chassis::right_swing_to_angle(). */
 struct swing_to_angle_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
-    float min_voltage = constants.swing_min_voltage;
-    float max_voltage = constants.swing_max_voltage;
-    float opposite_voltage = constants.swing_opposite_voltage;
-    float exit_error = constants.swing_exit_error;
-    float settle_error = constants.swing_settle_error;
-    float settle_time = constants.swing_settle_time;
-    float timeout = constants.swing_timeout;
-    float slew = constants.swing_slew;
-    bool wait = true;
-    swing_constants k = swing_constants{};
+    mik::turn_direction direction = mik::turn_direction::undefined; ///< The way the robot should turn (ccw, cw, or shortest path).
+    float min_voltage = constants.swing_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.swing_max_voltage; ///< Max voltage on the drive out of 12.
+    float opposite_voltage = constants.swing_opposite_voltage; ///< Voltage on the opposite side of the drivetrain out of 12.
+    float exit_error = constants.swing_exit_error;   ///< Distance from target in degrees; within this error the motion exits.
+    float settle_error = constants.swing_settle_error; ///< Error to be considered settled in degrees.
+    float settle_time = constants.swing_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.swing_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    swing_constants k = swing_constants{};           ///< PID and starti constants. Use k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::turn_to_point(). */
 struct turn_to_point_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
-    float angle_offset = 0;
-    float min_voltage = constants.turn_min_voltage;
-    float max_voltage = constants.turn_max_voltage;
-    float exit_error = constants.turn_exit_error;
-    float settle_error = constants.turn_settle_error;
-    float settle_time = constants.turn_settle_time;
-    float timeout = constants.turn_timeout;
-    float slew = constants.turn_slew;
-    bool wait = true;
-    turn_constants k = turn_constants{};
+    mik::turn_direction direction = mik::turn_direction::undefined; ///< The way the robot should turn (ccw, cw, or shortest path).
+    float angle_offset = 0;                          ///< Angle turned past the desired heading in degrees.
+    float min_voltage = constants.turn_min_voltage;  ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.turn_max_voltage;  ///< Max voltage on the drive out of 12.
+    float exit_error = constants.turn_exit_error;    ///< Distance from target in degrees; within this error the motion exits.
+    float settle_error = constants.turn_settle_error; ///< Error to be considered settled in degrees.
+    float settle_time = constants.turn_settle_time;  ///< Time to be considered settled in milliseconds.
+    float timeout = constants.turn_timeout;          ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    turn_constants k = turn_constants{};             ///< PID and starti constants. Use k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::left_swing_to_point() and Chassis::right_swing_to_point(). */
 struct swing_to_point_params {
-    mik::turn_direction direction = mik::turn_direction::FASTEST;
-    float angle_offset = 0;
-    float min_voltage = constants.swing_min_voltage;
-    float max_voltage = constants.swing_max_voltage;
-    float opposite_voltage = constants.swing_opposite_voltage;
-    float exit_error = constants.swing_exit_error;
-    float settle_error = constants.swing_settle_error;
-    float settle_time = constants.swing_settle_time;
-    float timeout = constants.swing_timeout;
-    float slew = constants.swing_slew;
-    bool wait = true;
-    swing_constants k = swing_constants{};
+    mik::turn_direction direction = mik::turn_direction::undefined; ///< The way the robot should turn (ccw, cw, or shortest path).
+    float angle_offset = 0;                          ///< Angle turned past the desired heading in degrees.
+    float min_voltage = constants.swing_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.swing_max_voltage; ///< Max voltage on the drive out of 12.
+    float opposite_voltage = constants.swing_opposite_voltage; ///< Voltage on the opposite side of the drivetrain out of 12.
+    float exit_error = constants.swing_exit_error;   ///< Distance from target in degrees; within this error the motion exits.
+    float settle_error = constants.swing_settle_error; ///< Error to be considered settled in degrees.
+    float settle_time = constants.swing_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.swing_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    swing_constants k = swing_constants{};           ///< PID and starti constants. Use k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::drive_distance(). */
 struct drive_distance_params {
-    float heading = NAN;
-    float min_voltage = constants.drive_min_voltage;
-    float max_voltage = constants.drive_max_voltage;
-    float heading_max_voltage = constants.heading_max_voltage;
-    float exit_error = constants.drive_exit_error;
-    float settle_error = constants.drive_settle_error;
-    float settle_time = constants.drive_settle_time;
-    float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
+    float heading = NAN;                             ///< Desired heading in degrees. Defaults to the current heading.
+    float min_voltage = constants.drive_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.drive_max_voltage; ///< Max voltage on the drive out of 12.
+    float heading_max_voltage = constants.heading_max_voltage; ///< Max voltage for getting to heading out of 12.
+    float exit_error = constants.drive_exit_error;   ///< Distance from target in inches; within this error the motion exits.
+    float settle_error = constants.drive_settle_error; ///< Error to be considered settled in inches.
+    float settle_time = constants.drive_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.drive_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    drive_constants drive_k = drive_constants{};     ///< Drive PID and starti constants. Use drive_k. to access constants.
+    heading_constants heading_k = heading_constants{}; ///< Heading PID and starti constants. Use heading_k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::drive_to_point(). */
 struct drive_to_point_params {
-    float min_voltage = constants.drive_min_voltage;
-    float max_voltage = constants.drive_max_voltage;
-    float heading_max_voltage = constants.heading_max_voltage;
-    float exit_error = constants.drive_exit_error;
-    float settle_error = constants.drive_settle_error;
-    float settle_time = constants.drive_settle_time;
-    float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
-
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
+    vex::directionType direction = vex::directionType::undefined; ///< Force forward or reverse approach. Defaults to choosing automatically.
+    float min_voltage = constants.drive_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.drive_max_voltage; ///< Max voltage on the drive out of 12.
+    float heading_max_voltage = constants.heading_max_voltage; ///< Max voltage for getting to heading out of 12.
+    float exit_error = constants.drive_exit_error;   ///< Distance from target in inches; within this error the motion exits.
+    float settle_error = constants.drive_settle_error; ///< Error to be considered settled in inches.
+    float settle_time = constants.drive_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.drive_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    drive_constants drive_k = drive_constants{};     ///< Drive PID and starti constants. Use drive_k. to access constants.
+    heading_constants heading_k = heading_constants{}; ///< Heading PID and starti constants. Use heading_k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::drive_to_pose() (boomerang controller). */
 struct drive_to_pose_params {
-    vex::directionType direction = vex::directionType::undefined;
-    float lead = constants.boomerang_lead;
-    float drift = constants.boomerang_drift;
-    float min_voltage = constants.drive_min_voltage;
-    float max_voltage = constants.drive_max_voltage;
-    float heading_max_voltage = constants.heading_max_voltage;
-    float exit_error = constants.drive_exit_error;
-    float settle_error = constants.drive_settle_error;
-    float settle_time = constants.drive_settle_time;
-    float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
+    vex::directionType direction = vex::directionType::undefined; ///< Force forward or reverse approach. Defaults to choosing automatically.
+    float lead = constants.boomerang_lead;           ///< Constant scale factor that determines how far away the carrot point is.
+    float drift = constants.boomerang_drift;         ///< Limits speed while turning. Higher values increase lateral speed.
+    float min_voltage = constants.drive_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.drive_max_voltage; ///< Max voltage on the drive out of 12.
+    float heading_max_voltage = constants.heading_max_voltage; ///< Max voltage for getting to heading out of 12.
+    float exit_error = constants.drive_exit_error;   ///< Distance from target in inches; within this error the motion exits.
+    float settle_error = constants.drive_settle_error; ///< Error to be considered settled in inches.
+    float settle_time = constants.drive_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.drive_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    drive_constants drive_k = drive_constants{};     ///< Drive PID and starti constants. Use drive_k. to access constants.
+    heading_constants heading_k = heading_constants{}; ///< Heading PID and starti constants. Use heading_k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::holonomic_to_pose(). */
 struct holonomic_to_pose_params {
-    float min_voltage = constants.drive_min_voltage;
-    float max_voltage = constants.drive_max_voltage;
-    float heading_max_voltage = constants.heading_max_voltage;
-    float exit_error = constants.drive_exit_error;
-    float settle_error = constants.drive_settle_error;
-    float settle_time = constants.drive_settle_time;
-    float turn_settle_error = constants.turn_settle_error;
-    float turn_settle_time = constants.turn_settle_time;
-    float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
-
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
+    float min_voltage = constants.drive_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.drive_max_voltage; ///< Max voltage on the drive out of 12.
+    float heading_max_voltage = constants.heading_max_voltage; ///< Max voltage for heading correction out of 12.
+    float exit_error = constants.drive_exit_error;   ///< Distance from target in inches; within this error the motion exits.
+    float settle_error = constants.drive_settle_error; ///< Drive error to be considered settled in inches.
+    float settle_time = constants.drive_settle_time; ///< Drive time to be considered settled in milliseconds.
+    float turn_settle_error = constants.turn_settle_error; ///< Turn error to be considered settled in degrees.
+    float turn_settle_time = constants.turn_settle_time; ///< Turn time to be considered settled in milliseconds.
+    float timeout = constants.drive_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    drive_constants drive_k = drive_constants{};     ///< Drive PID and starti constants. Use drive_k. to access constants.
+    heading_constants heading_k = heading_constants{}; ///< Heading PID and starti constants. Use heading_k. to access constants.
 };
 
+/** @brief Optional parameters for Chassis::strafe_distance(). */
 struct strafe_distance_params {
-    float heading = NAN;
-    float min_voltage = constants.drive_min_voltage;
-    float max_voltage = constants.drive_max_voltage;
-    float heading_max_voltage = constants.heading_max_voltage;
-    float exit_error = constants.drive_exit_error;
-    float settle_error = constants.drive_settle_error;
-    float settle_time = constants.drive_settle_time;
-    float timeout = constants.drive_timeout;
-    float slew = constants.drive_slew;
-    float heading_slew = constants.heading_slew;
-    bool wait = true;
-    drive_constants drive_k = drive_constants{};
-    heading_constants heading_k = heading_constants{};
+    float heading = NAN;                             ///< Desired heading in degrees. Defaults to the current heading.
+    float min_voltage = constants.drive_min_voltage; ///< Minimum voltage on the drive, used for chaining movements.
+    float max_voltage = constants.drive_max_voltage; ///< Max voltage on the drive out of 12.
+    float heading_max_voltage = constants.heading_max_voltage; ///< Max voltage for getting to heading out of 12.
+    float exit_error = constants.drive_exit_error;   ///< Distance from target in inches; within this error the motion exits.
+    float settle_error = constants.drive_settle_error; ///< Error to be considered settled in inches.
+    float settle_time = constants.drive_settle_time; ///< Time to be considered settled in milliseconds.
+    float timeout = constants.drive_timeout;         ///< Time before quitting and moving on in milliseconds.
+    bool wait = true;                                ///< Yields program until motion has finished, true by default.
+    drive_constants drive_k = drive_constants{};     ///< Drive PID and starti constants. Use drive_k. to access constants.
+    heading_constants heading_k = heading_constants{}; ///< Heading PID and starti constants. Use heading_k. to access constants.
 };

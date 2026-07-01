@@ -74,18 +74,18 @@ void mirror(float& x, float& y, float& angle, mik::turn_direction& turn_directio
     }
 
     if (mirror_x ^ mirror_y) {
-        turn_direction = turn_direction == mik::turn_direction::CW ? mik::turn_direction::CCW : mik::turn_direction::CW;
+        turn_direction = turn_direction == mik::turn_direction::cw ? mik::turn_direction::ccw : mik::turn_direction::cw;
     }
 }
 
 void mirror(float& angle, bool mirror_x, bool mirror_y) {
     float dummy_x = 0, dummy_y = 0;
-    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mik::turn_direction unused = mik::turn_direction::undefined;
     mirror(dummy_x, dummy_y, angle, unused, mirror_x, mirror_y);
 }
 
 void mirror(float& x, float& y, float& angle, bool mirror_x, bool mirror_y) {
-    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mik::turn_direction unused = mik::turn_direction::undefined;
     mirror(x, y, angle, unused, mirror_x, mirror_y);
 }
 
@@ -101,17 +101,17 @@ void mirror(float& angle, mik::turn_direction& turn_direction, bool mirror_x, bo
 
 void mirror(float& x, float& y, bool mirror_x, bool mirror_y) {
     float dummy_angle = 0;
-    mik::turn_direction unused = mik::turn_direction::FASTEST;
+    mik::turn_direction unused = mik::turn_direction::undefined;
     mirror(x, y, dummy_angle, unused, mirror_x, mirror_y);
 }
 
 float angle_error(float error, mik::turn_direction dir) {
     switch (dir) {
-        case mik::turn_direction::CW:
+        case mik::turn_direction::cw:
             return error < 0 ? error + 360 : error;
-        case mik::turn_direction::CCW:
+        case mik::turn_direction::ccw:
             return error > 0 ? error - 360 : error;
-        case mik::turn_direction::FASTEST:
+        case mik::turn_direction::undefined:
             return reduce_negative_180_to_180(error);
     }
 }
@@ -156,12 +156,11 @@ float slew_scaling(float drive_output, float prev_drive_output, float slew, bool
 
 float clamp_max_slip(float drive_output, float current_X, float current_Y, float current_angle_deg, float desired_X, float desired_Y, float drift) {
     const float heading = to_rad(current_angle_deg);
+    if (drift <= 0) return drive_output;
 
-    const float perp_dist = fabs(sin(heading) * (desired_Y - current_Y) - cos(heading) * (desired_X - current_X));
+    const float perp_dist = fabs(cos(heading) * (desired_X - current_X) + sin(heading) * (desired_Y - current_Y));
     const float dist = hypot(desired_X - current_X, desired_Y - current_Y);
-
-    const float radius = (dist * dist) / (2.0 * perp_dist);
-    const float max_slip = sqrt(drift * radius);
+    const float max_slip = sqrt((dist * dist) / (2 * fabs(perp_dist)) * drift);
     return clamp(drive_output, -max_slip, max_slip);  
 }
 

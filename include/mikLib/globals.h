@@ -24,15 +24,9 @@ namespace mik {
 
     /** @brief Explicitly specifies rotation direction when turning or swinging. */
     enum class turn_direction {
-        FASTEST, // Direction chosen automatically (shortest path)
-        CW,      // Clockwise rotation
-        CCW      // Counter‑clockwise rotation
-    };
-
-    enum class drive_direction {
-        FASTEST,  // Direction chosen automatically (shortest path)
-        FWD,      // Drives to point in forward direction
-        REV       // Drives it point in reverse direction
+        undefined, // Direction chosen automatically (shortest path)
+        cw,      // Clockwise rotation
+        ccw      // Counter‑clockwise rotation
     };
     
     enum class turn_type { TURN, LEFT_SWING, RIGHT_SWING };
@@ -71,13 +65,10 @@ namespace mik {
     inline constexpr vex::gearSetting green_18_1 = vex::gearSetting::ratio18_1;
     inline constexpr vex::gearSetting red_36_1   = vex::gearSetting::ratio36_1;
 
-    inline constexpr turn_direction clockwise         = turn_direction::CW;
-    inline constexpr turn_direction counter_clockwise = turn_direction::CCW;
-    inline constexpr turn_direction cw                = turn_direction::CW;
-    inline constexpr turn_direction ccw               = turn_direction::CCW;
-
-    inline constexpr drive_direction forwards     = drive_direction::FWD;
-    inline constexpr drive_direction reversed     = drive_direction::REV;
+    inline constexpr turn_direction clockwise         = turn_direction::cw;
+    inline constexpr turn_direction counter_clockwise = turn_direction::ccw;
+    inline constexpr turn_direction cw                = turn_direction::cw;
+    inline constexpr turn_direction ccw               = turn_direction::ccw;
 
     inline constexpr auto_variation one   = auto_variation::ONE;
     inline constexpr auto_variation two   = auto_variation::TWO;
@@ -139,11 +130,11 @@ namespace mik {
     inline const std::string pnematic_A_btn_bg_color = "#303030";
     inline const std::string pnematic_B_btn_bg_color = "#595959";
     inline const std::string pnematic_C_btn_bg_color = "#858585";
-    inline const std::string pnematic_D_btn_bg_color = "#cccccc";
+    inline const std::string pnematic_D_btn_bg_color = "#adadad";
     inline const std::string pnematic_E_btn_bg_color = "#303030";
     inline const std::string pnematic_F_btn_bg_color = "#595959";
     inline const std::string pnematic_G_btn_bg_color = "#858585";
-    inline const std::string pnematic_H_btn_bg_color = "#cccccc";
+    inline const std::string pnematic_H_btn_bg_color = "#adadad";
 
     // Auton screen colors
     inline const std::string& auton_bg_color = UI_black;

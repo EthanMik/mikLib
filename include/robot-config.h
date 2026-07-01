@@ -18,7 +18,12 @@ extern bool force_calibrate_inertial;
 extern Assembly assembly;
 extern Chassis chassis;
 
-void init(void);
+struct init_options {
+	bool enable_controller_selector = true;
+	bool check_disconnected_devices = true;
+};
+
+void init(init_options options);
 
 /** Disables user control in main, used by UI */
 void disable_user_control(bool stop_all_motors_ = false);

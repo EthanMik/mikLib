@@ -58,7 +58,13 @@ export default function prismIncludeLanguages(PrismObject: PrismLib): void {
       pattern: /(?<=[a-z_]\w*::)\s*[a-z_]\w*/,
       greedy: true,
     };
+    // Known mikLib struct type names (from constants.h) → green
+    const mikLibTypesPattern = {
+      pattern: /\b(?:drive_constants|heading_constants|turn_constants|swing_constants|turn_to_angle_params|swing_to_angle_params|turn_to_point_params|swing_to_point_params|drive_distance_params|drive_to_point_params|drive_to_pose_params|holonomic_to_pose_params|strafe_distance_params|auto_variation)\b/,
+      greedy: true,
+    };
     PrismObject.languages.cpp['class-name'] = [
+      mikLibTypesPattern,
       namespaceMemberPattern,
       ...(Array.isArray(existingClassName)
         ? existingClassName

@@ -24,7 +24,8 @@ void UI_graph_screen::UI_crt_graph_scr() {
     });
     
 
-    auto graph_name = UI_crt_gfx(UI_crt_txt("PID Output", 140, 62, graph_text_color, graph_bg_color, UI_distance_units::pixels));
+    auto _graph_name = UI_crt_gfx(UI_crt_txt(title, 140, 62, graph_text_color, graph_bg_color, UI_distance_units::pixels));
+    graph_name = static_cast<graphic*>(_graph_name.get());
     
     auto reset_btn = UI_crt_btn(UI_crt_grp({UI_crt_rec(366, 200, 98, 25, graph_reset_btn_bg_color, graph_reset_btn_outline_color, 2, UI_distance_units::pixels), UI_crt_txt("Reset", 392, 221-3, graph_text_color, graph_reset_btn_bg_color, UI_distance_units::pixels)}), 
         [this](){ reset_graph(); });
@@ -45,7 +46,7 @@ void UI_graph_screen::UI_crt_graph_scr() {
     auto _graph_lines = UI_crt_gfx(UI_crt_px(-1, -1, 0, UI_distance_units::pixels));
     graph_lines = static_cast<graphic*>(_graph_lines.get());
 
-    UI_graph_scr->add_UI_components({bg, legend_box, graph_table, graph_name, _y_axis, _legend_labels, reset_btn, _graph_lines});
+    UI_graph_scr->add_UI_components({bg, legend_box, graph_table, _graph_name, _y_axis, _legend_labels, reset_btn, _graph_lines});
 }
 
 void UI_graph_screen::reset_graph() {
@@ -73,9 +74,18 @@ void UI_graph_screen::set_plot_bounds(float y_min_bound, float y_max_bound, floa
     });
 }
 
-void UI_graph_screen::set_plot(const std::vector<std::function<float(float)>>& plots, const std::vector<std::pair<std::string, uint32_t>>& labels) {
+void UI_graph_screen::set_title(const std::string& title) {
+    this->title = title;
+    graph_name->replace_graphic({UI_crt_txt(title, 140, 62, graph_text_color, graph_bg_color, UI_distance_units::pixels)});
+}
+
+void UI_graph_screen::set_plot(const std::vector<std::function<float(float)>>& plots, const std::vector<std::pair<std::string, std::string>>& labels) {
     this->plots = plots;
     this->labels = labels;
+}
+
+void UI_graph_screen::set_plot(const std::function<float(float)>& plot, const std::pair<std::string, std::string>& label) {
+    set_plot(std::vector<std::function<float(float)>>{plot}, std::vector<std::pair<std::string, std::string>>{label});
 }
 
 std::pair<float, float> UI_graph_screen::transform_plot(float x, float y) {
@@ -130,7 +140,7 @@ void UI_graph_screen::graph() {
                 auto [x_px, y_px] = graph_scr->transform_plot(x, y_val);
 
                 if (!graph_scr->undefined) {
-                    uint32_t clr = (i < graph_scr->labels.size()) ? graph_scr->labels[i].second : 0x00FF3C00;
+                    std::string clr = (i < graph_scr->labels.size()) ? graph_scr->labels[i].second : "#ff3c00";
                     float dy = y_val - prev_y_vals[i];
 
                     if (dy < -180.0f) {

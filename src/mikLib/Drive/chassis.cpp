@@ -161,10 +161,10 @@ float Chassis::get_left_drive_position(int index) {
     };
 
     if (index > 0 && index < (int)mtrs.size())
-        return motor_pos_inches(mtrs[index]);
+        return motor_pos_inches(*mtrs[index]);
 
     float average_position = 0;
-    for (auto& mtr : mtrs) average_position += motor_pos_inches(mtr);
+    for (auto* mtr : mtrs) average_position += motor_pos_inches(*mtr);
     return average_position / mtrs.size();
 }
 
@@ -182,12 +182,12 @@ float Chassis::get_right_drive_position(int index) {
     };
 
     if (index > 0 && index < (int)mtrs.size())
-        return motor_pos_inches(mtrs[index]);
+        return motor_pos_inches(*mtrs[index]);
 
     float average_position = 0;
-    for (auto& mtr : mtrs) average_position += motor_pos_inches(mtr);
+    for (auto* mtr : mtrs) average_position += motor_pos_inches(*mtr);
     return average_position / mtrs.size();
-} 
+}
 
 float Chassis::get_forward_tracker_position() {
     if (tracker_mode == mik::tracker_mode::MOTOR_ENCODER) {

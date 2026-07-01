@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <algorithm>
+#include <iostream>
 
 #include "v5.h"
 #include "v5_api.h"
@@ -22,5 +23,6 @@
 
 using namespace vex;
 using namespace mik;
+using std::cout, std::endl, std::string, std::vector;
 
 #include "mikLib/Drive/chassis.h"

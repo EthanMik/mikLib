@@ -36,6 +36,9 @@ void test_boomerang();
 /** @brief Robot should chain through motions quickly and end in starting position */
 void test_motion_chaining();
 
+/** @brief Robot should chain through motions quickly and end in starting position */
+void test_odom_motion_chaining();
+
 /** @brief Robot should turn in place driving to corners and return in its starting position */
 void test_holonomic();
 

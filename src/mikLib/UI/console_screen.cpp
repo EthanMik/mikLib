@@ -6,7 +6,7 @@ UI_console_screen::UI_console_screen() {
     UI_crt_console_scr();
 }
 
-void UI_console_screen::add(const std::string& label_text, bool txt) {
+void UI_console_screen::add(const std::string& label_text) {
     add_impl(label_text, [](){ return ""; });
 }
 

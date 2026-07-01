@@ -1,0 +1,295 @@
+---
+sidebar_position: 5
+---
+
+# Motions
+
+How to use mikLib motions
+
+For all motions you are able to change each individual [exit condition](./pid-tuning.mdx#exit-conditions) by passing it in as a struct.
+Changing any of these values only modifies them for that motion, and consecutive ones will use defaults.
+
+```cpp
+chassis.turn_to_angle(90, { .settle_time = 300, .settle_error = 0.25, .timeout = 2000 });
+chassis.drive_distance(10, {  .timeout = 2000 });
+```
+
+:::tip
+You can hover over the images on this page to play the animation
+:::
+
+## Turn Motions
+
+:::important
+All angles are absolute. Meaning if you set the chassis heading to 45,
+`chassis.set_heading(45);`. Then every time you tell the robot to turn to 45 degrees, it will face the orientation that it started.
+:::
+
+For all turn motions you are able to modify the PID constants, max speed, and direction. With directions being 
+`cw` or `ccw`. If no direction is specified it will choose closest distance. 
+
+```cpp
+chassis.turn_to_angle(90, { 
+    .max_voltage = 6, // Robot can turn at half max speed
+    .k.p = 1.5, .k.d = 10, .k.starti = 20, // Changed turn PID to kP of 1.5, kD of 10, and starti of 20 
+    .direction = ccw // Can only turn ccw
+});
+```
+
+You are also able to pass entire structs at once
+
+```cpp
+// PID structs
+turn_constants turn = { .p = 1, .d = 12 };
+
+chassis.turn_to_angle(0, { .k = turn });
+
+// Entire turn params
+turn_to_angle_params p = {
+    .max_voltage = 12, .k = turn,
+    .settle_time = 300, .settle_error = 0.25, .timeout = 2000,
+    .direction = cw
+};
+
+chassis.turn_to_angle(0, p);
+```
+
+### Turn to Angle
+
+Turns the robot absolutely to specified angle
+
+```cpp
+chassis.turn_to_angle(90);
+```
+
+### Turn to Point
+
+Turns the robot to specified point. An offset can be applied so that 
+way the robot turns facing backwards to the point.
+
+```cpp
+chassis.turn_to_point(24, 24);
+chassis.turn_to_point(24, 24, { .angle_offset = 180 });
+```
+
+### Swing to Angle
+
+Swing to angle works like turn to angle, with you specifying which side of the
+drivetrain to move. Either `left` or `right`.
+
+Swings by default will lock the side of the drivetrain not turning, however if you want
+larger arcs you can adjust this by changing `opposite_voltage`. 
+
+```cpp
+chassis.left_swing_to_angle(90);
+chassis.right_swing_to_angle(0, { .opposite_voltage = 6 });
+```
+
+<video src={require('./img/drive-motions/swing.mp4').default} loop muted playsInline width="30%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+### Swing to Point
+
+Swing to point is the combination of turn to point and swing to angle. You can pass in `angle_offset` and `opposite_voltage`.
+
+```cpp
+// This will do roughly the same as swing to angle example
+chassis.left_swing_to_point(24, 0);
+chassis.right_swing_to_point(7, -23, { .opposite_voltage = 6, .angle_offset = 180 });
+```
+
+## Drive Motions
+
+For all drive motions you are able to modify the PID constants and max speeds for the drive and heading PID inside the drive motion. 
+
+```cpp
+chassis.drive_distance(4, { 
+    .max_voltage = 12, // Robot can move at max speed
+    .drive_k.p = 1.5, .drive_k.d = 10, // Changed drive PID to kP of 1.5 and kD of 10
+    .heading_k.p = 0, .heading_k.d = 0, .heading_max_voltage = 0 // Removing heading correction
+});
+```
+
+You are also able to pass entire structs at once
+
+```cpp
+// PID structs
+drive_constants drive = { .p = 1, .d = 12, .slew = 1 };
+heading_constants heading = { .p = 0, .d = 0 };
+
+chassis.drive_distance(10, { .drive_k = drive, .heading_k = heading });
+
+// Entire drive distance params
+drive_distance_params p = {
+    .max_voltage = 12,
+    .drive_k = drive, .heading_k = heading,
+    .settle_time = 300, .settle_error = 0.25, .timeout = 2000,
+};
+
+chassis.drive_distance(10, p);
+```
+
+### Drive Distance
+
+This motion drives the robot either backwards or forwards at a specified angle.
+If no angle is applied it will drive at its current heading. 
+
+To move forward 10 inches at its current heading
+
+```cpp
+chassis.drive_distance(10);
+```
+
+To move backwards 20 inches locked at 45 degrees absolute heading
+
+```cpp
+chassis.drive_distance(-20, { .heading = 45 });
+```
+
+### Drive to Point
+
+This motion drives the robot to an X and Y position in inches. If the target is behind the robot it will go backwards.
+
+```cpp
+chassis.drive_to_point(24, 24); // Drives 24 inches forward and to the right
+```
+
+<video src={require('./img/drive-motions/dtp.mp4').default} loop muted playsInline width="30%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+The direction can also be forced to either ```forward``` or ```reverse```.
+
+```cpp
+chassis.drive_to_point(0, 24, { .direction = reverse }); // Drives 24 inches backward
+```
+
+<video src={require('./img/drive-motions/rev.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+### Drive to Pose
+
+This extends the drive to point motion by making it so the robot can travel to an angle. Under the hood it uses an algorithm called boomerang.
+
+```cpp
+chassis.drive_to_pose(24, 24, 90); // Drives 24 inches forward and to the right facing 90 degrees
+```
+
+<video src={require('./img/drive-motions/b1.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+
+There are also two params specific to boomerang, ```lead``` and ```drift```. 
+```Lead``` is a value from 0-1 that determines how wide of an arc to take. Default ```lead``` is `0.5`. 
+
+```Drift``` makes it so the robot will go slower while turning; for drivetrains with all omni wheels use
+a drift of ```2``` (default). For traction drives you can run drift of `10` which effectively disables it.
+
+```cpp
+chassis.drive_to_pose(24, 24, 90, { .lead = 0.6, .drift = 10 });
+```
+
+<video src={require('./img/drive-motions/b2.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+## Holonomic Motions
+
+:::important
+These motions only work for holonomic drives. If you are using a holonomic drive you can also use all the drive motions.
+:::
+
+### Strafe Distance
+
+
+This works the same as drive distance with positive distance moving
+the robot right and negative left. Will move at current heading if none is applied.
+
+```cpp
+chassis.strafe_distance(10); // Moves robot right 10 inches
+chassis.strafe_distance(-20, { .heading = 90 }); // Moves left 20 inches at 90 degrees
+```
+
+<video src={require('./img/drive-motions/strafe.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+### Holonomic to Pose
+
+This is similar to [`drive to pose`](#drive-to-pose) but for holonomic drivetrains. Along with the regular
+exit conditions, it also uses `turn_settle_time` and `turn_settle_error` to finish.
+
+```cpp
+chassis.holonomic_to_pose(24, 24, 90, { .turn_settle_time = 200, .turn_settle_error = 0.1 });
+```
+
+<video src={require('./img/drive-motions/holo.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+## Motion Chaining
+
+What you can also do with all these motions is motion chaining. Motion chaining is a way
+to make it so the robot does not stop at the end of each motion. 
+
+#### Min Voltage
+
+The way to do this is to adjust `min_voltage` to above zero. Min voltage overrides everything except heading correction while driving. 
+This allows the robot to carry speed into the next motion.
+
+#### Exit Error
+
+Since the robot will be moving faster since it's given a minimum speed, you can also give the robot `exit_error`, when the robot is
+within this distance of the target it immediately exits.
+
+Lets say the robot needs to take this path due to an obstacle.
+
+<video src={require('./img/drive-motions/path.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+With traditional means this is slow, takes 2.6 seconds.
+
+```cpp
+chassis.set_coordinates(0, 0, 0);
+chassis.drive_to_point(0, 24, { .min_voltage = 8, .exit_error = 5 });
+chassis.turn_to_point(24, 24, { .min_voltage = 12, .exit_error = 45 });
+chassis.drive_to_point(24, 24);
+```
+
+<video src={require('./img/drive-motions/fast.mp4').default} loop muted playsInline width="25%" onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0; }} />
+
+However by applying exit error and min voltage to the motions it gets us to the destination and
+shaves path down to 1.58 seconds.
+
+:::important
+If min speed is above zero on the last motion the robot **will not stop**.
+Make sure to add in `chassis.stop_drive()`.
+:::
+
+## Async
+
+The last thing you can do with all these motions is async them. By setting `wait` to false,
+whenever you call a motion it will not wait in code for the next task. To wait for the next motion
+you can call `chassis.wait()`.
+
+```cpp
+chassis.drive_distance(10, { .wait = false }); // Start driving 10 inches
+task::sleep(300); 
+intake(); // 300 ms into the drive motion start intaking
+chassis.wait(); // Wait for the robot to finish driving
+stop_intake(); // Stop intake
+```
+
+There are other things you can wait on, so if I were to call `drive_distance(10, { .wait = false })` again then
+
+```cpp
+chassis.wait_until(3); // Wait until robot drove 3 inches
+chassis.wait_until(50, percent); // Wait until robot drove 5 inches
+chassis.wait_until_within(3); // Wait until robot drove 7 inches
+```
+
+So if I want to intake halfway in the drive motion then I would do
+
+```cpp
+chassis.drive_distance(10, { .wait = false });
+chassis.wait_until(50, percent); 
+intake();
+chassis.wait();
+```
+
+You can also do custom exits. In this example if I get close to a wall then I will exit motion.
+
+```cpp
+chassis.drive_to_point(0, 80, { .wait = false });
+while (front.getObjectDistance(inches) > 5 && chassis.is_in_motion()) {
+    task::sleep(10);
+}
+chassis.cancel_motion();
+```

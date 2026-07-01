@@ -13,7 +13,7 @@ class distance : public vex::distance {
 public:
     /** 
      * @brief Creates a new distance sensor object that contains its position and offset from tracking center, on the port specified.
-     * @param index The port index for this sensor. The index is zero-based.
+     * @param port The port the sensor is plugged into (1-21).
      * @param position The face of the robot that the distance sensor is mounted to.
      * @param x_center_offset The horizontal offset from the tracking center, right is +, left is -
      * @param y_center_offset The vertical offset from the tracking center, forward is +, backwards is -
@@ -64,8 +64,10 @@ public:
      * 
      * @param sensor_pos The side of the robot that the distance sensor is mounted.
      * @param wall_pos The wall that is being looked at by desired distance sensor.
-     * @param max_reset_distance The maxiumum allowed of distance in inches that an odom axis can be changed.
-     * 
+     * @param x The robot's current x position in inches.
+     * @param y The robot's current y position in inches.
+     * @param angle The robot's current heading in degrees.
+     *
      * @return A new x or y coordinate based on the wall desired sensor is faced at.
      */
     float get_reset_axis_pos(mik::distance_position sensor_pos, mik::wall_position wall_pos, float x, float y, float angle);

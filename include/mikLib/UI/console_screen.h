@@ -16,19 +16,13 @@ public:
     std::shared_ptr<screen> get_console_screen();
     void reset();
 
-    void add(const std::string& label_text, bool txt);
+    void add(const std::string& label_text);
 
     template <typename F>
     void add(const std::string& label_text, F&& data);
 
-    template <typename F>
-    void add(F&& data);
-
     template <typename T>
     void add(const std::string& label_text, T& data);
-
-    template <typename T>
-    void add(T& data);
 
     std::shared_ptr<screen> UI_console_scr;
 
@@ -54,21 +48,10 @@ void UI_console_screen::add(const std::string& label_text, F&& data) {
     add_impl(label_text, std::forward<F>(data));
 }
 
-template <typename F>
-void UI_console_screen::add(F&& data) {
-    add_impl("", std::forward<F>(data));
-}
-
 template <typename T>
 void UI_console_screen::add(const std::string& label_text, T& data) {
     add_impl(label_text, data);
 }
-
-template <typename T>
-void UI_console_screen::add(T& data) {
-    add_impl("", data);
-}
-
 
 template <typename data_type>
 void UI_console_screen::add_impl(const std::string& label_text, data_type&& data) {
