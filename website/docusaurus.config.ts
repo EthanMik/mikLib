@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'mikLib',
+  title: 'mikLib Documentation',
   tagline: 'An easy to use odometry VEXcode template with UI support.',
   favicon: 'img/favicon.ico',
 
@@ -68,8 +68,8 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    // Social card shown in link previews (Google, Discord, Twitter, etc.)
+    image: 'img/docusaurus-social-card.png',
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: true,
