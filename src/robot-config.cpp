@@ -80,6 +80,7 @@ static void loading_screen(bool stop) {
 	
 	if (stop) {
 		loading_bar.stop();
+		Brain.Screen.printAt(184, 220, "                        ");
 		return;
 	}
 	
@@ -95,6 +96,16 @@ static void loading_screen(bool stop) {
 #endif
 		int count = 0;
 		while(1) {
+#ifdef FAST_COMPILE
+			Brain.Screen.setFont(vex::fontType::mono40);
+			Brain.Screen.setPenColor("#999999");
+			Brain.Screen.printAt(160, 135, "mik");
+
+			Brain.Screen.setFont(vex::fontType::mono60);
+			Brain.Screen.setPenColor("#FFFFFF");
+			Brain.Screen.printAt(227, 135, "Lib");
+#endif
+			Brain.Screen.setFont(vex::fontType::mono20);
 			Brain.Screen.printAt(184, 220, calibrate.c_str());
 			task::sleep(200);
 			calibrate.append(".");
@@ -128,14 +139,14 @@ void init(init_options options) {
 	// Disable user control during initialization to prevent inputs
 	disable_user_control(false);
 	
+	// Start loading screen
+	loading_screen(false);
+
 	// Check disconnected devices
 	if (options.check_disconnected_devices) handle_disconnected_devices();
 	
 	// Load auton selector
 	if (options.enable_controller_selector) UI_controller_auton_selector();
-
-	// Start loading screen
-	loading_screen(false);
 
 	// Setup motors
 #ifndef FAST_COMPILE

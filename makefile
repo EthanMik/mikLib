@@ -1,5 +1,3 @@
-# VEXcode makefile 2019_03_26_01
-
 # Set to 1 to reduce upload speeds but disable Brain UI completely. 
 # Controller auton selector will be unaffected. 0 by default.
 FAST_COMPILE = 0
@@ -40,6 +38,7 @@ SRC_C := $(filter-out $(wildcard src/mikLib/UI/config_screen.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/console_screen.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/graph_screen.cpp), $(SRC_C))
 SRC_C := $(filter-out $(wildcard src/mikLib/UI/motors_screen.cpp), $(SRC_C))
+SRC_C := $(filter-out $(wildcard src/mikLib/UI/pneumatic_screen.cpp), $(SRC_C))
 endif
 
 OBJ = $(addprefix $(BUILD)/, $(addsuffix .o, $(basename $(SRC_C))) )
