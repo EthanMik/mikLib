@@ -12,7 +12,7 @@ An easy to use odometry VEXcode template with UI support.
 - Odometry
    - Two tracker inertial
    - Wall resetting
-- Drive motions
+- Motions
    - Turn to heading and point
    - Swing to heading and point
    - Drive inches and to point
