@@ -253,7 +253,7 @@ by pressing down for a second and while holding move finger down.
 | **Motor Temps** | Displays motor temps on console screen. Around 80% is when the motors are overheated |
 | **Motor Wattage** | How many watts each motor is pulling. Mainly used to determine friction within the drive or intake |
 | **Odom Data** | Displays inertial angles and tracker/drivetrain positions. Heading is in degrees, positions in inches |
-| **Reset Data** | Displays where the distance sensors think the robot is. Laid out in the format, odom x, y, and heading. Then each distance sensors `wall facing`, computed `x or y position` and `D: distance in inches`. Use this [simulation](https://ethanmik.github.io/Wall-Reset-Simulator/) for troubleshooting   |
+| **Reset Data** | Displays where the distance sensors think the robot is. Laid out in the format, odom x, y, and heading. Then each distance sensors `wall facing`, computed `x or y position` and `D: distance in inches`. Use this [simulation](https://ethanmik.github.io/Wall-Reset-Simulator/) for troubleshooting. For wall detection to work the robot needs to have its position set with `chassis.set_coordinates` before the button is pressed.   |
 | **PID Data** | Displays all constants changed during [tune mode](./pid-tuning/#tuner-setup) |
 | **Motor Torque** | Displays how much torque each motor is applying |
 | **Motor Eff** | Displays how efficient each motor is (output power / input power) |
