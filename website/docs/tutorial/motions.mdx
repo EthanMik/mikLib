@@ -253,6 +253,20 @@ If min speed is above zero on the last motion the robot **will not stop**.
 Make sure to add in `chassis.stop_drive()`.
 :::
 
+The default constants commonly uses for motion chaining are: 
+
+```cpp
+// Example motion chaining constants
+constants.drive_min_voltage = 4;
+constants.drive_exit_error = 3;
+
+constants.turn_min_voltage = 6;
+constants.turn_exit_error = 15;
+
+constants.swing_min_voltage = 6;
+constants.swing_exit_error = 15;
+```
+
 ## Async
 
 The last thing you can do with all these motions is async them. By setting `wait` to false,
