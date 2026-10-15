@@ -28,10 +28,19 @@ void pre_auton() {
 
 void auton(void) {
     UI.stop();
+
+    // Records the run to run.csv on the SD card so mikGen can overlay it on the planned path.
+    // Without an SD card this prints a warning and the auton runs as normal.
+    mik::run_log::start("run.csv");
     auton_scr->start_auton();
+    mik::run_log::stop();
 }
 
 void user_control(void) {
+    // An auton still running when the period ends never reaches its own stop(), so the run is
+    // written here instead. Does nothing when no run is being recorded.
+    mik::run_log::stop();
+
     while (chassis.calibrating) { task::sleep(50); }
 
     // How you want your drivetrain to stop during driver
